@@ -73,9 +73,9 @@ TransformEditorToolbox::TransformEditorToolbox(MainWindow* mainWindow, ads::CDoc
 	: mMainWindow(mainWindow)
 	, mDockManager(dockManager)
 {
-	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{updateWorld();});
-	mOnSelectedEntityChangedHandle = mMainWindow->OnSelectedEntityChanged.bind([this](const auto& entityRef){onEntitySelected(entityRef);});
-	mOnCommandEffectHandle = mMainWindow->OnCommandEffectApplied.bind([this](EditorCommand::EffectBitset effects, bool originalCall){onCommandExecuted(effects, originalCall);});
+	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{ updateWorld(); });
+	mOnSelectedEntityChangedHandle = mMainWindow->OnSelectedEntityChanged.bind([this](const auto& entityRef){ onEntitySelected(entityRef); });
+	mOnCommandEffectHandle = mMainWindow->OnCommandEffectApplied.bind([this](EditorCommand::EffectBitset effects, bool originalCall){ onCommandExecuted(effects, originalCall); });
 }
 
 TransformEditorToolbox::~TransformEditorToolbox()

@@ -55,7 +55,8 @@ TEST(FSM, BasicStateAndLink)
 	StateIDType currentState = TestStates::StateOne;
 
 	TestFSM::StateLinkRules stateOneLinks;
-	stateOneLinks.emplaceLink<FSM::LinkRules::FunctorLink>(TestStates::StateTwo, [](const TestFSM::BlackboardType&){
+	stateOneLinks.emplaceLink<FSM::LinkRules::FunctorLink>(TestStates::StateTwo, [](const TestFSM::BlackboardType&)
+	{
 		return true;
 	});
 	fsm.addState(TestStates::StateOne, std::move(stateOneLinks));

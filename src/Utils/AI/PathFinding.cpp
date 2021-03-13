@@ -46,7 +46,8 @@ namespace PathFinding
 		for (size_t polygon : polygons)
 		{
 			size_t polyShift = polygon * navMesh.geometry.vertsPerPoly;
-			for (size_t i = 0; i < navMesh.geometry.vertsPerPoly; ++i){
+			for (size_t i = 0; i < navMesh.geometry.vertsPerPoly; ++i)
+			{
 				polygonPoints[i] = navMesh.geometry.vertices[navMesh.geometry.indexes[polyShift + i]];
 			}
 

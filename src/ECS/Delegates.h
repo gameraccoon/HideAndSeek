@@ -133,7 +133,8 @@ public:
 			std::remove_if(
 				mFunctions.begin(),
 				mFunctions.end(),
-				[handle](FunctionData& val){
+				[handle](FunctionData& val)
+				{
 					return val.handle == handle;
 				}
 			),

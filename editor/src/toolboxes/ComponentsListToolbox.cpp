@@ -26,8 +26,8 @@ ComponentsListToolbox::ComponentsListToolbox(MainWindow* mainWindow, ads::CDockM
 	: mMainWindow(mainWindow)
 	, mDockManager(dockManager)
 {
-	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{updateContent();});
-	mOnComponentSourceChangedHandle = mMainWindow->OnSelectedComponentSourceChanged.bind([this](const auto& val){onSelectedComponentSourceChanged(val);});
+	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{ updateContent(); });
+	mOnComponentSourceChangedHandle = mMainWindow->OnSelectedComponentSourceChanged.bind([this](const auto& val){ onSelectedComponentSourceChanged(val); });
 }
 
 ComponentsListToolbox::~ComponentsListToolbox()

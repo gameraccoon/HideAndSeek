@@ -38,7 +38,8 @@ namespace Utils
 			std::sort(
 				borders.begin(),
 				borders.end(),
-				[](const SimpleBorder& first, const SimpleBorder& second){
+				[](const SimpleBorder& first, const SimpleBorder& second)
+				{
 					return first.a.x < second.a.x
 						|| (first.a.x == second.a.x &&
 							(first.b.x < second.b.x

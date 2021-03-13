@@ -110,14 +110,17 @@ void PrefabListToolbox::saveToFile(QString filePath)
 		filePath = mLastOpenFilePath;
 	}
 
-	try {
+	try
+	{
 		std::ofstream mapFile(filePath.toStdString());
 
 		nlohmann::json content{
 			{"prefabs", mPrefabs}
 		};
 		mapFile << std::setw(4) << content << std::endl;
-	} catch (const std::exception& e) {
+	}
+	catch (const std::exception& e)
+	{
 		LogError("Can't save level to file '%s': %s", filePath.toStdString().c_str(), e.what());
 	}
 }

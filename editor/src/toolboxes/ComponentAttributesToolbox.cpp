@@ -19,8 +19,8 @@ ComponentAttributesToolbox::ComponentAttributesToolbox(MainWindow* mainWindow, a
 	: mMainWindow(mainWindow)
 	, mDockManager(dockManager)
 {
-	mOnComponentChangedHandle = mMainWindow->OnSelectedComponentChanged.bind([this](const auto& val){onSelectedComponentChange(val);});
-	mOnCommandEffectHandle = mMainWindow->OnCommandEffectApplied.bind([this](EditorCommand::EffectBitset effects, bool originalCall){updateContent(effects, originalCall);});
+	mOnComponentChangedHandle = mMainWindow->OnSelectedComponentChanged.bind([this](const auto& val){ onSelectedComponentChange(val); });
+	mOnCommandEffectHandle = mMainWindow->OnCommandEffectApplied.bind([this](EditorCommand::EffectBitset effects, bool originalCall){ updateContent(effects, originalCall); });
 }
 
 ComponentAttributesToolbox::~ComponentAttributesToolbox()

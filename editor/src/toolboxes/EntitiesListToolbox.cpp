@@ -25,8 +25,8 @@ EntitiesListToolbox::EntitiesListToolbox(MainWindow* mainWindow, ads::CDockManag
 	: mMainWindow(mainWindow)
 	, mDockManager(dockManager)
 {
-	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{bindEvents(); updateContent();});
-	mOnSelectedEntityChangedHandle = mMainWindow->OnSelectedEntityChanged.bind([this](const auto& entityRef){onEntityChangedEvent(entityRef);});
+	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{ bindEvents(); updateContent(); });
+	mOnSelectedEntityChangedHandle = mMainWindow->OnSelectedEntityChanged.bind([this](const auto& entityRef){ onEntityChangedEvent(entityRef); });
 }
 
 EntitiesListToolbox::~EntitiesListToolbox()

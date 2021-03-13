@@ -14,7 +14,8 @@ TEST(Delegates, SingleCast)
 	delegate.callSafe(2);
 	ASSERT_THROW(delegate.callUnsafe(2), std::exception);
 
-	delegate.assign([&testVal](int test){
+	delegate.assign([&testVal](int test)
+	{
 		testVal = test;
 	});
 
@@ -47,7 +48,8 @@ TEST(Delegates, MultiCast)
 
 	delegate.broadcast(2);
 
-	Delegates::Handle handle = delegate.bind([&testVal1](int test){
+	Delegates::Handle handle = delegate.bind([&testVal1](int test)
+	{
 		testVal1 += test;
 	});
 	delegate.broadcast(3);
@@ -55,7 +57,8 @@ TEST(Delegates, MultiCast)
 	ASSERT_EQ(4, testVal1);
 	ASSERT_EQ(1, testVal2);
 
-	delegate.bind([&testVal2](int test){
+	delegate.bind([&testVal2](int test)
+	{
 		testVal2 += test;
 	});
 

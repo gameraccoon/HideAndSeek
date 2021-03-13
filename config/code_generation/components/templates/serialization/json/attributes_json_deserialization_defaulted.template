@@ -1,3 +1,4 @@
-if (auto valIt = json.find("{attribute_name}"); valIt != json.end()) {{
+if (auto valIt = json.find("{attribute_name}"); valIt != json.end())
+	{{
 		out{component_name_capital}->m{attribute_name_capital} = valIt.value();
 	}}{delim_endl}{delim_tab}

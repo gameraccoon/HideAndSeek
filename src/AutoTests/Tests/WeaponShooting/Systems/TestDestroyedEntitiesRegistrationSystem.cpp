@@ -18,7 +18,8 @@ void TestDestroyedEntitiesRegistrationSystem::update()
 	World& world = mWorldHolder.getWorld();
 
 	int count = 0;
-	world.getSpatialData().getAllCellManagers().forEachComponentSet<DeathComponent>([&count](DeathComponent*){
+	world.getSpatialData().getAllCellManagers().forEachComponentSet<DeathComponent>([&count](DeathComponent*)
+	{
 		++count;
 	});
 

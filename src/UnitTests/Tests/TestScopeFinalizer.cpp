@@ -8,7 +8,8 @@ TEST(ScopeFinalizer, CallLambda)
 {
 	int runCount = 0;
 	{
-		auto _ = ScopeFinalizer([&runCount](){
+		auto _ = ScopeFinalizer([&runCount]()
+		{
 			++runCount;
 		});
 		EXPECT_EQ(0, runCount);
@@ -20,7 +21,8 @@ TEST(ScopeFinalizer, CallStdFunction)
 {
 	int runCount = 0;
 	{
-		auto _ = ScopeFinalizer(std::function([&runCount](){
+		auto _ = ScopeFinalizer(std::function([&runCount]()
+		{
 			++runCount;
 		}));
 		EXPECT_EQ(0, runCount);

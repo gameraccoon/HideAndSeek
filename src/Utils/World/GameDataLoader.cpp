@@ -161,7 +161,8 @@ namespace GameDataLoader
 			}
 		}
 
-		try {
+		try
+		{
 			std::ofstream mapFile(levelPath);
 			nlohmann::json mapJson({{"world", world.toJson(componentSerializers)}});
 
@@ -169,7 +170,9 @@ namespace GameDataLoader
 
 			SaveLightBlockingGeometry(world, levelPath);
 			SavePathBlockingGeometry(world, levelPath);
-		} catch (const std::exception& e) {
+		}
+		catch (const std::exception& e)
+		{
 			LogError("Can't save world to file '%s': %s", levelPath.c_str(), e.what());
 		}
 	}
@@ -185,7 +188,8 @@ namespace GameDataLoader
 			levelPath = MAPS_PATH / (levelName + ".json");
 		}
 
-		try {
+		try
+		{
 			std::ifstream mapFile(levelPath);
 			nlohmann::json mapJson;
 			mapFile >> mapJson;
@@ -225,7 +229,8 @@ namespace GameDataLoader
 			}
 		}
 
-		try {
+		try
+		{
 			std::ofstream mapFile(gameDataPath);
 			nlohmann::json mapJson({{"gameData", gameData.toJson(componentSerializers)}});
 
@@ -248,7 +253,8 @@ namespace GameDataLoader
 			gameDataPath = GAME_DATA_PATH / (gameDataName + ".json");
 		}
 
-		try {
+		try
+		{
 			std::ifstream mapFile(gameDataPath);
 			nlohmann::json mapJson;
 			mapFile >> mapJson;

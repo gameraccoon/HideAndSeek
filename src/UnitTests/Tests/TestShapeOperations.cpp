@@ -40,7 +40,8 @@ static bool AreShapesEqual(const std::vector<SimpleBorder>& a, const std::vector
 			std::remove_if(
 				a_copy.begin(),
 				a_copy.end(),
-				[&border](const SimpleBorder& borderB){
+				[&border](const SimpleBorder& borderB)
+				{
 					return border.a.isNearlyEqualTo(borderB.a) && border.b.isNearlyEqualTo(borderB.b);
 				}),
 			a_copy.end()

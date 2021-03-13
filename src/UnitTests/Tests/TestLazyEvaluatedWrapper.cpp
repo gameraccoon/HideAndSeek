@@ -7,7 +7,8 @@
 TEST(LazyEvaluatedWrapper, CallLambda)
 {
 	int runCount = 0;
-	LazyEvaluated lazyEvaluatedLambda([&runCount](){
+	LazyEvaluated lazyEvaluatedLambda([&runCount]()
+	{
 		++runCount;
 		return 8;
 	});
@@ -22,7 +23,8 @@ TEST(LazyEvaluatedWrapper, CallLambda)
 TEST(LazyEvaluatedWrapper, CallStdFunction)
 {
 	int runCount = 0;
-	LazyEvaluated lazyEvaluatedStdFunction(std::function([&runCount](){
+	LazyEvaluated lazyEvaluatedStdFunction(std::function([&runCount]()
+	{
 		++runCount;
 		return 9;
 	}));

@@ -40,7 +40,8 @@ TEST(ConcurrentAccessDetector, BadCase)
 		{
 			DETECT_CONCURRENT_ACCESS(detectorInstance);
 
-			auto thread = std::thread([&detectorInstance](){
+			auto thread = std::thread([&detectorInstance]()
+			{
 				DETECT_CONCURRENT_ACCESS(detectorInstance);
 			});
 			thread.join();
