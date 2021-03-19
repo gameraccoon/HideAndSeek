@@ -53,6 +53,7 @@ void from_json(const nlohmann::json& json, SimpleBorder& border)
 	json.at("b").get_to(border.b);
 }
 
-static_assert(std::is_pod<SimpleBorder>(), "SimpleBorder should be a POD type");
+static_assert(std::is_trivial<SimpleBorder>(), "SimpleBorder should be a trivial type");
+static_assert(std::is_standard_layout<SimpleBorder>(), "SimpleBorder should have standard layout");
 static_assert(std::is_trivially_constructible<SimpleBorder>(), "SimpleBorder should be trivially constructible");
 static_assert(std::is_trivially_copyable<SimpleBorder>(), "SimpleBorder should be trivially copyable");

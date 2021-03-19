@@ -58,5 +58,6 @@ void from_json(const nlohmann::json& json, Rotator& outRotator)
 	json.at("v").get_to(outRotator.mValue);
 }
 
-static_assert(std::is_pod<Rotator>(), "Rotator should be pod type");
+static_assert(std::is_trivial<Rotator>(), "Rotator should be trivial type");
+static_assert(std::is_standard_layout<Rotator>(), "Rotator should have standard layout");
 static_assert(std::is_trivially_copyable<Rotator>(), "Rotator should be trivially copyable");

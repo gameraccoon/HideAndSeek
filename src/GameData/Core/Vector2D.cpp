@@ -214,5 +214,6 @@ void from_json(const nlohmann::json& json, Vector2D& outVector)
 }
 
 static_assert(sizeof(Vector2D) == sizeof(int)*2, "Vector2D is too big");
-static_assert(std::is_pod<Vector2D>(), "Vector2D should be pod type");
+static_assert(std::is_trivial<Vector2D>(), "Vector2D should be trivial type");
+static_assert(std::is_standard_layout<Vector2D>(), "Vector2D should have standard layout");
 static_assert(std::is_trivially_copyable<Vector2D>(), "Vector2D should be trivially copyable");

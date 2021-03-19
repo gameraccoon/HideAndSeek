@@ -70,14 +70,14 @@ Game examples that can run for a limited period of frames with fixed dt and RNG 
 - git-lfs
 - CMake
 - python3
-- a compiler that supports C++17
+- a compiler that supports C++20
 - for Linux you need to install SLD2, SDL2_Image, SDL2_mixer and SDL2_ttf (devel and static) using your packet manager
 
 #### Prerequisites for building the editor
 - git-lfs
 - CMake
 - python3
-- a compiler that supports C++17
+- a compiler that supports C++20
 - Qt Creator
 
 #### Building the game

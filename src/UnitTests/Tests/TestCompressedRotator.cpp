@@ -19,7 +19,8 @@ TEST(CompressedRotator, Value)
 	EXPECT_TRUE(minusHalfPiRotator.isNearlyEqualTo(CompressedRotator<u16>{minusHalfPiRotator}.decompress()));
 	EXPECT_TRUE(piRotator.isNearlyEqualTo(CompressedRotator<u16>{piRotator}.decompress()));
 
-	static_assert(std::is_pod<CompressedRotator<u16>>(), "CompressedRotator should be POD type");
+	static_assert(std::is_trivial<CompressedRotator<u16>>(), "CompressedRotator should be trivial type");
+	static_assert(std::is_standard_layout<CompressedRotator<u16>>(), "CompressedRotator should have standard layout");
 }
 
 TEST(CompressedRotator, Static)
