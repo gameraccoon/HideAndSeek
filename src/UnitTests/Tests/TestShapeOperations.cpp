@@ -396,3 +396,22 @@ TEST(ShapeOperations, SortBorders_SortWithHoles)
 	}
 }
 
+TEST(ShapeOperations, SortBorders_SortNonConvex)
+{
+	const std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{
+		{-30.0f, 30.0f}, {-30.0f, -10.0f}, {-20.0f, 10.0f},
+		{30.0f, -10.0f}, {20.0f, -10.0f}, {10.0f, -20.0f},
+		{20.0f, -10.0f}, {0.0f, -10.0f}, {0.0f, -30.0f},
+		{20.0f, -40.0f}, {40.0f, -10.0f}, {-10.0f, 10.0f},
+		{10.0f, 10.0f}, {30.0f, 30.0f}, {-10.0f, 20.0f}
+	}, ShapeOrder::Ordered);
+
+	std::vector<SimpleBorder> shape = expectedShape;
+
+	std::shuffle(shape.begin(), shape.end(), std::mt19937(std::random_device()()));
+
+	std::vector<size_t> foundShapes = ShapeOperations::SortBorders(shape);
+
+	EXPECT_EQ(1u, foundShapes.size());
+	EXPECT_TRUE(AreShapesEqual(expectedShape, shape, ShapeEquality::Ordered));
+}
