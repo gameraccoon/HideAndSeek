@@ -30,24 +30,23 @@ namespace PathBlockingGeometry
 		// merge intersecting shapes
 		ShapeOperations::MergeGeometry(mergedGeometry);
 
-		//std::vector<ShapeOperations::Shape> splitGeometry;
-		//splitGeometry.reserve(mergedGeometry.size() * 2);
+		std::vector<std::vector<Vector2D>> splitGeometry;
+		splitGeometry.reserve(mergedGeometry.size() * 2);
 		std::for_each(
 			mergedGeometry.begin(),
 			mergedGeometry.end(),
-			[](ShapeOperations::MergedGeometry& geometry)
+			[&splitGeometry](ShapeOperations::MergedGeometry& geometry)
 			{
 				ShapeOperations::OptimizeShape(geometry.borders);
-				ShapeOperations::SortBorders(geometry.borders);
-				//ShapeOperations::SplitIntoConvexShapes(geometry.borders, splitGeometry);
+				ShapeOperations::SplitIntoConvexShapes(geometry.borders, splitGeometry);
 			}
 		);
 
 		// gather the results as set of points
 		outGeometry.clear();
-		for (ShapeOperations::MergedGeometry& geometry : mergedGeometry)
+		for (std::vector<Vector2D>& geometry : splitGeometry)
 		{
-			const size_t pointsSize = geometry.borders.size();
+			const size_t pointsSize = geometry.size();
 
 			outGeometry.emplace_back();
 			std::vector<Vector2D>& polygon = outGeometry.back();
@@ -56,7 +55,7 @@ namespace PathBlockingGeometry
 			for (size_t i = 0; i < pointsSize; ++i)
 			{
 				// path blocking geometry has the opposite winding order
-				const Vector2D point = geometry.borders[pointsSize - 1 - i].a;
+				const Vector2D point = geometry[pointsSize - 1 - i];
 				polygon[i] = point;
 			}
 		}

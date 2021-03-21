@@ -8,6 +8,8 @@
 #include <cstring>
 #include <numeric>
 
+#include <polypartition.h>
+
 #include "Base/Math/Float.h"
 
 #include "Utils/Geometry/Collide.h"
@@ -774,9 +776,58 @@ namespace ShapeOperations
 		}
 	}
 
-	void SplitIntoConvexShapes(const Shape& /*geometry*/, std::vector<Shape>& /*newShapes*/)
+	void SplitIntoConvexShapes(Shape geometry, std::vector<std::vector<Vector2D>>& newShapes)
 	{
+		std::vector<size_t> shapes = ShapeOperations::SortBorders(geometry);
+		shapes.push_back(geometry.size());
 
+		std::vector<TPPLPoly> polygons;
+
+		for (size_t i = 0; i < shapes.size() - 1; ++i)
+		{
+			const size_t pointsCount = shapes[i + 1] - shapes[i];
+
+			TPPLPoly ttplPolygon;
+			ttplPolygon.Init(pointsCount);
+
+			const size_t startIdx = shapes[i];
+			const size_t endIdx = shapes[i + 1];
+			float areaSum = 0.0f;
+			for (size_t idx = startIdx; idx < endIdx; ++idx)
+			{
+				const SimpleBorder& border = geometry[idx];
+				size_t pointIdx = idx - startIdx;
+				ttplPolygon[pointIdx].x = border.a.x;
+				ttplPolygon[pointIdx].y = border.a.y;
+				areaSum += (border.b.x - border.a.x) * (border.b.y + border.a.y);
+			}
+			ttplPolygon.SetHole(areaSum > 0.0f);
+			polygons.push_back(std::move(ttplPolygon));
+		}
+
+		TPPLPartition pp;
+		std::vector<TPPLPoly> resultPolygons;
+		if (polygons.size() > 1)
+		{
+			// if with holes
+			pp.ConvexPartition_HM(&polygons, &resultPolygons);
+		}
+		else
+		{
+			// if without holes
+			pp.ConvexPartition_OPT(&polygons[0], &resultPolygons);
+		}
+
+		newShapes.reserve(resultPolygons.size());
+		for (auto& polygon : resultPolygons)
+		{
+			newShapes.emplace_back(polygon.GetNumPoints());
+			for (size_t i = 0, iSize = polygon.GetNumPoints(); i < iSize; ++i)
+			{
+				const TPPLPoint& point = polygon[i];
+				newShapes.back()[i] = {point.x, point.y};
+			}
+		}
 	}
 
 	std::vector<size_t> SortBorders(Shape& inOutShape)
@@ -785,7 +836,6 @@ namespace ShapeOperations
 		{
 			SimpleBorder coords;
 			float angleA;
-			//float angleB;
 		};
 
 		const float oneBorderFraction = 1.0f / static_cast<float>(inOutShape.size());
@@ -806,8 +856,7 @@ namespace ShapeOperations
 			{
 				return AngledBorder{
 					border,
-					(border.a - middlePos).rotation().getValue()/*,
-					(border.b - middlePos).rotation().getValue()*/
+					(border.a - middlePos).rotation().getValue()
 				};
 			}
 		);

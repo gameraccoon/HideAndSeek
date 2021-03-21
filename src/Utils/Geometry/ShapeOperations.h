@@ -36,7 +36,7 @@ namespace ShapeOperations
 
 	void MergeGeometry(std::vector<MergedGeometry>& inOutGeometry);
 
-	void SplitIntoConvexShapes(const Shape& geometry, std::vector<Shape>& newShapes);
+	void SplitIntoConvexShapes(Shape geometry, std::vector<std::vector<Vector2D>>& newShapes);
 
 	// returns start indexes of the figure and each hole in the resulting shape
 	std::vector<size_t> SortBorders(Shape& inOutShape);
