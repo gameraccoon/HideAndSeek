@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "Base/Types/TemplateHelpers.h"
+
 namespace VectorUtils
 {
 	template <typename T>
@@ -56,5 +58,17 @@ namespace VectorUtils
 		}
 
 		inOutVector.erase(inOutVector.begin() + (vectorSize - indexesCount + skippedIndexes), inOutVector.end());
+	}
+
+	template<typename First, typename... Others>
+	auto JoinVectors(First&& firstVector, Others&&... otherVectors)
+	{
+		using value_type = typename std::decay<decltype(*firstVector.begin())>::type;
+		std::vector<value_type> result;
+		size_t size = firstVector.size() + (otherVectors.size() + ...);
+		result.reserve(size);
+		TemplateHelpers::CopyOrMoveContainer<First>(std::forward<First>(firstVector), std::back_inserter(result));
+		(TemplateHelpers::CopyOrMoveContainer<Others>(std::forward<Others>(otherVectors), std::back_inserter(result)), ...);
+		return result;
 	}
 }

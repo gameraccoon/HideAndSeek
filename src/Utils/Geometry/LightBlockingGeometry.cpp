@@ -127,6 +127,14 @@ namespace LightBlockingGeometry
 		{
 			const BoundingBox cellAABB = SpatialWorldData::GetCellAABB(pos);
 			ShapeOperations::MergeGeometry(oneCellGeometry);
+			std::for_each(
+				oneCellGeometry.begin(),
+				oneCellGeometry.end(),
+				[](ShapeOperations::MergedGeometry& geometry)
+				{
+					ShapeOperations::OptimizeShape(geometry.borders);
+				}
+			);
 			FillGeometryInCell(outGeometry[pos], oneCellGeometry, cellAABB);
 		}
 	}

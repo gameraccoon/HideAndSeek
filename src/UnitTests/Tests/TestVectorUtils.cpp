@@ -113,3 +113,41 @@ TEST(VectorUtils, RemoveIndexesUnordered)
 		EXPECT_TRUE(ContainSameElements(std::move(expectedResult), std::move(testVector)));
 	}
 }
+
+TEST(VectorUtils, JoinVectors)
+{
+	using namespace VectorUtils;
+
+	EXPECT_EQ(std::vector<int>({1, 2, 3, 4}), JoinVectors(std::vector<int>({1, 2}), std::vector<int>({3, 4})));
+
+	EXPECT_EQ(
+		std::vector<int>({1, 2, 3, 4, 5}),
+		JoinVectors(
+			std::vector<int>({1, 2}),
+			std::vector<int>({3, 4}),
+			std::vector<int>({5})
+		)
+	);
+
+	EXPECT_EQ(
+		std::vector<int>({1, 2, 3}),
+		JoinVectors(
+			std::vector<int>({1, 2}),
+			std::vector<int>({}),
+			std::vector<int>({3})
+		)
+	);
+
+	{
+		std::vector<int> lvalueOriginalVector({1, 2});
+		std::vector<int> movedOriginalVector({3, 4});
+
+		EXPECT_EQ(
+			std::vector<int>({1, 2, 3, 4}),
+			JoinVectors(lvalueOriginalVector, std::move(movedOriginalVector))
+		);
+
+		// original lvalue vector should not change
+		EXPECT_EQ(std::vector<int>({1, 2}), lvalueOriginalVector);
+	}
+}

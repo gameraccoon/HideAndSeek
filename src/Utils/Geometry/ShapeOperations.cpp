@@ -6,6 +6,7 @@
 #include <unordered_set>
 
 #include <cstring>
+#include <numeric>
 
 #include "Base/Math/Float.h"
 
@@ -669,6 +670,21 @@ namespace ShapeOperations
 		}
 	}
 
+	std::vector<SimpleBorder> ConvertBordersToSimpleBorders(const std::vector<Border>& borders, Vector2D location)
+	{
+		std::vector<SimpleBorder> result(borders.size());
+		std::transform(
+			borders.begin(),
+			borders.end(),
+			result.begin(),
+			[location](const Border& border)
+			{
+				return SimpleBorder(border.getA() + location, border.getB() + location);
+			}
+		);
+		return result;
+	}
+
 	bool AreShapesIntersect(const MergedGeometry& firstGeometry, const MergedGeometry& secondGeometry)
 	{
 		if (!Collide::AreAABBsIntersectInclusive(firstGeometry.aabb, secondGeometry.aabb))
@@ -690,19 +706,19 @@ namespace ShapeOperations
 		return false;
 	}
 
-	void MergeGeometry(std::vector<MergedGeometry>& inOutCellGeometry)
+	void MergeGeometry(std::vector<MergedGeometry>& inOutGeometry)
 	{
-		if (inOutCellGeometry.empty())
+		if (inOutGeometry.empty())
 		{
 			return;
 		}
 
-		for (size_t i = 0; i < inOutCellGeometry.size() - 1; ++i)
+		for (size_t i = 0; i < inOutGeometry.size() - 1; ++i)
 		{
-			MergedGeometry& firstGeometry = inOutCellGeometry[i];
-			for (size_t j = i + 1; j < inOutCellGeometry.size(); ++j)
+			MergedGeometry& firstGeometry = inOutGeometry[i];
+			for (size_t j = i + 1; j < inOutGeometry.size(); ++j)
 			{
-				MergedGeometry& secondGeometry = inOutCellGeometry[j];
+				MergedGeometry& secondGeometry = inOutGeometry[j];
 				if (AreShapesIntersect(firstGeometry, secondGeometry))
 				{
 					std::vector<SimpleBorder> newShape = ShapeOperations::GetUnion(firstGeometry.borders, secondGeometry.borders);
@@ -710,7 +726,7 @@ namespace ShapeOperations
 					// save the new geometry to the position of the first figure
 					firstGeometry.borders = std::move(newShape);
 					// remove the second figure
-					inOutCellGeometry.erase(inOutCellGeometry.begin() + j);
+					inOutGeometry.erase(inOutGeometry.begin() + j);
 					// retry all collision tests with the first figure
 					--i;
 					break;
@@ -758,4 +774,92 @@ namespace ShapeOperations
 		}
 	}
 
+	void SplitIntoConvexShapes(const Shape& /*geometry*/, std::vector<Shape>& /*newShapes*/)
+	{
+
+	}
+
+	std::vector<size_t> SortBorders(Shape& inOutShape)
+	{
+		struct AngledBorder
+		{
+			SimpleBorder coords;
+			float angleA;
+			//float angleB;
+		};
+
+		const float oneBorderFraction = 1.0f / static_cast<float>(inOutShape.size());
+		Vector2D middlePos = std::accumulate(inOutShape.begin(), inOutShape.end(), ZERO_VECTOR,
+			[oneBorderFraction](Vector2D accumulatedValue, const SimpleBorder& border) -> Vector2D
+			{
+				return accumulatedValue + border.a * oneBorderFraction;
+			}
+		);
+
+		std::vector<AngledBorder> sortedBorders(inOutShape.size());
+
+		std::transform(
+			inOutShape.begin(),
+			inOutShape.end(),
+			sortedBorders.begin(),
+			[middlePos](const SimpleBorder& border)
+			{
+				return AngledBorder{
+					border,
+					(border.a - middlePos).rotation().getValue()/*,
+					(border.b - middlePos).rotation().getValue()*/
+				};
+			}
+		);
+		inOutShape.clear();
+
+		auto lessPointAngle = [](const AngledBorder& a, const AngledBorder& b) -> bool
+		{
+			return a.angleA < b.angleA;
+		};
+
+		std::sort(
+			sortedBorders.begin(),
+			sortedBorders.end(),
+			lessPointAngle
+		);
+
+		auto moveSortedBorders = [](std::vector<SimpleBorder>& inOutResult, std::vector<AngledBorder>& inOutSource, size_t sourceIndex)
+		{
+			inOutResult.push_back(inOutSource[sourceIndex].coords);
+			inOutSource.erase(inOutSource.begin() + sourceIndex);
+		};
+
+		std::vector<size_t> shapeStartIndexes;
+		while (!sortedBorders.empty())
+		{
+			shapeStartIndexes.push_back(inOutShape.size());
+			moveSortedBorders(inOutShape, sortedBorders, 0);
+			size_t i = 0;
+			// this can be optimized
+			while (true)
+			{
+				if (inOutShape.back().b == sortedBorders[i].coords.a)
+				{
+					moveSortedBorders(inOutShape, sortedBorders, i);
+					if (inOutShape.back().b == inOutShape[shapeStartIndexes.back()].a)
+					{
+						break;
+					}
+				}
+				else
+				{
+					++i;
+					if (i >= sortedBorders.size()) { i = 0; }
+				}
+			}
+		}
+
+		return shapeStartIndexes;
+	}
+
+	void ExtendInPlace(Shape& /*inOutShape*/, float /*radius*/)
+	{
+		// ToDo: actual extrude
+	}
 }

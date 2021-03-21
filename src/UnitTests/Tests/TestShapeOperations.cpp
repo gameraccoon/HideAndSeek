@@ -3,12 +3,34 @@
 #include <algorithm>
 #include <random>
 
+#include <span>
+
 #include <gtest/gtest.h>
+
+#include "Base/Types/ComplexTypes/VectorUtils.h"
 
 #include "Utils/Geometry/Collide.h"
 #include "Utils/Geometry/ShapeOperations.h"
 
-static std::vector<SimpleBorder> GenerateShape(const std::vector<Vector2D>& points)
+enum class ShapeOrder
+{
+	Ordered,
+	Unordered
+};
+
+namespace VectorUtils {
+	template <typename T, typename... Args>
+	std::vector<T> JoinVectors(Args... inputVectors)
+	{
+		std::vector<T> result;
+		size_t size = (inputVectors.size() + ...);
+		result.reserve(size);
+		(std::copy(std::begin(inputVectors...), std::end(inputVectors...), std::back_inserter(result)));
+		return result;
+	}
+}
+
+static std::vector<SimpleBorder> GenerateShape(const std::vector<Vector2D>& points, ShapeOrder order = ShapeOrder::Unordered)
 {
 	std::vector<SimpleBorder> result;
 	size_t pointsCount = points.size();
@@ -18,36 +40,67 @@ static std::vector<SimpleBorder> GenerateShape(const std::vector<Vector2D>& poin
 		result.emplace_back(points[i], points[j]);
 	});
 
-	// borders can be in any order theoretically, so let's shuffle them
-	// we need to use a predefined seed to have stable results (more or less)
-	std::shuffle(std::begin(result), std::end(result), std::mt19937(42));
+	if (order == ShapeOrder::Unordered)
+	{
+		// borders can be in any order theoretically, so let's shuffle them
+		// we need to use a predefined seed to have stable results (more or less)
+		std::shuffle(std::begin(result), std::end(result), std::mt19937(42));
+	}
 
 	return result;
 }
 
-static bool AreShapesEqual(const std::vector<SimpleBorder>& a, const std::vector<SimpleBorder>& b)
+enum class ShapeEquality
+{
+	Ordered,
+	Shuffled,
+	Exact
+};
+
+static bool AreShapesEqual(const std::span<const SimpleBorder> a, const std::span<const SimpleBorder> b, const ShapeEquality equalityType)
 {
 	if (a.size() != b.size())
 	{
 		return false;
 	}
 
-	auto a_copy = a;
-
-	for (const SimpleBorder& border : b)
+	if (equalityType == ShapeEquality::Shuffled)
 	{
-		a_copy.erase(
-			std::remove_if(
-				a_copy.begin(),
-				a_copy.end(),
-				[&border](const SimpleBorder& borderB)
-				{
-					return border.a.isNearlyEqualTo(borderB.a) && border.b.isNearlyEqualTo(borderB.b);
-				}),
-			a_copy.end()
-		);
+		std::vector a_copy(a.begin(), a.end());
+
+		for (const SimpleBorder& border : b)
+		{
+			a_copy.erase(
+				std::remove_if(
+					a_copy.begin(),
+					a_copy.end(),
+					[&border](const SimpleBorder& borderB)
+					{
+						return border.a.isNearlyEqualTo(borderB.a) && border.b.isNearlyEqualTo(borderB.b);
+					}),
+				a_copy.end()
+			);
+		}
+		return a_copy.empty();
 	}
-	return a_copy.empty();
+	else if (equalityType == ShapeEquality::Ordered)
+	{
+		std::vector a_copy(a.begin(), a.end());
+
+		auto it = std::find(a_copy.begin(), a_copy.end(), b[0]);
+		if (it == a_copy.end())
+		{
+			return false;
+		}
+
+		std::rotate(a_copy.begin(), it, a_copy.end());
+
+		return std::equal(a_copy.begin(), a_copy.end(), b.begin());
+	}
+	else
+	{
+		return std::equal(a.begin(), a.end(), b.begin());
+	}
 }
 
 static const std::vector<SimpleBorder>& GetShape(const std::vector<SimpleBorder>& vec)
@@ -70,22 +123,13 @@ void TestShapesUnionResultIsCorrect(const std::vector<A>& shape1, const std::vec
 	{
 		std::vector<SimpleBorder> resultingShape = ShapeOperations::GetUnion(preparedShape1, preparedShape2);
 		ShapeOperations::OptimizeShape(resultingShape);
-		EXPECT_TRUE(AreShapesEqual(expectedShape, resultingShape));
+		EXPECT_TRUE(AreShapesEqual(expectedShape, resultingShape, ShapeEquality::Shuffled));
 	}
 	{
 		std::vector<SimpleBorder> resultingShape = ShapeOperations::GetUnion(preparedShape2, preparedShape1);
 		ShapeOperations::OptimizeShape(resultingShape);
-		EXPECT_TRUE(AreShapesEqual(expectedShape, resultingShape));
+		EXPECT_TRUE(AreShapesEqual(expectedShape, resultingShape, ShapeEquality::Shuffled));
 	}
-}
-
-template <typename T>
-static std::vector<T> JoinVectors(const std::vector<T>& a, const std::vector<T>& b)
-{
-	std::vector<T> result = a;
-	result.reserve(a.size() + b.size());
-	std::copy(b.begin(), b.end(), std::back_inserter(result));
-	return result;
 }
 
 static std::vector<Vector2D> GetMovedShape(const std::vector<Vector2D>& shape, Vector2D shift)
@@ -173,6 +217,7 @@ TEST(ShapeOperations, Union_TwoRectsIntersectionOnCorner)
 
 TEST(ShapeOperations, Union_TwoRectsCornerTouchingBorder)
 {
+	using namespace VectorUtils;
 	std::vector<Vector2D> shape1{{10.0f, -60.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}};
 	std::vector<Vector2D> shape2{{10.0f, 10.0f}, {50.0f, -30.0f}, {60.0f, -20.0f}, {20.0f, 20.0f}};
 	std::vector<SimpleBorder> expectedShape = JoinVectors(GenerateShape(shape1), GenerateShape(shape2));
@@ -191,6 +236,7 @@ TEST(ShapeOperations, Union_TwoRectsCornerTouchingBorderFullyInside)
 
 TEST(ShapeOperations, Union_TwoRectsTouchingCorner)
 {
+	using namespace VectorUtils;
 	std::vector<SimpleBorder> shape1(GenerateShape({{-30.0f, 10.0f}, {-10.0f, -10.0f}, {10.0f, 10.0f}, {-10.0f, 30.0f}}));
 	std::vector<SimpleBorder> shape2(GenerateShape({{10.0f, 10.0f}, {30.0f, -10.0f}, {50.0f, 10.0f}, {30.0f, 30.0f}}));
 	std::vector<SimpleBorder> expectedShape = JoinVectors(shape1, shape2);
@@ -200,6 +246,7 @@ TEST(ShapeOperations, Union_TwoRectsTouchingCorner)
 
 TEST(ShapeOperations, Union_TwoComplexFiguresBorderTouchingCorderOfFourBorders)
 {
+	using namespace VectorUtils;
 	std::vector<SimpleBorder> shape1a(GenerateShape({{-30.0f, 10.0f}, {-10.0f, -10.0f}, {10.0f, 10.0f}, {-10.0f, 30.0f}}));
 	std::vector<SimpleBorder> shape1b(GenerateShape({{10.0f, 10.0f}, {30.0f, -10.0f}, {50.0f, 10.0f}, {30.0f, 30.0f}}));
 	std::vector<Vector2D> shape2{{10.0f, -20.0f}, {20.0f, -20.0f}, {20.0f, 30.0f}, {10.0f, 30.0f}};
@@ -210,6 +257,7 @@ TEST(ShapeOperations, Union_TwoComplexFiguresBorderTouchingCorderOfFourBorders)
 
 TEST(ShapeOperations, Union_TwoComplexFiguresOneCornerAnd4OverlappingBorders)
 {
+	using namespace VectorUtils;
 	std::vector<Vector2D> originalShape({{-20.0f, 0.0f}, {0.0f, -20.0f}, {20.0f, 0.0f}, {0.0f, 20.0f}});
 
 	std::vector<SimpleBorder> shape1 = JoinVectors(GenerateShape(GetMovedShape(originalShape, {-20.0f, 0.0f})), GenerateShape(GetMovedShape(originalShape, {20.0f, 0.0f})));
@@ -222,6 +270,7 @@ TEST(ShapeOperations, Union_TwoComplexFiguresOneCornerAnd4OverlappingBorders)
 
 TEST(ShapeOperations, Union_TwoSameComplexFigures)
 {
+	using namespace VectorUtils;
 	std::vector<Vector2D> originalShape({{-20.0f, 0.0f}, {0.0f, -20.0f}, {20.0f, 0.0f}, {0.0f, 20.0f}});
 
 	std::vector<SimpleBorder> shape1 = JoinVectors(GenerateShape(GetMovedShape(originalShape, {-20.0f, 0.0f})), GenerateShape(GetMovedShape(originalShape, {20.0f, 0.0f})));
@@ -264,7 +313,7 @@ TEST(ShapeOperations, OptimizeShape_OneExtraPoint)
 	std::vector<SimpleBorder> shape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, -40.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}});
 	std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}});
 	ShapeOperations::OptimizeShape(shape);
-	EXPECT_TRUE(AreShapesEqual(expectedShape, shape));
+	EXPECT_TRUE(AreShapesEqual(expectedShape, shape, ShapeEquality::Shuffled));
 }
 
 TEST(ShapeOperations, OptimizeShape_TwoExtraPointOnABorder)
@@ -272,7 +321,7 @@ TEST(ShapeOperations, OptimizeShape_TwoExtraPointOnABorder)
 	std::vector<SimpleBorder> shape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, -40.0f}, {10.0f, 40.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}});
 	std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}});
 	ShapeOperations::OptimizeShape(shape);
-	EXPECT_TRUE(AreShapesEqual(expectedShape, shape));
+	EXPECT_TRUE(AreShapesEqual(expectedShape, shape, ShapeEquality::Shuffled));
 }
 
 TEST(ShapeOperations, OptimizeShape_DuplicatedPoint)
@@ -280,18 +329,19 @@ TEST(ShapeOperations, OptimizeShape_DuplicatedPoint)
 	std::vector<SimpleBorder> shape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, -60.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}});
 	std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}});
 	ShapeOperations::OptimizeShape(shape);
-	EXPECT_TRUE(AreShapesEqual(expectedShape, shape));
+	EXPECT_TRUE(AreShapesEqual(expectedShape, shape, ShapeEquality::Shuffled));
 }
 
 TEST(ShapeOperations, OptimizeShape_TwoFiguresTouchingWithMirroredAngle)
 {
+	using namespace VectorUtils;
 	std::vector<SimpleBorder> tempShape1 = GenerateShape(std::vector<Vector2D>{{0.0f, 0.0f}, {10.0f, 0.0f}, {10.0f, 10.0f}, {0.0f, 10.0f}});
 	std::vector<SimpleBorder> tempShape2 = GenerateShape(std::vector<Vector2D>{{10.0f, 10.0f}, {20.0f, 10.0f}, {20.0f, 20.0f}, {10.0f, 20.0f}});
 	std::vector<SimpleBorder> testShape = JoinVectors(std::move(tempShape1), std::move(tempShape2));
 	// expect the shape to be unchanged, since we don't want borders with opposing directions to merge
 	std::vector<SimpleBorder> expectedShape = testShape;
 	ShapeOperations::OptimizeShape(testShape);
-	EXPECT_TRUE(AreShapesEqual(expectedShape, testShape));
+	EXPECT_TRUE(AreShapesEqual(expectedShape, testShape, ShapeEquality::Shuffled));
 }
 
 TEST(ShapeOperations, OptimizeShape_BorderSplitTwice)
@@ -307,6 +357,42 @@ TEST(ShapeOperations, OptimizeShape_BorderSplitTwice)
 
 	std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{{30.0f, -60.0f}, {30.0f, 10.0f}, {-30.0f, 10.0f}, {-30.0f, -60.0f}});
 	ShapeOperations::OptimizeShape(testShape);
-	EXPECT_TRUE(AreShapesEqual(expectedShape, testShape));
+	EXPECT_TRUE(AreShapesEqual(expectedShape, testShape, ShapeEquality::Shuffled));
+}
+
+TEST(ShapeOperations, SortBorders_SortWithoutHoles)
+{
+	const std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}}, ShapeOrder::Ordered);
+	std::vector<SimpleBorder> shape = expectedShape;
+	std::random_shuffle(shape.begin(), shape.end());
+
+	std::vector<size_t> foundShapes = ShapeOperations::SortBorders(shape);
+
+	EXPECT_EQ(1u, foundShapes.size());
+	EXPECT_TRUE(AreShapesEqual(expectedShape, shape, ShapeEquality::Ordered));
+}
+
+TEST(ShapeOperations, SortBorders_SortWithHoles)
+{
+	using namespace VectorUtils;
+	const std::vector<SimpleBorder> outerShape = GenerateShape(std::vector<Vector2D>{{30.0f, -60.0f}, {30.0f, 60.0f}, {-30.0f, 60.0f}, {-30.0f, -60.0f}}, ShapeOrder::Ordered);
+	const std::vector<SimpleBorder> holeShape = GenerateShape(std::vector<Vector2D>{{-20.0f, -40.0f}, {-20.0f, 40.0f}, {20.0f, 40.0f}}, ShapeOrder::Ordered);
+	std::vector<SimpleBorder> shape = JoinVectors(outerShape, holeShape);
+	std::random_shuffle(shape.begin(), shape.end());
+
+	const std::vector<size_t> foundShapes = ShapeOperations::SortBorders(shape);
+
+	EXPECT_EQ(2u, foundShapes.size());
+	if (foundShapes.size() >= 2)
+	{
+		const size_t secondShapeStart = foundShapes[1];
+		// order is not specified, so we get the order from elemets count
+		bool isOuterShapeFirst = (secondShapeStart == 4);
+		auto& firstExpectedShape = isOuterShapeFirst ? outerShape : holeShape;
+		auto& secondExpectedShape = isOuterShapeFirst ? holeShape : outerShape;
+
+		EXPECT_TRUE(AreShapesEqual(firstExpectedShape, {shape.begin(), secondShapeStart}, ShapeEquality::Ordered));
+		EXPECT_TRUE(AreShapesEqual(secondExpectedShape, {shape.begin() + secondShapeStart, shape.end()}, ShapeEquality::Ordered));
+	}
 }
 

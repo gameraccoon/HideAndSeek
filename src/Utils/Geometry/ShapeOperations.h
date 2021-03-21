@@ -9,7 +9,9 @@
 
 namespace ShapeOperations
 {
-	std::vector<SimpleBorder> GetUnion(const std::vector<SimpleBorder>& shape1, const std::vector<SimpleBorder>& shape2);
+	using Shape = std::vector<SimpleBorder>;
+
+	Shape GetUnion(const Shape& shape1, const Shape& shape2);
 	// join all borders that make a straight line
 	void OptimizeShape(std::vector<SimpleBorder>& inOutShape);
 
@@ -18,7 +20,7 @@ namespace ShapeOperations
 		MergedGeometry(const std::vector<Border>& inBorders, Vector2D location);
 		MergedGeometry(const std::vector<SimpleBorder>& simpleBorders);
 
-		std::vector<SimpleBorder> borders;
+		Shape borders;
 		BoundingBox aabb
 		{
 			std::numeric_limits<float>::max(),
@@ -28,7 +30,16 @@ namespace ShapeOperations
 		};
 	};
 
+	std::vector<SimpleBorder> ConvertBordersToSimpleBorders(const std::vector<Border>& borders, Vector2D location);
+
 	bool AreShapesIntersect(const MergedGeometry& firstGeometry, const MergedGeometry& secondGeometry);
 
-	void MergeGeometry(std::vector<MergedGeometry>& inOutCellGeometry);
+	void MergeGeometry(std::vector<MergedGeometry>& inOutGeometry);
+
+	void SplitIntoConvexShapes(const Shape& geometry, std::vector<Shape>& newShapes);
+
+	// returns start indexes of the figure and each hole in the resulting shape
+	std::vector<size_t> SortBorders(Shape& inOutShape);
+
+	void ExtendInPlace(Shape& inOutShape, float radius);
 }
