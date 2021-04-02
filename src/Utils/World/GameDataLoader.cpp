@@ -86,7 +86,7 @@ namespace GameDataLoader
 
 		for (auto& [key, cellData] : geometryJson.items())
 		{
-			const int delimeterPos = key.find(',');
+			const size_t delimeterPos = key.find(',');
 			const CellPos pos{std::atoi(key.substr(0, delimeterPos).c_str()), std::atoi(key.substr(delimeterPos + 1).c_str())};
 			LightBlockingGeometryComponent* lightBlockingCompontnt = spatialData.getCell(pos)->getCellComponents().getOrAddComponent<LightBlockingGeometryComponent>();
 			cellData.get_to(lightBlockingCompontnt->getBordersRef());
