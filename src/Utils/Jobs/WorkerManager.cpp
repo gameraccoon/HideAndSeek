@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <ranges>
 
 namespace Jobs
 {
@@ -40,17 +41,11 @@ namespace Jobs
 		{
 			std::unique_lock<std::mutex> l(mDataMutex);
 
-			std::for_each(
-				begin(jobs),
-				end(jobs),
-				[thisJobGroupId](auto& job){ job->setJobGroupID(thisJobGroupId); }
-			);
+			std::ranges::for_each(jobs, [thisJobGroupId](auto& job){
+				job->setJobGroupID(thisJobGroupId);
+			});
 
-			std::move(
-				begin(jobs),
-				end(jobs),
-				back_inserter(mPlannedJobs)
-			);
+			std::ranges::move(jobs, back_inserter(mPlannedJobs));
 
 			mPlannedJobsTrigger.notify_all();
 		}

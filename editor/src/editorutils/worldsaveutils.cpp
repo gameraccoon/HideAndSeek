@@ -1,5 +1,8 @@
 #include "worldsaveutils.h"
 
+#include <algorithm>
+#include <ranges>
+
 #include "GameData/World.h"
 
 #include "GameData/Components/CollisionComponent.generated.h"
@@ -35,9 +38,7 @@ namespace Utils
 		for (auto& [cellPos, borders] : lightBlockingGeometryPieces)
 		{
 			// try to stabilize borders between saves
-			std::sort(
-				borders.begin(),
-				borders.end(),
+			std::ranges::sort(borders,
 				[](const SimpleBorder& first, const SimpleBorder& second)
 				{
 					return first.a.x < second.a.x

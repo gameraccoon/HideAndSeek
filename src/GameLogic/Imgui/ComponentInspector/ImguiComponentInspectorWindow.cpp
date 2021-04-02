@@ -4,9 +4,10 @@
 
 #include <algorithm>
 #include <cstring>
+#include <ranges>
 #include <sstream>
-#include <string_view>
 #include <string.h>
+#include <string_view>
 
 #include "imgui/imgui.h"
 
@@ -96,7 +97,7 @@ void ImguiComponentInspectorWindow::showComponentsInspector()
 
 		std::vector<BaseComponent*> components;
 		cell->getEntityManager().getAllEntityComponents(entity, components);
-		std::sort(components.begin(), components.end(), [](auto a, auto b)
+		std::ranges::sort(components, [](auto a, auto b)
 		{
 			return a->getComponentTypeName() < b->getComponentTypeName();
 		});

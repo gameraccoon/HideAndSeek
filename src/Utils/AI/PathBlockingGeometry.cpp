@@ -1,5 +1,8 @@
 #include "Base/precomp.h"
 
+#include <algorithm>
+#include <ranges>
+
 #include "Utils/AI/PathBlockingGeometry.h"
 
 #include "GameData/Core/Hull.h"
@@ -32,9 +35,7 @@ namespace PathBlockingGeometry
 
 		std::vector<std::vector<Vector2D>> splitGeometry;
 		splitGeometry.reserve(mergedGeometry.size() * 2);
-		std::for_each(
-			mergedGeometry.begin(),
-			mergedGeometry.end(),
+		std::ranges::for_each(mergedGeometry,
 			[&splitGeometry](ShapeOperations::MergedGeometry& geometry)
 			{
 				ShapeOperations::SplitIntoConvexShapes(geometry.borders, splitGeometry);

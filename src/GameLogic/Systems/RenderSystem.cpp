@@ -3,6 +3,7 @@
 #include "GameLogic/Systems/RenderSystem.h"
 
 #include <algorithm>
+#include <ranges>
 
 #include "GameData/Components/RenderComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
@@ -190,11 +191,7 @@ public:
 			const std::vector<Vector2D>& visibilityPolygon = light->getCachedVisibilityPolygon();
 
 			mCalculationResults[i].polygon.resize(visibilityPolygon.size());
-			std::copy(
-				std::begin(visibilityPolygon),
-				std::end(visibilityPolygon),
-				std::begin(mCalculationResults[i].polygon)
-			);
+			std::ranges::copy(visibilityPolygon, std::begin(mCalculationResults[i].polygon));
 			mCalculationResults[i].location = transform->getLocation();
 			mCalculationResults[i].size = mMaxFov * light->getBrightness();
 		}
@@ -284,7 +281,7 @@ void RenderSystem::drawLights(SpatialEntityManager& managerGroup, std::vector<Wo
 		// prepare function that will collect the calculated data
 		auto finalizeFn = [&allResults](std::vector<VisibilityPolygonCalculationJob::Result>&& results)
 		{
-			std::move(results.begin(), results.end(), std::back_inserter(allResults));
+			std::ranges::move(results, std::back_inserter(allResults));
 		};
 
 		// calculate how many threads we need
@@ -320,7 +317,7 @@ void RenderSystem::drawLights(SpatialEntityManager& managerGroup, std::vector<Wo
 		mJobsWorkerManager.runJobs(std::move(jobs));
 
 		// sort lights in some deterministic order
-		std::sort(allResults.begin(), allResults.end(), [](auto& a, auto& b)
+		std::ranges::sort(allResults, [](auto& a, auto& b)
 		{
 			return (
 				a.location.x < b.location.x

@@ -3,6 +3,7 @@
 #include "ECS/EntityManager.h"
 
 #include <algorithm>
+#include <ranges>
 
 #include <nlohmann/json.hpp>
 
@@ -342,7 +343,7 @@ nlohmann::json EntityManager::toJson(const ComponentSerializersHolder& component
 		sortedEntityIndexMap.push_back(indexPair);
 	}
 
-	std::sort(sortedEntityIndexMap.begin(), sortedEntityIndexMap.end());
+	std::ranges::sort(sortedEntityIndexMap);
 
 	nlohmann::json outJson{
 		{"entityIndexMap", sortedEntityIndexMap}

@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <algorithm>
 
-#include <polypartition.h>
+#include "polypartition.h"
 
 #include "Base/Types/TemplateAliases.h"
 

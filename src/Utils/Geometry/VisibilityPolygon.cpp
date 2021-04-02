@@ -3,6 +3,7 @@
 #include "Utils/Geometry/VisibilityPolygon.h"
 
 #include <algorithm>
+#include <ranges>
 
 #include "Base/Math/Float.h"
 
@@ -139,7 +140,7 @@ void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2
 	}
 
 	// sort the borders so we can iterate over them in clockwise order
-	std::sort(mCaches.bordersToTrace.begin(), mCaches.bordersToTrace.end(), LessPointAngle);
+	std::ranges::sort(mCaches.bordersToTrace, LessPointAngle);
 
 	size_t closestBorderIdx = 0;
 	std::vector<size_t> potentialContinuations;

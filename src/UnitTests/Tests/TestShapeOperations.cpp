@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <random>
-
+#include <ranges>
 #include <span>
 
 #include <gtest/gtest.h>
@@ -25,7 +25,7 @@ namespace VectorUtils {
 		std::vector<T> result;
 		size_t size = (inputVectors.size() + ...);
 		result.reserve(size);
-		(std::copy(std::begin(inputVectors...), std::end(inputVectors...), std::back_inserter(result)));
+		(std::ranges::copy(inputVectors..., std::back_inserter(result)));
 		return result;
 	}
 }

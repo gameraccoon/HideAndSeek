@@ -2,7 +2,9 @@
 
 #include "GameData/World.h"
 
+#include <algorithm>
 #include <cmath>
+#include <ranges>
 
 #include <nlohmann/json.hpp>
 
@@ -149,7 +151,7 @@ nlohmann::json SpatialWorldData::toJson(const ComponentSerializersHolder& compon
 		sortedCells.emplace_back(cell.first, &cell.second);
 	}
 
-	std::sort(sortedCells.begin(), sortedCells.end(), [](const auto& cellPairA, const auto& cellPairB) -> bool {
+	std::ranges::sort(sortedCells, [](const auto& cellPairA, const auto& cellPairB) -> bool {
 		return (
 			cellPairA.first.x < cellPairB.first.x
 			||

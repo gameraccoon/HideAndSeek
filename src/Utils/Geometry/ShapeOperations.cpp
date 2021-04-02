@@ -2,13 +2,14 @@
 
 #include "Utils/Geometry/ShapeOperations.h"
 
+#include <algorithm>
+#include <cstring>
+#include <numeric>
+#include <ranges>
 #include <unordered_map>
 #include <unordered_set>
 
-#include <cstring>
-#include <numeric>
-
-#include <polypartition.h>
+#include "polypartition.h"
 
 #include "Base/Math/Float.h"
 
@@ -521,7 +522,7 @@ namespace ShapeOperations
 			}
 		}
 
-		std::sort(bordersToRemove.begin(), bordersToRemove.end(), std::greater());
+		std::ranges::sort(bordersToRemove, std::greater());
 		bordersToRemove.erase(std::unique(bordersToRemove.begin(), bordersToRemove.end()), bordersToRemove.end());
 
 		for (size_t index : bordersToRemove)
@@ -533,7 +534,7 @@ namespace ShapeOperations
 		// ToDo: probably need to correct the logic above to normally elliminate such borders
 		// instead of doing this NlogN overcomplicated and not always correct (-0) stuff to fight a super-rare case
 		static_assert(sizeof(SimpleBorder) == sizeof(float)*4, "SimpleBorder should have size of 4 floats");
-		std::sort(fracturedBorders.begin(), fracturedBorders.end(), [](const SimpleBorder& left, const SimpleBorder& right) {
+		std::ranges::sort(fracturedBorders, [](const SimpleBorder& left, const SimpleBorder& right) {
 			return std::memcmp(&left, &right, sizeof(SimpleBorder)) < 0;
 		});
 		auto last = std::unique(fracturedBorders.begin(), fracturedBorders.end());
@@ -665,7 +666,7 @@ namespace ShapeOperations
 		}
 
 		// remove extra borders that have left
-		std::sort(bordersToRemove.begin(), bordersToRemove.end(), std::greater());
+		std::ranges::sort(bordersToRemove, std::greater());
 		for (size_t index : bordersToRemove)
 		{
 			inOutShape.erase(inOutShape.begin() + index);
@@ -868,11 +869,7 @@ namespace ShapeOperations
 			return a.angleA < b.angleA;
 		};
 
-		std::sort(
-			sortedBorders.begin(),
-			sortedBorders.end(),
-			lessPointAngle
-		);
+		std::ranges::sort(sortedBorders, lessPointAngle);
 
 		auto moveSortedBorders = [](std::vector<SimpleBorder>& inOutResult, std::vector<AngledBorder>& inOutSource, size_t sourceIndex)
 		{
@@ -923,7 +920,7 @@ namespace ShapeOperations
 			center += border.a * onePointFraction;
 		}
 
-		std::for_each(inOutShape.begin(), inOutShape.end(),
+		std::ranges::for_each(inOutShape,
 			[center, radius](SimpleBorder& border){
 				border.a -= (center - border.a).unit() * radius;
 				border.b -= (center - border.b).unit() * radius;
