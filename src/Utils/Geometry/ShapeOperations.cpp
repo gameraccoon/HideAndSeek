@@ -533,8 +533,8 @@ namespace ShapeOperations
 		// ToDo: probably need to correct the logic above to normally elliminate such borders
 		// instead of doing this NlogN overcomplicated and not always correct (-0) stuff to fight a super-rare case
 		static_assert(sizeof(SimpleBorder) == sizeof(float)*4, "SimpleBorder should have size of 4 floats");
-		std::sort(fracturedBorders.begin(), fracturedBorders.end(), [](const SimpleBorder left, const SimpleBorder right) {
-			return std::memcmp(&left, &right, 1);
+		std::sort(fracturedBorders.begin(), fracturedBorders.end(), [](const SimpleBorder& left, const SimpleBorder& right) {
+			return std::memcmp(&left, &right, sizeof(SimpleBorder)) < 0;
 		});
 		auto last = std::unique(fracturedBorders.begin(), fracturedBorders.end());
 		fracturedBorders.erase(last, fracturedBorders.end());
@@ -905,8 +905,9 @@ namespace ShapeOperations
 				else
 				{
 					++i;
-					if (i >= sortedBorders.size()) { i = 0; }
 				}
+
+				if (i >= sortedBorders.size()) { i = 0; }
 			}
 		}
 
