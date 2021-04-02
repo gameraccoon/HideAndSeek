@@ -12,8 +12,16 @@ namespace Math
 	{
 		Assert(isfinite(a) && isfinite(b), "Comparison with NaN or Inf is not allowed");
 		Assert(isfinite(epsilon), "Epsilon should not be NaN or Inf");
-		Assert(std::ilogb(a) < std::ilogb(epsilon) + 27, "Number is too big to be compared with this epsilon: %f %f", a, epsilon);
-		Assert(std::ilogb(b) < std::ilogb(epsilon) + 27, "Number is too big to be compared with this epsilon: %f %f", b, epsilon);
+
+		if ((a < 0.0f) == (b < 0.0f))
+		{
+			if (std::ilogb(a) >= std::ilogb(epsilon) + 27
+				&&
+				std::ilogb(b) >= std::ilogb(epsilon) + 27)
+			{
+				ReportError("Numbers are too big to be compared with this epsilon: %f %f, epsilon %f", a, b, epsilon);
+			}
+		}
 	}
 #endif // DEBUG_CHECKS
 

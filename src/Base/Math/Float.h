@@ -17,6 +17,7 @@ namespace std
 namespace Math
 {
 	constexpr float DEFAULT_EPSILON = 0.001f;
+	constexpr float SYSTEM_EPSILON = std::numeric_limits<float>::epsilon();
 
 	bool AreEqualWithEpsilon(float a, float b, float epsilon = DEFAULT_EPSILON);
 	bool IsGreaterWithEpsilon(float a, float b, float epsilon = DEFAULT_EPSILON);
