@@ -1,9 +1,10 @@
 #pragma once
 
 #include <cmath>
+#include "Base/CompilerHelpers.h"
 
 // delete this code when C++20 is fully supported
-#if __cplusplus <= 201703L
+#if __cplusplus <= 201703L && USED_COMPILER != COMPILER_MSVC
 namespace std
 {
 	inline float lerp(float a, float b, float t)
