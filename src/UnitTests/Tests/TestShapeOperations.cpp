@@ -44,7 +44,7 @@ static std::vector<SimpleBorder> GenerateShape(const std::vector<Vector2D>& poin
 	{
 		// borders can be in any order theoretically, so let's shuffle them
 		// we need to use a predefined seed to have stable results (more or less)
-		std::shuffle(std::begin(result), std::end(result), std::mt19937(42));
+		std::ranges::shuffle(result, std::mt19937(42));
 	}
 
 	return result;
@@ -395,7 +395,7 @@ TEST(ShapeOperations, SortBorders_SortWithoutHoles)
 {
 	const std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}}, ShapeOrder::Ordered);
 	std::vector<SimpleBorder> shape = expectedShape;
-	std::shuffle(shape.begin(), shape.end(), std::mt19937(std::random_device()()));
+	std::ranges::shuffle(shape, std::mt19937(std::random_device()()));
 
 	std::vector<size_t> foundShapes = ShapeOperations::SortBorders(shape);
 
@@ -410,7 +410,7 @@ TEST(ShapeOperations, SortBorders_SortWithHoles)
 	const std::vector<SimpleBorder> holeShape = GenerateShape(std::vector<Vector2D>{{-20.0f, -40.0f}, {-20.0f, 40.0f}, {20.0f, 40.0f}}, ShapeOrder::Ordered);
 	std::vector<SimpleBorder> shape = JoinVectors(outerShape, holeShape);
 
-	std::shuffle(shape.begin(), shape.end(), std::mt19937(std::random_device()()));
+	std::ranges::shuffle(shape, std::mt19937(std::random_device()()));
 
 	const std::vector<size_t> foundShapes = ShapeOperations::SortBorders(shape);
 
@@ -440,7 +440,7 @@ TEST(ShapeOperations, SortBorders_SortNonConvex)
 
 	std::vector<SimpleBorder> shape = expectedShape;
 
-	std::shuffle(shape.begin(), shape.end(), std::mt19937(std::random_device()()));
+	std::ranges::shuffle(shape, std::mt19937(std::random_device()()));
 
 	std::vector<size_t> foundShapes = ShapeOperations::SortBorders(shape);
 
