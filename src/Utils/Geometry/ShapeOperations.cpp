@@ -623,7 +623,7 @@ namespace ShapeOperations
 								{
 									for (auto& borderInfo : pointsIt->second)
 									{
-										if (borderInfo.borderIndex == jBorderIdx)
+										if (borderInfo.borderIndex == iBorderIdx)
 										{
 											borderInfo.secondBorderPoint = jBorderPoint;
 											break;

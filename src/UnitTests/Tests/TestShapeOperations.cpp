@@ -244,7 +244,7 @@ TEST(ShapeOperations, Union_TwoRectsTouchingCorner)
 	TestShapesUnionResultIsCorrect(shape1, shape2, expectedShape);
 }
 
-TEST(ShapeOperations, Union_TwoComplexFiguresBorderTouchingCorderOfFourBorders)
+TEST(ShapeOperations, Union_TwoComplexFiguresBorderTouchingCornerOfFourBorders)
 {
 	using namespace VectorUtils;
 	std::vector<SimpleBorder> shape1a(GenerateShape({{-30.0f, 10.0f}, {-10.0f, -10.0f}, {10.0f, 10.0f}, {-10.0f, 30.0f}}));
