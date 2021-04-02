@@ -309,3 +309,4 @@ TEST(ShapeOperations, OptimizeShape_BorderSplitTwice)
 	ShapeOperations::OptimizeShape(testShape);
 	EXPECT_TRUE(AreShapesEqual(expectedShape, testShape));
 }
+
