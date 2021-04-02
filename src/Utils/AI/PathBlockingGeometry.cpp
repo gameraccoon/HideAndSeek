@@ -10,7 +10,7 @@
 
 namespace PathBlockingGeometry
 {
-	static const float GEOMETRY_EXTENT = 10.0f;
+	static const float GEOMETRY_EXTENT = 20.0f;
 
 	void CalculatePathBlockingGeometry(std::vector<std::vector<Vector2D>>& outGeometry, const TupleVector<CollisionComponent*, TransformComponent*>& components)
 	{
@@ -37,7 +37,6 @@ namespace PathBlockingGeometry
 			mergedGeometry.end(),
 			[&splitGeometry](ShapeOperations::MergedGeometry& geometry)
 			{
-				ShapeOperations::OptimizeShape(geometry.borders);
 				ShapeOperations::SplitIntoConvexShapes(geometry.borders, splitGeometry);
 			}
 		);

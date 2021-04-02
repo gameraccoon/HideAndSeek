@@ -308,6 +308,16 @@ TEST(ShapeOperations, Union_NonConvexShapeOneOverlappingBorderOneDirection)
 	TestShapesUnionResultIsCorrect(shape1, shape2, expectedResult);
 }
 
+TEST(ShapeOperations, Union_TwoRectsWithNotRoundCoordinates)
+{
+	// coordinates from an existent bug
+	std::vector<Vector2D> shape1{{31.082706451416016f, -465.0944519042969f}, {31.082706451416016f, -438.5184631347656f}, {-128.373046875f, -438.5184631347656f}, {-128.373046875f, -465.0944519042969f}};
+	std::vector<Vector2D> shape2{{-89.91729736328125f, -465.0944519042969f}, {-89.91729736328125f, -438.5184631347656f}, {-249.373046875f, -438.5184631347656f}, {-249.373046875f, -465.0944519042969f}};
+	std::vector<Vector2D> expectedResult{{31.082706451416016f, -465.0944519042969f}, {31.082706451416016f, -438.5184631347656}, {-249.373046875f, -438.5184631347656f}, {-249.373046875f, -465.0944519042969f}};
+
+	TestShapesUnionResultIsCorrect(shape1, shape2, expectedResult);
+}
+
 TEST(ShapeOperations, OptimizeShape_OneExtraPoint)
 {
 	std::vector<SimpleBorder> shape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, -40.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}});
@@ -360,11 +370,32 @@ TEST(ShapeOperations, OptimizeShape_BorderSplitTwice)
 	EXPECT_TRUE(AreShapesEqual(expectedShape, testShape, ShapeEquality::Shuffled));
 }
 
+TEST(ShapeOperations, OptimizeShape_NonConvexFigure)
+{
+	// borders and order taken from an existent bug
+	std::vector<SimpleBorder> testShape{
+		{{10.0f, 20.0f}, {-10.0f, 20.0f}},
+		{{30.0f, -60.0f}, {30.0f, 10.0f}},
+		{{-30.0f, 10.0f}, {-30.0f, -60.0f}},
+		{{-30.0f, -60.0f}, {-10.0f, -60.0f}},
+		{{-10.0f, -60.0f}, {10.0f, -60.0f}},
+		{{10.0f, -60.0f}, {30.0f, -60.0f}},
+		{{10.0f, 10.0f}, {10.0f, 20.0f}},
+		{{-10.0f, 20.0f}, {-10.0f, 10.0f}},
+		{{30.0f, 10.0f}, {10.0f, 10.0f}},
+		{{-10.0f, 10.0f}, {-30.0f, 10.0f}}
+	};
+
+	std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{{30.0f, -60.0f}, {30.0f, 10.0f}, {10.0f, 10.0f}, {10.0f, 20.0f}, {-10.0f, 20.0f}, {-10.0f, 10.0f}, {-30.0f, 10.0f}, {-30.0f, -60.0f}});
+	ShapeOperations::OptimizeShape(testShape);
+	EXPECT_TRUE(AreShapesEqual(expectedShape, testShape, ShapeEquality::Shuffled));
+}
+
 TEST(ShapeOperations, SortBorders_SortWithoutHoles)
 {
 	const std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{{10.0f, -60.0f}, {10.0f, 60.0f}, {-10.0f, 60.0f}, {-10.0f, -60.0f}}, ShapeOrder::Ordered);
 	std::vector<SimpleBorder> shape = expectedShape;
-	std::random_shuffle(shape.begin(), shape.end());
+	std::shuffle(shape.begin(), shape.end(), std::mt19937(std::random_device()()));
 
 	std::vector<size_t> foundShapes = ShapeOperations::SortBorders(shape);
 
@@ -378,7 +409,8 @@ TEST(ShapeOperations, SortBorders_SortWithHoles)
 	const std::vector<SimpleBorder> outerShape = GenerateShape(std::vector<Vector2D>{{30.0f, -60.0f}, {30.0f, 60.0f}, {-30.0f, 60.0f}, {-30.0f, -60.0f}}, ShapeOrder::Ordered);
 	const std::vector<SimpleBorder> holeShape = GenerateShape(std::vector<Vector2D>{{-20.0f, -40.0f}, {-20.0f, 40.0f}, {20.0f, 40.0f}}, ShapeOrder::Ordered);
 	std::vector<SimpleBorder> shape = JoinVectors(outerShape, holeShape);
-	std::random_shuffle(shape.begin(), shape.end());
+
+	std::shuffle(shape.begin(), shape.end(), std::mt19937(std::random_device()()));
 
 	const std::vector<size_t> foundShapes = ShapeOperations::SortBorders(shape);
 

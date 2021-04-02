@@ -460,11 +460,11 @@ namespace ShapeOperations
 				const auto it = std::lower_bound(borderPointFractions.begin(), borderPointFractions.end(), intersectionFraction);
 				const size_t newPosition = std::distance(borderPointFractions.begin(), it);
 
-				if (newPosition >= 1 && borderPointFractions[newPosition - 1] == intersectionFraction)
+				if (newPosition >= 1 && Math::AreEqualWithEpsilon(borderPointFractions[newPosition - 1], intersectionFraction))
 				{
 					borderPoints[newPosition - 1].cutDirection = CalcBetterCutDirection(borderPoints[newPosition - 1].cutDirection, cutDirection);
 				}
-				else if (newPosition < borderPointFractions.size() && borderPointFractions[newPosition] == intersectionFraction)
+				else if (newPosition < borderPointFractions.size() && Math::AreEqualWithEpsilon(borderPointFractions[newPosition], intersectionFraction))
 				{
 					borderPoints[newPosition].cutDirection = CalcBetterCutDirection(borderPoints[newPosition].cutDirection, cutDirection);
 				}
@@ -568,7 +568,7 @@ namespace ShapeOperations
 		);
 
 		// collect neighboring borders
-		std::unordered_map<Vector2D, std::vector<BorderInfo>> points;
+		std::unordered_map<Vector2DKey<>, std::vector<BorderInfo>> points;
 		for (size_t i = 0, iSize = inOutShape.size(); i < iSize; ++i)
 		{
 			const SimpleBorder& border = inOutShape[i];
@@ -592,7 +592,7 @@ namespace ShapeOperations
 					if (borders[i].isFirstPoint != borders[j].isFirstPoint)
 					{
 						// process borders that produce a straight line
-						float area = Collide::SignedArea(pos, borders[i].secondBorderPoint, borders[j].secondBorderPoint);
+						float area = Collide::SignedArea(pos.value, borders[i].secondBorderPoint, borders[j].secondBorderPoint);
 						if (Math::IsNearZero(area))
 						{
 							size_t iBorderIdx = borders[i].borderIndex;
@@ -604,7 +604,7 @@ namespace ShapeOperations
 								Vector2D anotherIntersectionPoint;
 								// replace border i with the merged border in the final shape
 								SimpleBorder& finalBorder = inOutShape[iBorderIdx];
-								if (finalBorder.a == pos)
+								if (finalBorder.a.isNearlyEqualTo(pos.value))
 								{
 									finalBorder.a = jBorderPoint;
 									anotherIntersectionPoint = finalBorder.b;
@@ -724,6 +724,7 @@ namespace ShapeOperations
 				if (AreShapesIntersect(firstGeometry, secondGeometry))
 				{
 					std::vector<SimpleBorder> newShape = ShapeOperations::GetUnion(firstGeometry.borders, secondGeometry.borders);
+					ShapeOperations::OptimizeShape(newShape);
 
 					// save the new geometry to the position of the first figure
 					firstGeometry.borders = std::move(newShape);
@@ -888,11 +889,16 @@ namespace ShapeOperations
 			// this can be optimized
 			while (true)
 			{
-				if (inOutShape.back().b == sortedBorders[i].coords.a)
+				if (inOutShape.back().b.isNearlyEqualTo(sortedBorders[i].coords.a))
 				{
 					moveSortedBorders(inOutShape, sortedBorders, i);
-					if (inOutShape.back().b == inOutShape[shapeStartIndexes.back()].a)
+					if (inOutShape.back().b.isNearlyEqualTo(inOutShape[shapeStartIndexes.back()].a))
 					{
+						break;
+					}
+
+					if ALMOST_NEVER(sortedBorders.empty()) {
+						ReportError("sortedBorders should not be empty here, the shape was invalid");
 						break;
 					}
 				}
@@ -907,8 +913,21 @@ namespace ShapeOperations
 		return shapeStartIndexes;
 	}
 
-	void ExtendInPlace(Shape& /*inOutShape*/, float /*radius*/)
+	void ExtendInPlace(Shape& inOutShape, float radius)
 	{
+		float onePointFraction = 1.0f / inOutShape.size();
+		Vector2D center(ZERO_VECTOR);
+		for (const SimpleBorder& border : inOutShape)
+		{
+			center += border.a * onePointFraction;
+		}
+
+		std::for_each(inOutShape.begin(), inOutShape.end(),
+			[center, radius](SimpleBorder& border){
+				border.a -= (center - border.a).unit() * radius;
+				border.b -= (center - border.b).unit() * radius;
+			}
+		);
 		// ToDo: actual extrude
 	}
 }
