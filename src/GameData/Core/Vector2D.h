@@ -1,8 +1,11 @@
 #pragma once
 
-#include "Rotator.h"
+#include <cmath>
 
 #include <nlohmann/json_fwd.hpp>
+
+#include "Rotator.h"
+
 
 struct Vector2D
 {
@@ -83,6 +86,30 @@ constexpr Vector2D UP_DIRECTION(0.0f, -1.0f);
 constexpr Vector2D DOWN_DIRECTION(0.0f, 1.0f);
 constexpr Vector2D ZERO_VECTOR(0.0f, 0.0f);
 
+// if we want to use vector as key in unordered map then we can use this class to allow to be compared with some precision
+template<int PrecisionBin = 10>
+struct Vector2DKey
+{
+	static constexpr float Multiplier = static_cast<float>(1 << PrecisionBin);
+
+	float keyX;
+	float keyY;
+
+	Vector2D value;
+
+	// implicit conversion
+	constexpr Vector2DKey(Vector2D value)
+		: keyX(std::round(value.x * Multiplier))
+		, keyY(std::round(value.y * Multiplier))
+		, value(value)
+	{}
+
+	[[nodiscard]] constexpr bool operator==(const Vector2DKey& other) const noexcept
+	{
+		return keyX == other.keyX && keyY == other.keyY;
+	}
+};
+
 namespace std
 {
 	template <>
@@ -91,6 +118,15 @@ namespace std
 		std::size_t operator()(Vector2D k) const
 		{
 			return hash<float>()(k.x) ^ (hash<float>()(k.y) << 1);
+		}
+	};
+
+	template <int Precision>
+	struct hash<Vector2DKey<Precision>>
+	{
+		std::size_t operator()(const Vector2DKey<Precision>& k) const
+		{
+			return hash<float>()(k.keyX) ^ (hash<float>()(k.keyY) << 1);
 		}
 	};
 }

@@ -1,6 +1,6 @@
 #include "Base/precomp.h"
 
-#include <cmath>
+#include <map>
 
 #include <gtest/gtest.h>
 
@@ -267,4 +267,18 @@ TEST(Vector2D, InvLerp)
 		EXPECT_FLOAT_EQ(0.3f, Vector2D::InvLerp(testVectorA, testVectorB, Vector2D::Lerp(testVectorA, testVectorB, 0.3f)));
 		EXPECT_FLOAT_EQ(0.9f, Vector2D::InvLerp(testVectorA, testVectorB, Vector2D::Lerp(testVectorA, testVectorB, 0.9f)));
 	}
+}
+
+TEST(Vector2DKey, UseInMap)
+{
+	std::unordered_map<Vector2DKey<>, int> vectorToInt;
+	vectorToInt[Vector2D(10.0f, 10.0f)] = 1;
+	vectorToInt[Vector2D(10.00001f, 10.0f)] = 2; // overwrites the first value
+	vectorToInt[Vector2D(10.1f, 10.0f)] = 3;
+
+	EXPECT_EQ(2u, vectorToInt.size());
+	EXPECT_EQ(2, vectorToInt[Vector2D(10.0f, 10.0f)]);
+	EXPECT_EQ(2, vectorToInt[Vector2D(10.00001f, 10.0f)]);
+	EXPECT_EQ(2, vectorToInt[Vector2D(10.0f, 10.00001f)]);
+	EXPECT_EQ(3, vectorToInt[Vector2D(10.1f, 10.0f)]);
 }
