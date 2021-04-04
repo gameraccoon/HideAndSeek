@@ -39,13 +39,9 @@ DebugDrawSystem::DebugDrawSystem(WorldHolder& worldHolder, const TimeData& timeD
 template<typename T>
 void RemoveOldDrawElement(std::vector<T>& vector, GameplayTimestamp now)
 {
-	vector.erase(
-		std::remove_if(
-			vector.begin(),
-			vector.end(),
-			[now](const T& val){ return val.isLifeTimeExceeded(now); }
-		),
-		vector.end()
+	std::erase_if(
+		vector,
+		[now](const T& val){ return val.isLifeTimeExceeded(now); }
 	);
 }
 

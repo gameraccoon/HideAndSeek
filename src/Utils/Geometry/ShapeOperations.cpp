@@ -559,13 +559,9 @@ namespace ShapeOperations
 	void OptimizeShape(std::vector<SimpleBorder>& inOutShape)
 	{
 		// remove empty borders
-		inOutShape.erase(
-			std::remove_if(
-				inOutShape.begin(),
-				inOutShape.end(),
-				[](const SimpleBorder& border) { return border.a == border.b; }
-			),
-			inOutShape.end()
+		std::erase_if(
+			inOutShape,
+			[](const SimpleBorder& border) { return border.a == border.b; }
 		);
 
 		// collect neighboring borders

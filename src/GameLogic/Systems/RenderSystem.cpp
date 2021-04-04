@@ -260,16 +260,12 @@ void RenderSystem::drawLights(SpatialEntityManager& managerGroup, std::vector<Wo
 	Vector2D emitterPositionBordersRB = playerSightPosition + screenHalfSize + maxFov;
 
 	// exclude lights that are too far to be visible
-	lightComponentSets.erase(
-		std::remove_if(
-			std::begin(lightComponentSets),
-			std::end(lightComponentSets),
-			[emitterPositionBordersLT, emitterPositionBordersRB](auto& componentSet)
-			{
-				return !std::get<1>(componentSet)->getLocation().isInsideRect(emitterPositionBordersLT, emitterPositionBordersRB);
-			}
-		),
-		std::end(lightComponentSets)
+	std::erase_if(
+		lightComponentSets,
+		[emitterPositionBordersLT, emitterPositionBordersRB](auto& componentSet)
+		{
+			return !std::get<1>(componentSet)->getLocation().isInsideRect(emitterPositionBordersLT, emitterPositionBordersRB);
+		}
 	);
 
 	if (!lightComponentSets.empty())

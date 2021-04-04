@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "Base/Types/TemplateAliases.h"
 
 #include "GameData/Spatial/WorldCell.h"
@@ -24,16 +25,12 @@ namespace ImguiPropertyFiltration
 
 		void filterEntities(TupleVector<WorldCell*, Entity>& inOutEntities)
 		{
-			inOutEntities.erase(
-				std::remove_if(
-					inOutEntities.begin(),
-					inOutEntities.end(),
-					[this](const auto& tuple)
-					{
-						return !isConditionPassed(std::get<0>(tuple)->getEntityManager(), std::get<1>(tuple));
-					}
-				),
-				inOutEntities.end()
+			std::erase_if(
+				inOutEntities,
+				[this](const auto& tuple)
+				{
+					return !isConditionPassed(std::get<0>(tuple)->getEntityManager(), std::get<1>(tuple));
+				}
 			);
 		}
 

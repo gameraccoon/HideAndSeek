@@ -70,15 +70,12 @@ static bool AreShapesEqual(const std::span<const SimpleBorder> a, const std::spa
 
 		for (const SimpleBorder& border : b)
 		{
-			a_copy.erase(
-				std::remove_if(
-					a_copy.begin(),
-					a_copy.end(),
-					[&border](const SimpleBorder& borderB)
-					{
-						return border.a.isNearlyEqualTo(borderB.a) && border.b.isNearlyEqualTo(borderB.b);
-					}),
-				a_copy.end()
+			std::erase_if(
+				a_copy,
+				[&border](const SimpleBorder& borderB)
+				{
+					return border.a.isNearlyEqualTo(borderB.a) && border.b.isNearlyEqualTo(borderB.b);
+				}
 			);
 		}
 		return a_copy.empty();

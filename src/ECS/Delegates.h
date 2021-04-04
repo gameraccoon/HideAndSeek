@@ -129,16 +129,12 @@ public:
 
 	void unbind(Delegates::Handle handle)
 	{
-		mFunctions.erase(
-			std::remove_if(
-				mFunctions.begin(),
-				mFunctions.end(),
-				[handle](FunctionData& val)
-				{
-					return val.handle == handle;
-				}
-			),
-			mFunctions.end()
+		std::erase_if(
+			mFunctions,
+			[handle](FunctionData& val)
+			{
+				return val.handle == handle;
+			}
 		);
 	}
 

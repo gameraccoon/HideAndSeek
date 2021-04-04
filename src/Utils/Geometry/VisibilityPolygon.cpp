@@ -51,16 +51,12 @@ static bool NormalizePoint(Vector2D& point, const Vector2D& pair, float left, fl
 static void FilterOutPotentialContinuations(std::vector<size_t>& outPotentialContinuations, std::vector<VisibilityPolygonCalculator::AngledBorder>& boardersToTrace, float maxAngle)
 {
 	// filter out the continuations that are not longer stick out of the end of the closest border
-	outPotentialContinuations.erase(
-		std::remove_if(
-			outPotentialContinuations.begin(),
-			outPotentialContinuations.end(),
-			[&boardersToTrace, maxAngle](size_t idx)
-			{
-				return (Rotator::NormalizeRawAngle(maxAngle - boardersToTrace[idx].angleB) >= 0.0f);
-			}
-		),
-		outPotentialContinuations.end()
+	std::erase_if(
+		outPotentialContinuations,
+		[&boardersToTrace, maxAngle](size_t idx)
+		{
+			return (Rotator::NormalizeRawAngle(maxAngle - boardersToTrace[idx].angleB) >= 0.0f);
+		}
 	);
 }
 
