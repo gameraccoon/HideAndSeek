@@ -590,7 +590,7 @@ namespace ShapeOperations
 					{
 						// process borders that produce a straight line
 						const float area = Collide::SignedArea(pos.value, borders[i].secondBorderPoint, borders[j].secondBorderPoint);
-						if (Math::IsNearZero(area))
+						if (Math::IsNearZero(area, 0.01f))
 						{
 							const size_t finalBorderIdx = borders[i].borderIndex;
 							const size_t borderIdxToRemove = borders[j].borderIndex;
@@ -631,7 +631,7 @@ namespace ShapeOperations
 							// link the final border instead of the removed border
 							{
 								const SimpleBorder borderToRemove = inOutShape[borderIdxToRemove];
-								const Vector2D anotherIntersectionPoint = (borderToRemove.a == pos.value) ? borderToRemove.b : borderToRemove.a;
+								const Vector2D anotherIntersectionPoint = (borderToRemove.a.isNearlyEqualTo(pos.value)) ? borderToRemove.b : borderToRemove.a;
 								auto pointsIt = points.find(Vector2DKey(anotherIntersectionPoint));
 								// ignore if the other border was already processed
 								if (pointsIt != points.end())
