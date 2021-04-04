@@ -1,6 +1,7 @@
 #include "Base/precomp.h"
 
 #include <algorithm>
+#include <numeric>
 #include <random>
 #include <ranges>
 #include <span>
@@ -57,6 +58,22 @@ enum class ShapeEquality
 	Exact
 };
 
+template<typename T>
+static bool AreRingsEqual(const T& shapeA, const T& shapeB)
+{
+	std::vector a_copy(shapeA.begin(), shapeA.end());
+
+	auto it = std::find(a_copy.begin(), a_copy.end(), shapeB[0]);
+	if (it == a_copy.end())
+	{
+		return false;
+	}
+
+	std::rotate(a_copy.begin(), it, a_copy.end());
+
+	return std::equal(a_copy.begin(), a_copy.end(), shapeB.begin());
+}
+
 static bool AreShapesEqual(const std::span<const SimpleBorder> a, const std::span<const SimpleBorder> b, const ShapeEquality equalityType)
 {
 	if (a.size() != b.size())
@@ -82,22 +99,45 @@ static bool AreShapesEqual(const std::span<const SimpleBorder> a, const std::spa
 	}
 	else if (equalityType == ShapeEquality::Ordered)
 	{
-		std::vector a_copy(a.begin(), a.end());
-
-		auto it = std::find(a_copy.begin(), a_copy.end(), b[0]);
-		if (it == a_copy.end())
-		{
-			return false;
-		}
-
-		std::rotate(a_copy.begin(), it, a_copy.end());
-
-		return std::equal(a_copy.begin(), a_copy.end(), b.begin());
+		return AreRingsEqual(a, b);
 	}
 	else
 	{
 		return std::equal(a.begin(), a.end(), b.begin());
 	}
+}
+
+static bool AreShapeVectorsEqual(const std::vector<std::vector<Vector2D>>& shapeVectorA, const std::vector<std::vector<Vector2D>>& shapeVectorB)
+{
+	if (shapeVectorA.size() != shapeVectorB.size())
+	{
+		return false;
+	}
+
+	std::vector<size_t> notFoundShapes(shapeVectorA.size());
+	std::iota(notFoundShapes.begin(), notFoundShapes.end(), 0);
+
+	for (const std::vector<Vector2D>& shape : shapeVectorA)
+	{
+		size_t foundShape = std::numeric_limits<size_t>::max();
+		for (size_t shapeIdx : notFoundShapes)
+		{
+			if (AreRingsEqual(shape, shapeVectorB[shapeIdx]))
+			{
+				foundShape = shapeIdx;
+				break;
+			}
+		}
+
+		if (foundShape == std::numeric_limits<size_t>::max())
+		{
+			return false;
+		}
+
+		std::erase(notFoundShapes, foundShape);
+	}
+
+	return notFoundShapes.empty();
 }
 
 static const std::vector<SimpleBorder>& GetShape(const std::vector<SimpleBorder>& vec)
@@ -445,4 +485,31 @@ TEST(ShapeOperations, SortBorders_SortNonConvex)
 
 	EXPECT_EQ(1u, foundShapes.size());
 	EXPECT_TRUE(AreShapesEqual(expectedShape, shape, ShapeEquality::Ordered));
+}
+
+TEST(ShapeOperations, SplitIntoConvexShapes_AlreadyConvexShape)
+{
+	const std::vector<SimpleBorder> initialShape = GenerateShape(std::vector<Vector2D>{ {30.0f, -60.0f}, { 30.0f, 60.0f }, { -30.0f, 60.0f }, { -30.0f, -60.0f }});
+	const std::vector<std::vector<Vector2D>> expectedResult = { std::vector<Vector2D>{ {30.0f, -60.0f}, { 30.0f, 60.0f }, { -30.0f, 60.0f }, { -30.0f, -60.0f }} };
+	std::vector<std::vector<Vector2D>> resultingShapes;
+	ShapeOperations::SplitIntoConvexShapes(initialShape, resultingShapes);
+
+	EXPECT_EQ(1u, resultingShapes.size());
+	EXPECT_TRUE(AreShapeVectorsEqual(expectedResult, resultingShapes));
+}
+
+TEST(ShapeOperations, SplitIntoConvexShapes_NonConvexQuad)
+{
+	const std::vector<SimpleBorder> initialShape = GenerateShape(std::vector<Vector2D>{ {0.0f, 10.0f}, { 20.0f, -10.0f }, { 0.0f, 30.0f }, { -20.0f, -10.0f }});
+
+	const std::vector<std::vector<Vector2D>> expectedShapes = {
+		{ std::vector<Vector2D>{ {0.0f, 10.0f}, { 20.0f, -10.0f }, { 0.0f, 30.0f }} },
+		{ std::vector<Vector2D>{ {0.0f, 10.0f}, { 0.0f, 30.0f }, { -20.0f, -10.0f }} },
+	};
+
+	std::vector<std::vector<Vector2D>> resultingShapes;
+	ShapeOperations::SplitIntoConvexShapes(initialShape, resultingShapes);
+
+	EXPECT_EQ(2u, resultingShapes.size());
+	EXPECT_TRUE(AreShapeVectorsEqual(expectedShapes, resultingShapes));
 }
