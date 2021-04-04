@@ -3,7 +3,7 @@
 #include <string>
 
 class World;
-class ComponentSerializersHolder;
+struct ComponentSerializersHolder;
 
 namespace Utils
 {

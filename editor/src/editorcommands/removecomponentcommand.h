@@ -9,7 +9,7 @@
 #include "src/editorutils/componentreference.h"
 
 class World;
-class ComponentSerializersHolder;
+struct ComponentSerializersHolder;
 
 class RemoveComponentCommand : public EditorCommand
 {

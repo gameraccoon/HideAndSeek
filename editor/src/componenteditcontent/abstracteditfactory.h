@@ -12,7 +12,7 @@
 
 class QWidget;
 class QLayout;
-class ComponentSourceReference;
+struct ComponentSourceReference;
 
 class EditData : public QObject
 {

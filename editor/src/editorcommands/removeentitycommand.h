@@ -6,7 +6,7 @@
 #include <nlohmann/json.hpp>
 
 class World;
-class ComponentSerializersHolder;
+struct ComponentSerializersHolder;
 
 class RemoveEntityCommand : public EditorCommand
 {

@@ -3,7 +3,7 @@
 #include "src/componenteditcontent/abstracteditfactory.h"
 #include "src/componenteditcontent/typeeditconstructorhelpers.h"
 
-class ComponentSourceReference;
+struct ComponentSourceReference;
 
 {attribute_includes}
 
