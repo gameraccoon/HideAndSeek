@@ -569,8 +569,8 @@ namespace ShapeOperations
 		for (size_t i = 0, iSize = inOutShape.size(); i < iSize; ++i)
 		{
 			const SimpleBorder& border = inOutShape[i];
-			points[border.a].emplace_back(border.b, i, true);
-			points[border.b].emplace_back(border.a, i, false);
+			points[Vector2DKey(border.a)].emplace_back(border.b, i, true);
+			points[Vector2DKey(border.b)].emplace_back(border.a, i, false);
 		}
 
 		// iterate over all neighboring border pairs and join ones that produce a straight line
@@ -613,7 +613,7 @@ namespace ShapeOperations
 								}
 
 								// update secondBorderPoint of the intersection from another side of the final border
-								auto pointsIt = points.find(secondFinalBorderPoint);
+								auto pointsIt = points.find(Vector2DKey(secondFinalBorderPoint));
 								// ignore if the other border was already processed
 								if (pointsIt != points.end())
 								{
@@ -631,8 +631,8 @@ namespace ShapeOperations
 							// link the final border instead of the removed border
 							{
 								const SimpleBorder borderToRemove = inOutShape[borderIdxToRemove];
-								const Vector2D anotherIntersectionPoint = (borderToRemove.a == pos) ? borderToRemove.b : borderToRemove.a;
-								auto pointsIt = points.find(anotherIntersectionPoint);
+								const Vector2D anotherIntersectionPoint = (borderToRemove.a == pos.value) ? borderToRemove.b : borderToRemove.a;
+								auto pointsIt = points.find(Vector2DKey(anotherIntersectionPoint));
 								// ignore if the other border was already processed
 								if (pointsIt != points.end())
 								{

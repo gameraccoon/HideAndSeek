@@ -272,13 +272,13 @@ TEST(Vector2D, InvLerp)
 TEST(Vector2DKey, UseInMap)
 {
 	std::unordered_map<Vector2DKey<>, int> vectorToInt;
-	vectorToInt[Vector2D(10.0f, 10.0f)] = 1;
-	vectorToInt[Vector2D(10.00001f, 10.0f)] = 2; // overwrites the first value
-	vectorToInt[Vector2D(10.1f, 10.0f)] = 3;
+	vectorToInt[Vector2DKey(Vector2D(10.0f, 10.0f))] = 1;
+	vectorToInt[Vector2DKey(Vector2D(10.00001f, 10.0f))] = 2; // overwrites the first value
+	vectorToInt[Vector2DKey(Vector2D(10.1f, 10.0f))] = 3;
 
 	EXPECT_EQ(2u, vectorToInt.size());
-	EXPECT_EQ(2, vectorToInt[Vector2D(10.0f, 10.0f)]);
-	EXPECT_EQ(2, vectorToInt[Vector2D(10.00001f, 10.0f)]);
-	EXPECT_EQ(2, vectorToInt[Vector2D(10.0f, 10.00001f)]);
-	EXPECT_EQ(3, vectorToInt[Vector2D(10.1f, 10.0f)]);
+	EXPECT_EQ(2, vectorToInt[Vector2DKey(Vector2D(10.0f, 10.0f))]);
+	EXPECT_EQ(2, vectorToInt[Vector2DKey(Vector2D(10.00001f, 10.0f))]);
+	EXPECT_EQ(2, vectorToInt[Vector2DKey(Vector2D(10.0f, 10.00001f))]);
+	EXPECT_EQ(3, vectorToInt[Vector2DKey(Vector2D(10.1f, 10.0f))]);
 }

@@ -97,8 +97,7 @@ struct Vector2DKey
 
 	Vector2D value;
 
-	// implicit conversion
-	constexpr Vector2DKey(Vector2D value)
+	constexpr explicit Vector2DKey(Vector2D value)
 		: keyX(std::round(value.x * Multiplier))
 		, keyY(std::round(value.y * Multiplier))
 		, value(value)
