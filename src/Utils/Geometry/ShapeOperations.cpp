@@ -589,66 +589,66 @@ namespace ShapeOperations
 					if (borders[i].isFirstPoint != borders[j].isFirstPoint)
 					{
 						// process borders that produce a straight line
-						float area = Collide::SignedArea(pos.value, borders[i].secondBorderPoint, borders[j].secondBorderPoint);
+						const float area = Collide::SignedArea(pos.value, borders[i].secondBorderPoint, borders[j].secondBorderPoint);
 						if (Math::IsNearZero(area))
 						{
-							size_t iBorderIdx = borders[i].borderIndex;
-							size_t jBorderIdx = borders[j].borderIndex;
-							Vector2D iBorderPoint = borders[i].secondBorderPoint;
-							Vector2D jBorderPoint = borders[j].secondBorderPoint;
+							const size_t finalBorderIdx = borders[i].borderIndex;
+							const size_t borderIdxToRemove = borders[j].borderIndex;
+							const Vector2D notChangedBorderPoint = borders[i].secondBorderPoint;
+							const Vector2D movedBorderPoint = borders[j].secondBorderPoint;
 
 							{
-								Vector2D anotherIntersectionPoint;
+								Vector2D secondFinalBorderPoint;
 								// replace border i with the merged border in the final shape
-								SimpleBorder& finalBorder = inOutShape[iBorderIdx];
+								SimpleBorder& finalBorder = inOutShape[finalBorderIdx];
 								if (finalBorder.a.isNearlyEqualTo(pos.value))
 								{
-									finalBorder.a = jBorderPoint;
-									anotherIntersectionPoint = finalBorder.b;
+									finalBorder.a = movedBorderPoint;
+									secondFinalBorderPoint = finalBorder.b;
 								}
 								else
 								{
-									finalBorder.b = jBorderPoint;
-									anotherIntersectionPoint = finalBorder.a;
+									finalBorder.b = movedBorderPoint;
+									secondFinalBorderPoint = finalBorder.a;
 								}
 
-								// link the final border instead of border i
-								auto pointsIt = points.find(anotherIntersectionPoint);
+								// update secondBorderPoint of the intersection from another side of the final border
+								auto pointsIt = points.find(secondFinalBorderPoint);
 								// ignore if the other border was already processed
 								if (pointsIt != points.end())
 								{
 									for (auto& borderInfo : pointsIt->second)
 									{
-										if (borderInfo.borderIndex == iBorderIdx)
+										if (borderInfo.borderIndex == finalBorderIdx)
 										{
-											borderInfo.secondBorderPoint = jBorderPoint;
+											borderInfo.secondBorderPoint = movedBorderPoint;
 											break;
 										}
 									}
 								}
 							}
 
-							// link the final border instead of border j
+							// link the final border instead of the removed border
 							{
-								const SimpleBorder borderToRemove = inOutShape[jBorderIdx];
-								Vector2D anotherIntersectionPoint = (borderToRemove.a == pos) ? borderToRemove.b : borderToRemove.a;
+								const SimpleBorder borderToRemove = inOutShape[borderIdxToRemove];
+								const Vector2D anotherIntersectionPoint = (borderToRemove.a == pos) ? borderToRemove.b : borderToRemove.a;
 								auto pointsIt = points.find(anotherIntersectionPoint);
 								// ignore if the other border was already processed
 								if (pointsIt != points.end())
 								{
 									for (auto& borderInfo : pointsIt->second)
 									{
-										if (borderInfo.borderIndex == jBorderIdx)
+										if (borderInfo.borderIndex == borderIdxToRemove)
 										{
-											borderInfo.borderIndex = iBorderIdx;
-											borderInfo.secondBorderPoint = iBorderPoint;
+											borderInfo.borderIndex = finalBorderIdx;
+											borderInfo.secondBorderPoint = notChangedBorderPoint;
 											break;
 										}
 									}
 								}
 							}
 							// border j is unlinked so we won't refer to it anymore, but we'll delete it later
-							bordersToRemove.push_back(jBorderIdx);
+							bordersToRemove.push_back(borderIdxToRemove);
 
 							// there can't be more than one valid straight line going through one point
 							goto pair_loop_exit;
