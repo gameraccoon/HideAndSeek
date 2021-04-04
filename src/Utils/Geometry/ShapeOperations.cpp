@@ -159,6 +159,7 @@ namespace ShapeOperations
 
 	static PointPositionOnSide GetPointPositionOnSide(Vector2D start, Vector2D end, Vector2D point, bool shouldInverse)
 	{
+		// ToDo: add a comment about the meaning of shouldInverse
 		if (point == start)
 		{
 			return shouldInverse ? PointPositionOnSide::End : PointPositionOnSide::Start;
