@@ -2,6 +2,7 @@
 
 #include "Utils/Geometry/ShapeOperations.h"
 
+#include <array>
 #include <algorithm>
 #include <cstring>
 #include <numeric>
