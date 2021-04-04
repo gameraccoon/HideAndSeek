@@ -44,7 +44,7 @@ static std::vector<SimpleBorder> GenerateShape(const std::vector<Vector2D>& poin
 	{
 		// borders can be in any order theoretically, so let's shuffle them
 		// we need to use a predefined seed to have stable results (more or less)
-		std::ranges::shuffle(result, std::mt19937(42));
+		std::ranges::shuffle(result, std::mt19937(11));
 	}
 
 	return result;
