@@ -26,23 +26,23 @@ static bool NormalizePoint(Vector2D& point, const Vector2D& pair, float left, fl
 {
 	if (point.x < left)
 	{
-		point = pair + abs((left - pair.x)/(point.x - pair.x)) * (point-pair);
+		point = pair + std::fabs((left - pair.x)/(point.x - pair.x)) * (point-pair);
 		return true;
 	}
 	else if (point.x > right)
 	{
-		point = pair + abs((pair.x - right)/(pair.x - point.x)) * (point-pair);
+		point = pair + std::fabs((pair.x - right)/(pair.x - point.x)) * (point-pair);
 		return true;
 	}
 
 	if (point.y < top)
 	{
-		point = pair + abs((top - pair.y)/(point.y - pair.y)) * (point-pair);
+		point = pair + std::fabs((top - pair.y)/(point.y - pair.y)) * (point-pair);
 		return true;
 	}
 	else if (point.y > bottom)
 	{
-		point = pair + abs((pair.y - bottom)/(pair.y - point.y)) * (point-pair);
+		point = pair + std::fabs((pair.y - bottom)/(pair.y - point.y)) * (point-pair);
 		return true;
 	}
 	return false;
