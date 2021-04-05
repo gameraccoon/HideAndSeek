@@ -24,8 +24,14 @@ namespace PathBlockingGeometry
 			const Hull& hull = collision->getGeometry();
 			if (hull.type == HullType::Angular)
 			{
-				std::vector<SimpleBorder> borders = ShapeOperations::ConvertBordersToSimpleBorders(hull.borders, transform->getLocation());
-				ShapeOperations::ExtendInPlace(borders, GEOMETRY_EXTENT);
+				std::vector<SimpleBorder> borders;
+				ShapeOperations::ExtendGeometry(borders, hull.points, GEOMETRY_EXTENT);
+				std::ranges::for_each(borders, [location = transform->getLocation()](SimpleBorder& border)
+				{
+					border.a += location;
+					border.b += location;
+				});
+
 				mergedGeometry.push_back(std::move(borders));
 			}
 		}
@@ -38,7 +44,7 @@ namespace PathBlockingGeometry
 		std::ranges::for_each(mergedGeometry,
 			[&splitGeometry](ShapeOperations::MergedGeometry& geometry)
 			{
-				ShapeOperations::SplitIntoConvexShapes(geometry.borders, splitGeometry);
+				ShapeOperations::SplitIntoConvexShapes(splitGeometry, geometry.borders);
 			}
 		);
 

@@ -671,21 +671,6 @@ namespace ShapeOperations
 		}
 	}
 
-	std::vector<SimpleBorder> ConvertBordersToSimpleBorders(const std::vector<Border>& borders, Vector2D location)
-	{
-		std::vector<SimpleBorder> result(borders.size());
-		std::transform(
-			borders.begin(),
-			borders.end(),
-			result.begin(),
-			[location](const Border& border)
-			{
-				return SimpleBorder(border.getA() + location, border.getB() + location);
-			}
-		);
-		return result;
-	}
-
 	bool AreShapesIntersect(const MergedGeometry& firstGeometry, const MergedGeometry& secondGeometry)
 	{
 		if (!Collide::AreAABBsIntersectInclusive(firstGeometry.aabb, secondGeometry.aabb))
@@ -776,7 +761,16 @@ namespace ShapeOperations
 		}
 	}
 
-	void SplitIntoConvexShapes(Shape geometry, std::vector<std::vector<Vector2D>>& newShapes)
+	MergedGeometry::MergedGeometry(std::vector<SimpleBorder>&& simpleBorders)
+		: borders(std::move(simpleBorders))
+	{
+		for (const SimpleBorder& border : borders)
+		{
+			updateAABBFromBorder(aabb, border);
+		}
+	}
+
+	void SplitIntoConvexShapes(std::vector<std::vector<Vector2D>>& inOutShapes, Shape geometry)
 	{
 		std::vector<size_t> shapes = ShapeOperations::SortBorders(geometry);
 		shapes.push_back(geometry.size());
@@ -818,14 +812,13 @@ namespace ShapeOperations
 			pp.ConvexPartition_OPT(&polygons[0], &resultPolygons);
 		}
 
-		newShapes.reserve(resultPolygons.size());
 		for (auto& polygon : resultPolygons)
 		{
-			newShapes.emplace_back(polygon.GetNumPoints());
+			inOutShapes.emplace_back(polygon.GetNumPoints());
 			for (size_t i = 0, iSize = polygon.GetNumPoints(); i < iSize; ++i)
 			{
 				const TPPLPoint& point = polygon[i];
-				newShapes.back()[i] = {point.x, point.y};
+				inOutShapes.back()[i] = {point.x, point.y};
 			}
 		}
 	}
@@ -909,21 +902,26 @@ namespace ShapeOperations
 		return shapeStartIndexes;
 	}
 
-	void ExtendInPlace(Shape& inOutShape, float radius)
+	void ExtendGeometry(Shape& outResultingShape, const std::vector<Vector2D>& geometry, float radius)
 	{
-		float onePointFraction = 1.0f / inOutShape.size();
-		Vector2D center(ZERO_VECTOR);
-		for (const SimpleBorder& border : inOutShape)
+		outResultingShape.clear();
+
+		std::vector<Vector2D> points(geometry.size());
+
+		auto getNeighboringPoints = [size = points.size()](size_t i) -> std::pair<size_t, size_t>
 		{
-			center += border.a * onePointFraction;
+			return { (i > 0) ? i - 1 : size - 1, (i < size - 1) ? i + 1 : 0 };
+		};
+
+		for (size_t i = 0, iSize = points.size(); i < iSize; ++i)
+		{
+			auto [prev, next] = getNeighboringPoints(i);
+			Vector2D direction = ((geometry[i] - geometry[prev]).normal() + (geometry[next] - geometry[i]).normal()).unit();
+			points[i] = geometry[i] + direction * radius;
 		}
 
-		std::ranges::for_each(inOutShape,
-			[center, radius](SimpleBorder& border){
-				border.a -= (center - border.a).unit() * radius;
-				border.b -= (center - border.b).unit() * radius;
-			}
-		);
-		// ToDo: actual extrude
+		FOR_EACH_BORDER(points.size(), {
+			outResultingShape.emplace_back(points[i], points[j]);
+		});
 	}
 }

@@ -19,6 +19,7 @@ namespace ShapeOperations
 	{
 		MergedGeometry(const std::vector<Border>& inBorders, Vector2D location);
 		MergedGeometry(const std::vector<SimpleBorder>& simpleBorders);
+		MergedGeometry(std::vector<SimpleBorder>&& simpleBorders);
 
 		Shape borders;
 		BoundingBox aabb
@@ -30,16 +31,14 @@ namespace ShapeOperations
 		};
 	};
 
-	std::vector<SimpleBorder> ConvertBordersToSimpleBorders(const std::vector<Border>& borders, Vector2D location);
-
 	bool AreShapesIntersect(const MergedGeometry& firstGeometry, const MergedGeometry& secondGeometry);
 
 	void MergeGeometry(std::vector<MergedGeometry>& inOutGeometry);
 
-	void SplitIntoConvexShapes(Shape geometry, std::vector<std::vector<Vector2D>>& newShapes);
+	void SplitIntoConvexShapes(std::vector<std::vector<Vector2D>>& inOutShapes, Shape geometry);
 
 	// returns start indexes of the figure and each hole in the resulting shape
 	std::vector<size_t> SortBorders(Shape& inOutShape);
 
-	void ExtendInPlace(Shape& inOutShape, float radius);
+	void ExtendGeometry(Shape& outResultingShape, const std::vector<Vector2D>& geometry, float radius);
 }

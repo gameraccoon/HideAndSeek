@@ -492,7 +492,7 @@ TEST(ShapeOperations, SplitIntoConvexShapes_AlreadyConvexShape)
 	const std::vector<SimpleBorder> initialShape = GenerateShape(std::vector<Vector2D>{ {30.0f, -60.0f}, { 30.0f, 60.0f }, { -30.0f, 60.0f }, { -30.0f, -60.0f }});
 	const std::vector<std::vector<Vector2D>> expectedResult = { std::vector<Vector2D>{ {30.0f, -60.0f}, { 30.0f, 60.0f }, { -30.0f, 60.0f }, { -30.0f, -60.0f }} };
 	std::vector<std::vector<Vector2D>> resultingShapes;
-	ShapeOperations::SplitIntoConvexShapes(initialShape, resultingShapes);
+	ShapeOperations::SplitIntoConvexShapes(resultingShapes, initialShape);
 
 	EXPECT_EQ(1u, resultingShapes.size());
 	EXPECT_TRUE(AreShapeVectorsEqual(expectedResult, resultingShapes));
@@ -508,7 +508,7 @@ TEST(ShapeOperations, SplitIntoConvexShapes_NonConvexQuad)
 	};
 
 	std::vector<std::vector<Vector2D>> resultingShapes;
-	ShapeOperations::SplitIntoConvexShapes(initialShape, resultingShapes);
+	ShapeOperations::SplitIntoConvexShapes(resultingShapes, initialShape);
 
 	EXPECT_EQ(2u, resultingShapes.size());
 	EXPECT_TRUE(AreShapeVectorsEqual(expectedShapes, resultingShapes));
