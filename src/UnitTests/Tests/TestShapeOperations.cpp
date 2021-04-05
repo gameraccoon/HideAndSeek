@@ -350,9 +350,19 @@ TEST(ShapeOperations, Union_NonConvexShapeOneOverlappingBorderOneDirection)
 TEST(ShapeOperations, Union_TwoRectsWithNotRoundCoordinates)
 {
 	// coordinates from an existent bug
-	std::vector<Vector2D> shape1{{31.082706451416016f, -465.0944519042969f}, {31.082706451416016f, -438.5184631347656f}, {-128.373046875f, -438.5184631347656f}, {-128.373046875f, -465.0944519042969f}};
-	std::vector<Vector2D> shape2{{-89.91729736328125f, -465.0944519042969f}, {-89.91729736328125f, -438.5184631347656f}, {-249.373046875f, -438.5184631347656f}, {-249.373046875f, -465.0944519042969f}};
-	std::vector<Vector2D> expectedResult{{31.082706451416016f, -465.0944519042969f}, {31.082706451416016f, -438.5184631347656}, {-249.373046875f, -438.5184631347656f}, {-249.373046875f, -465.0944519042969f}};
+	std::vector<Vector2D> shape1{ { 31.082706451416016f, -465.0944519042969f }, { 31.082706451416016f, -438.5184631347656f }, { -128.373046875f, -438.5184631347656f }, { -128.373046875f, -465.0944519042969f } };
+	std::vector<Vector2D> shape2{ { -89.91729736328125f, -465.0944519042969f }, { -89.91729736328125f, -438.5184631347656f }, { -249.373046875f, -438.5184631347656f }, { -249.373046875f, -465.0944519042969f } };
+	std::vector<Vector2D> expectedResult{ { 31.082706451416016f, -465.0944519042969f }, { 31.082706451416016f, -438.5184631347656f }, { -249.373046875f, -438.5184631347656f }, { -249.373046875f, -465.0944519042969f } };
+
+	TestShapesUnionResultIsCorrect(shape1, shape2, expectedResult);
+}
+
+TEST(ShapeOperations, Union_TwoFiguresWithNotRoundCoordinates)
+{
+	// coordinates from an existent bug
+	std::vector<SimpleBorder> shape1{ { { -0.707107544f, -325.292908f }, { -0.707107544f, -346.707092f } }, { { -0.707107544f, -346.707092f }, { 120.707108f, -346.707092f } }, { { 136.707108f, -325.707092f }, { 136.707108f, -204.292892f } }, { { 136.707108f, -204.292892f }, { 115.292892f, -204.292892f } }, { { 120.707100f, -325.707062f }, { 136.707108f, -325.707092f } }, { { 120.707108f, -346.707092f }, { 120.707100f, -325.707062f } }, { { 115.292885f, -325.292908f }, { -0.707107544f, -325.292908f } }, { { 115.292892f, -204.292892f }, { 115.292885f, -325.292908f } } };
+	std::vector<SimpleBorder> shape2{ { { 136.707108f, -204.707108f }, { 136.707108f, -83.2928925f } }, { { 136.707108f, -83.2928925f }, { 115.292892f, -83.2928925f } }, { { 115.292892f, -83.2928925f }, { 115.292892f, -204.707108f } }, { { 115.292892f, -204.707108f }, { 136.707108f, -204.707108f } } };
+	std::vector<SimpleBorder> expectedResult{ { { -0.707107544f, -325.292908f }, { -0.707107544f, -346.707092f } }, { { -0.707107544f, -346.707092f }, { 120.707108f, -346.707092f } }, { { 136.707108f, -325.707092f }, { 136.707108f, 115.292892f } }, { { 136.707108f, 115.292892f }, { 115.292892f, 115.292892f } }, { { 120.707100f, -325.707062f }, { 136.707108f, -325.707092f } }, { { 120.707108f, -346.707092f }, { 120.707100f, -325.707062f } }, { { 115.292885f, -325.292908f }, { -0.707107544f, -325.292908f } }, { { 115.292892f, 115.292892f }, { 115.292885f, -325.292908f } } };
 
 	TestShapesUnionResultIsCorrect(shape1, shape2, expectedResult);
 }
@@ -428,6 +438,16 @@ TEST(ShapeOperations, OptimizeShape_NonConvexFigure)
 	std::vector<SimpleBorder> expectedShape = GenerateShape(std::vector<Vector2D>{{30.0f, -60.0f}, {30.0f, 10.0f}, {10.0f, 10.0f}, {10.0f, 20.0f}, {-10.0f, 20.0f}, {-10.0f, 10.0f}, {-30.0f, 10.0f}, {-30.0f, -60.0f}});
 	ShapeOperations::OptimizeShape(testShape);
 	EXPECT_TRUE(AreShapesEqual(expectedShape, testShape, ShapeEquality::Shuffled));
+}
+
+TEST(ShapeOperations, OptimizeShape_ConvexFigure)
+{
+	// borders and order taken from an existent bug
+	std::vector<SimpleBorder> testShape{ { { -1099.93799f, 627.486450f }, { -1099.93799f, 627.900635f } }, { { -1099.93799f, 506.486450f }, { -1099.93799f, 627.486450f } }, { { -1099.93799f, 748.900635f }, { -1121.35229f, 748.900635f } }, { { -1099.93799f, 627.900635f }, { -1099.93799f, 748.900635f } }, { { -1121.35229f, 627.486450f }, { -1121.35229f, 506.486450f } }, { { -1121.35229f, 506.486450f }, { -1099.93799f, 506.486450f } }, { { -1121.35229f, 748.900635f }, { -1121.35242f, 627.900635f } }, { { -1121.35229f, 627.900635f }, { -1121.35229f, 627.486450f } } };
+
+	const std::vector<Vector2D> expectedResult{ { -1099.93799f, 748.900635f }, { -1121.35229f, 748.900635f }, { -1121.35229f, 506.486450f }, { -1099.93799f, 506.486450f } };
+	ShapeOperations::OptimizeShape(testShape);
+	EXPECT_TRUE(AreShapesEqual(GenerateShape(expectedResult, ShapeOrder::Ordered), testShape, ShapeEquality::Shuffled));
 }
 
 TEST(ShapeOperations, SortBorders_SortWithoutHoles)
