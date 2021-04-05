@@ -4,6 +4,7 @@
 
 #include "src/editorcommands/changeentitygrouplocationcommand.h"
 #include "src/editorcommands/addentitygroupcommand.h"
+#include "src/editorcommands/removeentitiescommand.h"
 
 #include "DockManager.h"
 #include "DockWidget.h"
@@ -283,6 +284,10 @@ void TransformEditorToolbox::showContextMenu(const QPoint& pos)
 	connect(&actionPasteComponent, &QAction::triggered, this, &TransformEditorToolbox::onPasteCommand);
 	contextMenu.addAction(&actionPasteComponent);
 
+	QAction actionDeleteComponent("Delete", this);
+	connect(&actionDeleteComponent, &QAction::triggered, this, &TransformEditorToolbox::onDeleteCommand);
+	contextMenu.addAction(&actionDeleteComponent);
+
 	contextMenu.exec(mContent->mapToGlobal(pos));
 }
 
@@ -348,7 +353,33 @@ void TransformEditorToolbox::onPasteCommand()
 	mMainWindow->getCommandStack().executeNewCommand<AddEntityGroupCommand>(world,
 		mCopiedObjects,
 		serializationHolder,
-		mContent->deprojectAbsolute(getWidgetCenter()) - mCopiedGroupCenter);
+		mContent->deprojectAbsolute(getWidgetCenter()) - mCopiedGroupCenter
+	);
+
+	mContent->repaint();
+}
+
+void TransformEditorToolbox::onDeleteCommand()
+{
+	World* world = mMainWindow->getCurrentWorld();
+	if (world == nullptr)
+	{
+		return;
+	}
+
+	if (mContent == nullptr)
+	{
+		return;
+	}
+
+	// clear copied objects because the deleted objects could be part of them
+	mCopiedObjects.clear();
+
+	mMainWindow->getCommandStack().executeNewCommand<RemoveEntitiesCommand>(
+		world,
+		mContent->mSelectedEntities,
+		mMainWindow->getComponentSerializationHolder()
+	);
 
 	mContent->repaint();
 }

@@ -11,7 +11,7 @@
 #include <QAction>
 #include <QInputDialog>
 
-#include "src/editorcommands/removeentitycommand.h"
+#include "src/editorcommands/removeentitiescommand.h"
 
 #include "src/toolboxes/PrefabListToolbox.h"
 
@@ -177,7 +177,7 @@ void EntitiesListToolbox::showContextMenu(const QPoint& pos)
 
 void EntitiesListToolbox::removeSelectedEntity()
 {
-	QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
+	/*QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
 	if (entitiesList == nullptr)
 	{
 		return;
@@ -195,11 +195,11 @@ void EntitiesListToolbox::removeSelectedEntity()
 		return;
 	}
 
-	mMainWindow->getCommandStack().executeNewCommand<RemoveEntityCommand>(
+	mMainWindow->getCommandStack().executeNewCommand<RemoveEntitiesCommand>(
 		currentWorld,
-		Entity(currentItem->text().toUInt()),
+		{ Entity(currentItem->text().toUInt()) },
 		mMainWindow->getComponentSerializationHolder()
-	);
+	);*/
 }
 
 void EntitiesListToolbox::createPrefabRequested()

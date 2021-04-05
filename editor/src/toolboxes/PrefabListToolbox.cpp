@@ -17,7 +17,6 @@
 
 #include "ECS/ComponentFactory.h"
 
-#include "src/editorcommands/removeentitycommand.h"
 #include "src/editorcommands/addcomponentcommand.h"
 
 const QString PrefabListToolbox::WidgetName = "Prefabs";

@@ -102,6 +102,7 @@ private:
 	void showContextMenu(const QPoint& pos);
 	void onCopyCommand();
 	void onPasteCommand();
+	void onDeleteCommand();
 	QVector2D getWidgetCenter() const;
 
 private:
