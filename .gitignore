@@ -24,6 +24,9 @@ cmake_install.cmake
 *.generated.cpp
 *.generated.h
 
+# jetbrains ide files
+.idea/
+
 # other
 *.log
 log.txt
