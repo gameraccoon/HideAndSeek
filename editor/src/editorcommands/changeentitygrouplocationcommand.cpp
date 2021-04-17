@@ -4,7 +4,7 @@
 #include <GameData/Components/TransformComponent.generated.h>
 
 ChangeEntityGroupLocationCommand::ChangeEntityGroupLocationCommand(const std::vector<SpatialEntity>& entities, Vector2D shift)
-	: EditorCommand({EffectType::ComponentAttributes, EffectType::EntityLocations})
+	: EditorCommand(EffectBitset(EffectType::ComponentAttributes, EffectType::EntityLocations))
 	, mShift(shift)
 	, mOriginalEntities(entities)
 {

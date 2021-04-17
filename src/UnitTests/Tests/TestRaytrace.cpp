@@ -12,8 +12,8 @@
 
 struct CollidableObjects
 {
-	OptionalEntity Rect;
-	OptionalEntity Circle;
+	OptionalEntity rect;
+	OptionalEntity circle;
 };
 
 CollidableObjects FillCollidableObjects(World& world)
@@ -33,7 +33,7 @@ CollidableObjects FillCollidableObjects(World& world)
 		geometry.generateBorders();
 		collision->setGeometry(geometry);
 		Collide::UpdateBoundingBox(collision);
-		result.Rect = entity;
+		result.rect = entity;
 	}
 
 	{
@@ -49,7 +49,7 @@ CollidableObjects FillCollidableObjects(World& world)
 		geometry.setRadius(10.0f);
 		collision->setGeometry(geometry);
 		Collide::UpdateBoundingBox(collision);
-		result.Circle = entity;
+		result.circle = entity;
 	}
 
 	return result;
@@ -90,7 +90,7 @@ TEST(Raytrace, TraceRect)
 	RayTrace::TraceResult traceResult = RayTrace::Trace(world, Vector2D(20.f, 20.f), Vector2D(80.f, 60.f));
 
 	EXPECT_TRUE(traceResult.hasHit);
-	EXPECT_EQ(objects.Rect.getEntity(), traceResult.hitEntity.entity.getEntity());
+	EXPECT_EQ(objects.rect.getEntity(), traceResult.hitEntity.entity.getEntity());
 }
 
 TEST(Raytrace, FastTraceCircle)
@@ -122,5 +122,5 @@ TEST(Raytrace, TraceCircle)
 	RayTrace::TraceResult traceResult = RayTrace::Trace(world, Vector2D(520.f, 20.f), Vector2D(580.f, 60.f));
 
 	EXPECT_TRUE(traceResult.hasHit);
-	EXPECT_EQ(objects.Circle.getEntity(), traceResult.hitEntity.entity.getEntity());
+	EXPECT_EQ(objects.circle.getEntity(), traceResult.hitEntity.entity.getEntity());
 }

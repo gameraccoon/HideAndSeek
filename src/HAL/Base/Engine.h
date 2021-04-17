@@ -15,7 +15,7 @@ namespace HAL
 	class Engine
 	{
 	public:
-		Engine(int windowWidth, int windowHeight);
+		Engine(int windowWidth, int windowHeight) noexcept;
 
 		Engine(const Engine&) = delete;
 		Engine& operator=(const Engine&) = delete;

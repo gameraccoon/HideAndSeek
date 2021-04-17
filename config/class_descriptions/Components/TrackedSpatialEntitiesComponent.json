@@ -4,7 +4,7 @@
 	"attributes": [
 		{
 			"name": "entities",
-			"type": "std::map<StringID, SpatialEntity>",
+			"type": "std::map<StringId, SpatialEntity>",
 			"includes": [
 				"<map>",
 				"\"GameData/Spatial/SpatialEntity.h\""

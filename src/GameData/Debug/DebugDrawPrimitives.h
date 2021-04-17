@@ -7,12 +7,12 @@ struct DebugDrawPrimitive
 {
 	GameplayTimestamp lifeDeadline;
 
-	DebugDrawPrimitive(GameplayTimestamp lifeDeadline)
+	explicit DebugDrawPrimitive(GameplayTimestamp lifeDeadline)
 		: lifeDeadline(lifeDeadline)
 	{
 	}
 
-	bool isLifeTimeExceeded(GameplayTimestamp now) const
+	[[nodiscard]] bool isLifeTimeExceeded(GameplayTimestamp now) const
 	{
 		return now > lifeDeadline;
 	}

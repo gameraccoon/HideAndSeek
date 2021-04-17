@@ -10,6 +10,8 @@
 class {class_name} : public BaseComponent
 {{
 public:
+	{class_name}() noexcept = default;
+
 	{attribute_getters}
 
 	{attribute_getters_ref}
@@ -17,9 +19,9 @@ public:
 	{attribute_setters}
 
 public:
-	[[nodiscard]] static constexpr StringID GetTypeName() {{ return STR_TO_ID("{class_name}"); }}
+	[[nodiscard]] static constexpr StringId GetTypeName() {{ return STR_TO_ID("{class_name}"); }}
 
-	[[nodiscard]] StringID getComponentTypeName() const override {{ return GetTypeName(); }}
+	[[nodiscard]] StringId getComponentTypeName() const override {{ return GetTypeName(); }}
 
 private:
 	{attribute_fields}

@@ -13,7 +13,7 @@
 #include "GameData/Components/MovementComponent.generated.h"
 
 
-TestShootingControlSystem::TestShootingControlSystem(WorldHolder& worldHolder, TimeData& time)
+TestShootingControlSystem::TestShootingControlSystem(WorldHolder& worldHolder, TimeData& time) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(time)
 {

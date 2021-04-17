@@ -16,11 +16,11 @@ namespace HAL
 
 	Engine& GameBase::getEngine()
 	{
-		return *mEngine.get();
+		return *mEngine;
 	}
 
 	ResourceManager& GameBase::getResourceManager()
 	{
-		return *mResourceManager.get();
+		return *mResourceManager;
 	}
 }

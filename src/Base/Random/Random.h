@@ -4,5 +4,6 @@
 
 namespace Random
 {
-	inline std::mt19937 GlobalGenerator(1);
+	using GlobalGeneratorType = std::mt19937;
+	inline GlobalGeneratorType gGlobalGenerator(1);
 }

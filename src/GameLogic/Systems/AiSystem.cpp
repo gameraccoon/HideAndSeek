@@ -17,7 +17,7 @@
 #include "Utils/AI/NavMeshGenerator.h"
 #include "Utils/AI/PathFinding.h"
 
-AiSystem::AiSystem(WorldHolder& worldHolder, const TimeData& timeData)
+AiSystem::AiSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 {

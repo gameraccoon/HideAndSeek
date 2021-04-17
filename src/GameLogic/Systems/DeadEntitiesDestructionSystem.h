@@ -13,7 +13,7 @@
 class DeadEntitiesDestructionSystem : public System
 {
 public:
-	DeadEntitiesDestructionSystem(WorldHolder& worldHolder);
+	explicit DeadEntitiesDestructionSystem(WorldHolder& worldHolder) noexcept;
 	~DeadEntitiesDestructionSystem() override = default;
 
 	void update() override;

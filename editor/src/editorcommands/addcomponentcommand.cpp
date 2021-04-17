@@ -6,8 +6,8 @@
 
 #include "src/editorutils/componentreferenceutils.h"
 
-AddComponentCommand::AddComponentCommand(const ComponentSourceReference& source, StringID typeName, const ComponentFactory& factory)
-	: EditorCommand(EffectType::Components)
+AddComponentCommand::AddComponentCommand(const ComponentSourceReference& source, StringId typeName, const ComponentFactory& factory)
+	: EditorCommand(EffectBitset(EffectType::Components))
 	, mSource(source)
 	, mComponentTypeName(typeName)
 	, mComponentFactory(factory)

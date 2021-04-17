@@ -32,12 +32,12 @@ namespace Graphics
 
 	namespace Render
 	{
-		void drawQuad(const Internal::Surface& surface, const glm::mat4& transform, Vector2D size, QuadUV uv, float alpha = 1.0f);
-		void drawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size);
-		void drawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size, Vector2D ancor, float rotation, QuadUV uv, float alpha = 1.0f);
-		void drawFan(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
-		void drawStrip(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
-		void drawTiledQuad(const Internal::Surface& surface, Vector2D start, Vector2D size, Vector2D tiles, Vector2D uvShift);
+		void DrawQuad(const Internal::Surface& surface, const glm::mat4& transform, Vector2D size, QuadUV uv, float alpha = 1.0f);
+		void DrawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size);
+		void DrawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size, Vector2D anchor, float rotation, QuadUV uv, float alpha = 1.0f);
+		void DrawFan(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
+		void DrawStrip(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
+		void DrawTiledQuad(const Internal::Surface& surface, Vector2D start, Vector2D size, Vector2D tiles, Vector2D uvShift);
 	}
 
 	class Renderer
@@ -51,6 +51,6 @@ namespace Graphics
 		Renderer& operator=(Renderer&&) = delete;
 
 		void renderText(const Font& font, Vector2D pos, Color color, const char* text);
-		std::array<int, 2> getTextSize(const Font& font, const char* text);
+		[[nodiscard]] std::array<int, 2> getTextSize(const Font& font, const char* text);
 	};
 }

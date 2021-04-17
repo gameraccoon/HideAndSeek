@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[])
 {
-	Random::GlobalGenerator = std::mt19937(time(nullptr));
+	Random::gGlobalGenerator = std::mt19937(time(nullptr));
 
 	QApplication a(argc, argv);
 	MainWindow w;

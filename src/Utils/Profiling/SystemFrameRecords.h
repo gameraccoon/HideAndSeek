@@ -14,7 +14,7 @@ public:
 
 	void pauseRecording();
 	void resumeRecording();
-	bool isRecordingActive() const;
+	[[nodiscard]] bool isRecordingActive() const;
 
 	void printToFile(const std::vector<std::string>& systemNames, const std::string& fileName) const;
 	void print(const std::vector<std::string>& systemNames, std::ostream& stream) const;

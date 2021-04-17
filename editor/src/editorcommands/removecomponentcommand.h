@@ -14,14 +14,14 @@ struct ComponentSerializersHolder;
 class RemoveComponentCommand : public EditorCommand
 {
 public:
-	RemoveComponentCommand(const ComponentSourceReference& source, StringID typeName, const ComponentSerializersHolder& serializerHolder);
+	RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const ComponentSerializersHolder& serializerHolder);
 
 	void doCommand(World* world) override;
 	void undoCommand(World* world) override;
 
 private:
 	ComponentSourceReference mSource;
-	StringID mComponentTypeName;
+	StringId mComponentTypeName;
 	const ComponentSerializersHolder& mComponentSerializerHolder;
 	nlohmann::json mSerializedComponent;
 };

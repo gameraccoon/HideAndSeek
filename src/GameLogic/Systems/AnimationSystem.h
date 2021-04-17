@@ -13,7 +13,7 @@
 class AnimationSystem : public System
 {
 public:
-	AnimationSystem(WorldHolder& worldHolder, const TimeData& timeData);
+	AnimationSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;
 	~AnimationSystem() override = default;
 
 	void update() override;

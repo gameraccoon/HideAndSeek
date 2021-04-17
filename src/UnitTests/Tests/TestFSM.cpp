@@ -46,13 +46,13 @@ TEST(FSM, Blackboard)
 
 TEST(FSM, BasicStateAndLink)
 {
-	using StateIDType = TestStates;
+	using StateIdType = TestStates;
 	using BlackBoardKeyType = BlackboardTestValues;
-	using TestFSM = FSM::StateMachine<StateIDType, BlackBoardKeyType>;
+	using TestFSM = FSM::StateMachine<StateIdType, BlackBoardKeyType>;
 
 	FSM::Blackboard<BlackBoardKeyType> blackboard;
 	TestFSM fsm;
-	StateIDType currentState = TestStates::StateOne;
+	StateIdType currentState = TestStates::StateOne;
 
 	TestFSM::StateLinkRules stateOneLinks;
 	stateOneLinks.emplaceLink<FSM::LinkRules::FunctorLink>(TestStates::StateTwo, [](const TestFSM::BlackboardType&)
@@ -70,13 +70,13 @@ TEST(FSM, BasicStateAndLink)
 
 TEST(FSM, EqualityLinkRule)
 {
-	using StateIDType = TestStates;
+	using StateIdType = TestStates;
 	using BlackBoardKeyType = BlackboardTestValues;
-	using TestFSM = FSM::StateMachine<StateIDType, BlackBoardKeyType>;
+	using TestFSM = FSM::StateMachine<StateIdType, BlackBoardKeyType>;
 
 	FSM::Blackboard<BlackBoardKeyType> blackboard;
 	TestFSM fsm;
-	StateIDType currentState = TestStates::StateOne;
+	StateIdType currentState = TestStates::StateOne;
 
 	TestFSM::StateLinkRules stateOneLinks;
 	stateOneLinks.emplaceLink<FSM::LinkRules::VariableEqualLink, bool>(TestStates::StateTwo, BlackboardTestValues::One, true);
@@ -103,13 +103,13 @@ TEST(FSM, EqualityLinkRule)
 
 TEST(FSM, DoubleLinkJump)
 {
-	using StateIDType = TestStates;
+	using StateIdType = TestStates;
 	using BlackBoardKeyType = std::string;
-	using TestFSM = FSM::StateMachine<StateIDType, BlackBoardKeyType>;
+	using TestFSM = FSM::StateMachine<StateIdType, BlackBoardKeyType>;
 
 	FSM::Blackboard<BlackBoardKeyType> blackboard;
 	TestFSM fsm;
-	StateIDType currentState = TestStates::StateOne;
+	StateIdType currentState = TestStates::StateOne;
 
 	TestFSM::StateLinkRules stateOneLinks;
 	stateOneLinks.emplaceLink<FSM::LinkRules::VariableEqualLink, bool>(TestStates::StateTwo, "stepTwo", true);
@@ -138,13 +138,13 @@ TEST(FSM, DoubleLinkJump)
 
 TEST(FSM, HierarchicalStateMachine)
 {
-	using StateIDType = TestStates;
+	using StateIdType = TestStates;
 	using BlackBoardKeyType = std::string;
-	using TestFSM = FSM::StateMachine<StateIDType, BlackBoardKeyType>;
+	using TestFSM = FSM::StateMachine<StateIdType, BlackBoardKeyType>;
 
 	FSM::Blackboard<BlackBoardKeyType> blackboard;
 	TestFSM fsm;
-	StateIDType currentState = TestStates::StateOne;
+	StateIdType currentState = TestStates::StateOne;
 
 	TestFSM::StateLinkRules stateOneLinks;
 	stateOneLinks.emplaceLink<FSM::LinkRules::VariableEqualLink, bool>(TestStates::StateTwo, "stepOne", true);
@@ -190,9 +190,9 @@ TEST(FSM, HierarchicalStateMachine)
 
 TEST(FSM, HierarchicalFSMStringKeys_BugfixTest)
 {
-	using StateIDType = std::string;
+	using StateIdType = std::string;
 	using BlackBoardKeyType = std::string;
-	using TestFSM = FSM::StateMachine<StateIDType, BlackBoardKeyType>;
+	using TestFSM = FSM::StateMachine<StateIdType, BlackBoardKeyType>;
 
 	TestFSM fsm;
 

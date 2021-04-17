@@ -15,7 +15,7 @@ public:
 	Bitset() = default;
 	// can be implicitly created from T
 	template<typename... Args>
-	Bitset(Args... initialValues) { set(initialValues...); }
+	explicit Bitset(Args... initialValues) { set(initialValues...); }
 
 	template<typename... Args>
 	void set(Args... flags) { (setInner(flags, true), ...); }

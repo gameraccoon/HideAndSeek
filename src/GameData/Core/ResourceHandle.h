@@ -9,12 +9,12 @@ public:
 
 public:
 	ResourceHandle() = default;
-	explicit ResourceHandle(IndexType index) : ResourceIndex(index) {}
+	explicit ResourceHandle(IndexType index) : resourceIndex(index) {}
 
-	bool isValid() const { return ResourceIndex != InvalidResourceIndex; }
+	[[nodiscard]] bool isValid() const { return resourceIndex != InvalidResourceIndex; }
 
 	static constexpr IndexType InvalidResourceIndex = -1;
-	IndexType ResourceIndex = InvalidResourceIndex;
+	IndexType resourceIndex = InvalidResourceIndex;
 };
 
 static_assert(std::is_trivially_copyable<ResourceHandle>(), "ResourceHandle should be trivially copyable");

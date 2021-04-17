@@ -2,17 +2,17 @@
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/String/StringID.h"
+#include "Base/Types/String/StringId.h"
 
 #include "UnitTests/TestAssertHelper.h"
 
-TEST(StringID, TestHashingSanity)
+TEST(StringId, TestHashingSanity)
 {
-	constexpr StringID valA1 = STR_TO_ID("testA");
-	constexpr StringID valB1 = STR_TO_ID("testB");
+	constexpr StringId valA1 = STR_TO_ID("testA");
+	constexpr StringId valB1 = STR_TO_ID("testB");
 	// these also should be calculated at compile time
-	StringID valA2 = STR_TO_ID("testA");
-	StringID valB2 = STR_TO_ID("testB");
+	StringId valA2 = STR_TO_ID("testA");
+	StringId valB2 = STR_TO_ID("testB");
 	std::string valA3 = "testA";
 	std::string valB3 = "testB";
 
@@ -23,14 +23,14 @@ TEST(StringID, TestHashingSanity)
 	EXPECT_NE(valA2, STR_TO_ID(valB3));
 }
 
-TEST(StringID, TestIDToString)
+TEST(StringId, TestIdToString)
 {
-	// compile time generated StringID
-	StringID testC = STR_TO_ID("testC");
+	// compile time generated StringId
+	StringId testC = STR_TO_ID("testC");
 	EXPECT_EQ(std::string("testC"), ID_TO_STR(testC));
 
-	// runtime generated StringID
+	// runtime generated StringId
 	std::string testDStr = "testD";
-	StringID testD = STR_TO_ID(testDStr);
+	StringId testD = STR_TO_ID(testDStr);
 	EXPECT_EQ(testDStr, ID_TO_STR(testD));
 }

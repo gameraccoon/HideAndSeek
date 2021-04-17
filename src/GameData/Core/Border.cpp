@@ -6,7 +6,7 @@
 Border::Border(Vector2D a, Vector2D b) noexcept
 	: mPointA(a)
 	, mPointB(b)
-	, normal((b - a).normal())
+	, mNormal((b - a).normal())
 {
 }
 
@@ -24,7 +24,7 @@ void Border::setB(Vector2D b) noexcept
 
 void Border::calculateNormal() noexcept
 {
-	normal = (mPointB - mPointA).normal();
+	mNormal = (mPointB - mPointA).normal();
 }
 
 static_assert(std::is_trivially_copyable<Border>(), "Border should be trivially copyable");

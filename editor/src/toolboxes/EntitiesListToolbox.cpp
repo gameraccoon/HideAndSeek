@@ -239,8 +239,8 @@ void EntitiesListToolbox::bindEvents()
 {
 	if (World* currentWorld = mMainWindow->getCurrentWorld())
 	{
-		mOnEntityAddedHandle = currentWorld->getEntityManager().OnEntityAdded.bind([this]{updateContent();});
-		mOnEntityRemovedHandle = currentWorld->getEntityManager().OnEntityRemoved.bind([this]{updateContent();});
+		mOnEntityAddedHandle = currentWorld->getEntityManager().onEntityAdded.bind([this]{updateContent();});
+		mOnEntityRemovedHandle = currentWorld->getEntityManager().onEntityRemoved.bind([this]{updateContent();});
 	}
 }
 
@@ -248,7 +248,7 @@ void EntitiesListToolbox::unbindEvents()
 {
 	if (World* currentWorld = mMainWindow->getCurrentWorld())
 	{
-		currentWorld->getEntityManager().OnEntityAdded.unbind(mOnEntityAddedHandle);
-		currentWorld->getEntityManager().OnEntityRemoved.unbind(mOnEntityRemovedHandle);
+		currentWorld->getEntityManager().onEntityAdded.unbind(mOnEntityAddedHandle);
+		currentWorld->getEntityManager().onEntityRemoved.unbind(mOnEntityRemovedHandle);
 	}
 }

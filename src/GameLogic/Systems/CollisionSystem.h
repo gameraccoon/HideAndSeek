@@ -12,10 +12,7 @@
 class CollisionSystem : public System
 {
 public:
-	using KeyStatesMap = std::unordered_map<int, bool>;
-
-public:
-	CollisionSystem(WorldHolder& worldHolder);
+	explicit CollisionSystem(WorldHolder& worldHolder) noexcept;
 	~CollisionSystem() override = default;
 
 	void update() override;

@@ -92,15 +92,15 @@ TEST(Components, RemoveEntityWithComponents)
 	for (auto& [transform] : transforms)
 	{
 		Vector2D location = transform->getLocation();
-		if (location == location1 && location1Found == false)
+		if (location == location1 && !location1Found)
 		{
 			location1Found = true;
 		}
-		else if (location == location2 && location2Found == false)
+		else if (location == location2 && !location2Found)
 		{
 			location2Found = true;
 		}
-		else if (location == location3 && location3Found == false)
+		else if (location == location3 && !location3Found)
 		{
 			location3Found = true;
 		}

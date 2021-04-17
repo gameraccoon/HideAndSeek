@@ -103,13 +103,13 @@ public:
 		mNextFunctionId = 0;
 	}
 
-	MulticastDelegate(MulticastDelegate&& other)
+	MulticastDelegate(MulticastDelegate&& other) noexcept
 	{
 		*this = std::move(other);
 	}
 
-	MulticastDelegate& operator=(MulticastDelegate&& other)
-	{
+	MulticastDelegate& operator=(MulticastDelegate&& other) noexcept
+    {
 		mFunctions = std::move(other.mFunctions);
 		mNextFunctionId = other.mNextFunctionId;
 		other.clear();

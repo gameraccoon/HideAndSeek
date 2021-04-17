@@ -26,7 +26,7 @@ public:
 
 	Entity addEntity();
 	void removeEntity(Entity entity);
-	const std::unordered_map<Entity::EntityID, size_t>& getEntities() const { return mEntityIndexMap; }
+	[[nodiscard]] const std::unordered_map<Entity::EntityID, size_t>& getEntities() const { return mEntityIndexMap; }
 
 	// these two should be used carefully (added for the editor)
 	Entity getNonExistentEntity();
@@ -34,7 +34,7 @@ public:
 
 	void getAllEntityComponents(Entity entity, std::vector<BaseComponent*>& outComponents);
 
-	bool doesEntityHaveComponent(Entity entity, StringID typeID);
+	bool doesEntityHaveComponent(Entity entity, StringId typeId);
 
 	template<typename ComponentType>
 	bool doesEntityHaveComponent(Entity entity)
@@ -66,7 +66,7 @@ public:
 		return component;
 	}
 
-	void addComponent(Entity entity, BaseComponent* component, StringID typeID);
+	void addComponent(Entity entity, BaseComponent* component, StringId typeId);
 
 	template<typename ComponentType>
 	void removeComponent(Entity entity)
@@ -74,7 +74,7 @@ public:
 		removeComponent(entity, ComponentType::GetTypeName());
 	}
 
-	void removeComponent(Entity entity, StringID typeID);
+	void removeComponent(Entity entity, StringId typeId);
 
 	template<typename ComponentType>
 	ComponentType* scheduleAddComponent(Entity entity)
@@ -84,7 +84,7 @@ public:
 		return component;
 	}
 
-	void scheduleAddComponentToEntity(Entity entity, BaseComponent* component, StringID typeID);
+	void scheduleAddComponentToEntity(Entity entity, BaseComponent* component, StringId typeId);
 
 	template<typename ComponentType>
 	void scheduleRemoveComponent(Entity entity)
@@ -92,7 +92,7 @@ public:
 		scheduleRemoveComponent(entity, ComponentType::GetTypeName());
 	}
 
-	void scheduleRemoveComponent(Entity entity, StringID typeID);
+	void scheduleRemoveComponent(Entity entity, StringId typeId);
 	void executeScheduledActions();
 
 	template<typename... Components>
@@ -114,11 +114,11 @@ public:
 	{
 		auto componentVectors = mComponents.getComponentVectors<FirstComponent, Components...>();
 		auto& firstComponentVector = std::get<0>(componentVectors);
-		size_t shortestVectorSize = getShortestVector(componentVectors);
+		size_t shortestVectorSize = GetShortestVector(componentVectors);
 
 		constexpr unsigned componentsSize = sizeof...(Components);
 
-		for (EntityIndex entityIndex = 0, i_size = shortestVectorSize; entityIndex < i_size; ++entityIndex)
+		for (EntityIndex entityIndex = 0, iSize = shortestVectorSize; entityIndex < iSize; ++entityIndex)
 		{
 			auto& firstComponent = firstComponentVector[entityIndex];
 			if (firstComponent == nullptr)
@@ -140,11 +140,11 @@ public:
 	{
 		auto componentVectors = mComponents.getComponentVectors<FirstComponent, Components...>();
 		auto& firstComponentVector = std::get<0>(componentVectors);
-		size_t shortestVectorSize = getShortestVector(componentVectors);
+		size_t shortestVectorSize = GetShortestVector(componentVectors);
 
 		constexpr unsigned componentsSize = sizeof...(Components);
 
-		for (auto& [entityID, entityIndex] : mEntityIndexMap)
+		for (auto& [entityId, entityIndex] : mEntityIndexMap)
 		{
 			if (entityIndex >= shortestVectorSize)
 			{
@@ -161,7 +161,7 @@ public:
 
 			if (std::get<componentsSize>(components) != nullptr)
 			{
-				inOutComponents.push_back(std::tuple_cat(std::make_tuple(Entity(entityID)), std::make_tuple(data...), std::move(components)));
+				inOutComponents.push_back(std::tuple_cat(std::make_tuple(Entity(entityId)), std::make_tuple(data...), std::move(components)));
 			}
 		}
 	}
@@ -171,11 +171,11 @@ public:
 	{
 		auto componentVectors = mComponents.getComponentVectors<FirstComponent, Components...>();
 		auto& firstComponentVector = std::get<0>(componentVectors);
-		size_t shortestVectorSize = getShortestVector(componentVectors);
+		size_t shortestVectorSize = GetShortestVector(componentVectors);
 
 		constexpr unsigned componentsSize = sizeof...(Components);
 
-		for (EntityIndex entityIndex = 0, i_size = shortestVectorSize; entityIndex < i_size; ++entityIndex)
+		for (EntityIndex entityIndex = 0, iSize = shortestVectorSize; entityIndex < iSize; ++entityIndex)
 		{
 			auto& firstComponent = firstComponentVector[entityIndex];
 			if (firstComponent == nullptr)
@@ -199,11 +199,11 @@ public:
 	{
 		auto componentVectors = mComponents.getComponentVectors<FirstComponent, Components...>();
 		auto& firstComponentVector = std::get<0>(componentVectors);
-		size_t shortestVectorSize = getShortestVector(componentVectors);
+		size_t shortestVectorSize = GetShortestVector(componentVectors);
 
 		constexpr unsigned componentsSize = sizeof...(Components);
 
-		for (auto& [entityID, entityIndex] : mEntityIndexMap)
+		for (auto& [entityId, entityIndex] : mEntityIndexMap)
 		{
 			if (entityIndex >= shortestVectorSize)
 			{
@@ -223,11 +223,11 @@ public:
 				continue;
 			}
 
-			std::apply(processor, std::tuple_cat(std::make_tuple(Entity(entityID)), std::make_tuple(data...), std::move(components)));
+			std::apply(processor, std::tuple_cat(std::make_tuple(Entity(entityId)), std::make_tuple(data...), std::move(components)));
 		}
 	}
 
-	void getEntitiesHavingComponents(const std::vector<StringID>& componentIndexes, std::vector<Entity>& inOutEntities) const;
+	void getEntitiesHavingComponents(const std::vector<StringId>& componentIndexes, std::vector<Entity>& inOutEntities) const;
 
 	bool hasEntity(Entity entity);
 
@@ -238,17 +238,17 @@ public:
 
 	void transferEntityTo(EntityManager& otherManager, Entity entity);
 
-	nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
+	[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
 	void fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers);
 
 	// helper functions for cleanup before saving
-	void stableSortEntitiesByID();
+	void stableSortEntitiesById();
 	void clearCaches();
 	[[nodiscard]] bool hasAnyEntities() const;
 
 public:
-	MulticastDelegate<> OnEntityAdded;
-	MulticastDelegate<> OnEntityRemoved;
+	MulticastDelegate<> onEntityAdded;
+	MulticastDelegate<> onEntityRemoved;
 
 private:
 	using EntityIndex = size_t;
@@ -257,23 +257,23 @@ private:
 	{
 		Entity entity;
 		BaseComponent* component;
-		StringID typeID;
+		StringId typeId;
 
-		ComponentToAdd(Entity entity, BaseComponent* component, StringID typeID)
+		ComponentToAdd(Entity entity, BaseComponent* component, StringId typeId)
 			: entity(entity)
 			, component(component)
-			, typeID(typeID)
+			, typeId(typeId)
 		{}
 	};
 
 	struct ComponentToRemove
 	{
 		Entity entity;
-		StringID typeID;
+		StringId typeId;
 
-		ComponentToRemove(Entity entity, StringID typeID)
+		ComponentToRemove(Entity entity, StringId typeId)
 			: entity(entity)
-			, typeID(typeID)
+			, typeId(typeId)
 		{}
 	};
 
@@ -321,7 +321,7 @@ private:
 	}
 
 	template<typename... ComponentVector>
-	static size_t getShortestVector(const std::tuple<ComponentVector&...>& vectorTuple)
+	static size_t GetShortestVector(const std::tuple<ComponentVector&...>& vectorTuple)
 	{
 		size_t minimalSize = std::numeric_limits<size_t>::max();
 		std::apply(
@@ -334,7 +334,7 @@ private:
 		return minimalSize;
 	}
 
-	void addComponentToEntity(EntityIndex entityIdx, BaseComponent* component, StringID typeID);
+	void addComponentToEntity(EntityIndex entityIdx, BaseComponent* component, StringId typeId);
 
 private:
 	ComponentMap mComponents;

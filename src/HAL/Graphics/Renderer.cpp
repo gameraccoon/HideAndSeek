@@ -28,7 +28,7 @@ namespace HAL
 
 namespace Graphics
 {
-	void Render::drawQuad(const Internal::Surface& surface, const glm::mat4& transform, Vector2D size, Graphics::QuadUV uv, float alpha)
+	void Render::DrawQuad(const Internal::Surface& surface, const glm::mat4& transform, Vector2D size, Graphics::QuadUV uv, float alpha)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glLoadMatrixf(reinterpret_cast<const float*>(&transform));
@@ -36,15 +36,15 @@ namespace Graphics
 
 		glBegin(GL_QUADS);
 		glColor4f(1.0f, 1.0f, 1.0f, alpha);
-		glTexCoord2f(uv.U1, uv.V2); glVertex2f(0.0f, size.y);
-		glTexCoord2f(uv.U2, uv.V2); glVertex2f(size.x, size.y);
-		glTexCoord2f(uv.U2, uv.V1); glVertex2f(size.x, 0.0f);
-		glTexCoord2f(uv.U1, uv.V1); glVertex2f(0.0f, 0.0f);
+		glTexCoord2f(uv.u1, uv.v2); glVertex2f(0.0f, size.y);
+		glTexCoord2f(uv.u2, uv.v2); glVertex2f(size.x, size.y);
+		glTexCoord2f(uv.u2, uv.v1); glVertex2f(size.x, 0.0f);
+		glTexCoord2f(uv.u1, uv.v1); glVertex2f(0.0f, 0.0f);
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glEnd();
 	}
 
-	void Render::drawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size)
+	void Render::DrawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glm::mat4 transform{ 1.0f };
@@ -62,16 +62,16 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::drawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size, Vector2D ancor, float rotation, Graphics::QuadUV uv, float alpha)
+	void Render::DrawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size, Vector2D anchor, float rotation, Graphics::QuadUV uv, float alpha)
 	{
 		glm::mat4 transform{ 1.0f };
 		transform = glm::translate(transform, glm::vec3(pos.x, pos.y, 0.0f));
 		transform = glm::rotate(transform, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
-		transform = glm::translate(transform, glm::vec3(-size.x * ancor.x, -size.y * ancor.y, 0.0f));
-		drawQuad(surface, transform, size, uv, alpha);
+		transform = glm::translate(transform, glm::vec3(-size.x * anchor.x, -size.y * anchor.y, 0.0f));
+		DrawQuad(surface, transform, size, uv, alpha);
 	}
 
-	void Render::drawFan(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
+	void Render::DrawFan(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glLoadMatrixf(reinterpret_cast<const float*>(&transform));
@@ -88,7 +88,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::drawStrip(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
+	void Render::DrawStrip(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glLoadMatrixf(reinterpret_cast<const float*>(&transform));
@@ -105,7 +105,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::drawTiledQuad(const Internal::Surface& surface, Vector2D start, Vector2D size, Vector2D tiles, Vector2D uvShift)
+	void Render::DrawTiledQuad(const Internal::Surface& surface, Vector2D start, Vector2D size, Vector2D tiles, Vector2D uvShift)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glm::mat4 transform{ 1.0f };

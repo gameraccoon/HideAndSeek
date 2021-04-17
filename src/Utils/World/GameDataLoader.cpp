@@ -99,10 +99,10 @@ namespace GameDataLoader
 
 		for (auto& [key, cellData] : geometryJson["geometry"].items())
 		{
-			const size_t delimeterPos = key.find(',');
-			const CellPos pos{std::atoi(key.substr(0, delimeterPos).c_str()), std::atoi(key.substr(delimeterPos + 1).c_str())};
-			LightBlockingGeometryComponent* lightBlockingCompontnt = spatialData.getCell(pos)->getCellComponents().getOrAddComponent<LightBlockingGeometryComponent>();
-			cellData.get_to(lightBlockingCompontnt->getBordersRef());
+			const size_t delimiterPos = key.find(',');
+			const CellPos pos{std::atoi(key.substr(0, delimiterPos).c_str()), std::atoi(key.substr(delimiterPos + 1).c_str())};
+			LightBlockingGeometryComponent* lightBlockingComponent = spatialData.getCell(pos)->getCellComponents().getOrAddComponent<LightBlockingGeometryComponent>();
+			cellData.get_to(lightBlockingComponent->getBordersRef());
 		}
 	}
 

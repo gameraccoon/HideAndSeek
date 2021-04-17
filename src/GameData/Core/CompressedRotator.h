@@ -21,7 +21,7 @@ public:
 	{
 	}
 
-	Rotator decompress(unsigned int bitsCount = MaxBitsCount) const
+	[[nodiscard]] Rotator decompress(unsigned int bitsCount = MaxBitsCount) const
 	{
 		Assert(bitsCount <= MaxBitsCount, "bitsCount greater that the real bits count in the corresponding type");
 		return Decompress(mCompressedValue, bitsCount);
@@ -29,7 +29,7 @@ public:
 
 	static T Compress(Rotator rotator, unsigned int bitsCount = MaxBitsCount)
 	{
-		// comvert the value to the range from 0 to max
+		// convert the value to the range from 0 to max
 		float zeroToMaxRotation = rotator.getValue() >= 0 ? rotator.getValue() : MaxRotationFromZero+rotator.getValue();
 		return Utils::CompressFloatToIntCL<T, float>(zeroToMaxRotation, 0, MaxRotationFromZero, bitsCount);
 	}

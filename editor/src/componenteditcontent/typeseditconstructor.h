@@ -17,16 +17,16 @@
 #include "typeeditconstructorhelpers.h"
 
 template <typename T>
-StringID enum_to_string(T value);
+StringId enum_to_string(T value);
 
 template <typename T>
-T string_to_enum(StringID value);
+T string_to_enum(StringId value);
 
 template <typename T>
 std::vector<T> get_all_enum_values();
 
 template <typename T>
-std::vector<StringID> get_all_enum_value_names();
+std::vector<StringId> get_all_enum_value_names();
 
 namespace TypesEditConstructor
 {
@@ -67,7 +67,7 @@ namespace TypesEditConstructor
 			FillLabel(layout, label);
 
 			QComboBox* stringList = HS_NEW QComboBox();
-			for (StringID value : get_all_enum_value_names<T>())
+			for (StringId value : get_all_enum_value_names<T>())
 			{
 				stringList->addItem(QString::fromStdString(ID_TO_STR(value)));
 			}

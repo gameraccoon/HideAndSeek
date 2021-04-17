@@ -101,24 +101,24 @@ namespace ShapeOperations
 
 	static bool FindBordersRotationAroundPoint(SimpleBorder border1, SimpleBorder border2, Vector2D intersectionPoint)
 	{
-		bool isCheckInversed = false;
-		Vector2D firstPoint;
-		Vector2D secondPoint;
+		bool isCheckInverted = false;
 
+		Vector2D firstPoint;
 		if (border1.a.isNearlyEqualTo(intersectionPoint))
 		{
 			firstPoint = border1.b;
-			isCheckInversed = !isCheckInversed;
+            isCheckInverted = !isCheckInverted;
 		}
 		else
 		{
 			firstPoint = border1.a;
 		}
 
+        Vector2D secondPoint;
 		if (border2.b.isNearlyEqualTo(intersectionPoint))
 		{
 			secondPoint = border2.a;
-			isCheckInversed = !isCheckInversed;
+            isCheckInverted = !isCheckInverted;
 		}
 		else
 		{
@@ -127,7 +127,7 @@ namespace ShapeOperations
 
 		float signedArea = Collide::SignedArea(firstPoint, secondPoint, intersectionPoint);
 
-		return isCheckInversed ? (signedArea < 0) : (signedArea > 0);
+		return isCheckInverted ? (signedArea < 0) : (signedArea > 0);
 	}
 
 	static Vector2D ChangePointBasis(const std::array<float, 4>& matrix, Vector2D point)
@@ -143,7 +143,7 @@ namespace ShapeOperations
 		return SimpleBorder(ChangePointBasis(baisisTransformMatrix, border.a), ChangePointBasis(baisisTransformMatrix, border.b));
 	}
 
-	static const std::array<float, 4> InverseMatrix(std::array<float, 4> matrix)
+	static std::array<float, 4> InverseMatrix(std::array<float, 4> matrix)
 	{
 		const float determinant = matrix[0]*matrix[3] - matrix[1]*matrix[2];
 		Assert(determinant != 0.0f, "Determinant should never be equal to zero");
@@ -182,7 +182,7 @@ namespace ShapeOperations
 			std::vector<BorderIntersection>& borderAIntersections,
 			std::vector<BorderIntersection>& borderBIntersections)
 	{
-		// project borderB into coordigante system based on a borderA
+		// project borderB into coordinate system based on a borderA
 		Vector2D basisX = (borderA.b - borderA.a).unit();
 		Vector2D basisY = -basisX.normal();
 		std::array<float, 4> basisTransformMatrix = InverseMatrix({basisX.x, basisY.x, basisX.y, basisY.y});
@@ -474,7 +474,7 @@ namespace ShapeOperations
 				else
 				{
 					borderPointFractions.insert(it, intersectionFraction);
-					borderPoints.emplace(borderPoints.begin() + newPosition, intersectionPoint, cutDirection);
+					borderPoints.emplace(borderPoints.begin() + static_cast<ptrdiff_t>(newPosition), intersectionPoint, cutDirection);
 				}
 			}
 
@@ -529,11 +529,11 @@ namespace ShapeOperations
 
 		for (size_t index : bordersToRemove)
 		{
-			fracturedBorders.erase(fracturedBorders.begin() + index);
+			fracturedBorders.erase(fracturedBorders.begin() + static_cast<ptrdiff_t>(index));
 		}
 
 		// remove any duplicated borders
-		// ToDo: probably need to correct the logic above to normally elliminate such borders
+		// ToDo: probably need to correct the logic above to normally eliminate such borders
 		// instead of doing this NlogN overcomplicated and not always correct (-0) stuff to fight a super-rare case
 		static_assert(sizeof(SimpleBorder) == sizeof(float)*4, "SimpleBorder should have size of 4 floats");
 		std::ranges::sort(fracturedBorders, [](const SimpleBorder& left, const SimpleBorder& right) {
@@ -667,7 +667,7 @@ namespace ShapeOperations
 		std::ranges::sort(bordersToRemove, std::greater());
 		for (size_t index : bordersToRemove)
 		{
-			inOutShape.erase(inOutShape.begin() + index);
+			inOutShape.erase(inOutShape.begin() + static_cast<int>(index));
 		}
 	}
 
@@ -713,7 +713,7 @@ namespace ShapeOperations
 					// save the new geometry to the position of the first figure
 					firstGeometry.borders = std::move(newShape);
 					// remove the second figure
-					inOutGeometry.erase(inOutGeometry.begin() + j);
+					inOutGeometry.erase(inOutGeometry.begin() + static_cast<ptrdiff_t>(j));
 					// retry all collision tests with the first figure
 					--i;
 					break;
@@ -722,24 +722,24 @@ namespace ShapeOperations
 		}
 	}
 
-	static void updateAABBsX(BoundingBox& box, float x)
+	static void UpdateAABBsX(BoundingBox& box, float x)
 	{
 		if (x < box.minX) { box.minX = x; }
 		if (x > box.maxX) { box.maxX = x; }
 	}
 
-	static void updateAABBsY(BoundingBox& box, float y)
+	static void UpdateAABBsY(BoundingBox& box, float y)
 	{
 		if (y < box.minY) { box.minY = y; }
 		if (y > box.maxY) { box.maxY = y; }
 	}
 
-	static void updateAABBFromBorder(BoundingBox& aabb, const SimpleBorder& border)
+	static void UpdateAABBFromBorder(BoundingBox& aabb, const SimpleBorder& border)
 	{
-		updateAABBsX(aabb, border.a.x);
-		updateAABBsY(aabb, border.a.y);
-		updateAABBsX(aabb, border.b.x);
-		updateAABBsY(aabb, border.b.y);
+		UpdateAABBsX(aabb, border.a.x);
+		UpdateAABBsY(aabb, border.a.y);
+		UpdateAABBsX(aabb, border.b.x);
+		UpdateAABBsY(aabb, border.b.y);
 	}
 
 	MergedGeometry::MergedGeometry(const std::vector<Border>& inBorders, Vector2D location)
@@ -748,7 +748,7 @@ namespace ShapeOperations
 		for (const Border& border : inBorders)
 		{
 			borders.emplace_back(border.getA() + location, border.getB() + location);
-			updateAABBFromBorder(aabb, borders.back());
+			UpdateAABBFromBorder(aabb, borders.back());
 		}
 	}
 
@@ -757,7 +757,7 @@ namespace ShapeOperations
 	{
 		for (const SimpleBorder& border : borders)
 		{
-			updateAABBFromBorder(aabb, border);
+			UpdateAABBFromBorder(aabb, border);
 		}
 	}
 
@@ -766,7 +766,7 @@ namespace ShapeOperations
 	{
 		for (const SimpleBorder& border : borders)
 		{
-			updateAABBFromBorder(aabb, border);
+			UpdateAABBFromBorder(aabb, border);
 		}
 	}
 
@@ -865,7 +865,7 @@ namespace ShapeOperations
 		auto moveSortedBorders = [](std::vector<SimpleBorder>& inOutResult, std::vector<AngledBorder>& inOutSource, size_t sourceIndex)
 		{
 			inOutResult.push_back(inOutSource[sourceIndex].coords);
-			inOutSource.erase(inOutSource.begin() + sourceIndex);
+			inOutSource.erase(inOutSource.begin() + static_cast<ptrdiff_t>(sourceIndex));
 		};
 
 		std::vector<size_t> shapeStartIndexes;

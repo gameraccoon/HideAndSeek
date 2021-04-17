@@ -14,7 +14,7 @@
 class ResourceStreamingSystem : public System
 {
 public:
-	ResourceStreamingSystem(WorldHolder& worldHolder, HAL::ResourceManager& resourceManager);
+	ResourceStreamingSystem(WorldHolder& worldHolder, HAL::ResourceManager& resourceManager) noexcept;
 	~ResourceStreamingSystem() override = default;
 
 	void update() override;

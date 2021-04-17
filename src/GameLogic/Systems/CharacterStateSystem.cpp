@@ -14,7 +14,7 @@
 #include "GameData/GameData.h"
 
 
-CharacterStateSystem::CharacterStateSystem(WorldHolder& worldHolder, const TimeData& timeData)
+CharacterStateSystem::CharacterStateSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 {
@@ -70,7 +70,7 @@ void CharacterStateSystem::update()
 			CharacterState state = characterState->getState();
 
 			auto& animBlackboard = animationGroups->getBlackboardRef();
-			animBlackboard.setValue<StringID>(STR_TO_ID("charState"), enum_to_string(state));
+			animBlackboard.setValue<StringId>(STR_TO_ID("charState"), enum_to_string(state));
 
 			animBlackboard.setValue<bool>(enum_to_string(CharacterStateBlackboardKeys::TryingToMove), characterState->getBlackboard().getValue<bool>(CharacterStateBlackboardKeys::TryingToMove, false));
 			animBlackboard.setValue<bool>(enum_to_string(CharacterStateBlackboardKeys::ReadyToRun), characterState->getBlackboard().getValue<bool>(CharacterStateBlackboardKeys::ReadyToRun, false));

@@ -45,14 +45,14 @@ void World::fromJson(const nlohmann::json& json, const ComponentSerializersHolde
 	InitSpatialTrackedEntities(mSpatialData, mWorldComponents);
 }
 
-std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(StringID entityStringID)
+std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(StringId entityStringId)
 {
 	std::optional<std::pair<EntityView, CellPos>> result;
 	auto [trackedSpatialEntities] = getWorldComponents().getComponents<TrackedSpatialEntitiesComponent>();
 
 	if (trackedSpatialEntities)
 	{
-		auto it = trackedSpatialEntities->getEntities().find(entityStringID);
+		auto it = trackedSpatialEntities->getEntities().find(entityStringId);
 		if (it != trackedSpatialEntities->getEntities().end())
 		{
 			if (WorldCell* cell = getSpatialData().getCell(it->second.cell))
@@ -65,7 +65,7 @@ std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(Str
 	return result;
 }
 
-EntityView World::createTrackedSpatialEntity(StringID entityStringID, CellPos pos)
+EntityView World::createTrackedSpatialEntity(StringId entityStringId, CellPos pos)
 {
 	auto result = createSpatialEntity(pos);
 	auto [trackedSpatialEntities] = getWorldComponents().getComponents<TrackedSpatialEntitiesComponent>();
@@ -73,9 +73,9 @@ EntityView World::createTrackedSpatialEntity(StringID entityStringID, CellPos po
 	{
 		trackedSpatialEntities = getWorldComponents().addComponent<TrackedSpatialEntitiesComponent>();
 	}
-	trackedSpatialEntities->getEntitiesRef().insert_or_assign(entityStringID, SpatialEntity(result.getEntity(), pos));
+	trackedSpatialEntities->getEntitiesRef().insert_or_assign(entityStringId, SpatialEntity(result.getEntity(), pos));
 	SpatialTrackComponent* trackComponent = result.addComponent<SpatialTrackComponent>();
-	trackComponent->setId(entityStringID);
+	trackComponent->setId(entityStringId);
 	return result;
 }
 
@@ -87,7 +87,7 @@ EntityView World::createSpatialEntity(CellPos pos)
 
 void World::packForJsonSaving()
 {
-	mEntityManager.stableSortEntitiesByID();
+	mEntityManager.stableSortEntitiesById();
 	mSpatialData.packForJsonSaving();
 }
 

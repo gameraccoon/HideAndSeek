@@ -20,11 +20,11 @@ bool SpatialEntity::operator!=(const SpatialEntity& other) const
 	return !(*this == other);
 }
 
-void to_json(nlohmann::json& outJson, const SpatialEntity& SpatialEntity)
+void to_json(nlohmann::json& outJson, const SpatialEntity& spatialEntity)
 {
 	outJson = nlohmann::json{
-		{"cell", SpatialEntity.cell},
-		{"entity", SpatialEntity.entity}
+		{"cell", spatialEntity.cell},
+		{"entity", spatialEntity.entity}
 	};
 }
 

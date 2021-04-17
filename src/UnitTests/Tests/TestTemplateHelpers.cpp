@@ -2,18 +2,20 @@
 
 #include <gtest/gtest.h>
 
+#include <vector>
+
 #include "Base/Types/TemplateHelpers.h"
 
-namespace TemplateHelpterTestsInternal
+namespace TemplateHelperTestsInternal
 {
 	class Movable
 	{
 	public:
-		Movable(int value) : mVal(value) {}
-		Movable(const Movable& other) : mVal(other.mVal) {}
-		Movable& operator=(const Movable& other) { mVal = other.mVal; return *this;};
-		Movable(Movable&& other) : mVal(other.mVal) { other.mVal = 0; }
-		Movable& operator=(Movable&& other) { mVal = other.mVal; other.mVal = 0; return *this; }
+		Movable(int value) : mVal(value) {} // NOLINT(google-explicit-constructor)
+		Movable(const Movable& other) = default;
+		Movable& operator=(const Movable& other) = default;
+		Movable(Movable&& other) noexcept : mVal(other.mVal) { other.mVal = 0; }
+		Movable& operator=(Movable&& other)  noexcept { mVal = other.mVal; other.mVal = 0; return *this; }
 
 		bool operator==(const Movable& other) const { return other.mVal == mVal; }
 
@@ -28,7 +30,7 @@ namespace TemplateHelpterTestsInternal
 
 TEST(TemplateHelpers, CopyOrMoveContainer)
 {
-	using namespace TemplateHelpterTestsInternal;
+	using namespace TemplateHelperTestsInternal;
 
 	std::vector<Movable> lvalueOriginalVector({1, 2});
 	std::vector<Movable> movedOriginalVector({3, 4});
@@ -41,5 +43,5 @@ TEST(TemplateHelpers, CopyOrMoveContainer)
 
 	EXPECT_EQ(std::vector<Movable>({1, 2, 3, 4}), result);
 	EXPECT_EQ(std::vector<Movable>({1, 2}), lvalueOriginalVector);
-	EXPECT_EQ(std::vector<Movable>({0, 0}), movedOriginalVector);
+	EXPECT_EQ(std::vector<Movable>({0, 0}), movedOriginalVector); // NOLINT(bugprone-use-after-move)
 }

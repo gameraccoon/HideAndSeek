@@ -33,7 +33,7 @@ namespace NavMeshGenerator
 		outGeometry.vertices.clear();
 		outGeometry.indexes.clear();
 		// only triangles are supported now
-		outGeometry.vertsPerPoly = 3;
+		outGeometry.verticesPerPoly = 3;
 		outGeometry.isCalculated = false;
 
 		IntVector2D halfSize(static_cast<int>(size.x * 0.5f), static_cast<int>(size.y * 0.5f));
@@ -95,7 +95,7 @@ namespace NavMeshGenerator
 		bool inited = false;
 #endif // DEBUG_CHECKS
 
-		outGeometry.indexes.reserve(resultPolygons.size() * outGeometry.vertsPerPoly);
+		outGeometry.indexes.reserve(resultPolygons.size() * outGeometry.verticesPerPoly);
 		for (const TPPLPoly& polygon : resultPolygons)
 		{
 #ifdef DEBUG_CHECKS
@@ -148,8 +148,8 @@ namespace NavMeshGenerator
 		std::unordered_map<SortedBorderPair, std::vector<size_t>, BorderPairHash> polysByBorders;
 		for (size_t p = 0, pSize = geometry.polygonsCount; p < pSize; ++p)
 		{
-			size_t pShift = p * geometry.vertsPerPoly;
-			FOR_EACH_BORDER(geometry.vertsPerPoly,
+			size_t pShift = p * geometry.verticesPerPoly;
+			FOR_EACH_BORDER(geometry.verticesPerPoly,
 			{
 				size_t indexA = geometry.indexes[pShift + i];
 				size_t indexB = geometry.indexes[pShift + j];
@@ -185,11 +185,11 @@ namespace NavMeshGenerator
 #ifdef DEBUG_CHECKS
 		for (size_t p = 0; p < geometry.polygonsCount; ++p)
 		{
-			size_t pShift = p * geometry.vertsPerPoly;
+			size_t pShift = p * geometry.verticesPerPoly;
 			for (const NavMesh::InnerLinks::LinkData& link : outLinks.links[p])
 			{
 				bool found = false;
-				FOR_EACH_BORDER(geometry.vertsPerPoly,
+				FOR_EACH_BORDER(geometry.verticesPerPoly,
 				{
 					size_t index1 = pShift + i;
 					size_t index2 = pShift + j;
@@ -228,7 +228,7 @@ namespace NavMeshGenerator
 
 	static BoundingBox GetAABB(const NavMesh::Geometry& geometry, size_t polygonIdx)
 	{
-		BoundingBox result
+		BoundingBox Result
 		(
 			std::numeric_limits<float>::max(),
 			std::numeric_limits<float>::max(),
@@ -236,30 +236,30 @@ namespace NavMeshGenerator
 			std::numeric_limits<float>::min()
 		);
 
-		for (size_t indexIdx = 0, indexSize = geometry.vertsPerPoly; indexIdx < indexSize; ++indexIdx)
+		for (size_t indexIdx = 0, indexSize = geometry.verticesPerPoly; indexIdx < indexSize; ++indexIdx)
 		{
-			UpdateAABB(result, geometry.vertices[geometry.indexes[polygonIdx * geometry.vertsPerPoly + indexIdx]]);
+			UpdateAABB(Result, geometry.vertices[geometry.indexes[polygonIdx * geometry.verticesPerPoly + indexIdx]]);
 		}
 
-		return result;
+		return Result;
 	}
 
 	static bool DoesConvexPolygonIntersectCell(std::vector<Vector2D>& inOutPolygon, size_t polygonIdx, size_t cellX, size_t cellY, const NavMesh::Geometry& geometry, float cellSize)
 	{
-		for (size_t i = 0; i < geometry.vertsPerPoly; ++i)
+		for (size_t i = 0; i < geometry.verticesPerPoly; ++i)
 		{
-			inOutPolygon[i] = geometry.vertices[geometry.indexes[polygonIdx * geometry.vertsPerPoly + i]];
+			inOutPolygon[i] = geometry.vertices[geometry.indexes[polygonIdx * geometry.verticesPerPoly + i]];
 		}
 
 		BoundingBox aabb
 		(
-			geometry.navMeshStart.x + cellX * cellSize,
-			geometry.navMeshStart.y + cellY * cellSize,
-			geometry.navMeshStart.x + (cellX + 1) * cellSize,
-			geometry.navMeshStart.y + (cellY + 1) * cellSize
+			geometry.navMeshStart.x + static_cast<float>(cellX) * cellSize,
+			geometry.navMeshStart.y + static_cast<float>(cellY) * cellSize,
+			geometry.navMeshStart.x + static_cast<float>(cellX + 1) * cellSize,
+			geometry.navMeshStart.y + static_cast<float>(cellY + 1) * cellSize
 		);
 
-		for (size_t i = 0; i < geometry.vertsPerPoly - 1; ++i)
+		for (size_t i = 0; i < geometry.verticesPerPoly - 1; ++i)
 		{
 			if (inOutPolygon[i].x >= aabb.minX && inOutPolygon[i].x <= aabb.maxX
 				&& inOutPolygon[i].y >= aabb.minY && inOutPolygon[i].y <= aabb.maxY)
@@ -273,7 +273,7 @@ namespace NavMeshGenerator
 			}
 		}
 
-		size_t lastIndex = geometry.vertsPerPoly - 1;
+		size_t lastIndex = geometry.verticesPerPoly - 1;
 
 		if (inOutPolygon[lastIndex].x >= aabb.minX && inOutPolygon[lastIndex].x <= aabb.maxX
 			&& inOutPolygon[lastIndex].y >= aabb.minY && inOutPolygon[lastIndex].y <= aabb.maxY)
@@ -303,13 +303,13 @@ namespace NavMeshGenerator
 			[](std::vector<size_t>& vector){ vector.clear(); }
 		);
 
-		std::vector<Vector2D> reusablePolygon(geometry.vertsPerPoly);
+		std::vector<Vector2D> reusablePolygon(geometry.verticesPerPoly);
 
 		for (size_t polygonIdx = 0; polygonIdx < geometry.polygonsCount; ++polygonIdx)
 		{
 			BoundingBox aabb = GetAABB(geometry, polygonIdx);
-			size_t leftCellIdx = static_cast<size_t>(static_cast<size_t>(aabb.minX - geometry.navMeshStart.x) / outSpatialHash.cellSize);
-			size_t topCellIdx = static_cast<size_t>(static_cast<size_t>(aabb.minY - geometry.navMeshStart.y) / outSpatialHash.cellSize);
+			size_t leftCellIdx = static_cast<size_t>((aabb.minX - geometry.navMeshStart.x) / outSpatialHash.cellSize);
+			size_t topCellIdx = static_cast<size_t>((aabb.minY - geometry.navMeshStart.y) / outSpatialHash.cellSize);
 			size_t rightCellIdx = std::min(static_cast<size_t>(aabb.maxX - geometry.navMeshStart.x / outSpatialHash.cellSize), static_cast<size_t>(outSpatialHash.hashSize.x - 1));
 			size_t bottomCellIdx = std::min(static_cast<size_t>(aabb.maxY - geometry.navMeshStart.y / outSpatialHash.cellSize), static_cast<size_t>(outSpatialHash.hashSize.y - 1));
 

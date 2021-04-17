@@ -12,13 +12,13 @@ class World;
 class AddComponentCommand : public EditorCommand
 {
 public:
-	AddComponentCommand(const ComponentSourceReference& source, StringID typeName, const ComponentFactory& factory);
+	AddComponentCommand(const ComponentSourceReference& source, StringId typeName, const ComponentFactory& factory);
 
 	void doCommand(World* world) override;
 	void undoCommand(World* world) override;
 
 private:
 	ComponentSourceReference mSource;
-	StringID mComponentTypeName;
+	StringId mComponentTypeName;
 	const ComponentFactory& mComponentFactory;
 };

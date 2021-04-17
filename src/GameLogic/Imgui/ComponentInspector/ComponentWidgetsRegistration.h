@@ -7,5 +7,5 @@ class AbstractComponentImguiWidget;
 
 namespace ComponentWidgetsRegistration
 {
-	void RegisterInspectWidgets(std::map<StringID, std::unique_ptr<AbstractComponentImguiWidget>>& componentInspectWidgets);
+	void RegisterInspectWidgets(std::map<StringId, std::unique_ptr<AbstractComponentImguiWidget>>& componentInspectWidgets);
 }

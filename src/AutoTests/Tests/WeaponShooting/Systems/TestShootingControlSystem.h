@@ -9,7 +9,7 @@
 class TestShootingControlSystem : public System
 {
 public:
-	TestShootingControlSystem(WorldHolder& worldHolder, TimeData& time);
+	TestShootingControlSystem(WorldHolder& worldHolder, TimeData& time) noexcept;
 	~TestShootingControlSystem() override = default;
 
 	void update() override;

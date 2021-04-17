@@ -14,7 +14,7 @@
 #include "GameData/World.h"
 #include "GameData/Spatial/SpatialWorldData.h"
 
-TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(WorldHolder& worldHolder)
+TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
 }
@@ -47,7 +47,7 @@ void TestSpawnShootableUnitsSystem::spawnUnit(EntityManager& entityManager, Vect
 
 void TestSpawnShootableUnitsSystem::spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData)
 {
-	Vector2D jitter = Vector2D((Random::GlobalGenerator() % jitterRand) / jitterDivider - halfJitterMax, ((Random::GlobalGenerator() % jitterRand) / jitterDivider - halfJitterMax));
+	Vector2D jitter = Vector2D(static_cast<float>(Random::gGlobalGenerator() % JitterRand) / JitterDivider - HalfJitterMax, (static_cast<float>(Random::gGlobalGenerator() % JitterRand) / JitterDivider - HalfJitterMax));
 	Vector2D newPos = centerShifted + pos + jitter;
 	CellPos cellPos = SpatialWorldData::GetCellForPos(newPos);
 	spawnUnit(spatialData.getOrCreateCell(cellPos).getEntityManager(), newPos);
@@ -58,21 +58,21 @@ void TestSpawnShootableUnitsSystem::spawnUnits(SpatialWorldData& spatialData, in
 	int n = static_cast<int>(std::sqrt(count));
 	int m = count / n;
 
-	Vector2D centerShifted = pos - Vector2D(static_cast<float>(n - 1), m - ((count == m * n) ? 1.0f : 0.0f)) * (distance * 0.5f);
+	Vector2D centerShifted = pos - Vector2D(static_cast<float>(n - 1), static_cast<float>(m) - ((count == m * n) ? 1.0f : 0.0f)) * (Distance * 0.5f);
 
 	for (int j = 0; j < m; ++j)
 	{
 		for (int i = 0; i < n; ++i)
 		{
-			spawnJitteredUnit(Vector2D(i * distance, j * distance), centerShifted, spatialData);
+			spawnJitteredUnit(Vector2D(static_cast<float>(i) * Distance, static_cast<float>(j) * Distance), centerShifted, spatialData);
 		}
 	}
 
-	float yPos = m * distance;
+	float yPos = static_cast<float>(m) * Distance;
 	int unitsLeft = count - m * n;
 	for (int i = 0; i < unitsLeft; ++i)
 	{
-		spawnJitteredUnit(Vector2D(i * distance, yPos), centerShifted, spatialData);
+		spawnJitteredUnit(Vector2D(static_cast<float>(i) * Distance, yPos), centerShifted, spatialData);
 	}
 }
 
@@ -80,10 +80,10 @@ void TestSpawnShootableUnitsSystem::update()
 {
 	World& world = mWorldHolder.getWorld();
 
-	if (ticksPassed == 5)
+	if (mTicksPassed == 5)
 	{
 		spawnUnits(world.getSpatialData(), 100, Vector2D(-100.0f, 0.0f));
 	}
 
-	++ticksPassed;
+	++mTicksPassed;
 }

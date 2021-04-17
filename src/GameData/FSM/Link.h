@@ -62,9 +62,10 @@ namespace FSM
 			using BlackboardType = Blackboard<BlackboardKeyType>;
 
 		public:
-			VariableEqualLink(BlackboardKeyType name, ValueType expectedValue)
-				: mName(std::forward<BlackboardKeyType>(name))
-				, mExpectedValue(std::forward<ValueType>(expectedValue))
+			template<typename Key, typename Value>
+			VariableEqualLink(Key&& name, Value&& expectedValue)
+				: mName(std::forward<Key>(name))
+				, mExpectedValue(std::forward<Value>(expectedValue))
 			{
 			}
 

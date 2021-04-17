@@ -14,13 +14,13 @@ public:
 	explicit WorldCell(const CellPos& pos);
 
 	EntityManager& getEntityManager() { return mEntityManager; }
-	const EntityManager& getEntityManager() const { return mEntityManager; }
+	[[nodiscard]] const EntityManager& getEntityManager() const { return mEntityManager; }
 	ComponentSetHolder& getCellComponents() { return mCellComponents; }
-	const ComponentSetHolder& getCellComponents() const { return mCellComponents; }
+	[[nodiscard]] const ComponentSetHolder& getCellComponents() const { return mCellComponents; }
 
-	CellPos getPos() const { return mPos; }
+	[[nodiscard]] CellPos getPos() const { return mPos; }
 
-	nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
+	[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
 	void fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers);
 
 	void packForJsonSaving();

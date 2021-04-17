@@ -15,7 +15,7 @@ TEST(ConcurrentAccessDetector, GoodCases)
 		DETECT_CONCURRENT_ACCESS(detectorInstance);
 		{
 			DETECT_CONCURRENT_ACCESS(detectorInstance);
-			EXPECT_NO_FATAL_FAILURE(detectorInstance.aquire());
+			EXPECT_NO_FATAL_FAILURE(detectorInstance.acquire());
 			EXPECT_NO_FATAL_FAILURE(detectorInstance.release());
 		}
 	}
@@ -23,7 +23,7 @@ TEST(ConcurrentAccessDetector, GoodCases)
 	{
 		DETECT_CONCURRENT_ACCESS(detectorInstance);
 		DETECT_CONCURRENT_ACCESS(detectorInstance);
-		EXPECT_NO_FATAL_FAILURE(detectorInstance.aquire());
+		EXPECT_NO_FATAL_FAILURE(detectorInstance.acquire());
 		EXPECT_NO_FATAL_FAILURE(detectorInstance.release());
 	}
 }
@@ -33,7 +33,7 @@ TEST(ConcurrentAccessDetector, BadCase)
 	DisableFailOnAssert();
 
 	int assertCount = 0;
-	GlobalAssertHandler = [&assertCount](){ ++assertCount; };
+	gGlobalAssertHandler = [&assertCount](){ ++assertCount; };
 
 	{
 		ConcurrentAccessDetector detectorInstance;

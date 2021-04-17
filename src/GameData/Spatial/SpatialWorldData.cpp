@@ -23,7 +23,7 @@ std::vector<WorldCell*> SpatialWorldData::getCellsAround(const Vector2D& centerP
 	);
 
 	std::vector<WorldCell*> result;
-	result.reserve(static_cast<size_t>((rbCell.x - ltCell.x) * (rbCell.y - ltCell.y)));
+	result.reserve((rbCell.x - ltCell.x) * (rbCell.y - ltCell.y));
 
 	for (int i = ltCell.x; i <= rbCell.x; ++i)
 	{
@@ -99,8 +99,8 @@ bool SpatialWorldData::TransformCellPos(CellPos& inOutCellPos, Vector2D& inOutPo
 	int posXDiff = static_cast<int>(std::floor(inOutPos.x / CellSize));
 	int posYDiff = static_cast<int>(std::floor(inOutPos.y / CellSize));
 
-	inOutPos.x -= posXDiff * CellSize;
-	inOutPos.y -= posYDiff * CellSize;
+	inOutPos.x -= static_cast<float>(posXDiff) * CellSize;
+	inOutPos.y -= static_cast<float>(posYDiff) * CellSize;
 
 	inOutCellPos.x += posXDiff;
 	inOutCellPos.y += posYDiff;

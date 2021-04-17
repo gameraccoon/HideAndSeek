@@ -43,42 +43,42 @@ namespace StateMachines
 		}
 	}
 
-	static void RegisterCharacterAnimationSM(FSM::StateMachine<StringID, StringID>& sm)
+	static void RegisterCharacterAnimationSM(FSM::StateMachine<StringId, StringId>& sm)
 	{
-		using FSMType = FSM::StateMachine<StringID, StringID>;
+		using FSMType = FSM::StateMachine<StringId, StringId>;
 
 		{
 			FSMType::StateLinkRules rules;
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("move"), STR_TO_ID("charState"), enum_to_string(CharacterState::Walk));
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("move"), STR_TO_ID("charState"), enum_to_string(CharacterState::Run));
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("shoot"), STR_TO_ID("charState"), enum_to_string(CharacterState::Shoot));
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("shoot"), STR_TO_ID("charState"), enum_to_string(CharacterState::WalkAndShoot));
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("reload"), STR_TO_ID("charState"), enum_to_string(CharacterState::Reload));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("move"), STR_TO_ID("charState"), enum_to_string(CharacterState::Walk));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("move"), STR_TO_ID("charState"), enum_to_string(CharacterState::Run));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("shoot"), STR_TO_ID("charState"), enum_to_string(CharacterState::Shoot));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("shoot"), STR_TO_ID("charState"), enum_to_string(CharacterState::WalkAndShoot));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("reload"), STR_TO_ID("charState"), enum_to_string(CharacterState::Reload));
 			sm.addState(STR_TO_ID("idle"), std::move(rules));
 		}
 		{
 			FSMType::StateLinkRules rules;
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("idle"), STR_TO_ID("charState"), enum_to_string(CharacterState::Idle));
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("reload"), STR_TO_ID("charState"), enum_to_string(CharacterState::Reload));
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("shoot"), STR_TO_ID("charState"), enum_to_string(CharacterState::Shoot));
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("shoot"), STR_TO_ID("charState"), enum_to_string(CharacterState::WalkAndShoot));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("idle"), STR_TO_ID("charState"), enum_to_string(CharacterState::Idle));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("reload"), STR_TO_ID("charState"), enum_to_string(CharacterState::Reload));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("shoot"), STR_TO_ID("charState"), enum_to_string(CharacterState::Shoot));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("shoot"), STR_TO_ID("charState"), enum_to_string(CharacterState::WalkAndShoot));
 			sm.addState(STR_TO_ID("move"), std::move(rules));
 		}
 		{
 			FSMType::StateLinkRules rules;
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("idle"), STR_TO_ID("charState"), enum_to_string(CharacterState::Idle));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("idle"), STR_TO_ID("charState"), enum_to_string(CharacterState::Idle));
 			sm.addState(STR_TO_ID("reload"), std::move(rules));
 		}
 		{
 			FSMType::StateLinkRules rules;
-			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringID>(STR_TO_ID("idle"), STR_TO_ID("charState"), enum_to_string(CharacterState::Idle));
+			rules.emplaceLink<FSM::LinkRules::VariableEqualLink, StringId>(STR_TO_ID("idle"), STR_TO_ID("charState"), enum_to_string(CharacterState::Idle));
 			sm.addState(STR_TO_ID("shoot"), std::move(rules));
 		}
 	}
 
-	static void RegisterCharacterLegsAnimationSM(FSM::StateMachine<StringID, StringID>& sm)
+	static void RegisterCharacterLegsAnimationSM(FSM::StateMachine<StringId, StringId>& sm)
 	{
-		using FSMType = FSM::StateMachine<StringID, StringID>;
+		using FSMType = FSM::StateMachine<StringId, StringId>;
 
 		// Top level states
 		{

@@ -11,7 +11,7 @@
 class TestSpawnShootableUnitsSystem : public System
 {
 public:
-	TestSpawnShootableUnitsSystem(WorldHolder& worldHolder);
+	explicit TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 	std::string getName() override { return "TestSpawnShootableUnitsSystem"; }
@@ -23,11 +23,11 @@ private:
 
 private:
 	WorldHolder& mWorldHolder;
-	int ticksPassed = 0;
+	int mTicksPassed = 0;
 
-	static inline const int jitterRand = 500;
-	static inline const float jitterMax = 30.0f;
-	static inline const float halfJitterMax = jitterMax / 2.0f;
-	static inline const float jitterDivider = jitterRand / jitterMax;
-	static inline const float distance = 50.0f;
+	static inline const int JitterRand = 500;
+	static inline const float JitterMax = 30.0f;
+	static inline const float HalfJitterMax = JitterMax / 2.0f;
+	static inline const float JitterDivider = JitterRand / JitterMax;
+	static inline const float Distance = 50.0f;
 };

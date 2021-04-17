@@ -2,7 +2,7 @@
 
 #include "GameLogic/SharedManagers/TimeData.h"
 
-#include <math.h>
+#include <cmath>
 
 void TimeData::update(float deltaTime)
 {

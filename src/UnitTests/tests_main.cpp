@@ -27,11 +27,11 @@ public:
 class TestInfoLogger : public EmptyTestEventListener
 {
 	// Called before a test starts
-	virtual void OnTestStart(const TestInfo& test_info);
+	void OnTestStart(const TestInfo& test_info) override;
 	// Called after a failed assertion or a SUCCEED() invocation
-	virtual void OnTestPartResult(const TestPartResult& test_part_result);
+	void OnTestPartResult(const TestPartResult& test_part_result) override;
 	// Called after a test ends
-	virtual void OnTestEnd(const TestInfo& test_info);
+	void OnTestEnd(const TestInfo& test_info) override;
 };
 
 void SGTestingEnvironment::SetUp()
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	TestEventListeners& listeners = UnitTest::GetInstance()->listeners();
 	listeners.Append(HS_NEW TestInfoLogger());
 
-	int ret_val = RUN_ALL_TESTS();
+	int retVal = RUN_ALL_TESTS();
 
-	return ret_val;
+	return retVal;
 }

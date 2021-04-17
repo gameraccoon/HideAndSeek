@@ -5,7 +5,7 @@
 #include <GameData/World.h>
 
 AddEntityCommand::AddEntityCommand(Entity entity)
-	: EditorCommand(EffectType::Entities)
+	: EditorCommand(EffectBitset(EffectType::Entities))
 	, mEntity(entity)
 {
 }

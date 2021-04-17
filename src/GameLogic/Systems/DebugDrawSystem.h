@@ -24,7 +24,7 @@ public:
 	using KeyStatesMap = std::unordered_map<int, bool>;
 
 public:
-	DebugDrawSystem(WorldHolder& worldHolder, const TimeData& timeData, HAL::Engine& engine, HAL::ResourceManager& resourceManager);
+	DebugDrawSystem(WorldHolder& worldHolder, const TimeData& timeData, HAL::Engine& engine, HAL::ResourceManager& resourceManager) noexcept;
 	~DebugDrawSystem() override = default;
 
 	void update() override;

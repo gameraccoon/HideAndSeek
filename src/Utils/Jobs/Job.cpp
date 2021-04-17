@@ -4,13 +4,13 @@
 
 namespace Jobs
 {
-	void BaseJob::setJobGroupID(JobGroupID jobGroupID)
+	void BaseJob::setJobGroupId(JobGroupId jobGroupId)
 	{
-		mJobGroupID = jobGroupID;
+		mJobGroupId = jobGroupId;
 	}
 
-	BaseJob::JobGroupID Jobs::BaseJob::getJobGroupID()
+	BaseJob::JobGroupId Jobs::BaseJob::getJobGroupId() const
 	{
-		return mJobGroupID;
+		return mJobGroupId;
 	}
 }

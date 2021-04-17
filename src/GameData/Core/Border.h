@@ -8,7 +8,7 @@ public:
 	Border(Vector2D a, Vector2D b) noexcept;
 
 	/** Get normal-vector for this border */
-	[[nodiscard]] Vector2D getNormal() const { return normal; }
+	[[nodiscard]] Vector2D getNormal() const { return mNormal; }
 	/** Get first point of this segment */
 	[[nodiscard]] Vector2D getA() const { return mPointA; }
 	/** Get second point of this segment */
@@ -25,7 +25,7 @@ private:
 	Vector2D mPointA;
 	Vector2D mPointB;
 	/** Normal of this border */
-	Vector2D normal;
+	Vector2D mNormal;
 };
 
 struct SimpleBorder

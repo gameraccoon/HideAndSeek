@@ -9,7 +9,7 @@ ArgumentsParser::ArgumentsParser(int argc, char** argv, const std::string& argum
 {
 	for (int i = 1; i < argc; ++i)
 	{
-		mTokens.push_back(std::string(argv[i]));
+		mTokens.emplace_back(argv[i]);
 	}
 }
 

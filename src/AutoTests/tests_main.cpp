@@ -12,7 +12,7 @@
 
 using CasesMap = std::map<std::string, std::function<std::unique_ptr<BaseTestCase>()>>;
 
-CasesMap getCases()
+static CasesMap GetCases()
 {
 	return CasesMap
 	({
@@ -57,9 +57,9 @@ int main(int argc, char** argv)
 		seed = static_cast<unsigned int>(std::atoi(seedStr.c_str()));
 	}
 
-	Random::GlobalGenerator = std::mt19937(seed);
+	Random::gGlobalGenerator = std::mt19937(seed);
 
-	auto cases = getCases();
+	auto cases = GetCases();
 
 	if (arguments.hasArgument("list-cases"))
 	{
@@ -81,8 +81,8 @@ int main(int argc, char** argv)
 	{
 		std::unique_ptr<BaseTestCase> testCase = caseIt->second();
 		TestChecklist checklist = testCase->start(arguments);
-		bool isSuccessfull = ValidateChecklist(checklist);
-		return isSuccessfull ? 0 : 1;
+		bool isSuccessful = ValidateChecklist(checklist);
+		return isSuccessful ? 0 : 1;
 	}
 	else
 	{

@@ -27,10 +27,10 @@ public:
 	WorldCell& getOrCreateCell(const CellPos& pos);
 
 	std::unordered_map<CellPos, WorldCell>& getAllCells() { return mCells; }
-	const std::unordered_map<CellPos, WorldCell>& getAllCells() const { return mCells; }
+	[[nodiscard]] const std::unordered_map<CellPos, WorldCell>& getAllCells() const { return mCells; }
 
 	SpatialEntityManager getAllCellManagers();
-	ConstSpatialEntityManager getAllCellManagers() const;
+	[[nodiscard]] ConstSpatialEntityManager getAllCellManagers() const;
 
 	// returns true if cell changed
 	static bool TransformCellPos(CellPos& inOutCellPos, Vector2D& inOutPos);
@@ -47,7 +47,7 @@ public:
 
 	static BoundingBox GetCellAABB(CellPos pos);
 
-	nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
+	[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
 	void fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers);
 
 	void packForJsonSaving();

@@ -21,7 +21,7 @@ public:
 private:
 	QWidget* mContentWidget = nullptr;
 	std::shared_ptr<EditData> mCurrentEdit;
-	std::map<StringID, std::unique_ptr<AbstractEditFactory>> mFactories;
+	std::map<StringId, std::unique_ptr<AbstractEditFactory>> mFactories;
 };
 
 #endif // COMPONENTCONTENTFABRIC_H

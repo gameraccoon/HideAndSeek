@@ -31,5 +31,5 @@ struct ComponentSourceReference
 struct ComponentReference
 {
 	ComponentSourceReference source;
-	StringID componentTypeName;
+	StringId componentTypeName;
 };

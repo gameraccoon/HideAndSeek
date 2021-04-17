@@ -13,7 +13,7 @@
 class MovementSystem : public System
 {
 public:
-	MovementSystem(WorldHolder& worldHolder, const TimeData& timeData);
+	MovementSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;
 	~MovementSystem() override = default;
 
 	void update() override;

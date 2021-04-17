@@ -15,7 +15,7 @@
 #include "Utils/Geometry/RayTrace.h"
 
 
-WeaponSystem::WeaponSystem(WorldHolder& worldHolder, const TimeData& timeData)
+WeaponSystem::WeaponSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 {
@@ -33,7 +33,7 @@ struct ShotInfo
 
 struct HitInfo
 {
-	HitInfo(Entity instigator) : instigator(instigator) {}
+	explicit HitInfo(Entity instigator) : instigator(instigator) {}
 
 	Entity instigator;
 	WorldCell* instigatorCell;
@@ -58,7 +58,7 @@ void WeaponSystem::update()
 				shot.instigatorCell = cell;
 				shot.distance = weapon->getShotDistance();
 				shot.damage = weapon->getDamageValue();
-				shotsToMake.push_back(std::move(shot));
+				shotsToMake.push_back(shot);
 
 				weapon->setShotFinishTimestamp(currentTime.getIncreasedByFloatTime(weapon->getShotPeriod()));
 			}
@@ -85,7 +85,7 @@ void WeaponSystem::update()
 				hitInfo.hitEntity = result.hitEntity;
 				hitInfo.impulse = traceEndPoint - transform->getLocation();
 				hitInfo.damageValue = shotInfo.damage;
-				hitsDone.push_back(std::move(hitInfo));
+				hitsDone.push_back(hitInfo);
 			}
 		}
 	}

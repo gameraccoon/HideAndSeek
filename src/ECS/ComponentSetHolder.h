@@ -32,7 +32,7 @@ public:
 	}
 
 	template<typename T>
-	T* addComponent()
+	T* addComponent() noexcept
 	{
 		T* component = HS_NEW T();
 		addComponent(component, T::GetTypeName());
@@ -50,8 +50,8 @@ public:
 		return static_cast<T*>(it->second);
 	}
 
-	void addComponent(BaseComponent* component, StringID typeID);
-	void removeComponent(StringID typeID);
+	void addComponent(BaseComponent* component, StringId typeId);
+	void removeComponent(StringId typeId);
 
 	template<typename... Components>
 	std::tuple<Components*...> getComponents()
@@ -65,7 +65,7 @@ public:
 		return std::make_tuple(getSingleComponent<Components>()...);
 	}
 
-	nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
+	[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
 	void fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers);
 
 	[[nodiscard]] bool hasAnyComponents() const;
@@ -100,5 +100,5 @@ private:
 	}
 
 private:
-	std::unordered_map<StringID, BaseComponent*> mComponents;
+	std::unordered_map<StringId, BaseComponent*> mComponents;
 };

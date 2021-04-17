@@ -13,7 +13,7 @@
 class CharacterStateSystem : public System
 {
 public:
-	CharacterStateSystem(WorldHolder& worldHolder, const TimeData& timeData);
+	CharacterStateSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;
 	~CharacterStateSystem() override = default;
 
 	void update() override;

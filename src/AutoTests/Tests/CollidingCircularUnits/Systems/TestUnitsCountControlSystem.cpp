@@ -14,12 +14,12 @@
 #include "GameData/World.h"
 #include "GameData/Spatial/SpatialWorldData.h"
 
-TestUnitsCountControlSystem::TestUnitsCountControlSystem(WorldHolder& worldHolder)
+TestUnitsCountControlSystem::TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
 }
 
-void TestUnitsCountControlSystem::spawnUnit(EntityManager& entityManager, Vector2D pos)
+void TestUnitsCountControlSystem::SpawnUnit(EntityManager& entityManager, Vector2D pos)
 {
 	Entity entity = entityManager.addEntity();
 	{
@@ -47,15 +47,15 @@ void TestUnitsCountControlSystem::spawnUnit(EntityManager& entityManager, Vector
 	entityManager.addComponent<CharacterStateComponent>(entity);
 }
 
-void TestUnitsCountControlSystem::spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData)
+void TestUnitsCountControlSystem::SpawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData)
 {
-	Vector2D jitter = Vector2D((Random::GlobalGenerator() % jitterRand) / jitterDivider - halfJitterMax, ((Random::GlobalGenerator() % jitterRand) / jitterDivider - halfJitterMax));
+	Vector2D jitter = Vector2D(static_cast<float>(Random::gGlobalGenerator() % jitterRand) / jitterDivider - halfJitterMax, (static_cast<float>(Random::gGlobalGenerator() % jitterRand) / jitterDivider - halfJitterMax));
 	Vector2D newPos = centerShifted + pos + jitter;
 	CellPos cellPos = SpatialWorldData::GetCellForPos(newPos);
-	spawnUnit(spatialData.getOrCreateCell(cellPos).getEntityManager(), newPos);
+	SpawnUnit(spatialData.getOrCreateCell(cellPos).getEntityManager(), newPos);
 }
 
-void TestUnitsCountControlSystem::spawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos)
+void TestUnitsCountControlSystem::SpawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos)
 {
 	int n = static_cast<int>(std::sqrt(count));
 	int m = count / n;
@@ -66,15 +66,15 @@ void TestUnitsCountControlSystem::spawnUnits(SpatialWorldData& spatialData, int 
 	{
 		for (int i = 0; i < n; ++i)
 		{
-			spawnJitteredUnit(Vector2D(i * distance, j * distance), centerShifted, spatialData);
+			SpawnJitteredUnit(Vector2D(i * distance, j * distance), centerShifted, spatialData);
 		}
 	}
 
-	float yPos = m * distance;
+	float yPos = static_cast<float>(m) * distance;
 	int unitsLeft = count - m * n;
 	for (int i = 0; i < unitsLeft; ++i)
 	{
-		spawnJitteredUnit(Vector2D(i * distance, yPos), centerShifted, spatialData);
+		SpawnJitteredUnit(Vector2D(i * distance, yPos), centerShifted, spatialData);
 	}
 }
 
@@ -84,7 +84,7 @@ void TestUnitsCountControlSystem::update()
 
 	if (mTicksPassed == 5)
 	{
-		spawnUnits(world.getSpatialData(), 500, Vector2D(-400.0f, 0.0f));
+		SpawnUnits(world.getSpatialData(), 500, Vector2D(-400.0f, 0.0f));
 	}
 
 	++mTicksPassed;

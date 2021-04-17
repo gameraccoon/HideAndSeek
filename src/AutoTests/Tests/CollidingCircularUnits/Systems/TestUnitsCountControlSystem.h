@@ -9,15 +9,15 @@
 class TestUnitsCountControlSystem : public System
 {
 public:
-	TestUnitsCountControlSystem(WorldHolder& worldHolder);
+	explicit TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 	std::string getName() override { return "TestUnitsCountControlSystem"; }
 
 private:
-	static void spawnUnit(EntityManager& entityManager, Vector2D pos);
-	static void spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData);
-	static void spawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos);
+	static void SpawnUnit(EntityManager& entityManager, Vector2D pos);
+	static void SpawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData);
+	static void SpawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos);
 
 private:
 	WorldHolder& mWorldHolder;

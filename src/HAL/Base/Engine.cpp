@@ -22,7 +22,7 @@ namespace HAL
 	ConcurrentAccessDetector gSDLAccessDetector;
 #endif
 
-	static const float MaxFrameTicks = 300.0f;
+	static const float MAX_FRAME_TICKS = 300.0f;
 
 	struct Engine::Impl
 	{
@@ -38,7 +38,7 @@ namespace HAL
 		float mMouseY;
 		SDL_Event mLastEvent;
 
-		Impl(int windowWidth, int windowHeight)
+		Impl(int windowWidth, int windowHeight) noexcept
 			: mSdl(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE)
 			, mWindow(windowWidth, windowHeight)
 			, mGlContext(mWindow)
@@ -46,20 +46,18 @@ namespace HAL
 			, mElapsedTicks(static_cast<float>(SDL_GetTicks()))
 			, mGame(nullptr)
 			, mQuit(false)
-			, mMouseX(windowWidth * 0.5f)
-			, mMouseY(windowHeight * 0.5f)
+			, mMouseX(static_cast<float>(windowWidth) * 0.5f)
+			, mMouseY(static_cast<float>(windowHeight) * 0.5f)
 		{
 		}
 
-		~Impl()
-		{
-		}
+		~Impl() = default;
 
 		void start();
 		void parseEvents();
 	};
 
-	Engine::Engine(int windowWidth, int windowHeight)
+	Engine::Engine(int windowWidth, int windowHeight) noexcept
 		: WindowWidth(windowWidth)
 		, WindowHeight(windowHeight)
 		, mPimpl(HS_NEW Impl(windowWidth, windowHeight))
@@ -162,7 +160,7 @@ namespace HAL
 				continue;
 			}
 
-			lastFrameTicks = std::min(lastFrameTicks, MaxFrameTicks);
+			lastFrameTicks = std::min(lastFrameTicks, MAX_FRAME_TICKS);
 			float lastFrameSeconds = lastFrameTicks * 0.001f;
 
 			if (mGame)

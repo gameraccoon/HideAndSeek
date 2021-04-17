@@ -17,9 +17,9 @@ namespace ShapeOperations
 
 	struct MergedGeometry
 	{
-		MergedGeometry(const std::vector<Border>& inBorders, Vector2D location);
-		MergedGeometry(const std::vector<SimpleBorder>& simpleBorders);
-		MergedGeometry(std::vector<SimpleBorder>&& simpleBorders);
+		explicit MergedGeometry(const std::vector<Border>& inBorders, Vector2D location);
+		explicit MergedGeometry(const std::vector<SimpleBorder>& simpleBorders);
+		explicit MergedGeometry(std::vector<SimpleBorder>&& simpleBorders);
 
 		Shape borders;
 		BoundingBox aabb

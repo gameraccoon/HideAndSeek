@@ -28,7 +28,7 @@ struct Vector2D
 
 	/** Normalize vector */
 	[[nodiscard]] Vector2D unit() const noexcept;
-	/** Mirror horisontally */
+	/** Mirror horizontally */
 	[[nodiscard]] Vector2D mirrorH() const noexcept;
 	/** Mirror vertically */
 	[[nodiscard]] Vector2D mirrorV() const noexcept;

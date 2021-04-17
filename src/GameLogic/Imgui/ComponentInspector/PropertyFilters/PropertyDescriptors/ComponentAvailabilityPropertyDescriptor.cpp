@@ -6,14 +6,14 @@
 
 namespace ImguiPropertyFiltration
 {
-	ComponentAvailabilityPropertyDescriptor::ComponentAvailabilityPropertyDescriptor(const std::string& componentName, StringID typeID)
+	ComponentAvailabilityPropertyDescriptor::ComponentAvailabilityPropertyDescriptor(const std::string& componentName, StringId typeId)
 		: AbstractPropertyDescriptor(componentName)
-		, mTypeID(typeID)
+		, mTypeId(typeId)
 	{}
 
-	std::shared_ptr<ComponentAvailabilityPropertyDescriptor> ComponentAvailabilityPropertyDescriptor::Create(const std::string& componentName, StringID typeID)
+	std::shared_ptr<ComponentAvailabilityPropertyDescriptor> ComponentAvailabilityPropertyDescriptor::Create(const std::string& componentName, StringId typeId)
 	{
-		auto result = std::make_shared<ComponentAvailabilityPropertyDescriptor>(componentName, typeID);
+		auto result = std::make_shared<ComponentAvailabilityPropertyDescriptor>(componentName, typeId);
 		result->mFilterFactories.push_back(std::make_shared<PropertyFilterFactory<HasComponentPropertyFilter>>(result));
 		return result;
 	}

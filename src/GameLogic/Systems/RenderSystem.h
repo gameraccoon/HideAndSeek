@@ -21,14 +21,11 @@ struct Vector2D;
 class RenderSystem : public System
 {
 public:
-	using KeyStatesMap = std::unordered_map<int, bool>;
-
-public:
 	RenderSystem(WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::Engine& engine,
 		HAL::ResourceManager& resourceManager,
-		Jobs::WorkerManager& jobsWorkerManager);
+		Jobs::WorkerManager& jobsWorkerManager) noexcept;
 
 	~RenderSystem() override = default;
 
@@ -36,7 +33,7 @@ public:
 	std::string getName() override { return "RenderSystem"; }
 
 private:
-	void drawVisibilityPolygon(const Graphics::Sprite& lightSprite, const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift);
+	static void DrawVisibilityPolygon(const Graphics::Sprite& lightSprite, const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift);
 	void drawBackground(World& world, const Vector2D& drawShift);
 	static Vector2D GetPlayerSightPosition(World& world);
 	void drawLights(class SpatialEntityManager& managerGroup, std::vector<class WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize);

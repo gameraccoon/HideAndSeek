@@ -12,7 +12,7 @@
 #include "GameData/World.h"
 
 
-MovementSystem::MovementSystem(WorldHolder& worldHolder, const TimeData& timeData)
+MovementSystem::MovementSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 {
@@ -39,7 +39,7 @@ void MovementSystem::update()
 
 	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<MovementComponent, TransformComponent>([timestampNow, &transfers](Entity entity, WorldCell* cell, MovementComponent* movement, TransformComponent* transform)
 	{
-		EntityView entitiyView{ entity, cell->getEntityManager() };
+		EntityView entityView{ entity, cell->getEntityManager() };
 
 		if (!movement->getNextStep().isZeroLength())
 		{
@@ -50,7 +50,7 @@ void MovementSystem::update()
 			bool isCellChanged = SpatialWorldData::TransformCellForPos(cellPos, pos);
 			if (isCellChanged)
 			{
-				transfers.emplace_back(cellPos, entitiyView);
+				transfers.emplace_back(cellPos, entityView);
 			}
 			transform->setUpdateTimestamp(timestampNow);
 			movement->setNextStep(ZERO_VECTOR);
@@ -67,9 +67,9 @@ void MovementSystem::update()
 	{
 		if (auto [spatialTracked] = transfer.entityView.getComponents<SpatialTrackComponent>(); spatialTracked != nullptr)
 		{
-			StringID spatialTrackID = spatialTracked->getId();
+			StringId spatialTrackId = spatialTracked->getId();
 			auto [trackedComponents] = world.getWorldComponents().getComponents<TrackedSpatialEntitiesComponent>();
-			auto it = trackedComponents->getEntitiesRef().find(spatialTrackID);
+			auto it = trackedComponents->getEntitiesRef().find(spatialTrackId);
 			if (it != trackedComponents->getEntitiesRef().end())
 			{
 				it->second.cell = transfer.cellTo;

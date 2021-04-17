@@ -87,6 +87,6 @@ void EditorCommandsStack::clearOldCommands()
 
 	if (mChangeHandler)
 	{
-		mChangeHandler(EditorCommand::EffectType::CommandStack, false);
+		mChangeHandler(EditorCommand::EffectBitset(EditorCommand::EffectType::CommandStack), false);
 	}
 }

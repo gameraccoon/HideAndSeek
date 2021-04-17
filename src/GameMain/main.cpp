@@ -1,16 +1,14 @@
 #include "Base/precomp.h"
 
+#include <ctime>
+
 #include "Base/Random/Random.h"
 
 #include "GameLogic/Game.h"
 
-#include <time.h>
-
-#include "Utils/Application/ArgumentsParser.h"
-
 int main(int argc, char** argv)
 {
-	Random::GlobalGenerator = std::mt19937(static_cast<unsigned int>(time(nullptr)));
+	Random::gGlobalGenerator = Random::GlobalGeneratorType(static_cast<unsigned int>(time(nullptr)));
 
 	ArgumentsParser arguments(argc, argv);
 

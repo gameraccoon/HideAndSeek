@@ -220,19 +220,19 @@ namespace Collide
 
 	static int GetCohenCode(const BoundingBox& box, const Vector2D& dot)
 	{
-		constexpr int LEFT_BIT = 0;
-		constexpr int RIGHT_BIT = 1;
-		constexpr int TOP_BIT = 2;
-		constexpr int BOTTOM_BIT = 3;
+		constexpr int leftBit = 0;
+		constexpr int rightBit = 1;
+		constexpr int topBit = 2;
+		constexpr int bottomBit = 3;
 
 		return (
-			((dot.x < box.minX) << LEFT_BIT)
+			((dot.x < box.minX) << leftBit)
 			|
-			((dot.x > box.maxX) << RIGHT_BIT)
+			((dot.x > box.maxX) << rightBit)
 			|
-			((dot.y < box.minY) << TOP_BIT)
+			((dot.y < box.minY) << topBit)
 			|
-			((dot.y > box.maxY) << BOTTOM_BIT)
+			((dot.y > box.maxY) << bottomBit)
 		);
 	}
 
@@ -248,21 +248,21 @@ namespace Collide
 			&& (boxA.minY <= boxB.maxY && boxA.maxY >= boxB.minY);
 	}
 
-	bool AreLinesIntersect(const Vector2D& A1, const Vector2D& A2, const Vector2D& B1, const Vector2D& B2)
+	bool AreLinesIntersect(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2)
 	{
 		return (
 			// check that points B1 and B2 on the different sides of A1 A2 line
-			Collide::SignedArea(A1, A2, B1) * Collide::SignedArea(A1, A2, B2) <= 0.0f
+			Collide::SignedArea(a1, a2, b1) * Collide::SignedArea(a1, a2, b2) <= 0.0f
 			&&
 			// check that points A1 and A2 on the different sides of B1 B2 line
-			Collide::SignedArea(B1, B2, A1) * Collide::SignedArea(B1, B2, A2) <= 0.0f
+			Collide::SignedArea(b1, b2, a1) * Collide::SignedArea(b1, b2, a2) <= 0.0f
 		);
 	}
 
-	bool AreLinesParallel(const Vector2D& A1, const Vector2D& A2, const Vector2D& B1, const Vector2D& B2)
+	bool AreLinesParallel(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2)
 	{
-		Vector2D diffA = A2 - A1;
-		Vector2D diffB = B2 - B1;
+		Vector2D diffA = a2 - a1;
+		Vector2D diffB = b2 - b1;
 		if (diffA.y == 0 || diffB.y == 0)
 		{
 			if (diffA.x == 0 || diffB.x == 0)
@@ -334,22 +334,22 @@ namespace Collide
 		return a * d - b * c;
 	}
 
-	Vector2D GetPointIntersect2Lines(const Vector2D& A1, const Vector2D& A2, const Vector2D& B1, const Vector2D& B2)
+	Vector2D GetPointIntersect2Lines(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2)
 	{
-		float DA1 = A1.y - A2.y;
-		float DB1 = A2.x - A1.x;
-		float DC1 = -DA1 * A1.x - DB1 * A1.y;
-		float DA2 = B1.y - B2.y;
-		float DB2 = B2.x - B1.x;
-		float DC2 = -DA2 * B1.x - DB2 * B1.y;
+		float da1 = a1.y - a2.y;
+		float db1 = a2.x - a1.x;
+		float dc1 = -da1 * a1.x - db1 * a1.y;
+		float da2 = b1.y - b2.y;
+		float db2 = b2.x - b1.x;
+		float dc2 = -da2 * b1.x - db2 * b1.y;
 
-		float zn = Det(DA1, DB1, DA2, DB2);
+		float zn = Det(da1, db1, da2, db2);
 
 		// if lines are not parallel
 		if (zn < -EPS || zn > EPS)
 		{
-			float x = -Det(DC1, DB1, DC2, DB2) / zn;
-			float y = -Det(DA1, DC1, DA2, DC2) / zn;
+			float x = -Det(dc1, db1, dc2, db2) / zn;
+			float y = -Det(da1, dc1, da2, dc2) / zn;
 
 			return Vector2D(x, y);
 		}

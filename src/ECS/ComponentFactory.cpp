@@ -2,7 +2,7 @@
 
 #include "ECS/ComponentFactory.h"
 
-ComponentFactory::CreationFn ComponentFactory::getCreationFn(StringID className) const
+ComponentFactory::CreationFn ComponentFactory::getCreationFn(StringId className) const
 {
 	const auto& it = mComponentCreators.find(className);
 	if (it != mComponentCreators.cend())
@@ -14,7 +14,7 @@ ComponentFactory::CreationFn ComponentFactory::getCreationFn(StringID className)
 	return nullptr;
 }
 
-BaseComponent* ComponentFactory::createComponent(StringID typeName) const
+BaseComponent* ComponentFactory::createComponent(StringId typeName) const
 {
 	const auto& it = mComponentCreators.find(typeName);
 	if (it != mComponentCreators.cend() && it->second)

@@ -25,7 +25,7 @@ void WorldCell::fromJson(const nlohmann::json& json, const ComponentSerializersH
 
 void WorldCell::packForJsonSaving()
 {
-	mEntityManager.stableSortEntitiesByID();
+	mEntityManager.stableSortEntitiesById();
 }
 
 void WorldCell::clearCaches()

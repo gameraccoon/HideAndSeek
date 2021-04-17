@@ -16,7 +16,7 @@
 
 #include "HAL/Base/Engine.h"
 
-ImguiSystem::ImguiSystem(ImguiDebugData& debugData, HAL::Engine& engine)
+ImguiSystem::ImguiSystem(ImguiDebugData& debugData, HAL::Engine& engine) noexcept
 	: mEngine(engine)
 	, mDebugData(debugData)
 {

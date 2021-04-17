@@ -7,15 +7,15 @@
 
 namespace Graphics
 {
-	AnimationGroup::AnimationGroup(std::map<StringID, std::vector<ResourceHandle>>&& animationClips, StringID stateMachineID, StringID defaultState)
+	AnimationGroup::AnimationGroup(std::map<StringId, std::vector<ResourceHandle>>&& animationClips, StringId stateMachineId, StringId defaultState)
 		: mAnimationClips(animationClips)
-		, mStateMachineID(stateMachineID)
+		, mStateMachineId(stateMachineId)
 		, mDefaultState(defaultState)
 	{
 	}
 
 	bool AnimationGroup::isValid() const
 	{
-		return mStateMachineID.isValid();
+		return mStateMachineId.isValid();
 	}
 }

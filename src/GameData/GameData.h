@@ -11,7 +11,7 @@ class GameData
 public:
 	ComponentSetHolder& getGameComponents() { return mGameComponents; }
 
-	nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
+	[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
 	void fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers);
 
 private:

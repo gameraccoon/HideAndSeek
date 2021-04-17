@@ -61,17 +61,17 @@ enum class ShapeEquality
 template<typename T>
 static bool AreRingsEqual(const T& shapeA, const T& shapeB)
 {
-	std::vector a_copy(shapeA.begin(), shapeA.end());
+	std::vector aCopy(shapeA.begin(), shapeA.end());
 
-	auto it = std::find(a_copy.begin(), a_copy.end(), shapeB[0]);
-	if (it == a_copy.end())
+	auto it = std::find(aCopy.begin(), aCopy.end(), shapeB[0]);
+	if (it == aCopy.end())
 	{
 		return false;
 	}
 
-	std::rotate(a_copy.begin(), it, a_copy.end());
+	std::rotate(aCopy.begin(), it, aCopy.end());
 
-	return std::equal(a_copy.begin(), a_copy.end(), shapeB.begin());
+	return std::equal(aCopy.begin(), aCopy.end(), shapeB.begin());
 }
 
 static bool AreShapesEqual(const std::span<const SimpleBorder> a, const std::span<const SimpleBorder> b, const ShapeEquality equalityType)
@@ -83,19 +83,19 @@ static bool AreShapesEqual(const std::span<const SimpleBorder> a, const std::spa
 
 	if (equalityType == ShapeEquality::Shuffled)
 	{
-		std::vector a_copy(a.begin(), a.end());
+		std::vector aCopy(a.begin(), a.end());
 
 		for (const SimpleBorder& border : b)
 		{
 			std::erase_if(
-				a_copy,
+				aCopy,
 				[&border](const SimpleBorder& borderB)
 				{
 					return border.a.isNearlyEqualTo(borderB.a) && border.b.isNearlyEqualTo(borderB.b);
 				}
 			);
 		}
-		return a_copy.empty();
+		return aCopy.empty();
 	}
 	else if (equalityType == ShapeEquality::Ordered)
 	{
@@ -229,7 +229,7 @@ TEST(ShapeOperations, Union_TwoRectsWithOneOverlappingBorderOneDirectionFullyIns
 {
 	std::vector<Vector2D> shape1{{10.0f, -60.0f}, {10.0f, -10.0f}, {-10.0f, -10.0f}, {-10.0f, -60.0f}};
 	std::vector<Vector2D> shape2{{30.0f, -60.0f}, {30.0f, 10.0f}, {-30.0f, 10.0f}, {-30.0f, -60.0f}};
-	std::vector<Vector2D> expectedResult(shape2);
+	const std::vector<Vector2D>& expectedResult(shape2);
 
 	TestShapesUnionResultIsCorrect(shape1, shape2, expectedResult);
 }
@@ -262,7 +262,7 @@ TEST(ShapeOperations, Union_TwoRectsCornerTouchingBorder)
 	TestShapesUnionResultIsCorrect(shape1, shape2, expectedShape);
 }
 
-// disabled because the function can't produse correct results in this non-trivial case, more investigation required
+// disabled because the function can't produce correct results in this non-trivial case, more investigation required
 TEST(ShapeOperations, DISABLED_Union_TwoFiguresCornerTouchingBorderFullyInside)
 {
 	std::vector<Vector2D> shape1{{10.0f, -20.0f}, {10.0f, 20.0f}, {-10.0f, 20.0f}, {-10.0f, -20.0f}};
@@ -286,12 +286,12 @@ TEST(ShapeOperations, Union_TwoRectsTouchingCorner)
 TEST(ShapeOperations, DISABLED_Union_TwoComplexFiguresBorderTouchingCornerOfFourBorders)
 {
 	using namespace VectorUtils;
-	std::vector<SimpleBorder> shape1a(GenerateShape({{-30.0f, 10.0f}, {-10.0f, -10.0f}, {10.0f, 10.0f}, {-10.0f, 30.0f}}));
-	std::vector<SimpleBorder> shape1b(GenerateShape({{10.0f, 10.0f}, {30.0f, -10.0f}, {50.0f, 10.0f}, {30.0f, 30.0f}}));
+	std::vector<SimpleBorder> shape1A(GenerateShape({{-30.0f, 10.0f}, {-10.0f, -10.0f}, {10.0f, 10.0f}, {-10.0f, 30.0f}}));
+	std::vector<SimpleBorder> shape1B(GenerateShape({{10.0f, 10.0f}, {30.0f, -10.0f}, {50.0f, 10.0f}, {30.0f, 30.0f}}));
 	std::vector<Vector2D> shape2{{10.0f, -20.0f}, {20.0f, -20.0f}, {20.0f, 30.0f}, {10.0f, 30.0f}};
-	std::vector<SimpleBorder> expectedShape = JoinVectors(shape1a, GenerateShape({{10.0f, -20.0f}, {20.0f, -20.0f}, {20.0f, 0.0f}, {30.0f, -10.0f}, {50.0f, 10.0f}, {30.0f, 30.0f}, {20.0f, 20.0f}, {20.0f, 30.0f}, {10.0f, 30.0f}}));
+	std::vector<SimpleBorder> expectedShape = JoinVectors(shape1A, GenerateShape({{10.0f, -20.0f}, {20.0f, -20.0f}, {20.0f, 0.0f}, {30.0f, -10.0f}, {50.0f, 10.0f}, {30.0f, 30.0f}, {20.0f, 20.0f}, {20.0f, 30.0f}, {10.0f, 30.0f}}));
 
-	TestShapesUnionResultIsCorrect(JoinVectors(shape1a, shape1b), shape2, expectedShape);
+	TestShapesUnionResultIsCorrect(JoinVectors(shape1A, shape1B), shape2, expectedShape);
 }
 
 TEST(ShapeOperations, Union_TwoComplexFiguresOneCornerAnd4OverlappingBorders)
@@ -313,9 +313,9 @@ TEST(ShapeOperations, Union_TwoSameComplexFigures)
 	std::vector<Vector2D> originalShape({{-20.0f, 0.0f}, {0.0f, -20.0f}, {20.0f, 0.0f}, {0.0f, 20.0f}});
 
 	std::vector<SimpleBorder> shape1 = JoinVectors(GenerateShape(GetMovedShape(originalShape, {-20.0f, 0.0f})), GenerateShape(GetMovedShape(originalShape, {20.0f, 0.0f})));
-	std::vector<SimpleBorder> shape2(shape1);
+	const std::vector<SimpleBorder>& shape2(shape1);
 
-	std::vector<SimpleBorder> expectedShape(shape1);
+	const std::vector<SimpleBorder>& expectedShape(shape1);
 
 	TestShapesUnionResultIsCorrect(shape1, shape2, expectedShape);
 }

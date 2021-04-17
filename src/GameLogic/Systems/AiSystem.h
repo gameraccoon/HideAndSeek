@@ -13,7 +13,7 @@
 class AiSystem : public System
 {
 public:
-	AiSystem(WorldHolder& worldHolder, const TimeData& timeData);
+	AiSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;
 	~AiSystem() override = default;
 
 	void update() override;

@@ -5,12 +5,12 @@
 class DestroyedEntitiesTestCheck : public TestCheck
 {
 public:
-	DestroyedEntitiesTestCheck(int expectedDestroyedEntities)
+	explicit DestroyedEntitiesTestCheck(int expectedDestroyedEntities)
 		: mExpectedDestroyedEntities(expectedDestroyedEntities)
 	{}
 
-	bool isPassed() const override { return mDestroyedEntities == mExpectedDestroyedEntities; };
-	std::string describe() const override
+	[[nodiscard]] bool isPassed() const override { return mDestroyedEntities == mExpectedDestroyedEntities; };
+	[[nodiscard]] std::string describe() const override
 	{
 		return FormatString("Destroyed entities: %d, expected %d.", mDestroyedEntities, mExpectedDestroyedEntities);
 	}

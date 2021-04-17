@@ -1,8 +1,8 @@
 #pragma once
 
-#include <inttypes.h>
+#include <cinttypes>
 
-// don't use theese in your code
+// don't use these in your code
 using raw_s8 = int8_t;
 using raw_u8 = uint8_t;
 using raw_s16 = int16_t;

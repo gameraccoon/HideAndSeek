@@ -18,8 +18,8 @@ public:
 
 	~LeakDetectorClass();
 
-	void AddAllocated(void* p, size_t size, const char* file, int line) noexcept;
-	void RemoveAllocated(void* p) noexcept;
+	void addAllocated(void* p, size_t size, const char* file, int line) noexcept;
+	void removeAllocated(void* p) noexcept;
 
 private:
 	// single-linked list node
@@ -52,18 +52,18 @@ private:
 	void printLeaks() noexcept;
 
 	void freeAllocatedList();
-	static void freeLeaksList(MemoryLeak* listBegin);
+	static void FreeLeaksList(MemoryLeak* listBegin);
 
-	AllocatedPtr* allocatedList = nullptr;
+	AllocatedPtr* mAllocatedList = nullptr;
 
-	MemoryLeak* memoryLeaksFirst = nullptr;
-	MemoryLeak* memoryLeaksLast = nullptr;
+	MemoryLeak* mMemoryLeaksFirst = nullptr;
+	MemoryLeak* mEmoryLeaksLast = nullptr;
 
-	std::recursive_mutex mutex;
+	std::recursive_mutex mMutex;
 };
 
-void* operator new(size_t size, const char* file, int line);
-void* operator new[](size_t size, const char* file, int line);
+void* operator new(size_t size, const char* file, int line) noexcept;
+void* operator new[](size_t size, const char* file, int line) noexcept;
 
 void* operator new(size_t size);
 void* operator new[](size_t size);
@@ -71,10 +71,14 @@ void* operator new[](size_t size);
 void operator delete(void* p) noexcept;
 void operator delete(void* p, size_t /*size*/) noexcept;
 
+void* operator new(size_t size, const std::nothrow_t& tag) noexcept;
+void* operator new[](size_t size, const std::nothrow_t& tag) noexcept;
+
 void operator delete[](void* p) noexcept;
 void operator delete[](void* p, size_t /*size*/) noexcept;
 
-#define HS_NEW new(__FILE__, __LINE__)
+// use it instead of 'new' to ease memory leak detection (HS stands for Hide&Seek)
+#define HS_NEW new (__FILE__, __LINE__)
 
 #ifdef REDEFINE_NEW
 #define new HS_NEW
@@ -82,7 +86,7 @@ void operator delete[](void* p, size_t /*size*/) noexcept;
 
 #else
 
-// use it instead of 'new' to ease memory leak detection (HS stands for Hide&Seak)
-#define HS_NEW new
+// use it instead of 'new' to ease memory leak detection (HS stands for Hide&Seek)
+#define HS_NEW new (std::nothrow)
 
 #endif // DETECT_MEMORY_LEAKS

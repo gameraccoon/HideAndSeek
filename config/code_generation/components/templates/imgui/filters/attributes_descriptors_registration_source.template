@@ -6,7 +6,7 @@
 
 namespace ImguiPropertyFiltration
 {{
-	namespace PropertyDescriptiorsRegistration
+	namespace PropertyDescriptorsRegistration
 	{{
 		template<typename T>
 		void RegisterIfHasFactories(DescriptionsRawData& data, std::vector<std::string>&& searchStrings)

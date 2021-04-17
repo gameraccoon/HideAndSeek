@@ -10,7 +10,7 @@
 #include "Utils/Geometry/Collide.h"
 
 
-CollisionSystem::CollisionSystem(WorldHolder& worldHolder)
+CollisionSystem::CollisionSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
 }

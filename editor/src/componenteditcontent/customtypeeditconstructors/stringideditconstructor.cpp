@@ -11,19 +11,19 @@
 namespace TypesEditConstructor
 {
 	template<>
-	Edit<StringID>::Ptr FillEdit<StringID>::Call(QLayout* layout, const QString& label, const StringID& initialValue)
+	Edit<StringId>::Ptr FillEdit<StringId>::Call(QLayout* layout, const QString& label, const StringId& initialValue)
 	{
 		FillLabel(layout, label);
 
 		QHBoxLayout *innerLayout = HS_NEW QHBoxLayout;
 
-		Edit<StringID>::Ptr edit = std::make_shared<Edit<StringID>>(initialValue);
-		Edit<StringID>::WeakPtr editWeakPtr = edit;
+		Edit<StringId>::Ptr edit = std::make_shared<Edit<StringId>>(initialValue);
+		Edit<StringId>::WeakPtr editWeakPtr = edit;
 
 		Edit<std::string>::Ptr editX = FillEdit<std::string>::Call(innerLayout, "id", ID_TO_STR(initialValue));
 		editX->bindOnChange([editWeakPtr](std::string /*oldValue*/, std::string newValue, bool)
 		{
-			if (Edit<StringID>::Ptr edit = editWeakPtr.lock())
+			if (Edit<StringId>::Ptr edit = editWeakPtr.lock())
 			{
 				edit->transmitValueChange(STR_TO_ID(newValue));
 			}

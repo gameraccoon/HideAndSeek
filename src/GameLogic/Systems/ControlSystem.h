@@ -13,7 +13,7 @@
 class ControlSystem : public System
 {
 public:
-	ControlSystem(WorldHolder& worldHolder, const InputData& inputData);
+	ControlSystem(WorldHolder& worldHolder, const InputData& inputData) noexcept;
 	~ControlSystem() override = default;
 
 	void update() override;

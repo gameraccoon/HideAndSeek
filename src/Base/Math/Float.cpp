@@ -2,7 +2,6 @@
 
 #include "Base/Math/Float.h"
 
-#include <math.h>
 #include <memory.h>
 
 namespace Math
@@ -10,8 +9,8 @@ namespace Math
 #ifdef DEBUG_CHECKS
 	static void CheckFloatsCanBeCompared(float a, float b, float epsilon)
 	{
-		Assert(isfinite(a) && isfinite(b), "Comparison with NaN or Inf is not allowed");
-		Assert(isfinite(epsilon), "Epsilon should not be NaN or Inf");
+		Assert(std::isfinite(a) && std::isfinite(b), "Comparison with NaN or Inf is not allowed");
+		Assert(std::isfinite(epsilon), "Epsilon should not be NaN or Inf");
 
 		if ((a < 0.0f) == (b < 0.0f))
 		{
@@ -68,7 +67,7 @@ namespace Math
 	bool IsNearZero(float v, float epsilon)
 	{
 #ifdef DEBUG_CHECKS
-		Assert(isfinite(v), "Comparison with NaN or Inf is not allowed");
+		Assert(std::isfinite(v), "Comparison with NaN or Inf is not allowed");
 #endif // DEBUG_CHECKS
 		return fabs(v) < epsilon;
 	}

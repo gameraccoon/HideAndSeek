@@ -10,7 +10,7 @@
  * You can use this object to detect data races in debug mode, skipping any checks in release builds
  * Use it as if you use mutex:
  * a) create an object of ConcurrentAccessDetector
- * b) aquire it at the beginning of the potential critical section
+ * b) acquire it at the beginning of the potential critical section
  * c) release it at the end of the potential critical section
  *
  * You can also use ConcurrentAccessDetector::Guard(instance); to serve as std::lock_guard for a mutex
@@ -24,7 +24,7 @@ public:
 		explicit Guard(ConcurrentAccessDetector& detector)
 			: mDetector(detector)
 		{
-			mDetector.aquire();
+            mDetector.acquire();
 		}
 
 		~Guard()
@@ -45,7 +45,7 @@ public:
 	ConcurrentAccessDetector() = default;
 	~ConcurrentAccessDetector()
 	{
-		Assert(mAquiredCount.load(std::memory_order_relaxed) == 0, "Not all threads released ConcurrentAccessDetector or a data race occured");
+		Assert(mAcquiredCount.load(std::memory_order_relaxed) == 0, "Not all threads released ConcurrentAccessDetector or a data race occurred");
 	}
 
 	ConcurrentAccessDetector(const ConcurrentAccessDetector&) = delete;
@@ -53,12 +53,12 @@ public:
 	ConcurrentAccessDetector(ConcurrentAccessDetector&&) = delete;
 	ConcurrentAccessDetector& operator=(ConcurrentAccessDetector&&) = delete;
 
-	void aquire()
+	void acquire()
 	{
 		// Note that this code doesn't have to be 100% thread-safe
 		// covering 90% cases is enough to detect data races
-		const int aquiredCountBefore = mAquiredCount.fetch_add(1, std::memory_order_relaxed);
-		if (aquiredCountBefore > 0)
+		const int acquiredCountBefore = mAcquiredCount.fetch_add(1, std::memory_order_relaxed);
+		if (acquiredCountBefore > 0)
 		{
 			std::thread::id ownedThreadID = mOwningThreadID.load(std::memory_order_relaxed);
 			AssertRelease(ownedThreadID == std::this_thread::get_id(), "A data race detected");
@@ -71,11 +71,11 @@ public:
 
 	void release()
 	{
-		mAquiredCount.fetch_sub(1, std::memory_order_relaxed);
+		mAcquiredCount.fetch_sub(1, std::memory_order_relaxed);
 	}
 
 private:
-	std::atomic<int> mAquiredCount{0};
+	std::atomic<int> mAcquiredCount{0};
 	std::atomic<std::thread::id> mOwningThreadID;
 };
 #else

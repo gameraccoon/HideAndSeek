@@ -8,7 +8,7 @@ class NonCopyableClassForRemoveIndexes
 {
 public:
 	NonCopyableClassForRemoveIndexes() = default;
-	NonCopyableClassForRemoveIndexes(int value) : value(value) {}
+	explicit NonCopyableClassForRemoveIndexes(int value) : value(value) {}
 	NonCopyableClassForRemoveIndexes(const NonCopyableClassForRemoveIndexes&) = delete;
 	NonCopyableClassForRemoveIndexes& operator=(const NonCopyableClassForRemoveIndexes&) = delete;
 	NonCopyableClassForRemoveIndexes(NonCopyableClassForRemoveIndexes&&) = default;
@@ -50,7 +50,11 @@ TEST(VectorUtils, RemoveIndexes)
 
 	{
 		std::vector<NonCopyableClassForRemoveIndexes> testVector;
-		for (int i = 0; i < 10; ++i) { testVector.emplace_back(i); }
+		testVector.reserve(10);
+		for (int i = 0; i < 10; ++i)
+		{
+			testVector.emplace_back(i);
+		}
 		VectorUtils::RemoveIndexes(testVector, {3,4,7});
 
 		std::vector<NonCopyableClassForRemoveIndexes> expectedResult;

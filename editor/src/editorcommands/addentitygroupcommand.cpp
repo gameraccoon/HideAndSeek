@@ -6,7 +6,7 @@
 #include "GameData/Components/TransformComponent.generated.h"
 
 AddEntityGroupCommand::AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, const ComponentSerializersHolder& serializationHolder, const Vector2D& shift)
-	: EditorCommand(EffectType::Entities)
+	: EditorCommand(EffectBitset(EffectType::Entities))
 	, mEntities(entities)
 	, mSerializationHolder(serializationHolder)
 	, mShift(shift)

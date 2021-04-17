@@ -8,7 +8,7 @@ static_assert(sizeof(s8) == 1, "Wrong size of s8");
 static_assert(std::is_signed<raw_s8>(), "Should be signed");
 static_assert(std::is_integral<raw_s8>(), "Should be integral");
 
-static_assert(sizeof(u8) == 1, "Srong size of type");
+static_assert(sizeof(u8) == 1, "Wrong size of type");
 static_assert(std::is_unsigned<raw_u8>(), "Should be unsigned");
 static_assert(std::is_integral<raw_u8>(), "Should be integral");
 

@@ -21,10 +21,7 @@
 class ImguiSystem : public System
 {
 public:
-	using KeyStatesMap = std::unordered_map<int, bool>;
-
-public:
-	ImguiSystem(ImguiDebugData& debugData, HAL::Engine& engine);
+	ImguiSystem(ImguiDebugData& debugData, HAL::Engine& engine) noexcept;
 	~ImguiSystem() override = default;
 
 	void update() override;

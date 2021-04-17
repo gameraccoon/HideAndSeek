@@ -23,9 +23,9 @@ namespace Graphics
 
 		~Font() override;
 
-		bool isValid() const override;
+		[[nodiscard]] bool isValid() const override;
 
-		FC_Font* getRawFont() const;
+		[[nodiscard]] FC_Font* getRawFont() const;
 
 	private:
 		FC_Font* mFont = nullptr;

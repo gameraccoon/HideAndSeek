@@ -28,7 +28,7 @@ void SpatialEntityManager::getAllEntityComponents(Entity entity, std::vector<Bas
 	}
 }
 
-void SpatialEntityManager::getSpatialEntitiesHavingComponents(const std::vector<StringID>& componentIndexes, TupleVector<WorldCell*, Entity>& inOutEntities) const
+void SpatialEntityManager::getSpatialEntitiesHavingComponents(const std::vector<StringId>& componentIndexes, TupleVector<WorldCell*, Entity>& inOutEntities) const
 {
 	std::vector<Entity> entities;
 

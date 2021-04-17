@@ -30,7 +30,7 @@ RenderSystem::RenderSystem(
 		HAL::Engine& engine,
 		HAL::ResourceManager& resourceManager,
 		Jobs::WorkerManager& jobsWorkerManager
-	)
+	) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mEngine(engine)
@@ -79,13 +79,13 @@ void RenderSystem::update()
 			for (const auto& data : render->getSpriteDatas())
 			{
 				const Graphics::Sprite& spriteData = resourceManager.getResource<Graphics::Sprite>(data.spriteHandle);
-				Graphics::Render::drawQuad(*spriteData.getSurface(), location, data.params.size, data.params.anchor, rotation, spriteData.getUV(), 1.0f);
+				Graphics::Render::DrawQuad(*spriteData.getSurface(), location, data.params.size, data.params.anchor, rotation, spriteData.getUV(), 1.0f);
 			}
 		});
 	}
 }
 
-void RenderSystem::drawVisibilityPolygon(const Graphics::Sprite& lightSprite, const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift)
+void RenderSystem::DrawVisibilityPolygon(const Graphics::Sprite& lightSprite, const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift)
 {
 	if (polygon.size() > 2)
 	{
@@ -102,7 +102,7 @@ void RenderSystem::drawVisibilityPolygon(const Graphics::Sprite& lightSprite, co
 
 		glm::mat4 transform(1.0f);
 		transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
-		Graphics::Render::drawFan(*lightSprite.getSurface(), drawablePolygon, transform, 0.5f);
+		Graphics::Render::DrawFan(*lightSprite.getSurface(), drawablePolygon, transform, 0.5f);
 	}
 }
 
@@ -123,7 +123,7 @@ void RenderSystem::drawBackground(World& world, const Vector2D& drawShift)
 		const Vector2D spriteSize(spriteData.params.size);
 		const Vector2D tiles(windowSize.x / spriteSize.x, windowSize.y / spriteSize.y);
 		const Vector2D uvShift(-drawShift.x / spriteSize.x, -drawShift.y / spriteSize.y);
-		Graphics::Render::drawTiledQuad(*backgroundSprite.getSurface(), ZERO_VECTOR, windowSize, tiles, uvShift);
+		Graphics::Render::DrawTiledQuad(*backgroundSprite.getSurface(), ZERO_VECTOR, windowSize, tiles, uvShift);
 	}
 }
 
@@ -166,7 +166,7 @@ public:
 	using LightBlockingComponents = std::vector<LightBlockingGeometryComponent*>;
 
 public:
-	VisibilityPolygonCalculationJob(Vector2D maxFov, const LightBlockingComponents& lightBlockingComponents, GameplayTimestamp timestamp, FinalizeFn finalizeFn)
+	VisibilityPolygonCalculationJob(Vector2D maxFov, const LightBlockingComponents& lightBlockingComponents, GameplayTimestamp timestamp, FinalizeFn finalizeFn) noexcept
 		: mMaxFov(maxFov)
 		, mLightBlockingComponents(lightBlockingComponents)
 		, mTimestamp(timestamp)
@@ -218,11 +218,11 @@ private:
 };
 
 // just to suppress weak vtables warning
-VisibilityPolygonCalculationJob::~VisibilityPolygonCalculationJob() {}
+VisibilityPolygonCalculationJob::~VisibilityPolygonCalculationJob() = default;
 
 static size_t GetJobDivisor(size_t maxThreadsCount)
 {
-	// this alghorithm is subject to change
+	// this algorithm is subject to change
 	// we need to divide work into chunks to pass to different threads
 	// take to consideration that the count of free threads most likely
 	// smaller that threadsCount and can fluctuate over time
@@ -295,7 +295,7 @@ void RenderSystem::drawLights(SpatialEntityManager& managerGroup, std::vector<Wo
 		{
 			if (chunkItemIndex == 0)
 			{
-				jobs.emplace_back(HS_NEW VisibilityPolygonCalculationJob(maxFov, lightBlockingComponents, timestampNow, finalizeFn));
+				jobs.emplace_back(std::make_unique<VisibilityPolygonCalculationJob>(maxFov, lightBlockingComponents, timestampNow, finalizeFn));
 			}
 
 			VisibilityPolygonCalculationJob* jobData = static_cast<VisibilityPolygonCalculationJob*>(jobs.rbegin()->get());
@@ -325,7 +325,7 @@ void RenderSystem::drawLights(SpatialEntityManager& managerGroup, std::vector<Wo
 		// draw the results on screen
 		for (auto& result : allResults)
 		{
-			drawVisibilityPolygon(
+			DrawVisibilityPolygon(
 				lightSprite,
 				result.polygon,
 				result.size,
@@ -338,5 +338,5 @@ void RenderSystem::drawLights(SpatialEntityManager& managerGroup, std::vector<Wo
 	VisibilityPolygonCalculator visibilityPolygonCalculator;
 	std::vector<Vector2D> polygon;
 	visibilityPolygonCalculator.calculateVisibilityPolygon(polygon, lightBlockingComponents, playerSightPosition, maxFov);
-	drawVisibilityPolygon(lightSprite, polygon, maxFov, drawShift + playerSightPosition);
+	DrawVisibilityPolygon(lightSprite, polygon, maxFov, drawShift + playerSightPosition);
 }

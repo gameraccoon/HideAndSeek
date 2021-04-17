@@ -6,7 +6,7 @@
 #include <GameData/Components/TransformComponent.generated.h>
 
 AddSpatialEntityCommand::AddSpatialEntityCommand(const SpatialEntity& entity, const Vector2D& location)
-	: EditorCommand(EffectType::Entities)
+	: EditorCommand(EffectBitset(EffectType::Entities))
 	, mEntity(entity)
 	, mLocation(location)
 {

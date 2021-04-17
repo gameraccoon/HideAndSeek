@@ -7,8 +7,8 @@
 
 #include "src/editorutils/componentreferenceutils.h"
 
-RemoveComponentCommand::RemoveComponentCommand(const ComponentSourceReference& source, StringID typeName, const ComponentSerializersHolder& serializerHolder)
-	: EditorCommand(EffectType::Components)
+RemoveComponentCommand::RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const ComponentSerializersHolder& serializerHolder)
+	: EditorCommand(EffectBitset(EffectType::Components))
 	, mSource(source)
 	, mComponentTypeName(typeName)
 	, mComponentSerializerHolder(serializerHolder)

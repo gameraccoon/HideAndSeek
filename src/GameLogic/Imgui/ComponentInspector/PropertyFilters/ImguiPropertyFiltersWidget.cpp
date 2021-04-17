@@ -30,8 +30,8 @@ namespace ImguiPropertyFiltration
 {
 	void ImguiPropertyFiltersWidget::init(ImguiDebugData& debugData)
 	{
-		auto propertyDescriptions = PropertyDescriptiorsRegistration::GetDescriptions();
-		debugData.componentFactory.forEachComponentType([&propertyDescriptions](StringID className)
+		auto propertyDescriptions = PropertyDescriptorsRegistration::GetDescriptions();
+		debugData.componentFactory.forEachComponentType([&propertyDescriptions](StringId className)
 		{
 			std::string componentName = ID_TO_STR(className);
 			std::string lowerComponentName = componentName;
@@ -96,7 +96,7 @@ namespace ImguiPropertyFiltration
 			// tolower
 			std::transform(strId.begin(), strId.end(), strId.begin(), [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
 
-			if (strId.size() >= mMinimalSearchLen)
+			if (strId.size() >= MinimalSearchLen)
 			{
 				mLastMatchedProperties = mPropertyDescriptors.findAllMatches(strId);
 			}
@@ -130,37 +130,37 @@ namespace ImguiPropertyFiltration
 			mFilterQueryBuffer[0] = '\0';
 		}
 
-		bool isFilterChoosen = false;
+		bool isFilterChosen = false;
 		for (const auto& suggestedFilter : mSuggestedFiltersFactories)
 		{
-			std::string filterName = suggestedFilter->getName().c_str();
+			std::string filterName = suggestedFilter->getName();
 			ImGui::TextUnformatted(filterName.c_str());
 			ImGui::SameLine();
 			if (ImGui::Button(FormatString("Add##%s", filterName).c_str()))
 			{
-				isFilterChoosen = true;
+				isFilterChosen = true;
 				mAppliedFilters.push_back(suggestedFilter->createFilter());
 				break;
 			}
 		}
-		if (isFilterChoosen)
+		if (isFilterChosen)
 		{
 			mSuggestedFiltersFactories.clear();
 		}
 	}
 
-	std::vector<StringID> ImguiPropertyFiltersWidget::getFilteredComponentTypes() const
+	std::vector<StringId> ImguiPropertyFiltersWidget::getFilteredComponentTypes() const
 	{
-		std::vector<StringID> filteredComponents;
+		std::vector<StringId> filteredComponents;
 		filteredComponents.reserve(mAppliedFilters.size());
 		// construct vector of unique elements
 		for (const auto& appliedFilter : mAppliedFilters)
 		{
-			StringID typeID = appliedFilter->getComponentType();
-			auto lowerIt = std::lower_bound(filteredComponents.begin(), filteredComponents.end(), typeID);
-			if (lowerIt == filteredComponents.end() || *lowerIt != typeID)
+			StringId typeId = appliedFilter->getComponentType();
+			auto lowerIt = std::lower_bound(filteredComponents.begin(), filteredComponents.end(), typeId);
+			if (lowerIt == filteredComponents.end() || *lowerIt != typeId)
 			{
-				filteredComponents.insert(lowerIt, typeID);
+				filteredComponents.insert(lowerIt, typeId);
 			}
 		}
 		return filteredComponents;
@@ -170,7 +170,7 @@ namespace ImguiPropertyFiltration
 	{
 		inOutEntities.clear();
 
-		std::vector<StringID> filteredComponentTypes = getFilteredComponentTypes();
+		std::vector<StringId> filteredComponentTypes = getFilteredComponentTypes();
 
 		if (!filteredComponentTypes.empty())
 		{

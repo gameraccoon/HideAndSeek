@@ -12,7 +12,7 @@
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 
-AnimationSystem::AnimationSystem(WorldHolder& worldHolder, const TimeData& time)
+AnimationSystem::AnimationSystem(WorldHolder& worldHolder, const TimeData& time) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(time)
 {

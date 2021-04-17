@@ -6,17 +6,17 @@ namespace Graphics
 {
 	struct QuadUV
 	{
-		float U1 = 0.0f;
-		float V1 = 0.0f;
-		float U2 = 1.0f;
-		float V2 = 1.0f;
+		float u1 = 0.0f;
+		float v1 = 0.0f;
+		float u2 = 1.0f;
+		float v2 = 1.0f;
 	};
 
 	struct Color
 	{
-		std::uint8_t R;
-		std::uint8_t G;
-		std::uint8_t B;
-		std::uint8_t A;
+		std::uint8_t r;
+		std::uint8_t g;
+		std::uint8_t b;
+		std::uint8_t a;
 	};
 }

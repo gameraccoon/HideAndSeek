@@ -46,7 +46,7 @@ private:
 	};
 
 private:
-	std::tuple<size_t, Vector2D> GetNextClosestBorderFromCondidates(const std::vector<size_t>& potentialContinuations, const AngledBorder& closestBorder, float maxExtent) const;
+	[[nodiscard]] std::tuple<size_t, Vector2D> getNextClosestBorderFromCandidates(const std::vector<size_t>& potentialContinuations, const AngledBorder& closestBorder, float maxExtent) const;
 
 private:
 	Caches mCaches;

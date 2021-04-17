@@ -41,7 +41,7 @@ public:
 		mManager.scheduleRemoveComponent<ComponentType>(mEntity);
 	}
 
-	Entity getEntity() const;
+	[[nodiscard]] Entity getEntity() const;
 	EntityManager& getManager() { return mManager; }
 
 private:

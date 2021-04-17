@@ -14,7 +14,7 @@
 		},
 		{
 			"name": "animationSMs",
-			"type": "std::map<StringID, FSM::StateMachine<StringID, StringID>>",
+			"type": "std::map<StringId, FSM::StateMachine<StringId, StringId>>",
 			"includes": [
 				"\"GameData/FSM/StateMachine.h\"",
 				"<map>"

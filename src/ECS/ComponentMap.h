@@ -4,13 +4,13 @@
 #include <algorithm>
 
 #include "ECS/Component.h"
-#include "Base/Types/String/StringID.h"
+#include "Base/Types/String/StringId.h"
 
 class ComponentMap
 {
 public:
-	using Iterator = std::unordered_map<StringID, std::vector<BaseComponent*>>::iterator;
-	using ConstIterator = std::unordered_map<StringID, std::vector<BaseComponent*>>::const_iterator;
+	using Iterator = std::unordered_map<StringId, std::vector<BaseComponent*>>::iterator;
+	using ConstIterator = std::unordered_map<StringId, std::vector<BaseComponent*>>::const_iterator;
 
 public:
 	ComponentMap() = default;
@@ -33,23 +33,23 @@ public:
 		return std::tuple_cat(std::tuple<std::vector<BaseComponent*>&>(it->second), getComponentVectors<Components>()...);
 	}
 
-	[[nodiscard]] std::vector<BaseComponent*>& getComponentVectorByID(StringID id)
+	[[nodiscard]] std::vector<BaseComponent*>& getComponentVectorById(StringId id)
 	{
 		auto it = mData.find(id);
 		return it == mData.end() ? mEmptyVector : it->second;
 	}
 
-	[[nodiscard]] const std::vector<BaseComponent*>& getComponentVectorByID(StringID id) const
+	[[nodiscard]] const std::vector<BaseComponent*>& getComponentVectorById(StringId id) const
 	{
-		return const_cast<ComponentMap*>(this)->getComponentVectorByID(id);
+		return const_cast<ComponentMap*>(this)->getComponentVectorById(id);
 	}
 
-	[[nodiscard]] std::vector<BaseComponent*>& getOrCreateComponentVectorByID(StringID id)
+	[[nodiscard]] std::vector<BaseComponent*>& getOrCreateComponentVectorById(StringId id)
 	{
 		return mData[id];
 	}
 
-	void cleanEmptyVetors()
+	void cleanEmptyVectors()
 	{
 		for (auto it = mData.begin(), itEnd = mData.end(); it != itEnd;)
 		{
@@ -90,6 +90,6 @@ private:
 	}
 
 private:
-	std::unordered_map<StringID, std::vector<BaseComponent*>> mData;
+	std::unordered_map<StringId, std::vector<BaseComponent*>> mData;
 	std::vector<BaseComponent*> mEmptyVector;
 };

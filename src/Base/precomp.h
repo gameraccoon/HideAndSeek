@@ -10,7 +10,7 @@
 
 #include "Base/CompilerHelpers.h"
 #include "Base/Debug/MemoryLeakDetection.h"
-#include "Base/Types/String/StringID.h"
+#include "Base/Types/String/StringId.h"
 #include "Base/Types/String/StringHelpers.h"
 #include "Base/Debug/Log.h"
 #include "Base/Debug/Assert.h"

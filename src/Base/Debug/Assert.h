@@ -1,14 +1,14 @@
 #pragma once
 
 // to be able to change behavior for tests
-inline std::function<void()> GlobalAssertHandler = [](){};
-inline std::function<void()> GlobalFatalAssertHandler = [](){ std::terminate(); };
+inline std::function<void()> gGlobalAssertHandler = [](){};
+inline std::function<void()> gGlobalFatalAssertHandler = [](){ std::terminate(); };
 
-inline bool GlobalAllowAssertLogs = true;
+inline bool gGlobalAllowAssertLogs = true;
 template<typename... Args>
 void LogAssertHelper(const char* condition, const char* file, size_t line, const std::string& message, Args... args) noexcept
 {
-	if (GlobalAllowAssertLogs)
+	if (gGlobalAllowAssertLogs)
 	{
 		Log::Instance().writeError(FormatString(std::string("Assertion failed '%s' %s:%d with message: '").append(message).append("'"), condition, file, line, std::forward<Args>(args)...));
 	}
@@ -19,7 +19,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 		do \
 		{ \
 			LogAssertHelper("false", __FILE__, __LINE__, ##__VA_ARGS__); \
-			GlobalAssertHandler(); \
+			gGlobalAssertHandler(); \
 		} while(0)
 #else
 	#define ReportError(...) do { } while(0)
@@ -30,7 +30,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 		do \
 		{ \
 			LogAssertHelper("false", __FILE__, __LINE__, ##__VA_ARGS__); \
-			GlobalFatalAssertHandler(); \
+			gGlobalFatalAssertHandler(); \
 		} while(0)
 #else
 	#define ReportFatalError(...) do { } while(0)
@@ -43,7 +43,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 		if ALMOST_NEVER(static_cast<bool>(cond) == false) \
 		{ \
 			LogAssertHelper(STR(cond), __FILE__, __LINE__, ##__VA_ARGS__); \
-			GlobalAssertHandler(); \
+			gGlobalAssertHandler(); \
 		} \
 	} while(0)
 #else
@@ -56,7 +56,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 		if ALMOST_NEVER(static_cast<bool>(cond) == false) \
 		{ \
 			LogAssertHelper(STR(cond), __FILE__, __LINE__, ##__VA_ARGS__); \
-			GlobalFatalAssertHandler(); \
+			gGlobalFatalAssertHandler(); \
 		} \
 	} while(0)
 #else
@@ -68,6 +68,6 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 	if ALMOST_NEVER(static_cast<bool>(cond) == false) \
 	{ \
 		LogAssertHelper("false", __FILE__, __LINE__, ##__VA_ARGS__); \
-		GlobalAssertHandler(); \
+		gGlobalAssertHandler(); \
 	} \
 } while(0)

@@ -14,7 +14,7 @@
 class WeaponSystem : public System
 {
 public:
-	WeaponSystem(WorldHolder& worldHolder, const TimeData& timeData);
+	WeaponSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;
 	~WeaponSystem() override = default;
 
 	void update() override;

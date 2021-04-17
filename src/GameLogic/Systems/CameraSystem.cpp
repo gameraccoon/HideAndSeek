@@ -10,7 +10,7 @@
 #include "GameData/GameData.h"
 
 
-CameraSystem::CameraSystem(WorldHolder& worldHolder, const InputData& inputData)
+CameraSystem::CameraSystem(WorldHolder& worldHolder, const InputData& inputData) noexcept
 	: mWorldHolder(worldHolder)
 	, mInputData(inputData)
 {

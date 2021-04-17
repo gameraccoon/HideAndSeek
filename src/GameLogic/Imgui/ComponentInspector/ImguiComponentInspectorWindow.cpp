@@ -6,7 +6,6 @@
 #include <cstring>
 #include <ranges>
 #include <sstream>
-#include <string.h>
 #include <string_view>
 
 #include "imgui/imgui.h"
@@ -44,7 +43,7 @@ void ImguiComponentInspectorWindow::applyFilters(ImguiDebugData& debugData)
 	 mPropertyFiltersWidget.getFilteredEntities(debugData, mFilteredEntities);
 }
 
-void ImguiComponentInspectorWindow::showEntityID()
+void ImguiComponentInspectorWindow::showEntityId()
 {
 	if (mSelectedEntity.has_value())
 	{
@@ -66,17 +65,17 @@ void ImguiComponentInspectorWindow::showFilteredEntities()
 		if (ImGui::TreeNode("Filtered entities"))
 		{
 			ImGui::BeginGroup();
-			auto scrollBoxSize = ImVec2(200.0f, std::min(180.0f, mFilteredEntities.size() * 17.0f + ImGui::GetStyle().FramePadding.y*4));
+			auto scrollBoxSize = ImVec2(200.0f, std::min(180.0f, static_cast<float>(mFilteredEntities.size()) * 17.0f + ImGui::GetStyle().FramePadding.y*4));
 			if (ImGui::BeginChild("FilteredEntities", scrollBoxSize, true))
 			{
-				for (size_t i = 0, iSize = mFilteredEntities.size(); i < iSize; ++i)
+				for (auto & filteredEntity : mFilteredEntities)
 				{
-					const Entity& entity = std::get<1>(mFilteredEntities[i]);
+					const Entity& entity = std::get<1>(filteredEntity);
 					char buf[32];
 					sprintf(buf, "0x%x", entity.getID());
 					if (ImGui::Selectable(buf, mSelectedEntity.has_value() && std::get<1>(*mSelectedEntity) == entity))
 					{
-						mSelectedEntity = mFilteredEntities[i];
+						mSelectedEntity = filteredEntity;
 						std::strcpy(mEntityFilterBuffer, buf);
 					}
 				}
@@ -140,7 +139,7 @@ void ImguiComponentInspectorWindow::update(ImguiDebugData& debugData)
 
 		showFilteredEntities();
 
-		showEntityID();
+		showEntityId();
 
 		showComponentsInspector();
 

@@ -8,20 +8,20 @@ namespace Jobs
 	{
 	public:
 		using UniquePtr = std::unique_ptr<BaseJob>;
-		using JobGroupID = unsigned long;
+		using JobGroupId = unsigned long;
 
 	public:
 		virtual ~BaseJob() = default;
 
 		// called in worker thread
 		virtual void process() = 0;
-		// called in the requeser thread when the work is done
+		// called in the requester thread when the work is done
 		virtual void finalize() = 0;
 
-		void setJobGroupID(JobGroupID jobGroupID);
-		JobGroupID getJobGroupID();
+		void setJobGroupId(JobGroupId jobGroupId);
+		[[nodiscard]] JobGroupId getJobGroupId() const;
 
 	private:
-		JobGroupID mJobGroupID;
+		JobGroupId mJobGroupId{};
 	};
 }

@@ -22,7 +22,7 @@ public:
 private:
 	void applyFilters(ImguiDebugData& debugData);
 
-	void showEntityID();
+	void showEntityId();
 	void showFilteredEntities();
 	void showComponentsInspector();
 
@@ -30,6 +30,6 @@ private:
 	char mEntityFilterBuffer[128] = "";
 	std::optional<std::tuple<WorldCell*, Entity>> mSelectedEntity;
 	TupleVector<WorldCell*, Entity> mFilteredEntities;
-	std::map<StringID, std::unique_ptr<AbstractComponentImguiWidget>> mComponentInspectWidgets;
+	std::map<StringId, std::unique_ptr<AbstractComponentImguiWidget>> mComponentInspectWidgets;
 	ImguiPropertyFiltration::ImguiPropertyFiltersWidget mPropertyFiltersWidget;
 };

@@ -20,9 +20,7 @@
 
 namespace HAL
 {
-	ResourceManager::ResourceManager()
-	{
-	}
+	ResourceManager::ResourceManager() noexcept = default;
 
 	int ResourceManager::createResourceLock(const ResourcePath& path)
 	{
@@ -65,10 +63,10 @@ namespace HAL
 				frame.at("w").get_to(w);
 				frame.at("h").get_to(h);
 
-				frameData.quadUV.U1 = x / atlasSize.x;
-				frameData.quadUV.V1 = y / atlasSize.y;
-				frameData.quadUV.U2 = (x + w) / atlasSize.x;
-				frameData.quadUV.V2 = (y + h) / atlasSize.y;
+				frameData.quadUV.u1 = x / atlasSize.x;
+				frameData.quadUV.v1 = y / atlasSize.y;
+				frameData.quadUV.u2 = (x + w) / atlasSize.x;
+				frameData.quadUV.v2 = (y + h) / atlasSize.y;
 				mAtlasFrames.emplace(fileName, std::move(frameData));
 			}
 		}
@@ -290,7 +288,7 @@ namespace HAL
 			int thisHandle = createResourceLock(path);
 			AnimGroupData animGroupData = loadAnimGroupData(path);
 
-			std::map<StringID, std::vector<ResourceHandle>> animClips;
+			std::map<StringId, std::vector<ResourceHandle>> animClips;
 			std::vector<ResourceHandle> clipsToRelease;
 			clipsToRelease.reserve(animGroupData.clips.size());
 			for (const auto& animClipPath : animGroupData.clips)
@@ -316,7 +314,7 @@ namespace HAL
 	void ResourceManager::unlockResource(ResourceHandle handle)
 	{
 		DETECT_CONCURRENT_ACCESS(mConcurrencyDetector);
-		auto locksCntIt = mResourceLocksCount.find(handle.ResourceIndex);
+		auto locksCntIt = mResourceLocksCount.find(handle.resourceIndex);
 		if ALMOST_NEVER(locksCntIt == mResourceLocksCount.end())
 		{
 			ReportError("Unlocking non-locked resource");
@@ -331,10 +329,10 @@ namespace HAL
 		else
 		{
 			// unload resource
-			auto resourceIt = mResources.find(handle.ResourceIndex);
+			auto resourceIt = mResources.find(handle.resourceIndex);
 			if (resourceIt != mResources.end())
 			{
-				auto releaseFnIt = mResourceReleaseFns.find(handle.ResourceIndex);
+				auto releaseFnIt = mResourceReleaseFns.find(handle.resourceIndex);
 				if (releaseFnIt != mResourceReleaseFns.end())
 				{
 					releaseFnIt->second(resourceIt->second.get());
@@ -342,13 +340,13 @@ namespace HAL
 				}
 				mResources.erase(resourceIt);
 			}
-			mResourceLocksCount.erase(handle.ResourceIndex);
-			auto pathIt = mPathFindMap.find(handle.ResourceIndex);
+			mResourceLocksCount.erase(handle.resourceIndex);
+			auto pathIt = mPathFindMap.find(handle.resourceIndex);
 			if (pathIt != mPathFindMap.end())
 			{
 				mPathsMap.erase(pathIt->second);
 			}
-			mPathFindMap.erase(handle.ResourceIndex);
+			mPathFindMap.erase(handle.resourceIndex);
 		}
 	}
 

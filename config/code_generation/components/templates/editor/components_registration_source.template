@@ -6,7 +6,7 @@
 
 {component_includes}
 
-void ComponentRegistration::RegisterToEditFactory(std::map<StringID, std::unique_ptr<AbstractEditFactory>>& factories)
+void ComponentRegistration::RegisterToEditFactory(std::map<StringId, std::unique_ptr<AbstractEditFactory>>& factories)
 {{
 	{editor/component_edit_factory_register}
 }}

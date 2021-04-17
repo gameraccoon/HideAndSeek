@@ -23,7 +23,7 @@ namespace StringUtils
 
 		std::ranges::for_each(result, [](char& c)
 		{
-			c = alphanumericCharacters[Random::GlobalGenerator() % charactersCount];
+			c = alphanumericCharacters[Random::gGlobalGenerator() % charactersCount];
 		});
 
 		return result;
@@ -43,7 +43,7 @@ namespace StringUtils
 
 		std::ranges::for_each(result, [](char& c)
 		{
-			c = base52Characters[Random::GlobalGenerator() % charactersCount];
+			c = base52Characters[Random::gGlobalGenerator() % charactersCount];
 		});
 
 		return result;
@@ -63,7 +63,7 @@ namespace StringUtils
 
 		std::ranges::for_each(result, [](char& c)
 		{
-			c = wordSafeBase32Characters[Random::GlobalGenerator() % charactersCount];
+			c = wordSafeBase32Characters[Random::gGlobalGenerator() % charactersCount];
 		});
 
 		return result;

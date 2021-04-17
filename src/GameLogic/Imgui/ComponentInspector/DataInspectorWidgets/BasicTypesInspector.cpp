@@ -4,7 +4,7 @@
 
 #include <cstring>
 
-#include "Base/Types/String/StringID.h"
+#include "Base/Types/String/StringId.h"
 
 #include "GameData/Core/Vector2D.h"
 #include "GameData/Time/GameplayTimestamp.h"
@@ -52,7 +52,7 @@ namespace ImguiDataInspection
 	}
 
 	template<>
-	void Inspector(const char* title, StringID& data)
+	void Inspector(const char* title, StringId& data)
 	{
 		char buffer[256];
 		std::strcpy(buffer, ID_TO_STR(data).c_str());

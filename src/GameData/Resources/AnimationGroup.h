@@ -7,12 +7,12 @@
 #include "GameData/Core/ResourceHandle.h"
 #include "GameData/FSM/Blackboard.h"
 
-template <typename StateIDType>
+template <typename StateIdType>
 class AnimationGroup
 {
 public:
-	StateIDType currentState;
-	std::map<StateIDType, std::vector<ResourceHandle>> animationClips;
-	StringID stateMachineId;
+	StateIdType currentState;
+	std::map<StateIdType, std::vector<ResourceHandle>> animationClips;
+	StringId stateMachineId;
 	size_t animationClipIdx = 0;
 };

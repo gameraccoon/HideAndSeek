@@ -5,17 +5,17 @@
 inline void EnableFailOnAssert() noexcept
 {
 #ifdef DEBUG_CHECKS
-	GlobalAssertHandler = [](){ GTEST_FAIL(); };
-	GlobalFatalAssertHandler = [](){ GTEST_FAIL(); };
-	GlobalAllowAssertLogs = true;
+	gGlobalAssertHandler = [](){ GTEST_FAIL(); };
+	gGlobalFatalAssertHandler = [](){ GTEST_FAIL(); };
+	gGlobalAllowAssertLogs = true;
 #endif // DEBUG_CHECKS
 }
 
 inline void DisableFailOnAssert() noexcept
 {
 #ifdef DEBUG_CHECKS
-	GlobalAssertHandler = [](){};
-	GlobalFatalAssertHandler = [](){};
-	GlobalAllowAssertLogs = false;
+	gGlobalAssertHandler = [](){};
+	gGlobalFatalAssertHandler = [](){};
+	gGlobalAllowAssertLogs = false;
 #endif // DEBUG_CHECKS
 }

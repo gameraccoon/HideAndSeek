@@ -10,5 +10,5 @@ class BaseComponent
 public:
 	virtual ~BaseComponent() = default;
 
-	virtual StringID getComponentTypeName() const = 0;
+	[[nodiscard]] virtual StringId getComponentTypeName() const = 0;
 };

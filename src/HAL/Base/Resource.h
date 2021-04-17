@@ -16,6 +16,6 @@ namespace HAL
 		Resource(Resource&&) = default;
 		Resource& operator=(Resource&&) = default;
 
-		virtual bool isValid() const = 0;
+		[[nodiscard]] virtual bool isValid() const = 0;
 	};
 }

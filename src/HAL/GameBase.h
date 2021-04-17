@@ -11,7 +11,7 @@ namespace HAL
 	{
 	public:
 		GameBase(int windowWidth, int windowHeight);
-		~GameBase();
+		~GameBase() override;
 
 	protected:
 		Engine& getEngine();

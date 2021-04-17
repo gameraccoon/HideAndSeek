@@ -20,7 +20,7 @@ namespace HAL
 	class ResourceManager
 	{
 	public:
-		explicit ResourceManager();
+		explicit ResourceManager() noexcept;
 
 		~ResourceManager() = default;
 
@@ -36,6 +36,7 @@ namespace HAL
 		ResourceHandle lockSound(const ResourcePath& path);
 		ResourceHandle lockMusic(const ResourcePath& path);
 	private:
+
 		ResourceHandle lockSurface(const ResourcePath& path);
 	public:
 
@@ -43,7 +44,7 @@ namespace HAL
 		[[nodiscard]] const T& getResource(ResourceHandle handle)
 		{
 			DETECT_CONCURRENT_ACCESS(mConcurrencyDetector);
-			auto it = mResources.find(handle.ResourceIndex);
+			auto it = mResources.find(handle.resourceIndex);
 			AssertFatal(it != mResources.end(), "Trying to access non loaded resource");
 			return static_cast<T&>(*(it->second.get()));
 		}
@@ -61,9 +62,9 @@ namespace HAL
 
 		struct AnimGroupData
 		{
-			std::map<StringID, ResourcePath> clips;
-			StringID stateMachineID;
-			StringID defaultState;
+			std::map<StringId, ResourcePath> clips;
+			StringId stateMachineID;
+			StringId defaultState;
 		};
 
 		using ReleaseFn = std::function<void(Resource*)>;

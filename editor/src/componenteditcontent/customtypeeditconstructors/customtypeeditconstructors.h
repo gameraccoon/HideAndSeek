@@ -47,7 +47,7 @@ namespace TypesEditConstructor
 	Edit<SpriteParams>::Ptr FillEdit<SpriteParams>::Call(QLayout* layout, const QString& label, const SpriteParams& initialValue);
 
 	template<>
-	Edit<StringID>::Ptr FillEdit<StringID>::Call(QLayout* layout, const QString& label, const StringID& initialValue);
+	Edit<StringId>::Ptr FillEdit<StringId>::Call(QLayout* layout, const QString& label, const StringId& initialValue);
 
 	template<>
 	Edit<Vector2D>::Ptr FillEdit<Vector2D>::Call(QLayout* layout, const QString& label, const Vector2D& initialValue);

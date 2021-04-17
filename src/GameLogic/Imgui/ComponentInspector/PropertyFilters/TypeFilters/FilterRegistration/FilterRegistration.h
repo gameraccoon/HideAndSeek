@@ -7,16 +7,16 @@
 namespace ImguiPropertyFiltration
 {
 	template<typename T>
-	void RegisterFilterFactories(std::vector<std::shared_ptr<AbstractPropertyFilterFactory>>& inOutFilterFactories, std::shared_ptr<AbstractPropertyDescriptor> descriptor);
+	void RegisterFilterFactories(std::vector<std::shared_ptr<AbstractPropertyFilterFactory>>& inOutFilterFactories, const std::shared_ptr<AbstractPropertyDescriptor>& descriptor);
 
 	template<>
-	void RegisterFilterFactories<float>(std::vector<std::shared_ptr<AbstractPropertyFilterFactory>>& inOutFilterFactories, std::shared_ptr<AbstractPropertyDescriptor> descriptor);
+	void RegisterFilterFactories<float>(std::vector<std::shared_ptr<AbstractPropertyFilterFactory>>& inOutFilterFactories, const std::shared_ptr<AbstractPropertyDescriptor>& descriptor);
 
 	template<>
-	void RegisterFilterFactories<Vector2D>(std::vector<std::shared_ptr<AbstractPropertyFilterFactory>>& inOutFilterFactories, std::shared_ptr<AbstractPropertyDescriptor> descriptor);
+	void RegisterFilterFactories<Vector2D>(std::vector<std::shared_ptr<AbstractPropertyFilterFactory>>& inOutFilterFactories, const std::shared_ptr<AbstractPropertyDescriptor>& descriptor);
 
 	template<typename T>
-	void RegisterFilterFactories(std::vector<std::shared_ptr<AbstractPropertyFilterFactory>>& /*inOutFilterFactories*/, std::shared_ptr<AbstractPropertyDescriptor> /*descriptor*/)
+	void RegisterFilterFactories(std::vector<std::shared_ptr<AbstractPropertyFilterFactory>>& /*inOutFilterFactories*/, const std::shared_ptr<AbstractPropertyDescriptor>& /*descriptor*/)
 	{
 		// fill nothing for unknown types
 	}

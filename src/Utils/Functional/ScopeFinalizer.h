@@ -6,8 +6,8 @@ template<typename CallableType>
 class ScopeFinalizer
 {
 public:
-	ScopeFinalizer(CallableType&& finelizeFn)
-		: mFinalizeFn(std::move(finelizeFn))
+	explicit ScopeFinalizer(CallableType&& finalizeFn)
+		: mFinalizeFn(std::move(finalizeFn))
 	{}
 
 	ScopeFinalizer(ScopeFinalizer&) = delete;

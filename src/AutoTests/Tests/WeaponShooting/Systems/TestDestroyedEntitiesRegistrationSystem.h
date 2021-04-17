@@ -11,7 +11,7 @@
 class TestDestroyedEntitiesRegistrationSystem : public System
 {
 public:
-	TestDestroyedEntitiesRegistrationSystem(WorldHolder& worldHolder, DestroyedEntitiesTestCheck& testCheck);
+	TestDestroyedEntitiesRegistrationSystem(WorldHolder& worldHolder, DestroyedEntitiesTestCheck& testCheck) noexcept;
 
 	void update() override;
 	std::string getName() override { return "TestSpawnShootableUnitsSystem"; }

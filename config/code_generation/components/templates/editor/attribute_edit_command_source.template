@@ -7,7 +7,7 @@
 #include "src/editorutils/componentreferenceutils.h"
 
 Change{class_name}{attribute_name_capital}Command::Change{class_name}{attribute_name_capital}Command(const ComponentSourceReference& source, const {attribute_type}& old{attribute_name_capital}, const {attribute_type}& new{attribute_name_capital}, bool needToUpdateLayout)
-	: EditorCommand(needToUpdateLayout ? EffectType::ComponentAttributes : EffectBitset(EffectType::ComponentAttributes, EffectType::SkipLayoutUpdate))
+	: EditorCommand(needToUpdateLayout ? EffectBitset(EffectType::ComponentAttributes) : EffectBitset(EffectType::ComponentAttributes, EffectType::SkipLayoutUpdate))
 	, mComponentSource(source)
 	, mOld{attribute_name_capital}(old{attribute_name_capital})
 	, mNew{attribute_name_capital}(new{attribute_name_capital})

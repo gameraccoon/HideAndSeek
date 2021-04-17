@@ -69,7 +69,7 @@ namespace LightBlockingGeometry
 	void CalculateLightGeometry(CalculatedGeometry& outGeometry, const CollisionGeometry& collisionGeometry)
 	{
 		std::unordered_map<CellPos, CellGeometry> cellGeometry;
-		for (const auto [cell, collision, transform] : collisionGeometry)
+		for (const auto& [cell, collision, transform] : collisionGeometry)
 		{
 			CellGeometry& currentCellGeometry = cellGeometry[cell->getPos()];
 

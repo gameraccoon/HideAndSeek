@@ -33,13 +33,13 @@ Entity EntityManager::addEntity()
 
 	while (insertionTrial < EntityInsertionTrialsLimit)
 	{
-		Entity::EntityID id = static_cast<Entity::EntityID>(Random::GlobalGenerator());
+		Entity::EntityID id = static_cast<Entity::EntityID>(Random::gGlobalGenerator());
 		auto insertionResult = mEntityIndexMap.try_emplace(id, mNextEntityIndex);
 		if (insertionResult.second)
 		{
 			mIndexEntityMap.emplace(mNextEntityIndex, id);
 			++mNextEntityIndex;
-			OnEntityAdded.broadcast();
+			onEntityAdded.broadcast();
 			return Entity(id);
 		}
 		++insertionTrial;
@@ -55,7 +55,7 @@ Entity EntityManager::getNonExistentEntity()
 
 	while (generationTrial < EntityInsertionTrialsLimit)
 	{
-		Entity::EntityID id = static_cast<Entity::EntityID>(Random::GlobalGenerator());
+		Entity::EntityID id = static_cast<Entity::EntityID>(Random::gGlobalGenerator());
 		if (mEntityIndexMap.find(id) == mEntityIndexMap.end())
 		{
 			return Entity(id);
@@ -73,7 +73,7 @@ void EntityManager::insertEntityUnsafe(Entity entity)
 	mIndexEntityMap.emplace(mNextEntityIndex, entity.getID());
 	++mNextEntityIndex;
 
-	OnEntityAdded.broadcast();
+	onEntityAdded.broadcast();
 }
 
 void EntityManager::removeEntity(Entity entity)
@@ -89,14 +89,14 @@ void EntityManager::removeEntity(Entity entity)
 
 	for (auto& componentVector : mComponents)
 	{
-		// if the vector containts deleted entity
+		// if the vector contains deleted entity
 		if (oldEntityIdx < componentVector.second.size())
 		{
 			// remove the element
 			delete componentVector.second[oldEntityIdx];
 			componentVector.second[oldEntityIdx] = nullptr;
 
-			// if the vector containts the last entity
+			// if the vector contains the last entity
 			if (mNextEntityIndex < componentVector.second.size() && oldEntityIdx != mNextEntityIndex)
 			{
 				// move it to the freed space
@@ -116,7 +116,7 @@ void EntityManager::removeEntity(Entity entity)
 	}
 	mIndexEntityMap.erase(mNextEntityIndex);
 
-	OnEntityRemoved.broadcast();
+	onEntityRemoved.broadcast();
 }
 
 void EntityManager::getAllEntityComponents(Entity entity, std::vector<BaseComponent*>& outComponents)
@@ -135,19 +135,19 @@ void EntityManager::getAllEntityComponents(Entity entity, std::vector<BaseCompon
 	}
 }
 
-bool EntityManager::doesEntityHaveComponent(Entity entity, StringID typeID)
+bool EntityManager::doesEntityHaveComponent(Entity entity, StringId typeId)
 {
 	auto entityIdxItr = mEntityIndexMap.find(entity.getID());
 	if (entityIdxItr != mEntityIndexMap.end())
 	{
-		std::vector<BaseComponent*>& componentArray = mComponents.getComponentVectorByID(typeID);
+		std::vector<BaseComponent*>& componentArray = mComponents.getComponentVectorById(typeId);
 		EntityIndex index = entityIdxItr->second;
 		return (componentArray.size() > index && componentArray[index] != nullptr);
 	}
 	return false;
 }
 
-void EntityManager::addComponent(Entity entity, BaseComponent* component, StringID typeID)
+void EntityManager::addComponent(Entity entity, BaseComponent* component, StringId typeId)
 {
 	auto entityIdxItr = mEntityIndexMap.find(entity.getID());
 	if (entityIdxItr == mEntityIndexMap.end())
@@ -155,10 +155,10 @@ void EntityManager::addComponent(Entity entity, BaseComponent* component, String
 		return;
 	}
 
-	addComponentToEntity(entityIdxItr->second, component, typeID);
+	addComponentToEntity(entityIdxItr->second, component, typeId);
 }
 
-void EntityManager::removeComponent(Entity entity, StringID typeID)
+void EntityManager::removeComponent(Entity entity, StringId typeId)
 {
 	auto entityIdxItr = mEntityIndexMap.find(entity.getID());
 	if (entityIdxItr == mEntityIndexMap.end())
@@ -166,7 +166,7 @@ void EntityManager::removeComponent(Entity entity, StringID typeID)
 		return;
 	}
 
-	auto& componentsVector = mComponents.getComponentVectorByID(typeID);
+	auto& componentsVector = mComponents.getComponentVectorById(typeId);
 
 	if (componentsVector.size() > entityIdxItr->second)
 	{
@@ -175,32 +175,32 @@ void EntityManager::removeComponent(Entity entity, StringID typeID)
 	}
 }
 
-void EntityManager::scheduleAddComponentToEntity(Entity entity, BaseComponent* component, StringID typeID)
+void EntityManager::scheduleAddComponentToEntity(Entity entity, BaseComponent* component, StringId typeId)
 {
-	mScheduledComponentAdditions.emplace_back(entity, component, typeID);
+	mScheduledComponentAdditions.emplace_back(entity, component, typeId);
 }
 
-void EntityManager::scheduleRemoveComponent(Entity entity, StringID typeID)
+void EntityManager::scheduleRemoveComponent(Entity entity, StringId typeId)
 {
-	mScheduledComponentRemovements.emplace_back(entity, typeID);
+	mScheduledComponentRemovements.emplace_back(entity, typeId);
 }
 
 void EntityManager::executeScheduledActions()
 {
 	for (const auto& addition : mScheduledComponentAdditions)
 	{
-		addComponent(addition.entity, addition.component, addition.typeID);
+		addComponent(addition.entity, addition.component, addition.typeId);
 	}
 	mScheduledComponentAdditions.clear();
 
 	for (const auto& removement : mScheduledComponentRemovements)
 	{
-		removeComponent(removement.entity, removement.typeID);
+		removeComponent(removement.entity, removement.typeId);
 	}
 	mScheduledComponentRemovements.clear();
 }
 
-void EntityManager::getEntitiesHavingComponents(const std::vector<StringID>& componentIndexes, std::vector<Entity>& inOutEntities) const
+void EntityManager::getEntitiesHavingComponents(const std::vector<StringId>& componentIndexes, std::vector<Entity>& inOutEntities) const
 {
 	if (componentIndexes.empty())
 	{
@@ -210,9 +210,9 @@ void EntityManager::getEntitiesHavingComponents(const std::vector<StringID>& com
 	EntityIndex endIdx = std::numeric_limits<EntityIndex>::max();
 	std::vector<const std::vector<BaseComponent*>*> componentVectors;
 	componentVectors.reserve(componentIndexes.size());
-	for (StringID typeID : componentIndexes)
+	for (StringId typeId : componentIndexes)
 	{
-		auto& componentVector = mComponents.getComponentVectorByID(typeID);
+		auto& componentVector = mComponents.getComponentVectorById(typeId);
 
 		endIdx = std::min(endIdx, componentVector.size());
 
@@ -247,7 +247,7 @@ void EntityManager::getPrefabFromEntity(nlohmann::json& json, Entity entity, con
 	for (BaseComponent* component : components)
 	{
 		auto componentObj = nlohmann::json{};
-		StringID componentTypeName = component->getComponentTypeName();
+		StringId componentTypeName = component->getComponentTypeName();
 		jsonSerializationHolder.getComponentSerializerFromClassName(componentTypeName)->toJson(componentObj, component);
 		json[ID_TO_STR(componentTypeName)] = componentObj;
 	}
@@ -264,7 +264,7 @@ void EntityManager::applyPrefabToExistentEntity(const nlohmann::json& json, Enti
 {
 	for (const auto& [componentTypeNameStr, componentObj] : json.items())
 	{
-		StringID componentTypeName = STR_TO_ID(componentTypeNameStr);
+		StringId componentTypeName = STR_TO_ID(componentTypeNameStr);
 		BaseComponent* component = componentSerializers.factory.createComponent(componentTypeName);
 
 		componentSerializers.jsonSerializer.getComponentSerializerFromClassName(componentTypeName)->fromJson(componentObj, component);
@@ -279,7 +279,7 @@ void EntityManager::applyPrefabToExistentEntity(const nlohmann::json& json, Enti
 
 void EntityManager::transferEntityTo(EntityManager& otherManager, Entity entity)
 {
-	AssertFatal(this != &otherManager, "Transferring entity to the same manager. This should never hapen");
+	AssertFatal(this != &otherManager, "Transferring entity to the same manager. This should never happen");
 
 	auto entityIdxItr = mEntityIndexMap.find(entity.getID());
 	if (entityIdxItr == mEntityIndexMap.end())
@@ -313,7 +313,7 @@ void EntityManager::transferEntityTo(EntityManager& otherManager, Entity entity)
 			// remove the element from the old manager
 			componentVector.second[oldEntityIdx] = nullptr;
 
-			// if the vector containts the last entity
+			// if the vector contains the last entity
 			if (mNextEntityIndex < componentVector.second.size() && oldEntityIdx != mNextEntityIndex)
 			{
 				// move it to the freed space
@@ -340,7 +340,7 @@ nlohmann::json EntityManager::toJson(const ComponentSerializersHolder& component
 	sortedEntityIndexMap.reserve(mEntityIndexMap.size());
 	for (const auto& indexPair : mEntityIndexMap)
 	{
-		sortedEntityIndexMap.push_back(indexPair);
+		sortedEntityIndexMap.emplace_back(indexPair);
 	}
 
 	std::ranges::sort(sortedEntityIndexMap);
@@ -357,12 +357,12 @@ nlohmann::json EntityManager::toJson(const ComponentSerializersHolder& component
 		const JsonComponentSerializer* jsonSerializer = componentSerializers.jsonSerializer.getComponentSerializerFromClassName(componentArray.first);
 		for (auto& component : componentArray.second)
 		{
-			auto componenObj = nlohmann::json{};
+			auto componentObj = nlohmann::json{};
 			if (component != nullptr)
 			{
-				jsonSerializer->toJson(componenObj, component);
+				jsonSerializer->toJson(componentObj, component);
 			}
-			componentArrayObject.push_back(componenObj);
+			componentArrayObject.push_back(componentObj);
 		}
 		components[ID_TO_STR(componentArray.first)] = componentArrayObject;
 	}
@@ -393,12 +393,12 @@ void EntityManager::fromJson(const nlohmann::json& json, const ComponentSerializ
 	const auto& components = json.at("components");
 	for (const auto& [typeStr, vector] : components.items())
 	{
-		StringID type = STR_TO_ID(typeStr);
+		StringId type = STR_TO_ID(typeStr);
 		ComponentFactory::CreationFn componentCreateFn = componentSerializers.factory.getCreationFn(type);
 		if (componentCreateFn != nullptr)
 		{
 			const JsonComponentSerializer* jsonSerializer = componentSerializers.jsonSerializer.getComponentSerializerFromClassName(type);
-			std::vector<BaseComponent*>& componentsVector = mComponents.getOrCreateComponentVectorByID(type);
+			std::vector<BaseComponent*>& componentsVector = mComponents.getOrCreateComponentVectorById(type);
 			componentsVector.reserve(vector.size());
 			for (const auto& componentData : vector)
 			{
@@ -417,13 +417,13 @@ void EntityManager::fromJson(const nlohmann::json& json, const ComponentSerializ
 	}
 }
 
-void EntityManager::stableSortEntitiesByID()
+void EntityManager::stableSortEntitiesById()
 {
 	std::vector<Entity::EntityID> ids;
 	ids.resize(mNextEntityIndex);
-	for (auto [entityID, idx] : mEntityIndexMap)
+	for (auto [entityId, idx] : mEntityIndexMap)
 	{
-		ids[idx] = entityID;
+		ids[idx] = entityId;
 	}
 
 	std::vector<size_t> positions;
@@ -459,7 +459,7 @@ void EntityManager::clearCaches()
 		if (lastFilledRIt != componentVector.rend())
 		{
 			size_t lastFilledIdx = std::distance(lastFilledRIt, componentVector.rend());
-			componentVector.erase(componentVector.begin() + lastFilledIdx, componentVector.end());
+			componentVector.erase(componentVector.begin() + static_cast<ptrdiff_t>(lastFilledIdx), componentVector.end());
 		}
 		else
 		{
@@ -467,7 +467,7 @@ void EntityManager::clearCaches()
 		}
 	}
 
-	mComponents.cleanEmptyVetors();
+    mComponents.cleanEmptyVectors();
 }
 
 bool EntityManager::hasAnyEntities() const
@@ -475,9 +475,9 @@ bool EntityManager::hasAnyEntities() const
 	return !mEntityIndexMap.empty();
 }
 
-void EntityManager::addComponentToEntity(EntityIndex entityIdx, BaseComponent* component, StringID typeID)
+void EntityManager::addComponentToEntity(EntityIndex entityIdx, BaseComponent* component, StringId typeId)
 {
-	auto& componentsVector = mComponents.getOrCreateComponentVectorByID(typeID);
+	auto& componentsVector = mComponents.getOrCreateComponentVectorById(typeId);
 	if (componentsVector.size() <= entityIdx)
 	{
 		if (componentsVector.capacity() <= entityIdx)

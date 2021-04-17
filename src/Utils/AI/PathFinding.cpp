@@ -13,7 +13,7 @@
 
 namespace PathFinding
 {
-	static constexpr size_t InvalidPolygon = std::numeric_limits<size_t>::max();
+	static constexpr size_t INVALID_POLYGON = std::numeric_limits<size_t>::max();
 
 	bool IsPointInsideConvexHull(Vector2D point, const std::vector<Vector2D>& hull)
 	{
@@ -24,29 +24,28 @@ namespace PathFinding
 			{
 				return false;
 			}
-		});
+		})
 
 		return true;
 	}
 
 	static size_t FindPolygonForPoint(Vector2D point, const NavMesh& navMesh)
 	{
-		Vector2D cellPointFloat;
-		cellPointFloat = (point - navMesh.geometry.navMeshStart) / navMesh.spatialHash.cellSize;
+		Vector2D cellPointFloat = (point - navMesh.geometry.navMeshStart) / navMesh.spatialHash.cellSize;
 		IntVector2D cellPoint(static_cast<int>(cellPointFloat.x), static_cast<int>(cellPointFloat.y));
 		if (cellPoint.x < 0 || cellPoint.x >= navMesh.spatialHash.hashSize.x
 			||
 			cellPoint.y < 0 || cellPoint.y >= navMesh.spatialHash.hashSize.y)
 		{
-			return InvalidPolygon;
+			return INVALID_POLYGON;
 		}
 
 		const std::vector<size_t>& polygons = navMesh.spatialHash.polygonsHash[cellPoint.x + cellPoint.y * navMesh.spatialHash.hashSize.x];
-		std::vector<Vector2D> polygonPoints(navMesh.geometry.vertsPerPoly);
+		std::vector<Vector2D> polygonPoints(navMesh.geometry.verticesPerPoly);
 		for (size_t polygon : polygons)
 		{
-			size_t polyShift = polygon * navMesh.geometry.vertsPerPoly;
-			for (size_t i = 0; i < navMesh.geometry.vertsPerPoly; ++i)
+			size_t polyShift = polygon * navMesh.geometry.verticesPerPoly;
+			for (size_t i = 0; i < navMesh.geometry.verticesPerPoly; ++i)
 			{
 				polygonPoints[i] = navMesh.geometry.vertices[navMesh.geometry.indexes[polyShift + i]];
 			}
@@ -57,7 +56,7 @@ namespace PathFinding
 			}
 		}
 
-		return InvalidPolygon;
+		return INVALID_POLYGON;
 	}
 
 	struct LineSegmentToNeighborIntersection
@@ -72,7 +71,7 @@ namespace PathFinding
 	static LineSegmentToNeighborIntersection FindLineSegmentToNeighborIntersection(const NavMesh& navMesh, Vector2D start, Vector2D finish, size_t polygon, size_t ignoredNeighbor)
 	{
 		LineSegmentToNeighborIntersection result;
-		result.link.neighbor = InvalidPolygon;
+		result.link.neighbor = INVALID_POLYGON;
 		float bestIntersectionQDistance = 0.0f;
 
 		for (const NavMesh::InnerLinks::LinkData& link : navMesh.links.links[polygon])
@@ -88,10 +87,9 @@ namespace PathFinding
 				{
 					Vector2D intersectionPoint = Collide::GetPointIntersect2Lines(start, finish, vert1, vert2);
 					float intersectionQDistance = (intersectionPoint - finish).qSize();
-					if (result.link.neighbor == InvalidPolygon
+					if (result.link.neighbor == INVALID_POLYGON
 						// choose the variant closer to the finish point
-						|| intersectionQDistance < bestIntersectionQDistance
-						)
+						|| intersectionQDistance < bestIntersectionQDistance)
 					{
 						result.link = link;
 						result.intersectionPoint = intersectionPoint;
@@ -169,7 +167,7 @@ namespace PathFinding
 
 	static PathPoint PopBestFromOpenList(OpenListType& openList, OpenMapType& openMap)
 	{
-		PathPoint result = std::move(openList.begin()->second);
+		PathPoint result = openList.begin()->second;
 		openList.erase(openList.begin());
 		openMap.erase(result.polygon);
 		AssertFatal(openList.size() == openMap.size(), "openList and openMap have diverged");
@@ -342,7 +340,7 @@ namespace PathFinding
 		size_t startPolygon = FindPolygonForPoint(start, navMesh);
 		size_t finishPolygon = FindPolygonForPoint(finish, navMesh);
 
-		if (startPolygon == InvalidPolygon || finishPolygon == InvalidPolygon)
+		if (startPolygon == INVALID_POLYGON || finishPolygon == INVALID_POLYGON)
 		{
 			outPath.push_back(start);
 			outPath.push_back(finish);
@@ -357,7 +355,7 @@ namespace PathFinding
 		{
 			PathPoint firstPoint;
 			firstPoint.polygon = finishPolygon;
-			firstPoint.previous = InvalidPolygon;
+			firstPoint.previous = INVALID_POLYGON;
 			// we are moving from finish to start, to then rewind the path
 			firstPoint.pos = finish;
 			firstPoint.scores.g = 0.0f;
@@ -371,7 +369,7 @@ namespace PathFinding
 		unsigned int stepLimit = 100u;
 		unsigned int step = 0u;
 		PathPoint currentPoint;
-		currentPoint.polygon = InvalidPolygon;
+		currentPoint.polygon = INVALID_POLYGON;
 		while (!openList.empty() && step < stepLimit)
 		{
 			++step;
@@ -391,12 +389,12 @@ namespace PathFinding
 
 			// find raycast neighbor (best possible neighbor from this point)
 			LineSegmentToNeighborIntersection rayIntersection = FindLineSegmentToNeighborIntersection(navMesh, currentPoint.pos, start, currentPoint.polygon, currentPoint.previous);
-			size_t bestNeighborID = rayIntersection.link.neighbor;
+			size_t bestNeighborId = rayIntersection.link.neighbor;
 
-			if (bestNeighborID != InvalidPolygon)
+			if (bestNeighborId != INVALID_POLYGON)
 			{
 				PathPoint point;
-				point.polygon = bestNeighborID;
+				point.polygon = bestNeighborId;
 				point.previous = currentPoint.polygon;
 				point.pos = rayIntersection.intersectionPoint;
 				point.scores = CalculatePointScores(point.pos, currentPoint.scores.g, currentPoint.pos, start);
@@ -406,9 +404,9 @@ namespace PathFinding
 
 			for (const NavMesh::InnerLinks::LinkData& link : navMesh.links.links[currentPoint.polygon])
 			{
-				// we already added bestNeighborID node to the open list
+				// we already added bestNeighborId node to the open list
 				// also skip the previous point where we came from
-				if (link.neighbor == bestNeighborID || link.neighbor == currentPoint.previous)
+				if (link.neighbor == bestNeighborId || link.neighbor == currentPoint.previous)
 				{
 					continue;
 				}
@@ -446,12 +444,12 @@ namespace PathFinding
 				PathPoint point;
 				point.polygon = startPolygon;
 				point.pos = start;
-				bestPath.push_back(std::move(point));
+				bestPath.push_back(point);
 			}
 
 			// unwind the path
 			size_t nextPolygon = currentPoint.polygon;
-			while (nextPolygon != InvalidPolygon)
+			while (nextPolygon != INVALID_POLYGON)
 			{
 				bestPath.push_back(closedList[nextPolygon]);
 				nextPolygon = bestPath.back().previous;

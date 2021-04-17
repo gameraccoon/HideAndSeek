@@ -60,10 +60,10 @@ static void FilterOutPotentialContinuations(std::vector<size_t>& outPotentialCon
 	);
 }
 
-std::tuple<size_t, Vector2D> VisibilityPolygonCalculator::GetNextClosestBorderFromCondidates(const std::vector<size_t>& potentialContinuations, const AngledBorder& closestBorder, float maxExtent) const
+std::tuple<size_t, Vector2D> VisibilityPolygonCalculator::getNextClosestBorderFromCandidates(const std::vector<size_t>& potentialContinuations, const AngledBorder& closestBorder, float maxExtent) const
 {
 	float closestBorderQDist = std::numeric_limits<float>::max();
-	Vector2D closestIntersectionPoint;
+	Vector2D closestIntersectionPoint{};
 	size_t closestBorderIdx;
 	Vector2D raytraceCoordinate = closestBorder.coords.b.unit() * (maxExtent + 10.0f);
 	for (size_t idx : potentialContinuations)
@@ -202,7 +202,8 @@ void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2
 				{
 					// find the best candidate to cast the shadow to
 					Vector2D closestIntersectionPoint;
-					std::tie(closestBorderIdx, closestIntersectionPoint) = GetNextClosestBorderFromCondidates(potentialContinuations, closestBorder, maxExtent);
+					std::tie(closestBorderIdx, closestIntersectionPoint) = getNextClosestBorderFromCandidates(
+						potentialContinuations, closestBorder, maxExtent);
 
 					outVisibilityPolygon.push_back(closestIntersectionPoint);
 				}
@@ -268,7 +269,8 @@ void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2
 
 		AngledBorder& closestBorder = mCaches.bordersToTrace[closestBorderIdx];
 		outVisibilityPolygon.push_back(closestBorder.coords.b);
-		std::tie(closestBorderIdx, closestIntersectionPoint) = GetNextClosestBorderFromCondidates(potentialContinuations, closestBorder, maxExtent);
+		std::tie(closestBorderIdx, closestIntersectionPoint) = getNextClosestBorderFromCandidates(
+			potentialContinuations, closestBorder, maxExtent);
 		outVisibilityPolygon.push_back(closestIntersectionPoint);
 		FilterOutPotentialContinuations(potentialContinuations, mCaches.bordersToTrace, mCaches.bordersToTrace[closestBorderIdx].angleB);
 	}

@@ -9,42 +9,42 @@ LeakDetectorClass::~LeakDetectorClass()
 	printLeaks();
 
 	freeAllocatedList();
-	freeLeaksList(memoryLeaksFirst);
+	FreeLeaksList(mMemoryLeaksFirst);
 }
 
-void LeakDetectorClass::AddAllocated(void* p, size_t size, const char* file, int line) noexcept
+void LeakDetectorClass::addAllocated(void* p, size_t size, const char* file, int line) noexcept
 {
-	std::lock_guard<std::recursive_mutex> g(mutex);
+	std::lock_guard<std::recursive_mutex> g(mMutex);
 
 	void* nextItemAddr = malloc(sizeof(AllocatedPtr));
-	AllocatedPtr* nextItem = new (nextItemAddr) AllocatedPtr(p, size, file, line, allocatedList);
-	allocatedList = nextItem;
+	AllocatedPtr* nextItem = new (nextItemAddr) AllocatedPtr(p, size, file, line, mAllocatedList);
+	mAllocatedList = nextItem;
 }
 
-void LeakDetectorClass::RemoveAllocated(void* p) noexcept
+void LeakDetectorClass::removeAllocated(void* p) noexcept
 {
-	std::lock_guard<std::recursive_mutex> g(mutex);
+	std::lock_guard<std::recursive_mutex> g(mMutex);
 
 	if (p == nullptr)
 	{
 		return;
 	}
 
-	if (allocatedList == nullptr)
+	if (mAllocatedList == nullptr)
 	{
 		return;
 	}
 
 	// first item needs a special treatment, since allocatedList points to it
-	if (allocatedList->pointer == p)
+	if (mAllocatedList->pointer == p)
 	{
-		AllocatedPtr* item = allocatedList;
-		allocatedList = allocatedList->next;
+		AllocatedPtr* item = mAllocatedList;
+		mAllocatedList = mAllocatedList->next;
 		free(item);
 		return;
 	}
 
-	AllocatedPtr* item = allocatedList;
+	AllocatedPtr* item = mAllocatedList;
 
 	while (item->next != nullptr)
 	{
@@ -64,25 +64,25 @@ void LeakDetectorClass::addLeakInfo(void* pointer, size_t size, const char* file
 	void* nextItemAddr = malloc(sizeof(MemoryLeak));
 	MemoryLeak* nextItem = new (nextItemAddr) MemoryLeak(pointer, size, file, line);
 
-	if (memoryLeaksFirst == nullptr)
+	if (mMemoryLeaksFirst == nullptr)
 	{
-		memoryLeaksFirst = nextItem;
+		mMemoryLeaksFirst = nextItem;
 	}
 
-	if (memoryLeaksLast != nullptr)
+	if (mMemoryLeaksFirst != nullptr)
 	{
-		memoryLeaksLast->next = nextItem;
+		mMemoryLeaksFirst->next = nextItem;
 	}
-	memoryLeaksLast = nextItem;
+	mMemoryLeaksFirst = nextItem;
 }
 
 template<typename... Args>
-static void writeOfstreamLine(std::ofstream& ofstream, Args... args)
+static void writeOstreamLine(std::ofstream& ostream, Args... args)
 {
-	if (ofstream.is_open())
+	if (ostream.is_open())
 	{
-		((ofstream << args), ...);
-		ofstream << "\n";
+		((ostream << args), ...);
+		ostream << "\n";
 	}
 
 	((std::clog << args), ...);
@@ -93,9 +93,9 @@ void LeakDetectorClass::printLeaks() noexcept
 {
 	MemoryLeak* localLeaksList;
 	{
-		std::lock_guard<std::recursive_mutex> g(mutex);
+		std::lock_guard<std::recursive_mutex> g(mMutex);
 
-		AllocatedPtr* item = allocatedList;
+		AllocatedPtr* item = mAllocatedList;
 		while (item != nullptr)
 		{
 			addLeakInfo(item->pointer, item->size, item->file, item->line);
@@ -103,12 +103,12 @@ void LeakDetectorClass::printLeaks() noexcept
 		}
 
 		// "move" the list to this function to ignore all the allocations happened in this function
-		localLeaksList = memoryLeaksFirst;
-		memoryLeaksFirst = nullptr;
-		memoryLeaksLast = nullptr;
+		localLeaksList = mMemoryLeaksFirst;
+		mMemoryLeaksFirst = nullptr;
+		mMemoryLeaksFirst = nullptr;
 
 		freeAllocatedList();
-		allocatedList = nullptr;
+		mAllocatedList = nullptr;
 	}
 
 	{
@@ -121,36 +121,37 @@ void LeakDetectorClass::printLeaks() noexcept
 		std::ofstream logFileStream("./logs/leaks_report.txt", std::ios_base::trunc);
 		logFileStream << std::showbase;
 
-		writeOfstreamLine(logFileStream, "Memory leak report started");
+        writeOstreamLine(logFileStream, "Memory leak report started");
 
 		if (localLeaksList == nullptr)
 		{
-			writeOfstreamLine(logFileStream, "No memory leaks detected");
+            writeOstreamLine(logFileStream, "No memory leaks detected");
 		}
 
 		MemoryLeak* item = localLeaksList;
 		size_t leakedBytes = 0;
 		while (item != nullptr)
 		{
-			writeOfstreamLine(logFileStream, "Error: Leaked ", item->size, " bytes (", std::hex, item->pointer, std::dec, ") allocated in ", item->file, "(", item->line, ")");
+            writeOstreamLine(logFileStream, "Error: Leaked ", item->size, " bytes (", std::hex, item->pointer, std::dec,
+                             ") allocated in ", item->file, "(", item->line, ")");
 			leakedBytes += item->size;
 			item = item->next;
 		}
 
 		if (leakedBytes > 0)
 		{
-			writeOfstreamLine(logFileStream, "Total leaked bytes: ", leakedBytes);
+            writeOstreamLine(logFileStream, "Total leaked bytes: ", leakedBytes);
 		}
 
-		writeOfstreamLine(logFileStream, "Memory leak report finished");
+        writeOstreamLine(logFileStream, "Memory leak report finished");
 
-		freeLeaksList(localLeaksList);
+		FreeLeaksList(localLeaksList);
 	}
 }
 
 void LeakDetectorClass::freeAllocatedList()
 {
-	AllocatedPtr* item = allocatedList;
+	AllocatedPtr* item = mAllocatedList;
 	while (item != nullptr)
 	{
 		AllocatedPtr* next = item->next;
@@ -160,7 +161,7 @@ void LeakDetectorClass::freeAllocatedList()
 	}
 }
 
-void LeakDetectorClass::freeLeaksList(LeakDetectorClass::MemoryLeak* listBegin)
+void LeakDetectorClass::FreeLeaksList(LeakDetectorClass::MemoryLeak* listBegin)
 {
 	MemoryLeak* item = listBegin;
 	while (item != nullptr)
@@ -172,17 +173,17 @@ void LeakDetectorClass::freeLeaksList(LeakDetectorClass::MemoryLeak* listBegin)
 	}
 }
 
-void* operator new(size_t size, const char* file, int line)
+void* operator new(size_t size, const char* file, int line) noexcept
 {
 	void* p = malloc(size);
-	LeakDetectorClass::Get().AddAllocated(p, size, file, line);
+	LeakDetectorClass::Get().addAllocated(p, size, file, line);
 	return p;
 }
 
-void* operator new[](size_t size, const char* file, int line)
+void* operator new[](size_t size, const char* file, int line) noexcept
 {
 	void* p = malloc(size);
-	LeakDetectorClass::Get().AddAllocated(p, size, file, line);
+	LeakDetectorClass::Get().addAllocated(p, size, file, line);
 	return p;
 }
 
@@ -196,27 +197,37 @@ void* operator new[](size_t size)
 	return operator new[](size, "<Unknown>", 0);
 }
 
+void* operator new(size_t size, const std::nothrow_t& /*tag*/) noexcept
+{
+	return operator new(size, "<Unknown>", 0);
+}
+
+void* operator new[](size_t size, const std::nothrow_t& /*tag*/) noexcept
+{
+	return operator new[](size, "<Unknown>", 0);
+}
+
 void operator delete(void* p) noexcept
 {
-	LeakDetectorClass::Get().RemoveAllocated(p);
+	LeakDetectorClass::Get().removeAllocated(p);
 	free(p);
 }
 
 void operator delete(void* p, size_t) noexcept
 {
-	LeakDetectorClass::Get().RemoveAllocated(p);
+	LeakDetectorClass::Get().removeAllocated(p);
 	free(p);
 }
 
 void operator delete[](void* p) noexcept
 {
-	LeakDetectorClass::Get().RemoveAllocated(p);
+	LeakDetectorClass::Get().removeAllocated(p);
 	free(p);
 }
 
 void operator delete[](void* p, size_t) noexcept
 {
-	LeakDetectorClass::Get().RemoveAllocated(p);
+	LeakDetectorClass::Get().removeAllocated(p);
 	free(p);
 }
 

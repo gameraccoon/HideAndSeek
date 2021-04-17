@@ -23,9 +23,9 @@ public:
 		};
 	}
 
-	CreationFn getCreationFn(StringID typeName) const;
+	[[nodiscard]] CreationFn getCreationFn(StringId typeName) const;
 
-	BaseComponent* createComponent(StringID typeName) const;
+	[[nodiscard]] BaseComponent* createComponent(StringId typeName) const;
 
 	template<typename F>
 	void forEachComponentType(F fn) const
@@ -37,5 +37,5 @@ public:
 	}
 
 private:
-	std::unordered_map<StringID, CreationFn> mComponentCreators;
+	std::unordered_map<StringId, CreationFn> mComponentCreators;
 };

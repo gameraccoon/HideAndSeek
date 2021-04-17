@@ -4,7 +4,7 @@
 	"attributes": [
 		{
 			"name": "id",
-			"type": "StringID"
+			"type": "StringId"
 		}
 	]
 }

@@ -6,7 +6,7 @@
 
 struct Vector2D;
 class Rotator;
-class StringID;
+class StringId;
 
 namespace ImguiDataInspection
 {
@@ -32,7 +32,7 @@ namespace ImguiDataInspection
 	void Inspector(const char* title, Rotator& data);
 
 	template<>
-	void Inspector(const char* title, StringID& data);
+	void Inspector(const char* title, StringId& data);
 
 	template<typename T>
 	void Inspector(const char* title, std::vector<T>& data)

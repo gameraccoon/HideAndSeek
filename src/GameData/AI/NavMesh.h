@@ -16,7 +16,7 @@ struct NavMesh
 	{
 		std::vector<Vector2D> vertices;
 		std::vector<size_t> indexes;
-		size_t vertsPerPoly = 3;
+		size_t verticesPerPoly = 3;
 		size_t polygonsCount = 0;
 		Vector2D navMeshStart{ZERO_VECTOR};
 		Vector2D navMeshSize{ZERO_VECTOR};

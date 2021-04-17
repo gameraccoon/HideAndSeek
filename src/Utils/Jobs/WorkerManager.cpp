@@ -14,7 +14,7 @@ namespace Jobs
 		// start the threads
 		for (size_t i = 0; i < threadsCount; ++i)
 		{
-			mThreads[i] = std::thread(std::bind(&WorkerManager::threadFunction, this));
+			mThreads[i] = std::thread([this] { threadFunction(); });
 		}
 	}
 
@@ -35,14 +35,14 @@ namespace Jobs
 
 	void WorkerManager::runJobs(std::vector<BaseJob::UniquePtr>&& jobs)
 	{
-		BaseJob::JobGroupID thisJobGroupId = generateNextID();
-		size_t runnedJobsCount = jobs.size();
+		BaseJob::JobGroupId thisJobGroupId = generateNextId();
+		size_t runJobsCount = jobs.size();
 
 		{
 			std::unique_lock<std::mutex> l(mDataMutex);
 
 			std::ranges::for_each(jobs, [thisJobGroupId](auto& job){
-				job->setJobGroupID(thisJobGroupId);
+				job->setJobGroupId(thisJobGroupId);
 			});
 
 			std::ranges::move(jobs, back_inserter(mPlannedJobs));
@@ -53,7 +53,7 @@ namespace Jobs
 		BaseJob::UniquePtr thisThreadActiveJob;
 		bool isJobsListEmpty = false;
 		std::vector<BaseJob::UniquePtr> jobsToFinalize;
-		jobsToFinalize.reserve(runnedJobsCount);
+		jobsToFinalize.reserve(runJobsCount);
 		while (true) // Loop-With-Exit
 		{
 			if (!isJobsListEmpty)
@@ -64,7 +64,7 @@ namespace Jobs
 				auto it = std::find_if(
 					std::begin(mPlannedJobs),
 					std::end(mPlannedJobs),
-					[thisJobGroupId](auto& job){ return job->getJobGroupID() == thisJobGroupId; }
+					[thisJobGroupId](auto& job){ return job->getJobGroupId() == thisJobGroupId; }
 				);
 
 				if (it != mPlannedJobs.end())
@@ -82,8 +82,8 @@ namespace Jobs
 			{
 				thisThreadActiveJob->process();
 				thisThreadActiveJob->finalize();
-				--runnedJobsCount;
-				if (runnedJobsCount == 0) { return; }
+				--runJobsCount;
+				if (runJobsCount == 0) { return; }
 				thisThreadActiveJob = nullptr;
 			}
 			else
@@ -108,7 +108,7 @@ namespace Jobs
 				auto newEnd = std::partition(
 					std::begin(mFinishedJobs),
 					std::end(mFinishedJobs),
-					[thisJobGroupId](auto& job){ return job->getJobGroupID() != thisJobGroupId; }
+					[thisJobGroupId](auto& job){ return job->getJobGroupId() != thisJobGroupId; }
 				);
 
 				// move away to process without locking
@@ -128,8 +128,8 @@ namespace Jobs
 			for (auto& job : jobsToFinalize)
 			{
 				job->finalize();
-				--runnedJobsCount;
-				if (runnedJobsCount == 0) { return; }
+				--runJobsCount;
+				if (runJobsCount == 0) { return; }
 			}
 			jobsToFinalize.clear();
 		}

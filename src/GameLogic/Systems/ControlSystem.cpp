@@ -16,7 +16,7 @@
 #include "GameData/GameData.h"
 
 
-ControlSystem::ControlSystem(WorldHolder& worldHolder, const InputData& inputData)
+ControlSystem::ControlSystem(WorldHolder& worldHolder, const InputData& inputData) noexcept
 	: mWorldHolder(worldHolder)
 	, mInputData(inputData)
 {

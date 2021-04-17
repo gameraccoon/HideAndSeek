@@ -13,7 +13,7 @@
 class CameraSystem : public System
 {
 public:
-	CameraSystem(WorldHolder& worldHolder, const InputData& inputData);
+	CameraSystem(WorldHolder& worldHolder, const InputData& inputData) noexcept;
 	~CameraSystem() override = default;
 
 	void update() override;

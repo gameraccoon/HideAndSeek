@@ -53,9 +53,9 @@ TEST(Collision, Angular)
 
 	Hull hull2;
 	hull2.type = HullType::Angular;
-	hull2.points.push_back(Vector2D(10.0f, 9.0f));
-	hull2.points.push_back(Vector2D(2.0f, 12.0f));
-	hull2.points.push_back(Vector2D(3.0f, 5.0f));
+	hull2.points.emplace_back(10.0f, 9.0f);
+	hull2.points.emplace_back(2.0f, 12.0f);
+	hull2.points.emplace_back(3.0f, 5.0f);
 	hull2.generateBorders();
 
 	Vector2D resist = ZERO_VECTOR;
@@ -88,10 +88,10 @@ TEST(Collision, CornerCase1)
 
 	Hull hull2;
 	hull2.type = HullType::Angular;
-	hull2.points.push_back(Vector2D(60.0, -60.0));
-	hull2.points.push_back(Vector2D(60.0, 60.0));
-	hull2.points.push_back(Vector2D(-60.0, 60.0));
-	hull2.points.push_back(Vector2D(-60.0, -60.0));
+	hull2.points.emplace_back(60.0f, -60.0f);
+	hull2.points.emplace_back(60.0f, 60.0f);
+	hull2.points.emplace_back(-60.0f, 60.0f);
+	hull2.points.emplace_back(-60.0f, -60.0f);
 	hull2.generateBorders();
 
 	Vector2D resist = ZERO_VECTOR;

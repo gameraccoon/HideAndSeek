@@ -7,7 +7,7 @@
 #include "GameData/Components/DeathComponent.generated.h"
 #include "GameData/World.h"
 
-TestDestroyedEntitiesRegistrationSystem::TestDestroyedEntitiesRegistrationSystem(WorldHolder& worldHolder, DestroyedEntitiesTestCheck& testCheck)
+TestDestroyedEntitiesRegistrationSystem::TestDestroyedEntitiesRegistrationSystem(WorldHolder& worldHolder, DestroyedEntitiesTestCheck& testCheck) noexcept
 	: mWorldHolder(worldHolder)
 	, mTestCheck(testCheck)
 {

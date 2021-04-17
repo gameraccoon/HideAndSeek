@@ -6,6 +6,9 @@
 class Log
 {
 public:
+    Log(const Log&) = delete;
+    void operator=(const Log&) = delete;
+
 	/**
 	 * Return single instance of class Log
 	 * Usage: Log::Instance().function(...);
@@ -25,20 +28,9 @@ private:
 	/** Filestream that holds the logfile handler */
 	std::ofstream mLogFileStream;
 
-	/** Construct singletone information */
-	static void create();
-
-	/** Function runs when user tries to get access to destroyed singletone */
-	static void onDeadReference();
-
-	/** function that destroy singletone with ability to construct it in future */
-	static void killPhoenixSingletone();
-
 	/* Turn off unusable operations */
 	Log();
 	~Log();
-	Log(const Log&) = delete;
-	void operator=(const Log&) = delete;
 };
 
 template<typename... Args>

@@ -63,6 +63,6 @@ namespace Audio
 
 	float AudioManager::GetMusicVolume()
 	{
-		return Mix_VolumeMusic(-1) / 128.0f;
+		return static_cast<float>(Mix_VolumeMusic(-1)) / 128.0f;
 	}
 }

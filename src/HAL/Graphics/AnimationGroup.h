@@ -17,16 +17,16 @@ namespace Graphics
 	{
 	public:
 		AnimationGroup() = default;
-		explicit AnimationGroup(std::map<StringID, std::vector<ResourceHandle>>&& animationClips, StringID stateMachineID, StringID defaultState);
+		explicit AnimationGroup(std::map<StringId, std::vector<ResourceHandle>>&& animationClips, StringId stateMachineId, StringId defaultState);
 
-		bool isValid() const override;
-		StringID getStateMachineID() const { return mStateMachineID; }
-		std::map<StringID, std::vector<ResourceHandle>> getAnimationClips() const { return mAnimationClips; }
-		StringID getDefaultState() const { return mDefaultState; }
+		[[nodiscard]] bool isValid() const override;
+		[[nodiscard]] StringId getStateMachineId() const { return mStateMachineId; }
+		[[nodiscard]] std::map<StringId, std::vector<ResourceHandle>> getAnimationClips() const { return mAnimationClips; }
+		[[nodiscard]] StringId getDefaultState() const { return mDefaultState; }
 
 	private:
-		std::map<StringID, std::vector<ResourceHandle>> mAnimationClips;
-		StringID mStateMachineID;
-		StringID mDefaultState;
+		std::map<StringId, std::vector<ResourceHandle>> mAnimationClips;
+		StringId mStateMachineId;
+		StringId mDefaultState;
 	};
 }

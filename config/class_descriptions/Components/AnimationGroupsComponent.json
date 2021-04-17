@@ -4,7 +4,7 @@
 	"attributes": [
 		{
 			"name": "data",
-			"type": "std::vector<AnimationGroup<StringID>>",
+			"type": "std::vector<AnimationGroup<StringId>>",
 			"includes": [
 				"<vector>",
 				"\"GameData/Resources/AnimationGroup.h\""
@@ -13,7 +13,7 @@
 		},
 		{
 			"name": "blackboard",
-			"type": "FSM::Blackboard<StringID>",
+			"type": "FSM::Blackboard<StringId>",
 			"includes": [
 				"\"GameData/FSM/Blackboard.h\""
 			],

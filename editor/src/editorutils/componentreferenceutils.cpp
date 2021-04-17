@@ -59,7 +59,7 @@ namespace Utils
 		}
 	}
 
-	void RemoveComponent(const ComponentSourceReference& source, StringID componentTypeName, World* world)
+	void RemoveComponent(const ComponentSourceReference& source, StringId componentTypeName, World* world)
 	{
 		if (world)
 		{

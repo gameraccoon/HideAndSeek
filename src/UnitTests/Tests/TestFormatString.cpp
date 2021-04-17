@@ -24,8 +24,8 @@ TEST(FormatString, StringFormats)
 	EXPECT_EQ("teststrLWtestconstref", FormatString("test%stestconstref", testStringConstRef));
 }
 
-TEST(FormatString, StringIDFormat)
+TEST(FormatString, StringIdFormat)
 {
-	StringID testAStrID = STR_TO_ID("testA");
-	EXPECT_EQ("testtestAtest", FormatString("test%stest", testAStrID));
+	StringId testAStrId = STR_TO_ID("testA");
+	EXPECT_EQ("testtestAtest", FormatString("test%stest", testAStrId));
 }

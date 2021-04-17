@@ -26,16 +26,16 @@ static bool AreVisibilityPolygonsEqual(const std::vector<Vector2D>& a, const std
 		return false;
 	}
 
-	auto a_copy = a;
+	auto aCopy = a;
 
-	auto it = std::find_if(a_copy.begin(), a_copy.end(), [start = b.front(), allowedError](Vector2D val){ return val.isNearlyEqualTo(start, allowedError); });
-	if (it == a_copy.end())
+	auto it = std::find_if(aCopy.begin(), aCopy.end(), [start = b.front(), allowedError](Vector2D val){ return val.isNearlyEqualTo(start, allowedError); });
+	if (it == aCopy.end())
 	{
 		return false;
 	}
 
-	std::rotate(a_copy.begin(), it, a_copy.end());
-	return a_copy.size() == b.size() && std::equal(a_copy.begin(), a_copy.end(), b.begin(), [allowedError](Vector2D a, Vector2D b){ return a.isNearlyEqualTo(b, allowedError); });
+	std::rotate(aCopy.begin(), it, aCopy.end());
+	return aCopy.size() == b.size() && std::equal(aCopy.begin(), aCopy.end(), b.begin(), [allowedError](Vector2D a, Vector2D b){ return a.isNearlyEqualTo(b, allowedError); });
 }
 
 static void FillTestLightBlockingGeometry(LightBlockingGeometryComponent& component, const Hull& geometry, const Vector2D& location)
@@ -123,13 +123,13 @@ TEST(VisibilityPolygon, ApertureDirection1)
 		// create 8 blocks that makes a figure like aperture
 		for (int i = 0; i < 8; ++i)
 		{
-			Rotator rotator(0.25f * i * PI);
+			Rotator rotator(0.25f * static_cast<float>(i) * PI);
 			auto rotatedGeometry = geometry;
 			Vector2D rotatedLocation = location.getRotated(rotator);
 			// rotate around zero point
-			for (size_t j = 0; j < rotatedGeometry.points.size(); ++j)
+			for (auto& point : rotatedGeometry.points)
 			{
-				rotatedGeometry.points[j] = rotatedGeometry.points[j].getRotated(rotator);
+				point = point.getRotated(rotator);
 			}
 			rotatedGeometry.generateBorders();
 			FillTestLightBlockingGeometry(component, rotatedGeometry, rotatedLocation);
@@ -175,13 +175,13 @@ TEST(VisibilityPolygon, ApertureDirection2)
 		// create 8 blocks that makes a figure like aperture
 		for (int i = 0; i < 8; ++i)
 		{
-			Rotator rotator(-0.25f * i * PI);
+			Rotator rotator(-0.25f * static_cast<float>(i) * PI);
 			auto rotatedGeometry = geometry;
 			Vector2D rotatedLocation = location.getRotated(rotator);
 			// rotate around zero point
-			for (size_t j = 0; j < rotatedGeometry.points.size(); ++j)
+			for (auto& point : rotatedGeometry.points)
 			{
-				rotatedGeometry.points[j] = rotatedGeometry.points[j].getRotated(rotator);
+				point = point.getRotated(rotator);
 			}
 			rotatedGeometry.generateBorders();
 			FillTestLightBlockingGeometry(component, rotatedGeometry, rotatedLocation);

@@ -32,11 +32,11 @@ namespace ImguiPropertyFiltration
 		void getFilteredEntities(ImguiDebugData& debugData, TupleVector<WorldCell*, Entity>& inOutEntities);
 
 	private:
-		std::vector<StringID> getFilteredComponentTypes() const;
+		[[nodiscard]] std::vector<StringId> getFilteredComponentTypes() const;
 		void init(ImguiDebugData& debugData);
 
 	private:
-		static constexpr int mMinimalSearchLen = 2;
+		static constexpr int MinimalSearchLen = 2;
 
 		char mFilterQueryBuffer[128] = "";
 		SubstringSearcher<std::shared_ptr<AbstractPropertyDescriptor>> mPropertyDescriptors;

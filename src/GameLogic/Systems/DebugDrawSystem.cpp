@@ -28,7 +28,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-DebugDrawSystem::DebugDrawSystem(WorldHolder& worldHolder, const TimeData& timeData, HAL::Engine& engine, HAL::ResourceManager& resourceManager)
+DebugDrawSystem::DebugDrawSystem(WorldHolder& worldHolder, const TimeData& timeData, HAL::Engine& engine, HAL::ResourceManager& resourceManager) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mEngine(engine)
@@ -45,7 +45,7 @@ void RemoveOldDrawElement(std::vector<T>& vector, GameplayTimestamp now)
 	);
 }
 
-static Vector2D GetNavmeshPolygonCenter(size_t triangleIdx, const NavMesh::Geometry& navMeshGeometry)
+/*static Vector2D GetNavmeshPolygonCenter(size_t triangleIdx, const NavMesh::Geometry& navMeshGeometry)
 {
 	Vector2D polygonCenter{ZERO_VECTOR};
 	for (size_t i = 0; i < navMeshGeometry.vertsPerPoly; ++i)
@@ -54,7 +54,7 @@ static Vector2D GetNavmeshPolygonCenter(size_t triangleIdx, const NavMesh::Geome
 	}
 	polygonCenter /= static_cast<float>(navMeshGeometry.vertsPerPoly);
 	return polygonCenter;
-}
+}*/
 
 static void DrawPath(const std::vector<Vector2D>& path, const Graphics::Sprite& navMeshSprite, const Graphics::QuadUV& quadUV, Vector2D drawShift)
 {
@@ -64,10 +64,10 @@ static void DrawPath(const std::vector<Vector2D>& path, const Graphics::Sprite& 
 		drawablePolygon.reserve(path.size() * 2);
 
 		{
-			float u1 = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
-			float v1 = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
-			float u2 = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
-			float v2 = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
+			float u1 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float v1 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float u2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float v2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
 			Vector2D normal = (path[1] - path[0]).normal() * 3;
 
@@ -77,10 +77,10 @@ static void DrawPath(const std::vector<Vector2D>& path, const Graphics::Sprite& 
 
 		for (size_t i = 1; i < path.size(); ++i)
 		{
-			float u1 = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
-			float v1 = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
-			float u2 = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
-			float v2 = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
+			float u1 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float v1 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float u2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float v2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
 			Vector2D normal = (path[i] - path[i-1]).normal() * 3;
 
@@ -90,7 +90,7 @@ static void DrawPath(const std::vector<Vector2D>& path, const Graphics::Sprite& 
 
 		glm::mat4 transform(1.0f);
 		transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
-		Graphics::Render::drawStrip(*navMeshSprite.getSurface(), drawablePolygon, transform, 0.5f);
+		Graphics::Render::DrawStrip(*navMeshSprite.getSurface(), drawablePolygon, transform, 0.5f);
 	}
 }
 
@@ -125,7 +125,7 @@ void DebugDrawSystem::update()
 		{
 			CellPos cellPos = cell->getPos();
 			Vector2D location = SpatialWorldData::GetRelativeLocation(cameraCell, cellPos, drawShift);
-			Graphics::Render::drawQuad(*collisionSprite.getSurface(),
+			Graphics::Render::DrawQuad(*collisionSprite.getSurface(),
 				location,
 				SpatialWorldData::CellSizeVector,
 				ZERO_VECTOR,
@@ -134,7 +134,7 @@ void DebugDrawSystem::update()
 
 			std::string text = FormatString("(%d, %d)", cellPos.x, cellPos.y);
 			std::array<int, 2> textSize = renderer.getTextSize(font, text.c_str());
-			Vector2D screenPos = SpatialWorldData::CellSizeVector*0.5 + SpatialWorldData::GetCellRealDistance(cellPos - cameraCell) - cameraLocation + screenHalfSize - Vector2D(textSize[0] * 0.5f, textSize[1] * 0.5f);
+			Vector2D screenPos = SpatialWorldData::CellSizeVector*0.5 + SpatialWorldData::GetCellRealDistance(cellPos - cameraCell) - cameraLocation + screenHalfSize - Vector2D(static_cast<float>(textSize[0]) * 0.5f, static_cast<float>(textSize[1]) * 0.5f);
 			renderer.renderText(font, screenPos, {255, 255, 255, 255}, text.c_str());
 		}
 	}
@@ -143,10 +143,10 @@ void DebugDrawSystem::update()
 	{
 		const Graphics::Sprite& collisionSprite = mResourceManager.getResource<Graphics::Sprite>(mCollisionSpriteHandle);
 		Graphics::QuadUV quadUV = collisionSprite.getUV();
-		spatialManager.forEachComponentSet<CollisionComponent, TransformComponent>([&collisionSprite, &quadUV, drawShift, &renderer, cameraCell](CollisionComponent* collision, TransformComponent* transform)
+		spatialManager.forEachComponentSet<CollisionComponent, TransformComponent>([&collisionSprite, &quadUV, drawShift](CollisionComponent* collision, TransformComponent* transform)
 		{
 			Vector2D location = transform->getLocation() + drawShift;
-			Graphics::Render::drawQuad(*collisionSprite.getSurface(),
+			Graphics::Render::DrawQuad(*collisionSprite.getSurface(),
 				Vector2D(collision->getBoundingBox().minX + location.x, collision->getBoundingBox().minY + location.y),
 				Vector2D(collision->getBoundingBox().maxX-collision->getBoundingBox().minX,
 						 collision->getBoundingBox().maxY-collision->getBoundingBox().minY),
@@ -168,24 +168,24 @@ void DebugDrawSystem::update()
 			const NavMesh& navMesh = navMeshComponent->getNavMesh();
 			const NavMesh::Geometry& navMeshGeometry = navMesh.geometry;
 			std::vector<Graphics::DrawPoint> drawablePolygon;
-			drawablePolygon.reserve(navMeshGeometry.vertsPerPoly);
+			drawablePolygon.reserve(navMeshGeometry.verticesPerPoly);
 			for (size_t k = 0; k < navMeshGeometry.polygonsCount; ++k)
 			{
 				drawablePolygon.clear();
-				for (size_t j = 0; j < navMeshGeometry.vertsPerPoly; ++j)
+				for (size_t j = 0; j < navMeshGeometry.verticesPerPoly; ++j)
 				{
-					float u = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
-					float v = static_cast<float>(Random::GlobalGenerator() * 1.0f / Random::GlobalGenerator.max());
+					float u = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+					float v = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
-					Vector2D pos = navMeshGeometry.vertices[navMeshGeometry.indexes[k*navMeshGeometry.vertsPerPoly + j]];
+					Vector2D pos = navMeshGeometry.vertices[navMeshGeometry.indexes[k*navMeshGeometry.verticesPerPoly + j]];
 					drawablePolygon.push_back(Graphics::DrawPoint{pos, Graphics::QuadLerp(quadUV, u, v)});
 				}
 				glm::mat4 transform(1.0f);
 				transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
-				Graphics::Render::drawFan(*navMeshSprite.getSurface(), drawablePolygon, transform, 0.3f);
+				Graphics::Render::DrawFan(*navMeshSprite.getSurface(), drawablePolygon, transform, 0.3f);
 			}
 
-			const NavMesh::InnerLinks& navMeshLinks = navMesh.links;
+			/*const NavMesh::InnerLinks& navMeshLinks = navMesh.links;
 			for (size_t i = 0; i < navMeshLinks.links.size(); ++i)
 			{
 				Vector2D firstPolygonCenter = GetNavmeshPolygonCenter(i, navMeshGeometry);
@@ -195,7 +195,7 @@ void DebugDrawSystem::update()
 					std::vector<Vector2D> line{firstPolygonCenter, secondPolygonCenter + (firstPolygonCenter - secondPolygonCenter)*0.52f};
 					DrawPath(line, navMeshSprite, quadUV, drawShift);
 				}
-			}
+			}*/
 		}
 
 		spatialManager.forEachComponentSet<AiControllerComponent>([&navMeshSprite, &quadUV, drawShift](AiControllerComponent* aiController)
@@ -215,7 +215,7 @@ void DebugDrawSystem::update()
 			const Graphics::Font& font = mResourceManager.getResource<Graphics::Font>(mFontHandle);
 			for (const auto& screenPoint : debugDraw->getScreenPoints())
 			{
-				Graphics::Render::drawQuad(*pointSprite.getSurface(), screenPoint.screenPos, pointSize);
+				Graphics::Render::DrawQuad(*pointSprite.getSurface(), screenPoint.screenPos, pointSize);
 				if (!screenPoint.name.empty())
 				{
 					renderer.renderText(font, screenPoint.screenPos, {255, 255, 255, 255}, screenPoint.name.c_str());
@@ -225,7 +225,7 @@ void DebugDrawSystem::update()
 			for (const auto& worldPoint : debugDraw->getWorldPoints())
 			{
 				Vector2D screenPos = worldPoint.pos - cameraLocation + screenHalfSize;
-				Graphics::Render::drawQuad(*pointSprite.getSurface(), screenPos, pointSize);
+				Graphics::Render::DrawQuad(*pointSprite.getSurface(), screenPos, pointSize);
 				if (!worldPoint.name.empty())
 				{
 					renderer.renderText(font, screenPos, {255, 255, 255, 255}, worldPoint.name.c_str());
@@ -237,7 +237,7 @@ void DebugDrawSystem::update()
 				Vector2D screenPosStart = worldLineSegment.startPos - cameraLocation + screenHalfSize;
 				Vector2D screenPosEnd = worldLineSegment.endPos - cameraLocation + screenHalfSize;
 				Vector2D diff = screenPosEnd - screenPosStart;
-				Graphics::Render::drawQuad(
+				Graphics::Render::DrawQuad(
 					*lineSprite.getSurface(),
 					(screenPosStart + screenPosEnd) * 0.5f,
 					Vector2D(diff.size(), pointSize.y),

@@ -26,17 +26,17 @@ std::vector<BaseComponent*> ComponentSetHolder::getAllComponents()
 	return components;
 }
 
-void ComponentSetHolder::addComponent(BaseComponent* component, StringID typeID)
+void ComponentSetHolder::addComponent(BaseComponent* component, StringId typeId)
 {
 	if (component != nullptr)
 	{
-		mComponents[typeID] = component;
+		mComponents[typeId] = component;
 	}
 }
 
-void ComponentSetHolder::removeComponent(StringID typeID)
+void ComponentSetHolder::removeComponent(StringId typeId)
 {
-	if (auto it = mComponents.find(typeID); it != mComponents.end())
+	if (auto it = mComponents.find(typeId); it != mComponents.end())
 	{
 		delete it->second;
 		mComponents.erase(it);
@@ -51,9 +51,9 @@ nlohmann::json ComponentSetHolder::toJson(const ComponentSerializersHolder& comp
 
 	for (auto component : mComponents)
 	{
-		auto componenObj = nlohmann::json{};
-		componentSerializers.jsonSerializer.getComponentSerializerFromClassName(component.first)->toJson(componenObj, component.second);
-		components[ID_TO_STR(component.first)] = componenObj;
+		auto componentObj = nlohmann::json{};
+		componentSerializers.jsonSerializer.getComponentSerializerFromClassName(component.first)->toJson(componentObj, component.second);
+		components[ID_TO_STR(component.first)] = componentObj;
 	}
 	outJson["components"] = components;
 
@@ -65,7 +65,7 @@ void ComponentSetHolder::fromJson(const nlohmann::json& json, const ComponentSer
 	const auto& components = json.at("components");
 	for (const auto& [stringType, componentData] : components.items())
 	{
-		StringID className = STR_TO_ID(stringType);
+		StringId className = STR_TO_ID(stringType);
 		ComponentFactory::CreationFn componentCreateFn = componentSerializers.factory.getCreationFn(className);
 		if (componentCreateFn != nullptr)
 		{

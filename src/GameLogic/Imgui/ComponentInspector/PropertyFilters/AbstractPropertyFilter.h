@@ -12,13 +12,13 @@ namespace ImguiPropertyFiltration
 	class AbstractPropertyFilter
 	{
 	public:
-		AbstractPropertyFilter(const std::weak_ptr<AbstractPropertyDescriptor>& descriptor)
+		explicit AbstractPropertyFilter(const std::weak_ptr<AbstractPropertyDescriptor>& descriptor)
 			: mDescriptor(descriptor)
 		{}
 
 		virtual ~AbstractPropertyFilter() = default;
 
-		StringID getComponentType() const
+		[[nodiscard]] StringId getComponentType() const
 		{
 			return getDescriptor()->getComponentType();
 		}
@@ -34,13 +34,13 @@ namespace ImguiPropertyFiltration
 			);
 		}
 
-		virtual std::string getName() const = 0;
+		[[nodiscard]] virtual std::string getName() const = 0;
 		virtual void updateImguiWidget() = 0;
 
 	protected:
 		virtual bool isConditionPassed(EntityManager& manager, Entity entity) const = 0;
 
-		const std::shared_ptr<AbstractPropertyDescriptor> getDescriptor() const
+		[[nodiscard]] std::shared_ptr<AbstractPropertyDescriptor> getDescriptor() const
 		{
 			std::shared_ptr<AbstractPropertyDescriptor> descriptor = mDescriptor.lock();
 			AssertFatal(descriptor, "Property descriptor should exist for PropertyFilter");
@@ -55,21 +55,21 @@ namespace ImguiPropertyFiltration
 	{
 	public:
 		virtual ~AbstractPropertyFilterFactory() = default;
-		virtual std::string getName() const = 0;
-		virtual std::unique_ptr<AbstractPropertyFilter> createFilter() const = 0;
+		[[nodiscard]] virtual std::string getName() const = 0;
+		[[nodiscard]] virtual std::unique_ptr<AbstractPropertyFilter> createFilter() const = 0;
 	};
 
 	template<typename T>
 	class PropertyFilterFactory : public AbstractPropertyFilterFactory
 	{
 	public:
-		PropertyFilterFactory(const std::weak_ptr<AbstractPropertyDescriptor>& descriptor)
+		explicit PropertyFilterFactory(const std::weak_ptr<AbstractPropertyDescriptor>& descriptor)
 			: mDescriptor(descriptor)
 		{}
 
-		std::string getName() const final { return T::GetStaticName(); }
+		[[nodiscard]] std::string getName() const final { return T::GetStaticName(); }
 
-		std::unique_ptr<AbstractPropertyFilter> createFilter() const final
+		[[nodiscard]] std::unique_ptr<AbstractPropertyFilter> createFilter() const final
 		{
 			return std::make_unique<T>(mDescriptor);
 		}

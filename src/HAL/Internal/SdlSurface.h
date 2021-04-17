@@ -21,14 +21,14 @@ namespace Graphics
 			Surface(Surface&&) = delete;
 			Surface& operator=(Surface&&) = delete;
 
-			~Surface();
+			~Surface() override;
 
-			int getWidth() const;
-			int getHeight() const;
+			[[nodiscard]] int getWidth() const;
+			[[nodiscard]] int getHeight() const;
 
 			void bind() const;
 
-			virtual bool isValid() const override;
+			[[nodiscard]] bool isValid() const override;
 
 		private:
 			SDL_Surface* mSurface;

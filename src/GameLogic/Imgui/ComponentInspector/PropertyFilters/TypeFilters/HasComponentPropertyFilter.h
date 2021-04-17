@@ -11,7 +11,7 @@ namespace ImguiPropertyFiltration
 
 		static std::string GetStaticName();
 
-		std::string getName() const override;
+		[[nodiscard]] std::string getName() const override;
 		void updateImguiWidget() override;
 		bool isConditionPassed(EntityManager& /*manager*/, Entity /*entity*/) const override;
 	};

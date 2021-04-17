@@ -7,7 +7,7 @@
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 
-DeadEntitiesDestructionSystem::DeadEntitiesDestructionSystem(WorldHolder& worldHolder)
+DeadEntitiesDestructionSystem::DeadEntitiesDestructionSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
 }

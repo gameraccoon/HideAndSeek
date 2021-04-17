@@ -32,7 +32,7 @@ namespace PathBlockingGeometry
 					border.b += location;
 				});
 
-				mergedGeometry.push_back(std::move(borders));
+				mergedGeometry.emplace_back(std::move(borders));
 			}
 		}
 

@@ -19,22 +19,22 @@ namespace Collide
 
 	bool AreAABBsIntersect(const BoundingBox& boxA, const BoundingBox& boxB);
 	bool AreAABBsIntersectInclusive(const BoundingBox& boxA, const BoundingBox& boxB);
-	bool AreLinesIntersect(const Vector2D& A1, const Vector2D& A2, const Vector2D& B1, const Vector2D& B2);
-	bool AreLinesParallel(const Vector2D& A1, const Vector2D& A2, const Vector2D& B1, const Vector2D& B2);
+	bool AreLinesIntersect(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2);
+	bool AreLinesParallel(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2);
 	bool IsLineIntersectAABB(const BoundingBox& box, const Vector2D& start, const Vector2D& finish);
-	Vector2D GetPointIntersect2Lines(const Vector2D& A1, const Vector2D& A2, const Vector2D& B1, const Vector2D& B2);
+	Vector2D GetPointIntersect2Lines(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2);
 }
 
 // macro that calls CODE for each border, where i and j are indexes of the vertices of this border
 #define FOR_EACH_BORDER(size, CODE) { \
 	do { \
-		for (size_t i = 0; i < size - 1; ++i) \
+		for (size_t i = 0; i < (size) - 1; ++i) \
 		{ \
 			size_t j = i + 1; \
 			CODE \
 		} \
 		{ \
-			size_t i = size - 1; \
+			size_t i = (size) - 1; \
 			size_t j = 0; \
 			CODE \
 		} \

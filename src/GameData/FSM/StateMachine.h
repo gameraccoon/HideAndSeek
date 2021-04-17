@@ -14,7 +14,7 @@ namespace FSM
 	 *
 	 * The SM can be initialized by adding states via calling addState method.
 	 * The current state and the blackboard are stored outside the class, allowing
-	 * using one SM for multiple state instanses.
+	 * using one SM for multiple state instances.
 	 *
 	 * Allow to have more than one levels of states.
 	 * Each parent node should have an unique state for identification purposes, but selecting a parent
@@ -23,7 +23,7 @@ namespace FSM
 	 * The same behavior can be achieved with StateMachine class (and in some cases more efficient),
 	 * but it will result in links duplication and will be harder to reason about.
 	 */
-	template <typename StateIDType, typename BlackboardKeyType>
+	template <typename StateIdType, typename BlackboardKeyType>
 	class StateMachine
 	{
 	public:
@@ -32,8 +32,8 @@ namespace FSM
 
 		struct LinkPair
 		{
-			LinkPair(StateIDType followingState, std::unique_ptr<BaseLinkRuleType> linkFollowRule)
-				: followingState(std::forward<StateIDType>(followingState))
+			LinkPair(StateIdType followingState, std::unique_ptr<BaseLinkRuleType> linkFollowRule)
+				: followingState(std::forward<StateIdType>(followingState))
 				, linkFollowRule(std::forward<std::unique_ptr<BaseLinkRuleType>>(linkFollowRule))
 			{}
 
@@ -47,10 +47,12 @@ namespace FSM
 
 			LinkPair& operator=(const LinkPair& other)
 			{
-				 return *this = LinkPair(other.followingState, other.linkFollowRule->makeCopy());
+				followingState = other.followingState;
+				linkFollowRule = other.linkFollowRule->makeCopy();
+				return *this;
 			}
 
-			StateIDType followingState;
+			StateIdType followingState;
 			std::unique_ptr<BaseLinkRuleType> linkFollowRule;
 		};
 
@@ -58,38 +60,38 @@ namespace FSM
 		{
 			// less verbose emplace function
 			template <template<typename...> typename LinkRuleType, typename... Types, typename... Args>
-			void emplaceLink(StateIDType state, Args&&... args)
+			void emplaceLink(StateIdType state, Args&&... args)
 			{
-				links.emplace_back(std::forward<StateIDType>(state), std::make_unique<LinkRuleType<BlackboardKeyType, Types...>>(std::forward<Args>(args)...));
+				links.emplace_back(std::move(state), std::make_unique<LinkRuleType<BlackboardKeyType, Types...>>(std::forward<Args>(args)...));
 			}
 
 			std::vector<LinkPair> links;
 		};
 
 	public:
-		void addState(StateIDType stateID, StateLinkRules&& stateLinkRules)
+		void addState(StateIdType stateId, StateLinkRules&& stateLinkRules)
 		{
-			bool isEmplaced;
-			std::tie(std::ignore, isEmplaced) = mStates.emplace(std::forward<StateIDType>(stateID), std::forward<StateLinkRules>(stateLinkRules));
-			Assert(isEmplaced, "State is already exists");
+			bool isAdded;
+			std::tie(std::ignore, isAdded) = mStates.emplace(std::forward<StateIdType>(stateId), std::forward<StateLinkRules>(stateLinkRules));
+			Assert(isAdded, "State is already exists");
 		}
 
-		void linkStates(StateIDType childStateID, StateIDType parentStateID, bool isDefaultState = false)
+		void linkStates(StateIdType childStateId, StateIdType parentStateId, bool isDefaultState = false)
 		{
 			if (isDefaultState)
 			{
-				bool isEmplaced;
-				std::tie(std::ignore, isEmplaced) = mParentToChildLinks.emplace(parentStateID, childStateID);
-				Assert(isEmplaced, "More than one initial state set for a parent state");
+				bool isAdded;
+				std::tie(std::ignore, isAdded) = mParentToChildLinks.emplace(parentStateId, childStateId);
+				Assert(isAdded, "More than one initial state set for a parent state");
 			}
-			mChildToParentLinks.emplace(std::forward<StateIDType>(childStateID), std::forward<StateIDType>(parentStateID));
+			mChildToParentLinks.emplace(std::forward<StateIdType>(childStateId), std::forward<StateIdType>(parentStateId));
 		}
 
-		StateIDType getNextState(const BlackboardType& blackboard, StateIDType previousState) const
+		StateIdType getNextState(const BlackboardType& blackboard, StateIdType previousState) const
 		{
 			bool needToProcess = true;
-			StateIDType currentState = previousState;
-			while (needToProcess == true)
+			StateIdType currentState = previousState;
+			while (needToProcess)
 			{
 				needToProcess = false;
 
@@ -135,7 +137,7 @@ namespace FSM
 		}
 
 	private:
-		bool recursiveUpdateParents(StateIDType& state, const BlackboardType& blackboard) const
+		bool recursiveUpdateParents(StateIdType& state, const BlackboardType& blackboard) const
 		{
 			auto parentIt = mChildToParentLinks.find(state);
 			if (parentIt == mChildToParentLinks.end())
@@ -143,7 +145,7 @@ namespace FSM
 				return false;
 			}
 
-			StateIDType processingState = parentIt->second;
+			StateIdType processingState = parentIt->second;
 
 			bool isProcessed = recursiveUpdateParents(processingState, blackboard);
 			if (isProcessed)
@@ -169,9 +171,9 @@ namespace FSM
 			return false;
 		}
 
-		void replaceToChildState(StateIDType& state) const
+		void replaceToChildState(StateIdType& state) const
 		{
-			typename std::map<StateIDType, StateIDType>::const_iterator childIt;
+			typename std::map<StateIdType, StateIdType>::const_iterator childIt;
 
 			while(true)
 			{
@@ -185,8 +187,8 @@ namespace FSM
 		}
 
 	private:
-		std::map<StateIDType, StateLinkRules> mStates;
-		std::map<StateIDType, StateIDType> mChildToParentLinks;
-		std::map<StateIDType, StateIDType> mParentToChildLinks;
+		std::map<StateIdType, StateLinkRules> mStates;
+		std::map<StateIdType, StateIdType> mChildToParentLinks;
+		std::map<StateIdType, StateIdType> mParentToChildLinks;
 	};
 }

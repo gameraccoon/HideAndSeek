@@ -9,7 +9,7 @@
 class TestCircularUnitsSystem : public System
 {
 public:
-	TestCircularUnitsSystem(WorldHolder& worldHolder, TimeData& time);
+	TestCircularUnitsSystem(WorldHolder& worldHolder, TimeData& time) noexcept;
 	~TestCircularUnitsSystem() override = default;
 
 	void update() override;

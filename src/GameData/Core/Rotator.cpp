@@ -9,7 +9,7 @@
 bool Rotator::isNearlyEqualTo(Rotator other) const noexcept
 {
 	float difference = this->getValue() - other.getValue();
-	return Math::AreEqualWithEpsilon(difference, 0) || Math::AreEqualWithEpsilon(difference, TwoPI);
+	return Math::AreEqualWithEpsilon(difference, 0) || Math::AreEqualWithEpsilon(difference, TWO_PI);
 }
 
 bool Rotator::operator==(Rotator other) const noexcept

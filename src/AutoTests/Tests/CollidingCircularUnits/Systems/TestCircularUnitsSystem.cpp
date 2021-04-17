@@ -11,7 +11,7 @@
 #include "GameData/Components/MovementComponent.generated.h"
 
 
-TestCircularUnitsSystem::TestCircularUnitsSystem(WorldHolder& worldHolder, TimeData& time)
+TestCircularUnitsSystem::TestCircularUnitsSystem(WorldHolder& worldHolder, TimeData& time) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(time)
 {
