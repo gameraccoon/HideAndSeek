@@ -227,7 +227,9 @@ target_link_libraries(${AUTOTESTS_NAME}
 )
 
 # symlink resources dir
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/resources" "${GAME_BIN_DIR}/resources")
+if(NOT EXISTS "${GAME_BIN_DIR}/resources")
+	execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/resources" "${GAME_BIN_DIR}/resources")
+endif()
 
 if (WIN32)
 	# copy dlls
