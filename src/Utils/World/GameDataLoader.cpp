@@ -9,6 +9,8 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 
+#include "Base/Random/RandomStrings.h"
+
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 #include "GameData/Components/LightBlockingGeometryComponent.generated.h"
@@ -25,7 +27,7 @@ namespace GameDataLoader
 	static const std::filesystem::path MAPS_PATH = "./resources/maps";
 	static const std::filesystem::path GAME_DATA_PATH = "./resources/game";
 
-	static void SaveLightBlockingGeometry(const World& world, const std::filesystem::path& levelPath)
+	static void SaveLightBlockingGeometry(const World& world, const std::filesystem::path& levelPath, const std::string& version)
 	{
 		namespace fs = std::filesystem;
 
@@ -35,6 +37,9 @@ namespace GameDataLoader
 		std::ofstream geometryFile(geometryPath);
 		nlohmann::json geometryJson;
 
+		geometryJson["version"] = version;
+		auto& geometryData = geometryJson["geometry"];
+
 		const std::unordered_map<CellPos, WorldCell>& cells = world.getSpatialData().getAllCells();
 		for (auto& [cellPos, cell] : cells)
 		{
@@ -42,7 +47,7 @@ namespace GameDataLoader
 			if (lightBlockingGeometry)
 			{
 				std::string key = std::to_string(cellPos.x) + "," + std::to_string(cellPos.y);
-				geometryJson[key] = lightBlockingGeometry->getBorders();
+				geometryData[key] = lightBlockingGeometry->getBorders();
 			}
 		}
 
@@ -65,7 +70,7 @@ namespace GameDataLoader
 		}
 	}
 
-	static void LoadLightBlockingGeometry(World& world, const std::filesystem::path& levelPath)
+	static void LoadLightBlockingGeometry(World& world, const std::filesystem::path& levelPath, const std::string& levelVersion)
 	{
 		namespace fs = std::filesystem;
 
@@ -74,6 +79,7 @@ namespace GameDataLoader
 
 		if (!fs::exists(geometryPath))
 		{
+			LogInfo("Light blocking geometry not found for level '%s', rebuilding", levelPath.c_str());
 			GenerateLightBlockingGeometry(world);
 			return;
 		}
@@ -82,9 +88,16 @@ namespace GameDataLoader
 		nlohmann::json geometryJson;
 		geometryFile >> geometryJson;
 
+		if (geometryJson["version"] != levelVersion)
+		{
+			LogWarning("Light blocking geometry for level '%s' has incorrect version, discarding it and rebuilding", levelPath.c_str());
+			GenerateLightBlockingGeometry(world);
+			return;
+		}
+
 		SpatialWorldData& spatialData = world.getSpatialData();
 
-		for (auto& [key, cellData] : geometryJson.items())
+		for (auto& [key, cellData] : geometryJson["geometry"].items())
 		{
 			const size_t delimeterPos = key.find(',');
 			const CellPos pos{std::atoi(key.substr(0, delimeterPos).c_str()), std::atoi(key.substr(delimeterPos + 1).c_str())};
@@ -93,7 +106,7 @@ namespace GameDataLoader
 		}
 	}
 
-	static void SavePathBlockingGeometry(const World& world, const std::filesystem::path& levelPath)
+	static void SavePathBlockingGeometry(const World& world, const std::filesystem::path& levelPath, const std::string& version)
 	{
 		namespace fs = std::filesystem;
 
@@ -101,13 +114,16 @@ namespace GameDataLoader
 		geometryPath.replace_extension(".pbg.json");
 
 		std::ofstream geometryFile(geometryPath);
-		nlohmann::json geometryJson;
 
 		auto [pathBlockingGeometry] = world.getWorldComponents().getComponents<PathBlockingGeometryComponent>();
 
 		if (pathBlockingGeometry)
 		{
-			geometryJson = pathBlockingGeometry->getPolygons();
+			nlohmann::json geometryJson({
+				{"version", version},
+				{"geometry", pathBlockingGeometry->getPolygons()}
+			});
+
 			geometryFile << std::setw(4) << geometryJson << std::endl;
 		}
 	}
@@ -122,7 +138,7 @@ namespace GameDataLoader
 		PathBlockingGeometry::CalculatePathBlockingGeometry(pathBlockingGeometry->getPolygonsRef(), components);
 	}
 
-	static void LoadPathBlockingGeometry(World& world, const std::filesystem::path& levelPath)
+	static void LoadPathBlockingGeometry(World& world, const std::filesystem::path& levelPath, const std::string& levelVersion)
 	{
 		namespace fs = std::filesystem;
 
@@ -131,6 +147,7 @@ namespace GameDataLoader
 
 		if (!fs::exists(geometryPath))
 		{
+			LogInfo("Path blocking geometry not found for level '%s', rebuilding", levelPath.c_str());
 			GeneratePathBlockingGeometry(world);
 			return;
 		}
@@ -139,8 +156,15 @@ namespace GameDataLoader
 		nlohmann::json geometryJson;
 		geometryFile >> geometryJson;
 
+		if (geometryJson["version"] != levelVersion)
+		{
+			LogWarning("Path blocking geometry for level '%s' has incorrect version, discarding it and rebuilding", levelPath.c_str());
+			GenerateLightBlockingGeometry(world);
+			return;
+		}
+
 		PathBlockingGeometryComponent* pathBlockingCompontnt = world.getWorldComponents().getOrAddComponent<PathBlockingGeometryComponent>();
-		geometryJson.get_to(pathBlockingCompontnt->getPolygonsRef());
+		geometryJson["geometry"].get_to(pathBlockingCompontnt->getPolygonsRef());
 	}
 
 	void SaveWorld(const World& world, const std::string& levelName, const ComponentSerializersHolder& componentSerializers)
@@ -161,15 +185,20 @@ namespace GameDataLoader
 			}
 		}
 
+		std::string levelVersion = std::string("d_").append(StringUtils::getRandomWordSafeBase32(10));
+
 		try
 		{
 			std::ofstream mapFile(levelPath);
-			nlohmann::json mapJson({{"world", world.toJson(componentSerializers)}});
+			nlohmann::json mapJson({
+				{"version", levelVersion},
+				{"world", world.toJson(componentSerializers)}
+			});
 
 			mapFile << std::setw(4) << mapJson << std::endl;
 
-			SaveLightBlockingGeometry(world, levelPath);
-			SavePathBlockingGeometry(world, levelPath);
+			SaveLightBlockingGeometry(world, levelPath, levelVersion);
+			SavePathBlockingGeometry(world, levelPath, levelVersion);
 		}
 		catch (const std::exception& e)
 		{
@@ -182,7 +211,7 @@ namespace GameDataLoader
 		namespace fs = std::filesystem;
 		fs::path levelPath(levelName);
 
-		// if it's name, we search the map in maps folder
+		// if it is a name, we search the map in the maps folder
 		if (levelName.find_first_of("/\\.") == std::string::npos)
 		{
 			levelPath = MAPS_PATH / (levelName + ".json");
@@ -194,12 +223,14 @@ namespace GameDataLoader
 			nlohmann::json mapJson;
 			mapFile >> mapJson;
 
+			const std::string levelVersion = mapJson.contains("version") ? mapJson.at("version") : "";
+
 			if (const auto& worldObject = mapJson.at("world"); worldObject.is_object())
 			{
 				world.fromJson(worldObject, componentSerializers);
 			}
-			LoadLightBlockingGeometry(world, levelPath);
-			LoadPathBlockingGeometry(world, levelPath);
+			LoadLightBlockingGeometry(world, levelPath, levelVersion);
+			LoadPathBlockingGeometry(world, levelPath, levelVersion);
 		}
 		catch(const nlohmann::detail::exception& e)
 		{
