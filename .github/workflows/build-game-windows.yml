@@ -1,0 +1,49 @@
+name: Windows - build
+
+on:
+  push:
+    paths:
+      - .github/**
+      - cmake/**
+      - config/**
+      - external/**
+      - src/**
+      - CMakeLists.txt
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release]
+    env:
+      BUILD_TYPE: ${{matrix.build_type}}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build/game
+
+    - name: Reconfigure git to use HTTP authentication
+      run: >
+        git config --global url."https://github.com/".insteadOf
+        git@github.com:
+
+    - name: Update LFS files
+      run: |
+        git lfs install
+        git lfs pull
+
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
+
+    - name: Generate project
+      shell: cmd
+      working-directory: ${{github.workspace}}/scripts
+      run: generate_game_vs2022_project.cmd
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build/game
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
