@@ -1,9 +1,9 @@
 [submodule "editor/Qt-Advanced-Docking-System"]
 	path = editor/Qt-Advanced-Docking-System
-	url = git@github.com:gameraccoon/Qt-Advanced-Docking-System.git
+	url = ../Qt-Advanced-Docking-System.git
 [submodule "external/sources/imgui"]
 	path = external/sources/imgui
-	url = git@github.com:ocornut/imgui.git
+	url = ../../ocornut/imgui.git
 [submodule "external/sources/soa-sort"]
 	path = external/sources/soa-sort
-	url = git@github.com:gameraccoon/soa-sort.git
+	url = ../soa-sort.git
