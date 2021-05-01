@@ -5,5 +5,5 @@
 class {class_name}ImguiWidget : public AbstractComponentImguiWidget
 {{
 public:
-	void update(BaseComponent* component);
+	void update(void* component);
 }};

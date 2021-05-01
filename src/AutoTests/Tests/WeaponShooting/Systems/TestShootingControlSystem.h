@@ -6,7 +6,7 @@
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 
-class TestShootingControlSystem : public System
+class TestShootingControlSystem : public Ecs::System
 {
 public:
 	TestShootingControlSystem(WorldHolder& worldHolder, TimeData& time) noexcept;

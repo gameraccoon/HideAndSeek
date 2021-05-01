@@ -7,7 +7,7 @@
 
 TEST(Delegates, SingleCast)
 {
-	SinglecastDelegate<int> delegate;
+	Ecs::SinglecastDelegate<int> delegate;
 
 	int testVal = 1;
 
@@ -41,14 +41,14 @@ TEST(Delegates, SingleCast)
 
 TEST(Delegates, MultiCast)
 {
-	MulticastDelegate<int> delegate;
+	Ecs::MulticastDelegate<int> delegate;
 
 	int testVal1 = 1;
 	int testVal2 = 1;
 
 	delegate.broadcast(2);
 
-	Delegates::Handle handle = delegate.bind([&testVal1](int test)
+	Ecs::Delegates::Handle handle = delegate.bind([&testVal1](int test)
 	{
 		testVal1 += test;
 	});

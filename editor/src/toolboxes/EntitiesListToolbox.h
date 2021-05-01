@@ -50,8 +50,8 @@ private:
 	MainWindow* mMainWindow;
 	ads::CDockManager* mDockManager;
 
-	Delegates::Handle mOnEntityAddedHandle;
-	Delegates::Handle mOnEntityRemovedHandle;
-	Delegates::Handle mOnWorldChangedHandle;
-	Delegates::Handle mOnSelectedEntityChangedHandle;
+	Ecs::Delegates::Handle mOnEntityAddedHandle;
+	Ecs::Delegates::Handle mOnEntityRemovedHandle;
+	Ecs::Delegates::Handle mOnWorldChangedHandle;
+	Ecs::Delegates::Handle mOnSelectedEntityChangedHandle;
 };

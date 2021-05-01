@@ -18,7 +18,7 @@
 /**
  * System that handles dear imgui debug tool
  */
-class ImguiSystem : public System
+class ImguiSystem : public Ecs::System
 {
 public:
 	ImguiSystem(ImguiDebugData& debugData, HAL::Engine& engine) noexcept;

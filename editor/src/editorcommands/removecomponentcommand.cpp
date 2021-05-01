@@ -7,11 +7,12 @@
 
 #include "src/editorutils/componentreferenceutils.h"
 
-RemoveComponentCommand::RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const ComponentSerializersHolder& serializerHolder)
+RemoveComponentCommand::RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const Ecs::ComponentSerializersHolder& serializerHolder, const ComponentFactory& componentFactory)
 	: EditorCommand(EffectBitset(EffectType::Components))
 	, mSource(source)
 	, mComponentTypeName(typeName)
 	, mComponentSerializerHolder(serializerHolder)
+	, mComponentFactory(componentFactory)
 {
 }
 
@@ -19,11 +20,11 @@ void RemoveComponentCommand::doCommand(World* world)
 {
 	if (mSerializedComponent.empty())
 	{
-		std::vector<BaseComponent*> components = Utils::GetComponents(mSource, world);
+		std::vector<TypedComponent> components = Utils::GetComponents(mSource, world);
 
-		auto it = std::find_if(components.begin(), components.end(), [typeName = mComponentTypeName](BaseComponent* component)
+		auto it = std::find_if(components.begin(), components.end(), [typeName = mComponentTypeName](const TypedComponent& component)
 		{
-			return component->getComponentTypeName() == typeName;
+			return component.typeId == typeName;
 		});
 
 		if (it == components.end())
@@ -31,8 +32,8 @@ void RemoveComponentCommand::doCommand(World* world)
 			return;
 		}
 
-		const JsonComponentSerializer* jsonSerializer = mComponentSerializerHolder.jsonSerializer.getComponentSerializerFromClassName(mComponentTypeName);
-		jsonSerializer->toJson(mSerializedComponent, *it);
+		const Ecs::JsonComponentSerializer* jsonSerializer = mComponentSerializerHolder.jsonSerializer.getComponentSerializerFromClassName(mComponentTypeName);
+		jsonSerializer->toJson(mSerializedComponent, it->component);
 	}
 
 	Utils::RemoveComponent(
@@ -44,14 +45,14 @@ void RemoveComponentCommand::doCommand(World* world)
 
 void RemoveComponentCommand::undoCommand(World* world)
 {
-	BaseComponent* component = mComponentSerializerHolder.factory.createComponent(mComponentTypeName);
+	void* component = mComponentFactory.createComponent(mComponentTypeName);
 
-	const JsonComponentSerializer* jsonSerializer = mComponentSerializerHolder.jsonSerializer.getComponentSerializerFromClassName(mComponentTypeName);
+	const Ecs::JsonComponentSerializer* jsonSerializer = mComponentSerializerHolder.jsonSerializer.getComponentSerializerFromClassName(mComponentTypeName);
 	jsonSerializer->fromJson(mSerializedComponent, component);
 
 	Utils::AddComponent(
 		mSource,
-		component,
+		TypedComponent(mComponentTypeName, component),
 		world
 	);
 }

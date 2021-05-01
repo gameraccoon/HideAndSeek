@@ -3,9 +3,7 @@
 #include <memory>
 #include <any>
 
-#include "ECS/Entity.h"
-
-class EntityManager;
+#include "GameData/EcsDefinitions.h"
 
 namespace ImguiPropertyFiltration
 {

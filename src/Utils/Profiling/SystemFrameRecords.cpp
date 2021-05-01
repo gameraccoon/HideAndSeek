@@ -9,7 +9,7 @@ void SystemFrameRecords::setRecordsLimit(unsigned int newLimit)
 	mRecordsLimit = newLimit;
 }
 
-void SystemFrameRecords::addFrame(SystemsFrameTime&& frameTime)
+void SystemFrameRecords::addFrame(Ecs::SystemsFrameTime&& frameTime)
 {
 	if (!mIsRecordingActive)
 	{
@@ -24,7 +24,7 @@ void SystemFrameRecords::addFrame(SystemsFrameTime&& frameTime)
 	mSystemFrameRecords.emplace_back(std::move(frameTime));
 }
 
-std::vector<SystemsFrameTime>& SystemFrameRecords::getFramesRef()
+std::vector<Ecs::SystemsFrameTime>& SystemFrameRecords::getFramesRef()
 {
 	return mSystemFrameRecords;
 }

@@ -1,13 +1,11 @@
 #pragma once
 
-#include "ECS/Component.h"
-
 {attribute_includes}
 
 /**
  * {component_description}
  */
-class {class_name} : public BaseComponent
+class {class_name}
 {{
 public:
 	{class_name}() noexcept = default;
@@ -20,8 +18,6 @@ public:
 
 public:
 	[[nodiscard]] static constexpr StringId GetTypeName() {{ return STR_TO_ID("{class_name}"); }}
-
-	[[nodiscard]] StringId getComponentTypeName() const override {{ return GetTypeName(); }}
 
 private:
 	{attribute_fields}

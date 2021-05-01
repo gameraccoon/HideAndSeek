@@ -2,20 +2,17 @@
 
 #include <variant>
 
-#include "ECS/Component.h"
-#include "ECS/ComponentSetHolder.h"
-#include "ECS/EntityManager.h"
+#include "GameData/EcsDefinitions.h"
 
 #include "componentreference.h"
 
 class World;
-class ComponentFactory;
 
 namespace Utils
 {
-	BaseComponent* GetComponent(const ComponentReference& reference, World* world);
-	std::vector<BaseComponent*> GetComponents(const ComponentSourceReference& source, World* world);
-	void AddComponent(const ComponentSourceReference& source, BaseComponent* component, World* world);
+	void* GetComponent(const ComponentReference& reference, World* world);
+	std::vector<TypedComponent> GetComponents(const ComponentSourceReference& source, World* world);
+	void AddComponent(const ComponentSourceReference& source, TypedComponent componentData, World* world);
 	void RemoveComponent(const ComponentSourceReference& source, StringId componentTypeName, World* world);
 
 	std::variant<ComponentSetHolder*, EntityManager*, std::nullptr_t> GetBoundComponentHolderOrEntityManager(const ComponentSourceReference& source, World* world);

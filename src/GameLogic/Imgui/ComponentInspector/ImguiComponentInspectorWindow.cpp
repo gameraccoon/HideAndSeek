@@ -94,21 +94,22 @@ void ImguiComponentInspectorWindow::showComponentsInspector()
 	{
 		auto [cell, entity] = *mSelectedEntity;
 
-		std::vector<BaseComponent*> components;
+		std::vector<TypedComponent> components;
 		cell->getEntityManager().getAllEntityComponents(entity, components);
-		std::ranges::sort(components, [](auto a, auto b)
+		std::ranges::sort(components, [](const auto& a, const auto& b)
 		{
-			return a->getComponentTypeName() < b->getComponentTypeName();
+			return a.typeId < b.typeId;
 		});
-		for (BaseComponent* component : components)
+
+		for (TypedComponent componentData : components)
 		{
-			std::string name = FormatString("%s##ComponentInspection", ID_TO_STR(component->getComponentTypeName()).c_str());
+			std::string name = FormatString("%s##ComponentInspection", ID_TO_STR(componentData.typeId).c_str());
 			if (ImGui::TreeNode(name.c_str()))
 			{
-				auto it = mComponentInspectWidgets.find(component->getComponentTypeName());
+				auto it = mComponentInspectWidgets.find(componentData.typeId);
 				if (it != mComponentInspectWidgets.end())
 				{
-					it->second->update(component);
+					it->second->update(componentData.component);
 				}
 
 				ImGui::TreePop();

@@ -10,6 +10,10 @@
 
 #include "GameData/Components/TransformComponent.generated.h"
 
+SpatialWorldData::SpatialWorldData(const ComponentFactory& componentFactory)
+	: mComponentFactory(componentFactory)
+{}
+
 std::vector<WorldCell*> SpatialWorldData::getCellsAround(const Vector2D& centerPosition, const Vector2D& rect)
 {
 	CellPos ltCell = CellPos(
@@ -58,8 +62,12 @@ WorldCell& SpatialWorldData::getOrCreateCell(const CellPos& pos)
 		return it->second;
 	}
 
-	auto pair = mCells.emplace(pos, pos);
-	return pair.first->second;
+	auto it = mCells.find(pos);
+	if (it == mCells.end())
+	{
+		std::tie(it, std::ignore) = mCells.try_emplace(pos, pos, mComponentFactory);
+	}
+	return it->second;
 }
 
 SpatialEntityManager SpatialWorldData::getAllCellManagers()
@@ -140,7 +148,7 @@ BoundingBox SpatialWorldData::GetCellAABB(CellPos pos)
 	return BoundingBox(pos.x * CellSize, pos.y * CellSize, (pos.x + 1) * CellSize, (pos.y + 1) * CellSize);
 }
 
-nlohmann::json SpatialWorldData::toJson(const ComponentSerializersHolder& componentSerializers) const
+nlohmann::json SpatialWorldData::toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const
 {
 	nlohmann::json cellsJson;
 
@@ -210,13 +218,13 @@ static void RedistributeSpatialEntitiesBetweenCells(SpatialWorldData& spatialDat
 	}
 }
 
-void SpatialWorldData::fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers)
+void SpatialWorldData::fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers)
 {
 	const auto& cellsJson = json.at("cells");
 	for (const auto& cellJson : cellsJson)
 	{
 		CellPos pos = cellJson.at("pos");
-		auto res = mCells.emplace(pos, pos);
+		auto res = mCells.try_emplace(pos, pos, mComponentFactory);
 		res.first->second.fromJson(cellJson.at("cell"), componentSerializers);
 	}
 

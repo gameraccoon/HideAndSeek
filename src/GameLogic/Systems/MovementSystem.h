@@ -10,7 +10,7 @@
 /**
  * System that process characters and objects movement
  */
-class MovementSystem : public System
+class MovementSystem : public Ecs::System
 {
 public:
 	MovementSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;

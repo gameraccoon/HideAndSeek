@@ -9,8 +9,8 @@ class SystemFrameRecords
 public:
 	void setRecordsLimit(unsigned int newLimit);
 
-	void addFrame(SystemsFrameTime&& frameTime);
-	std::vector<SystemsFrameTime>& getFramesRef();
+	void addFrame(Ecs::SystemsFrameTime&& frameTime);
+	std::vector<Ecs::SystemsFrameTime>& getFramesRef();
 
 	void pauseRecording();
 	void resumeRecording();
@@ -20,7 +20,7 @@ public:
 	void print(const std::vector<std::string>& systemNames, std::ostream& stream) const;
 
 private:
-	std::vector<SystemsFrameTime> mSystemFrameRecords;
+	std::vector<Ecs::SystemsFrameTime> mSystemFrameRecords;
 	unsigned int mRecordsLimit = 0;
 	bool mIsRecordingActive = true;
 };

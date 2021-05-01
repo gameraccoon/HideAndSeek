@@ -10,7 +10,7 @@
 /**
  * System that destructs enemies marked with DeathComponent
  */
-class DeadEntitiesDestructionSystem : public System
+class DeadEntitiesDestructionSystem : public Ecs::System
 {
 public:
 	explicit DeadEntitiesDestructionSystem(WorldHolder& worldHolder) noexcept;

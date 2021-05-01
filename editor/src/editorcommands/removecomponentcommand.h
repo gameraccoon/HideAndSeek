@@ -2,19 +2,19 @@
 
 #include "editorcommand.h"
 
-#include "ECS/Entity.h"
+#include "ECS/Serialization/ComponentSerializersHolder.h"
+#include "GameData/EcsDefinitions.h"
 
 #include <nlohmann/json.hpp>
 
 #include "src/editorutils/componentreference.h"
 
 class World;
-struct ComponentSerializersHolder;
 
 class RemoveComponentCommand : public EditorCommand
 {
 public:
-	RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const ComponentSerializersHolder& serializerHolder);
+	RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const Ecs::ComponentSerializersHolder& serializerHolder, const ComponentFactory& componentFactory);
 
 	void doCommand(World* world) override;
 	void undoCommand(World* world) override;
@@ -22,6 +22,7 @@ public:
 private:
 	ComponentSourceReference mSource;
 	StringId mComponentTypeName;
-	const ComponentSerializersHolder& mComponentSerializerHolder;
+	const Ecs::ComponentSerializersHolder& mComponentSerializerHolder;
+	const ComponentFactory& mComponentFactory;
 	nlohmann::json mSerializedComponent;
 };

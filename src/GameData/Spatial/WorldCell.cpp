@@ -4,12 +4,14 @@
 
 #include <nlohmann/json.hpp>
 
-WorldCell::WorldCell(const CellPos& pos)
-	: mPos(pos)
+WorldCell::WorldCell(const CellPos& pos, const ComponentFactory& componentFactory)
+	: mEntityManager(componentFactory)
+	, mCellComponents(componentFactory)
+	, mPos(pos)
 {
 }
 
-nlohmann::json WorldCell::toJson(const ComponentSerializersHolder& componentSerializers) const
+nlohmann::json WorldCell::toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const
 {
 	return nlohmann::json{
 		{"entity_manager", mEntityManager.toJson(componentSerializers)},
@@ -17,7 +19,7 @@ nlohmann::json WorldCell::toJson(const ComponentSerializersHolder& componentSeri
 	};
 }
 
-void WorldCell::fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers)
+void WorldCell::fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers)
 {
 	mEntityManager.fromJson(json.at("entity_manager"), componentSerializers);
 	mCellComponents.fromJson(json.at("cell_components"), componentSerializers);

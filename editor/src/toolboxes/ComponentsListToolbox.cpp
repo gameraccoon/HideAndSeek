@@ -97,10 +97,10 @@ void ComponentsListToolbox::onSelectedComponentSourceChanged(const std::optional
 
 	if (currentWorld && newSource.has_value())
 	{
-		const std::vector<BaseComponent*> components = Utils::GetComponents(*newSource, currentWorld);
-		for (const auto& component : components)
+		const std::vector<TypedComponent> components = Utils::GetComponents(*newSource, currentWorld);
+		for (const auto& componentData : components)
 		{
-			componentsList->addItem(QString::fromStdString(ID_TO_STR(component->getComponentTypeName())));
+			componentsList->addItem(QString::fromStdString(ID_TO_STR(componentData.typeId)));
 		}
 		mAddComponentButton->setEnabled(true);
 	}
@@ -163,7 +163,8 @@ void ComponentsListToolbox::removeSelectedComponent()
 		currentWorld,
 		*mLastSelectedComponentSource,
 		STR_TO_ID(currentItem->text().toStdString()),
-		mMainWindow->getComponentSerializationHolder()
+		mMainWindow->getComponentSerializationHolder(),
+		mMainWindow->getComponentFactory()
 	);
 	updateContent();
 }
@@ -175,7 +176,7 @@ void ComponentsListToolbox::addComponentCommand()
 	dialog->setCancelButtonText("Cancel");
 	dialog->setComboBoxEditable(false);
 	QStringList items;
-	mMainWindow->getComponentSerializationHolder().factory.forEachComponentType([&items](StringId name)
+	mMainWindow->getComponentFactory().forEachComponentType([&items](StringId name)
 	{
 		items.append(QString::fromStdString(ID_TO_STR(name)));
 	});
@@ -204,7 +205,7 @@ void ComponentsListToolbox::addComponent(const QString& typeName)
 			currentWorld,
 			*mLastSelectedComponentSource,
 			STR_TO_ID(typeName.toStdString()),
-			mMainWindow->getComponentSerializationHolder().factory
+			mMainWindow->getComponentFactory()
 		);
 	}
 	updateContent();

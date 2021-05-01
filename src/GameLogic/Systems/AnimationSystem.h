@@ -10,7 +10,7 @@
 /**
  * System that updates animations
  */
-class AnimationSystem : public System
+class AnimationSystem : public Ecs::System
 {
 public:
 	AnimationSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;

@@ -18,7 +18,7 @@ void AddComponentCommand::doCommand(World* world)
 {
 	Utils::AddComponent(
 		mSource,
-		mComponentFactory.createComponent(mComponentTypeName),
+		TypedComponent(mComponentTypeName, mComponentFactory.createComponent(mComponentTypeName)),
 		world
 	);
 }

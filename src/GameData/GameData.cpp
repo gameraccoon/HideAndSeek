@@ -4,14 +4,18 @@
 
 #include <nlohmann/json.hpp>
 
-nlohmann::json GameData::toJson(const ComponentSerializersHolder& componentSerializers) const
+GameData::GameData(const ComponentFactory& componentFactory)
+	: mGameComponents(componentFactory)
+{}
+
+nlohmann::json GameData::toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const
 {
 	return nlohmann::json{
 		{"game_components", mGameComponents.toJson(componentSerializers)}
 	};
 }
 
-void GameData::fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers)
+void GameData::fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers)
 {
 	mGameComponents.fromJson(json.at("game_components"), componentSerializers);
 }

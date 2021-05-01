@@ -5,8 +5,7 @@
 
 #include <QObject>
 
-#include "ECS/Entity.h"
-#include "ECS/Component.h"
+#include "GameData/EcsDefinitions.h"
 
 #include "src/editorcommands/editorcommandsstack.h"
 
@@ -18,7 +17,7 @@ class EditData : public QObject
 {
 public:
 	virtual ~EditData() = default;
-	virtual void fillContent(QLayout* layout, const ComponentSourceReference& sourceReference, const BaseComponent* component, EditorCommandsStack& commandStack, World* world) = 0;
+	virtual void fillContent(QLayout* layout, const ComponentSourceReference& sourceReference, const void* component, EditorCommandsStack& commandStack, World* world) = 0;
 };
 
 class AbstractEditFactory

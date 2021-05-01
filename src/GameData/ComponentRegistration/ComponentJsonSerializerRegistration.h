@@ -4,5 +4,5 @@
 
 namespace ComponentsRegistration
 {
-	void RegisterJsonSerializers(JsonComponentSerializationHolder& jsonSerializerHolder);
+	void RegisterJsonSerializers(Ecs::JsonComponentSerializationHolder& jsonSerializerHolder);
 }

@@ -4,39 +4,39 @@
 
 namespace Utils
 {
-	BaseComponent* GetComponent(const ComponentReference& reference, World* world)
+	void* GetComponent(const ComponentReference& reference, World* world)
 	{
-		std::vector<BaseComponent*> components = GetComponents(reference.source, world);
-		for (BaseComponent* component : components)
+		std::vector<TypedComponent> components = GetComponents(reference.source, world);
+		for (TypedComponent& componentData : components)
 		{
-			if (component->getComponentTypeName() == reference.componentTypeName)
+			if (componentData.typeId == reference.componentTypeName)
 			{
-				return component;
+				return componentData.component;
 			}
 		}
 		return nullptr;
 	}
 
-	std::vector<BaseComponent*> GetComponents(const ComponentSourceReference& source, World* world)
+	std::vector<TypedComponent> GetComponents(const ComponentSourceReference& source, World* world)
 	{
 		if (world)
 		{
 			auto componentHolderOrEntityManager = GetBoundComponentHolderOrEntityManager(source, world);
 			if (auto entityManager = std::get_if<EntityManager*>(&componentHolderOrEntityManager))
 			{
-				std::vector<BaseComponent*> components;
-				(*entityManager)->getAllEntityComponents(*source.entity, components);
-				return components;
+				std::vector<TypedComponent> componentDatas;
+				(*entityManager)->getAllEntityComponents(*source.entity, componentDatas);
+				return componentDatas;
 			}
 			else if (auto componentHolder = std::get_if<ComponentSetHolder*>(&componentHolderOrEntityManager))
 			{
 				return (*componentHolder)->getAllComponents();
 			}
 		}
-		return std::vector<BaseComponent*>();
+		return std::vector<TypedComponent>();
 	}
 
-	void AddComponent(const ComponentSourceReference& source, BaseComponent* component, World* world)
+	void AddComponent(const ComponentSourceReference& source, TypedComponent componentData, World* world)
 	{
 		if (world)
 		{
@@ -45,15 +45,15 @@ namespace Utils
 			{
 				(*entityManager)->addComponent(
 					*source.entity,
-					component,
-					component->getComponentTypeName()
+					componentData.component,
+					componentData.typeId
 				);
 			}
 			else if (auto componentHolder = std::get_if<ComponentSetHolder*>(&componentHolderOrEntityManager))
 			{
 				(*componentHolder)->addComponent(
-					component,
-					component->getComponentTypeName()
+					componentData.component,
+					componentData.typeId
 				);
 			}
 		}

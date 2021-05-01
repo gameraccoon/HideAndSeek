@@ -2,66 +2,70 @@
 
 #include "ECS/SystemsManager.h"
 
-void SystemsManager::update()
+namespace Ecs
 {
-#ifdef PROFILE_SYSTEMS
-	mThisFrameTime.frameTime = std::chrono::microseconds::zero();
-	mThisFrameTime.systemsTime.clear();
-#endif // PROFILE_SYSTEMS
-
-	for (std::unique_ptr<System>& system : mSystems)
+	void SystemsManager::update()
 	{
-#ifdef PROFILE_SYSTEMS
-		std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
-#endif // PROFILE_SYSTEMS
+	#ifdef PROFILE_SYSTEMS
+		mThisFrameTime.frameTime = std::chrono::microseconds::zero();
+		mThisFrameTime.systemsTime.clear();
+	#endif // PROFILE_SYSTEMS
 
-		// real work is being done here
-		system->update();
+		for (std::unique_ptr<System>& system : mSystems)
+		{
+	#ifdef PROFILE_SYSTEMS
+			std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
+	#endif // PROFILE_SYSTEMS
 
-#ifdef PROFILE_SYSTEMS
-		std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
-		auto timeDiff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-		mThisFrameTime.frameTime += timeDiff;
-		mThisFrameTime.systemsTime.push_back(timeDiff);
-#endif // PROFILE_SYSTEMS
+			// real work is being done here
+			system->update();
+
+	#ifdef PROFILE_SYSTEMS
+			std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+			auto timeDiff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+			mThisFrameTime.frameTime += timeDiff;
+			mThisFrameTime.systemsTime.push_back(timeDiff);
+	#endif // PROFILE_SYSTEMS
+		}
+
+	#ifdef PROFILE_SYSTEMS
+		mPreviousFrameTime = mThisFrameTime;
+	#endif // PROFILE_SYSTEMS
 	}
 
-#ifdef PROFILE_SYSTEMS
-	mPreviousFrameTime = mThisFrameTime;
-#endif // PROFILE_SYSTEMS
-}
-
-void SystemsManager::initResources()
-{
-	for (std::unique_ptr<System>& system : mSystems)
+	void SystemsManager::initResources()
 	{
-		system->initResources();
+		for (std::unique_ptr<System>& system : mSystems)
+		{
+			system->initResources();
+		}
 	}
-}
 
-void SystemsManager::shutdown()
-{
-	for (std::unique_ptr<System>& system : mSystems)
+	void SystemsManager::shutdown()
 	{
-		system->shutdown();
+		for (std::unique_ptr<System>& system : mSystems)
+		{
+			system->shutdown();
+		}
+		mSystems.clear();
 	}
-	mSystems.clear();
-}
 
-#ifdef PROFILE_SYSTEMS
-SystemsFrameTime SystemsManager::getPreviousFrameTimeData()
-{
-	return mPreviousFrameTime;
-}
-#endif // PROFILE_SYSTEMS
-
-std::vector<std::string> SystemsManager::getSystemNames()
-{
-	std::vector<std::string> result;
-	result.reserve(mSystems.size());
-	for (std::unique_ptr<System>& system : mSystems)
+	#ifdef PROFILE_SYSTEMS
+	SystemsFrameTime SystemsManager::getPreviousFrameTimeData()
 	{
-		result.push_back(system->getName());
+		return mPreviousFrameTime;
 	}
-	return result;
-}
+	#endif // PROFILE_SYSTEMS
+
+	std::vector<std::string> SystemsManager::getSystemNames()
+	{
+		std::vector<std::string> result;
+		result.reserve(mSystems.size());
+		for (std::unique_ptr<System>& system : mSystems)
+		{
+			result.push_back(system->getName());
+		}
+		return result;
+	}
+
+} // namespace Ecs

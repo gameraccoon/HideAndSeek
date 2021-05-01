@@ -167,7 +167,7 @@ namespace GameDataLoader
 		geometryJson["geometry"].get_to(pathBlockingCompontnt->getPolygonsRef());
 	}
 
-	void SaveWorld(const World& world, const std::string& levelName, const ComponentSerializersHolder& componentSerializers)
+	void SaveWorld(const World& world, const std::string& levelName, const Ecs::ComponentSerializersHolder& componentSerializers)
 	{
 		namespace fs = std::filesystem;
 		fs::path levelPath(levelName);
@@ -206,7 +206,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void LoadWorld(World& world, const std::string& levelName, const ComponentSerializersHolder& componentSerializers)
+	void LoadWorld(World& world, const std::string& levelName, const Ecs::ComponentSerializersHolder& componentSerializers)
 	{
 		namespace fs = std::filesystem;
 		fs::path levelPath(levelName);
@@ -242,7 +242,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const ComponentSerializersHolder& componentSerializers)
+	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const Ecs::ComponentSerializersHolder& componentSerializers)
 	{
 		namespace fs = std::filesystem;
 		fs::path gameDataPath(gameDataName);
@@ -273,7 +273,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void LoadGameData(GameData& gameData, const std::string& gameDataName, const ComponentSerializersHolder& componentSerializers)
+	void LoadGameData(GameData& gameData, const std::string& gameDataName, const Ecs::ComponentSerializersHolder& componentSerializers)
 	{
 		namespace fs = std::filesystem;
 		fs::path gameDataPath(gameDataName);

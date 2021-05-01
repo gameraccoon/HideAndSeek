@@ -2,13 +2,12 @@
 
 #include <unordered_map>
 
-#include "ECS/System.h"
-
+#include "GameData/EcsDefinitions.h"
 #include "GameData/Core/Vector2D.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-class TestSpawnShootableUnitsSystem : public System
+class TestSpawnShootableUnitsSystem : public Ecs::System
 {
 public:
 	explicit TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept;
@@ -17,7 +16,7 @@ public:
 	std::string getName() override { return "TestSpawnShootableUnitsSystem"; }
 
 private:
-	static void spawnUnit(class EntityManager& entityManager, Vector2D pos);
+	static void spawnUnit(EntityManager& entityManager, Vector2D pos);
 	static void spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, class SpatialWorldData& spatialData);
 	static void spawnUnits(class SpatialWorldData& spatialData, int count, Vector2D pos);
 

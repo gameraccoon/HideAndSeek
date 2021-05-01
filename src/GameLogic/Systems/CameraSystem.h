@@ -10,7 +10,7 @@
 /**
  * System that handles camera position
  */
-class CameraSystem : public System
+class CameraSystem : public Ecs::System
 {
 public:
 	CameraSystem(WorldHolder& worldHolder, const InputData& inputData) noexcept;

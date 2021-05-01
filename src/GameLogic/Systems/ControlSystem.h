@@ -10,7 +10,7 @@
 /**
  * System that handles movement controls
  */
-class ControlSystem : public System
+class ControlSystem : public Ecs::System
 {
 public:
 	ControlSystem(WorldHolder& worldHolder, const InputData& inputData) noexcept;

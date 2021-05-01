@@ -1,11 +1,11 @@
 #pragma once
 
 #include <string>
+ #include "ECS/Serialization/ComponentSerializersHolder.h"
 
 class World;
-struct ComponentSerializersHolder;
 
 namespace Utils
 {
-	void SaveWorld(World& world, const std::string& fileName, const ComponentSerializersHolder& serializationHolder);
+	void SaveWorld(World& world, const std::string& fileName, const Ecs::ComponentSerializersHolder& serializationHolder);
 }

@@ -10,7 +10,7 @@
 /**
  * System that ensures correct character state
  */
-class CharacterStateSystem : public System
+class CharacterStateSystem : public Ecs::System
 {
 public:
 	CharacterStateSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;

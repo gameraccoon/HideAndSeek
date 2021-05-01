@@ -1,7 +1,10 @@
 #pragma once
 
-#include "editorcommand.h"
 #include <functional>
+
+#include "ECS/Delegates.h"
+
+#include "editorcommand.h"
 
 class EditorCommandsStack
 {
@@ -63,5 +66,5 @@ private:
 	int mLastExecutedCommandIdx = -1;
 	bool mIsLastExecutedUndo = false;
 
-	Delegates::Handle mOnCommandEffectHandle;
+	Ecs::Delegates::Handle mOnCommandEffectHandle;
 };

@@ -18,7 +18,7 @@ struct Vector2D;
 /**
  * System that handles rendering of world objects
  */
-class DebugDrawSystem : public System
+class DebugDrawSystem : public Ecs::System
 {
 public:
 	using KeyStatesMap = std::unordered_map<int, bool>;

@@ -18,7 +18,7 @@ struct Vector2D;
 /**
  * System that handles rendering of world objects
  */
-class RenderSystem : public System
+class RenderSystem : public Ecs::System
 {
 public:
 	RenderSystem(WorldHolder& worldHolder,

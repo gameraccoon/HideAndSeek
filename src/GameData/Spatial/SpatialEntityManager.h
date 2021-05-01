@@ -2,8 +2,7 @@
 
 #include <vector>
 
-#include "ECS/EntityManager.h"
-#include "ECS/EntityView.h"
+#include "GameData/EcsDefinitions.h"
 
 #include "GameData/Spatial/WorldCell.h"
 
@@ -68,7 +67,7 @@ public:
 
 	void executeScheduledActions();
 
-	void getAllEntityComponents(Entity entity, std::vector<BaseComponent*>& outComponents);
+	void getAllEntityComponents(Entity entity, std::vector<TypedComponent>& outComponents);
 
 	void getSpatialEntitiesHavingComponents(const std::vector<StringId>& componentIndexes, TupleVector<WorldCell*, Entity>& inOutEntities) const;
 

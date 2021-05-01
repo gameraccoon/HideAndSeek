@@ -5,6 +5,7 @@
 #include "GameData/World.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 
 #include "Utils/Geometry/RayTrace.h"
 #include "Utils/Geometry/Collide.h"
@@ -57,7 +58,9 @@ CollidableObjects FillCollidableObjects(World& world)
 
 TEST(Raytrace, FastTraceRect1)
 {
-	World world;
+	ComponentFactory componentFactory;
+	ComponentsRegistration::RegisterComponents(componentFactory);
+	World world(componentFactory);
 	FillCollidableObjects(world);
 
 	EXPECT_TRUE(RayTrace::FastTrace(world, Vector2D(20.f, 20.f), Vector2D(80.f, 60.f))); // out-pierce-out
@@ -73,7 +76,9 @@ TEST(Raytrace, FastTraceRect1)
 
 TEST(Raytrace, FastTraceRect2)
 {
-	World world;
+	ComponentFactory componentFactory;
+	ComponentsRegistration::RegisterComponents(componentFactory);
+	World world(componentFactory);
 	FillCollidableObjects(world);
 
 	EXPECT_TRUE(RayTrace::FastTrace(world, Vector2D(35.f, 15.f), Vector2D(65.f, 45.f)));
@@ -83,7 +88,9 @@ TEST(Raytrace, FastTraceRect2)
 
 TEST(Raytrace, TraceRect)
 {
-	World world;
+	ComponentFactory componentFactory;
+	ComponentsRegistration::RegisterComponents(componentFactory);
+	World world(componentFactory);
 
 	CollidableObjects objects = FillCollidableObjects(world);
 
@@ -95,7 +102,9 @@ TEST(Raytrace, TraceRect)
 
 TEST(Raytrace, FastTraceCircle)
 {
-	World world;
+	ComponentFactory componentFactory;
+	ComponentsRegistration::RegisterComponents(componentFactory);
+	World world(componentFactory);
 	FillCollidableObjects(world);
 
 	EXPECT_TRUE(RayTrace::FastTrace(world, Vector2D(520.f, 20.f), Vector2D(580.f, 60.f))); // out-pierce-out
@@ -115,7 +124,9 @@ TEST(Raytrace, FastTraceCircle)
 
 TEST(Raytrace, TraceCircle)
 {
-	World world;
+	ComponentFactory componentFactory;
+	ComponentsRegistration::RegisterComponents(componentFactory);
+	World world(componentFactory);
 
 	CollidableObjects objects = FillCollidableObjects(world);
 

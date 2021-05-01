@@ -1,4 +1,5 @@
 {
+    "version": "d_xmwP58wMGV",
     "world": {
         "entity_manager": {
             "components": null,
@@ -11038,8 +11039,8 @@
                                 "TransformComponent": [
                                     {
                                         "location": {
-                                            "x": 79.0,
-                                            "y": 40.0
+                                            "x": 89.0,
+                                            "y": 98.0
                                         },
                                         "rotation": {
                                             "v": 0.0

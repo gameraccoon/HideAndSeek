@@ -30,12 +30,17 @@
 
 #include "GameLogic/Initialization/StateMachines.h"
 
+Game::Game(int width, int height)
+	: HAL::GameBase(width, height)
+{
+}
+
 void Game::start(ArgumentsParser& arguments)
 {
-	initSystems();
-
-	ComponentsRegistration::RegisterComponents(mComponentSerializers.factory);
+	ComponentsRegistration::RegisterComponents(mComponentFactory);
 	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializers.jsonSerializer);
+
+	initSystems();
 
 	GameDataLoader::LoadWorld(mWorld, arguments.getArgumentValue("world", "test"), mComponentSerializers);
 	GameDataLoader::LoadGameData(mGameData, arguments.getArgumentValue("gameData", "gameData"), mComponentSerializers);

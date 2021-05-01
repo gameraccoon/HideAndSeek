@@ -52,7 +52,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::registerFactories()
 {
-	ComponentsRegistration::RegisterComponents(mComponentSerializationHolder.factory);
+	ComponentsRegistration::RegisterComponents(mComponentFactory);
 	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializationHolder.jsonSerializer);
 	mComponentContentFactory.registerComponents();
 }
@@ -87,7 +87,7 @@ void MainWindow::fillWindowContent()
 
 void MainWindow::createWorld()
 {
-	mCurrentWorld = std::make_unique<World>();
+	mCurrentWorld = std::make_unique<World>(mComponentFactory);
 	mCommandStack.clear();
 	ui->actionRun_Game->setEnabled(true);
 	ui->actionSave_World->setEnabled(true);

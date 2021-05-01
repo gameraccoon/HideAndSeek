@@ -7,7 +7,7 @@
 #include "GameData/Components/{class_name}.generated.h"
 
 
-void {class_name}JsonSerializer::toJson(nlohmann::json& outJson, MAYBE_UNUSED const BaseComponent* component) const
+void {class_name}JsonSerializer::toJson(nlohmann::json& outJson, MAYBE_UNUSED const void* component) const
 {{
 	MAYBE_UNUSED const {class_name}* {component_name} = static_cast<const {class_name}*>(component);
 	outJson = nlohmann::json::object({{
@@ -15,7 +15,7 @@ void {class_name}JsonSerializer::toJson(nlohmann::json& outJson, MAYBE_UNUSED co
 	}});
 }}
 
-void {class_name}JsonSerializer::fromJson(MAYBE_UNUSED const nlohmann::json& json, MAYBE_UNUSED BaseComponent* outComponent) const
+void {class_name}JsonSerializer::fromJson(MAYBE_UNUSED const nlohmann::json& json, MAYBE_UNUSED void* outComponent) const
 {{
 	MAYBE_UNUSED {class_name}* out{component_name_capital} = static_cast<{class_name}*>(outComponent);
 	{serialization/json/attributes_json_deserialization}

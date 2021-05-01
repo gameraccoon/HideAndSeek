@@ -11,7 +11,7 @@
 /**
  * System that loads and distributes resources
  */
-class ResourceStreamingSystem : public System
+class ResourceStreamingSystem : public Ecs::System
 {
 public:
 	ResourceStreamingSystem(WorldHolder& worldHolder, HAL::ResourceManager& resourceManager) noexcept;

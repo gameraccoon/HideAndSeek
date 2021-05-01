@@ -9,7 +9,14 @@
 #include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 #include "GameData/Components/SpatialTrackComponent.generated.h"
 
-nlohmann::json World::toJson(const ComponentSerializersHolder& componentSerializers) const
+World::World(const ComponentFactory& componentFactory)
+	: mEntityManager(componentFactory)
+	, mWorldComponents(componentFactory)
+	, mSpatialData(componentFactory)
+{
+}
+
+nlohmann::json World::toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const
 {
 	return nlohmann::json{
 		{"entity_manager", mEntityManager.toJson(componentSerializers)},
@@ -36,7 +43,7 @@ static void InitSpatialTrackedEntities(SpatialWorldData& spatialData, ComponentS
 	});
 }
 
-void World::fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers)
+void World::fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers)
 {
 	mEntityManager.fromJson(json.at("entity_manager"), componentSerializers);
 	mWorldComponents.fromJson(json.at("world_components"), componentSerializers);

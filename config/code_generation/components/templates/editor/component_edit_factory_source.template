@@ -14,9 +14,9 @@
 
 #include "GameData/Components/{class_name}.generated.h"
 
-void {class_name}EditData::fillContent(MAYBE_UNUSED QLayout* layout, MAYBE_UNUSED const ComponentSourceReference& componentSource , const BaseComponent* component, MAYBE_UNUSED EditorCommandsStack& commandStack, MAYBE_UNUSED World* world)
+void {class_name}EditData::fillContent(MAYBE_UNUSED QLayout* layout, MAYBE_UNUSED const ComponentSourceReference& componentSource , const void* component, MAYBE_UNUSED EditorCommandsStack& commandStack, MAYBE_UNUSED World* world)
 {{
-	MAYBE_UNUSED const {class_name}* {component_name} = dynamic_cast<const {class_name}*>(component);
+	MAYBE_UNUSED const {class_name}* {component_name} = static_cast<const {class_name}*>(component);
 
 	{editor/attribute_edit_initialization}
 }}

@@ -6,7 +6,7 @@
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 
-class TestCircularUnitsSystem : public System
+class TestCircularUnitsSystem : public Ecs::System
 {
 public:
 	TestCircularUnitsSystem(WorldHolder& worldHolder, TimeData& time) noexcept;

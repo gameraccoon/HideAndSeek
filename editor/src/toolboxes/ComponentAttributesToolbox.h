@@ -40,6 +40,6 @@ private:
 	ads::CDockManager* mDockManager;
 	std::optional<ComponentReference> mLastSelectedComponent;
 
-	Delegates::Handle mOnComponentChangedHandle;
-	Delegates::Handle mOnCommandEffectHandle;
+	Ecs::Delegates::Handle mOnComponentChangedHandle;
+	Ecs::Delegates::Handle mOnCommandEffectHandle;
 };

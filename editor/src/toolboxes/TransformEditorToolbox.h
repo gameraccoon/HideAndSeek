@@ -9,9 +9,9 @@
 #include <QVector2D>
 #include <QWidget>
 
-#include "ECS/Entity.h"
 #include "ECS/Delegates.h"
 
+#include "GameData/EcsDefinitions.h"
 #include "GameData/Core/Vector2D.h"
 #include "GameData/Spatial/SpatialEntity.h"
 #include "GameData/Spatial/CellPos.h"
@@ -67,7 +67,7 @@ public:
 	float mScale = 1.0f;
 	Vector2D mCursorObjectOffset;
 
-	SinglecastDelegate<std::vector<SpatialEntity>, const Vector2D&> OnEntitiesMoved;
+	Ecs::SinglecastDelegate<std::vector<SpatialEntity>, const Vector2D&> OnEntitiesMoved;
 
 	std::vector<SpatialEntity> mSelectedEntities;
 	Vector2D mSelectedGroupCenter;
@@ -113,7 +113,7 @@ private:
 	std::vector<nlohmann::json> mCopiedObjects;
 	Vector2D mCopiedGroupCenter;
 
-	Delegates::Handle mOnWorldChangedHandle;
-	Delegates::Handle mOnSelectedEntityChangedHandle;
-	Delegates::Handle mOnCommandEffectHandle;
+	Ecs::Delegates::Handle mOnWorldChangedHandle;
+	Ecs::Delegates::Handle mOnSelectedEntityChangedHandle;
+	Ecs::Delegates::Handle mOnCommandEffectHandle;
 };

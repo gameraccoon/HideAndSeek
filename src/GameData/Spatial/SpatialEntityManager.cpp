@@ -15,7 +15,7 @@ void SpatialEntityManager::executeScheduledActions()
 	}
 }
 
-void SpatialEntityManager::getAllEntityComponents(Entity entity, std::vector<BaseComponent*>& outComponents)
+void SpatialEntityManager::getAllEntityComponents(Entity entity, std::vector<TypedComponent>& outComponents)
 {
 	for (WorldCell* cell : mCells)
 	{

@@ -1,19 +1,16 @@
 #pragma once
 
-#include "ECS/EntityManager.h"
-#include "ECS/ComponentSetHolder.h"
-
+#include "GameData/EcsDefinitions.h"
 #include "GameData/Spatial/SpatialEntityManager.h"
 #include "GameData/Spatial/WorldCell.h"
 #include "GameData/Spatial/CellPos.h"
 #include "GameData/Core/Vector2D.h"
 #include "GameData/Core/BoundingBox.h"
 
-struct ComponentSerializersHolder;
-
 class SpatialWorldData
 {
 public:
+	SpatialWorldData(const ComponentFactory& componentFactory);
 	/**
 	 * @brief getCellsAround returns cells that are inside or toucing a rect that have center in
 	 * `centerPosition` and size of `rect`
@@ -47,8 +44,8 @@ public:
 
 	static BoundingBox GetCellAABB(CellPos pos);
 
-	[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
-	void fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers);
+	[[nodiscard]] nlohmann::json toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const;
+	void fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers);
 
 	void packForJsonSaving();
 	void clearCaches();
@@ -62,4 +59,7 @@ public:
 private:
 	CellPos mBaseCell{0, 0};
 	std::unordered_map<CellPos, WorldCell> mCells;
+
+	// it's a temporary solution to store it here
+	const ComponentFactory& mComponentFactory;
 };

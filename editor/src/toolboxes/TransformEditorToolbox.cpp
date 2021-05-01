@@ -21,6 +21,8 @@
 
 #include "Base/Math/Float.h"
 
+#include "ECS/Serialization/ComponentSerializersHolder.h"
+
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
 
@@ -348,7 +350,7 @@ void TransformEditorToolbox::onPasteCommand()
 		return;
 	}
 
-	const ComponentSerializersHolder& serializationHolder = mMainWindow->getComponentSerializationHolder();
+	const Ecs::ComponentSerializersHolder& serializationHolder = mMainWindow->getComponentSerializationHolder();
 
 	mMainWindow->getCommandStack().executeNewCommand<AddEntityGroupCommand>(world,
 		mCopiedObjects,

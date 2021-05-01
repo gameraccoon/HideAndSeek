@@ -106,9 +106,15 @@ void ComponentAttributesToolbox::onSelectedComponentChange(const std::optional<C
 
 	if (componentReference.has_value())
 	{
-		if (BaseComponent* component = Utils::GetComponent(*componentReference, currentWorld))
+		if (void* component = Utils::GetComponent(*componentReference, currentWorld))
 		{
-			mMainWindow->getComponentContentFactory().replaceEditContent(componentAttributesContainerWidget->layout(), componentReference->source, component, mMainWindow->getCommandStack(), currentWorld);
+			mMainWindow->getComponentContentFactory().replaceEditContent(
+				componentAttributesContainerWidget->layout(),
+				componentReference->source,
+				TypedComponent(componentReference->componentTypeName, component),
+				mMainWindow->getCommandStack(),
+				currentWorld
+			);
 			validComponentIsSelected = true;
 			mLastSelectedComponent = componentReference;
 		}

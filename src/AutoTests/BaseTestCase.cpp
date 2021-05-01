@@ -8,14 +8,19 @@
 
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 
+BaseTestCase::BaseTestCase(int width, int height)
+	: HAL::GameBase(width, height)
+{
+}
+
 TestChecklist BaseTestCase::start(const ArgumentsParser& arguments)
 {
-	ComponentsRegistration::RegisterComponents(mComponentFactory);
-
 	mOneFrame = arguments.hasArgument("one-frame");
 
 	mProfileSystems = arguments.hasArgument("profile-systems");
 	mSystemProfileOutputPath = arguments.getArgumentValue("profile-systems", mSystemProfileOutputPath);
+
+	ComponentsRegistration::RegisterComponents(mComponentFactory);
 
 	initTestCase(arguments);
 

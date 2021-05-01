@@ -13,7 +13,7 @@
 
 static float TotalTimePlotValueGetter(void* data, int idx)
 {
-	return static_cast<float>(static_cast<SystemsFrameTime*>(data)[idx].frameTime.count()) * 0.001f;
+	return static_cast<float>(static_cast<Ecs::SystemsFrameTime*>(data)[idx].frameTime.count()) * 0.001f;
 }
 
 static float SystemTimePlotValueGetter(void* data, int idx)
@@ -25,7 +25,7 @@ void ImguiSystemsTimeReportWindow::update(ImguiDebugData& debugData)
 {
 	if (isVisible)
 	{
-		std::vector<SystemsFrameTime>& records = debugData.systemRecords.getFramesRef();
+		std::vector<Ecs::SystemsFrameTime>& records = debugData.systemRecords.getFramesRef();
 
 		if (records.empty())
 		{
@@ -75,7 +75,7 @@ void ImguiSystemsTimeReportWindow::update(ImguiDebugData& debugData)
 
 		// Frame time by systems plot
 		mCurrentFrame = std::min(mCurrentFrame, static_cast<int>(records.size() - 1));
-		SystemsFrameTime& frame = records[mCurrentFrame];
+		Ecs::SystemsFrameTime& frame = records[mCurrentFrame];
 		mMaxSystemTimeMs = std::max(mMaxSystemTimeMs, static_cast<float>(std::max_element(frame.systemsTime.begin(), frame.systemsTime.end())->count()) * 0.001f);
 		sprintf(overlay, "peak %.2f ms", static_cast<double>(mMaxSystemTimeMs));
 		ImGui::PlotHistogram(

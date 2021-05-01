@@ -23,7 +23,7 @@
 class Game : public HAL::GameBase
 {
 public:
-	using HAL::GameBase::GameBase;
+	Game(int width, int height);
 
 	void start(ArgumentsParser& arguments);
 	void update(float dt) override;
@@ -36,14 +36,15 @@ private:
 	void onGameShutdown();
 
 private:
-	World mWorld;
-	GameData mGameData;
-	WorldHolder mWorldHolder {&mWorld, mGameData};
+	ComponentFactory mComponentFactory;
+	World mWorld{mComponentFactory};
+	GameData mGameData{mComponentFactory};
+	WorldHolder mWorldHolder{&mWorld, mGameData};
 
 	InputData mInputData;
 
-	SystemsManager mSystemsManager;
-	ComponentSerializersHolder mComponentSerializers;
+	Ecs::SystemsManager mSystemsManager;
+	Ecs::ComponentSerializersHolder mComponentSerializers;
 	Jobs::WorkerManager mJobsWorkerManager{Jobs::GetAvailableThreadsCount()};
 	TimeData mTime;
 
@@ -57,6 +58,6 @@ private:
 #endif // IMGUI_ENABLED || PROFILE_SYSTEMS
 
 #ifdef IMGUI_ENABLED
-	ImguiDebugData mImguiDebugData{mWorldHolder, mTime, mSystemFrameRecords, mComponentSerializers.factory, {}};
+	ImguiDebugData mImguiDebugData{mWorldHolder, mTime, mSystemFrameRecords, mComponentFactory, {}};
 #endif // IMGUI_ENABLED
 };

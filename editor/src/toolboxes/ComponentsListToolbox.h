@@ -4,7 +4,7 @@
 #include <QWidget>
 
 #include "ECS/Delegates.h"
-#include "ECS/Entity.h"
+#include "GameData/EcsDefinitions.h"
 
 #include "src/editorutils/entityreference.h"
 #include "src/editorutils/componentreference.h"
@@ -47,6 +47,6 @@ private:
 	QPushButton* mAddComponentButton = nullptr;
 	std::optional<ComponentSourceReference> mLastSelectedComponentSource;
 
-	Delegates::Handle mOnWorldChangedHandle;
-	Delegates::Handle mOnComponentSourceChangedHandle;
+	Ecs::Delegates::Handle mOnWorldChangedHandle;
+	Ecs::Delegates::Handle mOnComponentSourceChangedHandle;
 };

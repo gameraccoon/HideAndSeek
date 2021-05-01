@@ -12,9 +12,9 @@ void ComponentContentFactory::registerComponents()
 	ComponentRegistration::RegisterToEditFactory(mFactories);
 }
 
-void ComponentContentFactory::replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, const BaseComponent* component, EditorCommandsStack& commandStack, World* world)
+void ComponentContentFactory::replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, TypedComponent componentData, EditorCommandsStack& commandStack, World* world)
 {
-	auto it = mFactories.find(component->getComponentTypeName());
+	auto it = mFactories.find(componentData.typeId);
 
 	QWidget* newContent = nullptr;
 	if (it != mFactories.end())
@@ -22,14 +22,14 @@ void ComponentContentFactory::replaceEditContent(QLayout* layout, const Componen
 		mCurrentEdit = it->second->getEditData();
 		newContent = HS_NEW QWidget();
 		QVBoxLayout* innerLayout = HS_NEW QVBoxLayout();
-		mCurrentEdit->fillContent(innerLayout, sourceReference, component, commandStack, world);
+		mCurrentEdit->fillContent(innerLayout, sourceReference, componentData.component, commandStack, world);
 		innerLayout->addStretch();
 		newContent->setLayout(innerLayout);
 	}
 	else
 	{
 		mCurrentEdit = nullptr;
-		ReportError("ComponentEditFactory not registered for component type '%s'", component->getComponentTypeName());
+		ReportError("ComponentEditFactory not registered for component type '%s'", componentData.typeId);
 	}
 
 	if (newContent != nullptr && mContentWidget == nullptr)

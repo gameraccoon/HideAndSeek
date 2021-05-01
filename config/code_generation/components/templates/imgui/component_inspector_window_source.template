@@ -8,7 +8,7 @@
 
 #include "GameLogic/Imgui/ComponentInspector/DataInspectorWidgets/TypesInspector.h"
 
-void {class_name}ImguiWidget::update(BaseComponent* component)
+void {class_name}ImguiWidget::update(void* component)
 {{
 	MAYBE_UNUSED {class_name}* {component_name} = static_cast<{class_name}*>(component);
 

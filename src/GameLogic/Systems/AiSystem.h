@@ -10,7 +10,7 @@
 /**
  * System that calculates AI
  */
-class AiSystem : public System
+class AiSystem : public Ecs::System
 {
 public:
 	AiSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;

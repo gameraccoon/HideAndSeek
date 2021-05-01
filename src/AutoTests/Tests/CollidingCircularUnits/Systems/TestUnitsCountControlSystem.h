@@ -6,7 +6,7 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-class TestUnitsCountControlSystem : public System
+class TestUnitsCountControlSystem : public Ecs::System
 {
 public:
 	explicit TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept;

@@ -9,7 +9,7 @@
 /**
  * System that resolve object collisions
  */
-class CollisionSystem : public System
+class CollisionSystem : public Ecs::System
 {
 public:
 	explicit CollisionSystem(WorldHolder& worldHolder) noexcept;

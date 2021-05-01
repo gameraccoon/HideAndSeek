@@ -2,11 +2,9 @@
 
 #include <QtWidgets/qcombobox.h>
 
-#include "ECS/Serialization/ComponentSerializersHolder.h"
-
 #include "GameData/World.h"
 
-RemoveEntitiesCommand::RemoveEntitiesCommand(const std::vector<SpatialEntity>& entities, const ComponentSerializersHolder& serializerHolder)
+RemoveEntitiesCommand::RemoveEntitiesCommand(const std::vector<SpatialEntity>& entities, const Ecs::ComponentSerializersHolder& serializerHolder)
 	: EditorCommand(EffectBitset(EffectType::Entities))
 	, mEntities(entities)
 	, mComponentSerializerHolder(serializerHolder)

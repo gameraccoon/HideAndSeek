@@ -2,7 +2,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "ECS/Entity.h"
+#include "GameData/EcsDefinitions.h"
 
 #include "GameData/Spatial/CellPos.h"
 

@@ -2,20 +2,24 @@
 
 #include <string>
 
-/**
- * The base class for game Systems (ECS ideology)
- *
- * Abstract
- */
-class System
+namespace Ecs
 {
-public:
-	virtual ~System() = default;
+	/**
+	 * The base class for game Systems
+	 *
+	 * Abstract
+	 */
+	class System
+	{
+	public:
+		virtual ~System() = default;
 
-	virtual void update() = 0;
-	virtual void initResources() {}
-	virtual void shutdown() {}
+		virtual void update() = 0;
+		virtual void initResources() {}
+		virtual void shutdown() {}
 
-	// for debug purposes
-	virtual std::string getName() = 0;
-};
+		// for debug purposes
+		virtual std::string getName() = 0;
+	};
+
+} // namespace Ecs

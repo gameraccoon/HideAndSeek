@@ -1,8 +1,6 @@
 #pragma once
 
-#include "ECS/SystemsManager.h"
-#include "ECS/ComponentFactory.h"
-
+#include "GameData/EcsDefinitions.h"
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 
@@ -21,7 +19,7 @@
 class BaseTestCase : public HAL::GameBase
 {
 public:
-	using HAL::GameBase::GameBase;
+	BaseTestCase(int width, int height);
 
 	TestChecklist start(const ArgumentsParser& arguments);
 	void update(float dt) final;
@@ -34,10 +32,11 @@ protected:
 	virtual void finalizeTestCase();
 
 protected:
-	World mWorld;
-	GameData mGameData;
-	WorldHolder mWorldHolder {&mWorld, mGameData};
-	SystemsManager mSystemsManager;
+	ComponentFactory mComponentFactory;
+	World mWorld{mComponentFactory};
+	GameData mGameData{mComponentFactory};
+	WorldHolder mWorldHolder{&mWorld, mGameData};
+	Ecs::SystemsManager mSystemsManager;
 	Jobs::WorkerManager mWorkerManager{1};
 	TimeData mTime;
 	InputData mInputData;
@@ -48,7 +47,6 @@ protected:
 
 private:
 	int mTicksCount = 0;
-	ComponentFactory mComponentFactory;
 	bool mOneFrame = false;
 
 	bool mProfileSystems = false;

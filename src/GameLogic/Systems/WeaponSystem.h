@@ -11,11 +11,10 @@
 /**
  * System that handles weapon manipulation
  */
-class WeaponSystem : public System
+class WeaponSystem : public Ecs::System
 {
 public:
 	WeaponSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;
-	~WeaponSystem() override = default;
 
 	void update() override;
 	std::string getName() override { return "WeaponSystem"; }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ECS/ComponentFactory.h"
+#include "GameData/EcsDefinitions.h"
 
 namespace ComponentsRegistration
 {

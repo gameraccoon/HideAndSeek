@@ -1,17 +1,14 @@
 #pragma once
 
-#include "ECS/EntityManager.h"
-#include "ECS/ComponentSetHolder.h"
+#include "GameData/EcsDefinitions.h"
 
 #include "GameData/Core/Vector2D.h"
 #include "GameData/Spatial/CellPos.h"
 
-struct ComponentSerializersHolder;
-
 class WorldCell
 {
 public:
-	explicit WorldCell(const CellPos& pos);
+	WorldCell(const CellPos& pos, const ComponentFactory& componentFactory);
 
 	EntityManager& getEntityManager() { return mEntityManager; }
 	[[nodiscard]] const EntityManager& getEntityManager() const { return mEntityManager; }
@@ -20,8 +17,8 @@ public:
 
 	[[nodiscard]] CellPos getPos() const { return mPos; }
 
-	[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const;
-	void fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers);
+	[[nodiscard]] nlohmann::json toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const;
+	void fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers);
 
 	void packForJsonSaving();
 	void clearCaches();

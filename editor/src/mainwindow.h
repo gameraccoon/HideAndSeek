@@ -12,6 +12,7 @@
 #include "ECS/Delegates.h"
 #include "ECS/Serialization/ComponentSerializersHolder.h"
 
+#include "GameData/EcsDefinitions.h"
 #include "GameData/Spatial/SpatialEntity.h"
 
 #include "editorutils/componentreference.h"
@@ -42,17 +43,18 @@ public:
 	~MainWindow();
 
 	World* getCurrentWorld() { return mCurrentWorld.get(); }
-	const ComponentSerializersHolder& getComponentSerializationHolder() const { return mComponentSerializationHolder; }
+	const Ecs::ComponentSerializersHolder& getComponentSerializationHolder() const { return mComponentSerializationHolder; }
+	const ComponentFactory& getComponentFactory() const { return mComponentFactory; }
 	ComponentContentFactory& getComponentContentFactory() { return mComponentContentFactory; }
 	EditorCommandsStack& getCommandStack() { return mCommandStack; }
 	PrefabListToolbox* getPrefabToolbox() { return mPrefabListToolbox.get(); }
 
 public:
-	MulticastDelegate<> OnWorldChanged;
-	MulticastDelegate<const std::optional<EntityReference>&> OnSelectedEntityChanged;
-	MulticastDelegate<const std::optional<ComponentSourceReference>&> OnSelectedComponentSourceChanged;
-	MulticastDelegate<const std::optional<ComponentReference>&> OnSelectedComponentChanged;
-	MulticastDelegate<EditorCommand::EffectBitset, bool> OnCommandEffectApplied;
+	Ecs::MulticastDelegate<> OnWorldChanged;
+	Ecs::MulticastDelegate<const std::optional<EntityReference>&> OnSelectedEntityChanged;
+	Ecs::MulticastDelegate<const std::optional<ComponentSourceReference>&> OnSelectedComponentSourceChanged;
+	Ecs::MulticastDelegate<const std::optional<ComponentReference>&> OnSelectedComponentChanged;
+	Ecs::MulticastDelegate<EditorCommand::EffectBitset, bool> OnCommandEffectApplied;
 
 private slots:
 	void on_actionTransform_Editor_triggered();
@@ -95,8 +97,9 @@ private:
 	// need to be a raw pointer in order to Qt Designer to work normally with this class
 	Ui::mainwindow* ui;
 	std::unique_ptr<ads::CDockManager> mDockManager;
+	ComponentFactory mComponentFactory;
 	std::unique_ptr<class World> mCurrentWorld;
-	ComponentSerializersHolder mComponentSerializationHolder;
+	Ecs::ComponentSerializersHolder mComponentSerializationHolder;
 	ComponentContentFactory mComponentContentFactory;
 	std::string mOpenedWorldPath;
 	EditorCommandsStack mCommandStack;

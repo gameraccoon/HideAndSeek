@@ -8,7 +8,7 @@
 
 #include "AutoTests/Tests/WeaponShooting/DestroyedEntitiesTestCheck.h"
 
-class TestDestroyedEntitiesRegistrationSystem : public System
+class TestDestroyedEntitiesRegistrationSystem : public Ecs::System
 {
 public:
 	TestDestroyedEntitiesRegistrationSystem(WorldHolder& worldHolder, DestroyedEntitiesTestCheck& testCheck) noexcept;

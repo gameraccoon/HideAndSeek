@@ -7,13 +7,11 @@
 
 #include "Base/Types/TemplateAliases.h"
 
-#include "ECS/Entity.h"
-
+#include "GameData/EcsDefinitions.h"
 #include "GameData/Debug/SubstringSearcher.h"
 
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/AbstractPropertyFilter.h"
 
-class EntityManager;
 class WorldCell;
 struct ImguiDebugData;
 

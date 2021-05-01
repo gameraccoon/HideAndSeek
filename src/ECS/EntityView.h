@@ -3,48 +3,62 @@
 #include "ECS/Entity.h"
 #include "ECS/EntityManager.h"
 
-/**
- * @brief Non-owning wrapper around entity amd its current entity manager
- */
-class EntityView
+namespace Ecs
 {
-public:
-	EntityView(Entity entity, EntityManager& manager);
-
-	template<typename ComponentType>
-	ComponentType* addComponent()
+	/**
+	 * @brief Non-owning wrapper around entity amd its current entity manager
+	 */
+	template <typename ComponentTypeId>
+	class EntityViewImpl
 	{
-		return mManager.addComponent<ComponentType>(mEntity);
-	}
+	public:
+		using EntityManager = EntityManagerImpl<ComponentTypeId>;
 
-	template<typename ComponentType>
-	void removeComponent()
-	{
-		mManager.removeComponent<ComponentType>(mEntity);
-	}
+		EntityViewImpl(Entity entity, EntityManager& manager)
+			: mEntity(entity)
+			, mManager(manager)
+		{
+		}
 
-	template<typename... Components>
-	std::tuple<Components*...> getComponents()
-	{
-		return mManager.getEntityComponents<Components...>(mEntity);
-	}
+		template<typename ComponentType>
+		ComponentType* addComponent()
+		{
+			return mManager.template addComponent<ComponentType>(mEntity);
+		}
 
-	template<typename ComponentType>
-	ComponentType* scheduleAddComponent()
-	{
-		return mManager.scheduleAddComponent<ComponentType>(mEntity);
-	}
+		template<typename ComponentType>
+		void removeComponent()
+		{
+			mManager.template removeComponent<ComponentType>(mEntity);
+		}
 
-	template<typename ComponentType>
-	void scheduleRemoveComponent()
-	{
-		mManager.scheduleRemoveComponent<ComponentType>(mEntity);
-	}
+		template<typename... Components>
+		std::tuple<Components*...> getComponents()
+		{
+			return mManager.template getEntityComponents<Components...>(mEntity);
+		}
 
-	[[nodiscard]] Entity getEntity() const;
-	EntityManager& getManager() { return mManager; }
+		template<typename ComponentType>
+		ComponentType* scheduleAddComponent()
+		{
+			return mManager.template scheduleAddComponent<ComponentType>(mEntity);
+		}
 
-private:
-	Entity mEntity;
-	EntityManager& mManager;
-};
+		template<typename ComponentType>
+		void scheduleRemoveComponent()
+		{
+			mManager.template scheduleRemoveComponent<ComponentType>(mEntity);
+		}
+
+		[[nodiscard]] Entity getEntity() const
+		{
+			return mEntity;
+		}
+		EntityManager& getManager() { return mManager; }
+
+	private:
+		Entity mEntity;
+		EntityManager& mManager;
+	};
+
+} // namespace Ecs
