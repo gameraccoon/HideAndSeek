@@ -37,12 +37,12 @@
 	{
 		"name_template": "{class_name}JsonSerializer.generated.h",
 		"template": "serialization/json/component_json_serializer_header",
-		"output_dir": "src/GameData/Serialization/Json/"
+		"output_dir": "src/GameData/Serialization/Json/Generated"
 	},
 	{
 		"name_template": "{class_name}JsonSerializer.generated.cpp",
 		"template": "serialization/json/component_json_serializer_source",
-		"output_dir": "src/GameData/Serialization/Json/"
+		"output_dir": "src/GameData/Serialization/Json/Generated"
 	},
 	{
 		"name_template": "{class_name}EditFactory.generated.h",

@@ -3,8 +3,6 @@
 #include <vector>
 #include <functional>
 
-#include <nlohmann/json_fwd.hpp>
-
 namespace Ecs
 {
 	template <typename... Args>

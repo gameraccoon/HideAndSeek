@@ -1,6 +1,6 @@
 #include "Base/precomp.h"
 
-#include "GameData/Serialization/Json/{class_name}JsonSerializer.generated.h"
+#include "GameData/Serialization/Json/Generated/{class_name}JsonSerializer.generated.h"
 
 #include <nlohmann/json.hpp>
 

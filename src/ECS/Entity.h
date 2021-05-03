@@ -1,7 +1,5 @@
 #pragma once
 
-#include <nlohmann/json_fwd.hpp>
-
 namespace Ecs
 {
 	class Entity
@@ -18,9 +16,6 @@ namespace Ecs
 
 		[[nodiscard]] EntityID getID() const { return mId; }
 
-		friend void to_json(nlohmann::json& outJson, Entity entity);
-		friend void from_json(const nlohmann::json& json, Entity& outEntity);
-
 	private:
 		EntityID mId;
 	};
@@ -36,9 +31,6 @@ namespace Ecs
 		[[nodiscard]] bool isValid() const { return mIsValid; }
 		[[nodiscard]] Entity getEntity() const noexcept;
 		[[nodiscard]] Entity::EntityID getID() const noexcept;
-
-		friend void to_json(nlohmann::json& outJson, const OptionalEntity& entity);
-		friend void from_json(const nlohmann::json& json, OptionalEntity& outEntity);
 
 	private:
 		Entity::EntityID mId = 0;
