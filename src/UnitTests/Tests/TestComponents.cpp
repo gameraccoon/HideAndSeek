@@ -16,14 +16,14 @@ TEST(Components, EntityCreationAndRemovement)
 	Entity testEntity2 = entityManager.addEntity();
 
 	EXPECT_NE(testEntity1, testEntity2);
-	EXPECT_NE(testEntity1.getID(), testEntity2.getID());
+	EXPECT_NE(testEntity1.getId(), testEntity2.getId());
 
 	entityManager.removeEntity(testEntity2);
 
 	Entity testEntity3 = entityManager.addEntity();
 
 	EXPECT_NE(testEntity1, testEntity3);
-	EXPECT_NE(testEntity1.getID(), testEntity3.getID());
+	EXPECT_NE(testEntity1.getId(), testEntity3.getId());
 }
 
 TEST(Components, ComponentsAttachment)

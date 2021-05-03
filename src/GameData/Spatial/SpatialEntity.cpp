@@ -13,7 +13,7 @@ SpatialEntity::SpatialEntity(Entity entity, CellPos cellPos)
 
 bool SpatialEntity::operator==(const SpatialEntity& other) const
 {
-	return cell == other.cell && entity.getID() == other.entity.getID();
+	return cell == other.cell && entity.getId() == other.entity.getId();
 }
 
 bool SpatialEntity::operator!=(const SpatialEntity& other) const

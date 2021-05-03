@@ -60,7 +60,7 @@ namespace Ecs
 
 			while (insertionTrial < EntityInsertionTrialsLimit)
 			{
-				Entity::EntityID id = static_cast<Entity::EntityID>(Random::gGlobalGenerator());
+				Entity::EntityId id = static_cast<Entity::EntityId>(Random::gGlobalGenerator());
 				auto insertionResult = mEntityIndexMap.try_emplace(id, mNextEntityIndex);
 				if (insertionResult.second)
 				{
@@ -78,7 +78,7 @@ namespace Ecs
 
 		void removeEntity(Entity entity)
 		{
-			auto entityIdxItr = mEntityIndexMap.find(entity.getID());
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr == mEntityIndexMap.end())
 			{
 				return;
@@ -106,12 +106,12 @@ namespace Ecs
 				}
 			}
 
-			mEntityIndexMap.erase(entity.getID());
+			mEntityIndexMap.erase(entity.getId());
 
 			if (oldEntityIdx != mNextEntityIndex)
 			{
 				// relink maps
-				Entity::EntityID entityID = mIndexEntityMap[mNextEntityIndex];
+				Entity::EntityId entityID = mIndexEntityMap[mNextEntityIndex];
 				mEntityIndexMap[entityID] = oldEntityIdx;
 				mIndexEntityMap[oldEntityIdx] = entityID;
 			}
@@ -120,7 +120,7 @@ namespace Ecs
 			onEntityRemoved.broadcast();
 		}
 
-		[[nodiscard]] const std::unordered_map<Entity::EntityID, size_t>& getEntities() const { return mEntityIndexMap; }
+		[[nodiscard]] const std::unordered_map<Entity::EntityId, size_t>& getEntities() const { return mEntityIndexMap; }
 
 		// these two should be used carefully (added for the editor)
 		Entity getNonExistentEntity()
@@ -130,7 +130,7 @@ namespace Ecs
 
 			while (generationTrial < EntityInsertionTrialsLimit)
 			{
-				Entity::EntityID id = static_cast<Entity::EntityID>(Random::gGlobalGenerator());
+				Entity::EntityId id = static_cast<Entity::EntityId>(Random::gGlobalGenerator());
 				if (mEntityIndexMap.find(id) == mEntityIndexMap.end())
 				{
 					return Entity(id);
@@ -144,8 +144,8 @@ namespace Ecs
 
 		void insertEntityUnsafe(Entity entity)
 		{
-			mEntityIndexMap.emplace(entity.getID(), mNextEntityIndex);
-			mIndexEntityMap.emplace(mNextEntityIndex, entity.getID());
+			mEntityIndexMap.emplace(entity.getId(), mNextEntityIndex);
+			mIndexEntityMap.emplace(mNextEntityIndex, entity.getId());
 			++mNextEntityIndex;
 
 			onEntityAdded.broadcast();
@@ -153,7 +153,7 @@ namespace Ecs
 
 		void getAllEntityComponents(Entity entity, std::vector<TypedComponent>& outComponents)
 		{
-			auto entityIdxItr = mEntityIndexMap.find(entity.getID());
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr != mEntityIndexMap.end())
 			{
 				EntityIndex index = entityIdxItr->second;
@@ -169,7 +169,7 @@ namespace Ecs
 
 		bool doesEntityHaveComponent(Entity entity, ComponentTypeId typeId)
 		{
-			auto entityIdxItr = mEntityIndexMap.find(entity.getID());
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr != mEntityIndexMap.end())
 			{
 				std::vector<void*>& componentArray = mComponents.getComponentVectorById(typeId);
@@ -182,7 +182,7 @@ namespace Ecs
 		template<typename ComponentType>
 		bool doesEntityHaveComponent(Entity entity)
 		{
-			auto entityIdxItr = mEntityIndexMap.find(entity.getID());
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr == mEntityIndexMap.end())
 			{
 				return false;
@@ -196,7 +196,7 @@ namespace Ecs
 		template<typename ComponentType>
 		ComponentType* addComponent(Entity entity)
 		{
-			auto entityIdxItr = mEntityIndexMap.find(entity.getID());
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr == mEntityIndexMap.end())
 			{
 				return nullptr;
@@ -211,7 +211,7 @@ namespace Ecs
 
 		void addComponent(Entity entity, void* component, ComponentTypeId typeId)
 		{
-			auto entityIdxItr = mEntityIndexMap.find(entity.getID());
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr == mEntityIndexMap.end())
 			{
 				return;
@@ -228,7 +228,7 @@ namespace Ecs
 
 		void removeComponent(Entity entity, ComponentTypeId typeId)
 		{
-			auto entityIdxItr = mEntityIndexMap.find(entity.getID());
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr == mEntityIndexMap.end())
 			{
 				return;
@@ -286,7 +286,7 @@ namespace Ecs
 		template<typename... Components>
 		std::tuple<Components*...> getEntityComponents(Entity entity)
 		{
-			auto entityIdxItr = mEntityIndexMap.find(entity.getID());
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr == mEntityIndexMap.end())
 			{
 				return getEmptyComponents<Components...>();
@@ -451,7 +451,7 @@ namespace Ecs
 
 		bool hasEntity(Entity entity)
 		{
-			return mEntityIndexMap.find(entity.getID()) != mEntityIndexMap.end();
+			return mEntityIndexMap.find(entity.getId()) != mEntityIndexMap.end();
 		}
 
 		// methods for the editor
@@ -497,16 +497,16 @@ namespace Ecs
 		{
 			AssertFatal(this != &otherManager, "Transferring entity to the same manager. This should never happen");
 
-			auto entityIdxItr = mEntityIndexMap.find(entity.getID());
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr == mEntityIndexMap.end())
 			{
 				return;
 			}
 
 			// ToDo use global entity ID collision detection
-			MAYBE_UNUSED auto insertionResult = otherManager.mEntityIndexMap.try_emplace(entity.getID(), otherManager.mNextEntityIndex);
-			AssertFatal(insertionResult.second, "EntityID is not unique, two entities have just collided");
-			otherManager.mIndexEntityMap.emplace(otherManager.mNextEntityIndex, entity.getID());
+			MAYBE_UNUSED auto insertionResult = otherManager.mEntityIndexMap.try_emplace(entity.getId(), otherManager.mNextEntityIndex);
+			AssertFatal(insertionResult.second, "EntityId is not unique, two entities have just collided");
+			otherManager.mIndexEntityMap.emplace(otherManager.mNextEntityIndex, entity.getId());
 			++otherManager.mNextEntityIndex;
 
 			--mNextEntityIndex; // now it points to the element that going to be removed
@@ -538,12 +538,12 @@ namespace Ecs
 				}
 			}
 
-			mEntityIndexMap.erase(entity.getID());
+			mEntityIndexMap.erase(entity.getId());
 
 			if (oldEntityIdx != mNextEntityIndex)
 			{
 				// relink maps
-				Entity::EntityID entityID = mIndexEntityMap[mNextEntityIndex];
+				Entity::EntityId entityID = mIndexEntityMap[mNextEntityIndex];
 				mEntityIndexMap[entityID] = oldEntityIdx;
 				mIndexEntityMap[oldEntityIdx] = entityID;
 			}
@@ -552,7 +552,7 @@ namespace Ecs
 
 		[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const
 		{
-			std::vector<std::pair<Entity::EntityID, EntityIndex>> sortedEntityIndexMap;
+			std::vector<std::pair<Entity::EntityId, EntityIndex>> sortedEntityIndexMap;
 			sortedEntityIndexMap.reserve(mEntityIndexMap.size());
 			for (const auto& indexPair : mEntityIndexMap)
 			{
@@ -636,7 +636,7 @@ namespace Ecs
 		// helper functions for cleanup before saving
 		void stableSortEntitiesById()
 		{
-			std::vector<Entity::EntityID> ids;
+			std::vector<Entity::EntityId> ids;
 			ids.resize(mNextEntityIndex);
 			for (auto [entityId, idx] : mEntityIndexMap)
 			{
@@ -658,7 +658,7 @@ namespace Ecs
 			soasort::applySwaps(ids, swaps);
 			for (EntityIndex idx = 0u; idx < mNextEntityIndex; ++idx)
 			{
-				Entity::EntityID id = ids[idx];
+				Entity::EntityId id = ids[idx];
 				mEntityIndexMap[id] = idx;
 				mIndexEntityMap[idx] = id;
 			}
@@ -804,8 +804,8 @@ namespace Ecs
 
 	private:
 		ComponentMap mComponents;
-		std::unordered_map<Entity::EntityID, EntityIndex> mEntityIndexMap;
-		std::unordered_map<EntityIndex, Entity::EntityID> mIndexEntityMap;
+		std::unordered_map<Entity::EntityId, EntityIndex> mEntityIndexMap;
+		std::unordered_map<EntityIndex, Entity::EntityId> mIndexEntityMap;
 
 		std::vector<ComponentToAdd> mScheduledComponentAdditions;
 		std::vector<ComponentToRemove> mScheduledComponentRemovements;

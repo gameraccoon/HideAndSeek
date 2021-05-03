@@ -69,7 +69,7 @@ namespace ImguiPropertyFiltration
 		if (ImGui::InputTextWithHint("##FilterSearch", "Search Query", mFilterQueryBuffer, IM_ARRAYSIZE(mFilterQueryBuffer)))
 		{
 			{
-				Entity::EntityID id = 0;
+				Entity::EntityId id = 0;
 				std::string_view strId(mFilterQueryBuffer, IM_ARRAYSIZE(mFilterQueryBuffer));
 				std::stringstream ss;
 				if (strId[0] == '0' && strId[1] == 'x') {

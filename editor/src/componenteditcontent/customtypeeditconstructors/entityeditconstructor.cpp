@@ -20,8 +20,8 @@ namespace TypesEditConstructor
 		Edit<Entity>::Ptr edit = std::make_shared<Edit<Entity>>(initialValue);
 		Edit<Entity>::WeakPtr editWeakPtr = edit;
 
-		Edit<Entity::EntityID>::Ptr editAngle = FillEdit<Entity::EntityID>::Call(innerLayout, "id", initialValue.getID());
-		editAngle->bindOnChange([editWeakPtr](float /*oldValue*/, Entity::EntityID newValue, bool)
+		Edit<Entity::EntityId>::Ptr editAngle = FillEdit<Entity::EntityId>::Call(innerLayout, "id", initialValue.getId());
+		editAngle->bindOnChange([editWeakPtr](float /*oldValue*/, Entity::EntityId newValue, bool)
 		{
 			if (Edit<Entity>::Ptr edit = editWeakPtr.lock())
 			{

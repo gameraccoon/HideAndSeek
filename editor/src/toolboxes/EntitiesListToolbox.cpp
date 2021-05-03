@@ -93,7 +93,7 @@ void EntitiesListToolbox::onEntityChangedEvent(const std::optional<EntityReferen
 		return;
 	}
 
-	QString text = QString::number(entity->entity.getID());
+	QString text = QString::number(entity->entity.getId());
 	int i = 0;
 	while (QListWidgetItem* item = entitiesList->item(i))
 	{
@@ -133,7 +133,7 @@ void EntitiesListToolbox::onCurrentItemChanged(QListWidgetItem* current, QListWi
 {
 	if (current)
 	{
-		Entity::EntityID entityID = current->data(0).toUInt();
+		Entity::EntityId entityID = current->data(0).toUInt();
 		EntityReference reference{Entity(entityID)};
 
 		if (current->data(1).toBool())

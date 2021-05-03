@@ -5,19 +5,19 @@ namespace Ecs
 	class Entity
 	{
 	public:
-		using EntityID = unsigned int;
+		using EntityId = unsigned int;
 
 	public:
-		explicit Entity(EntityID id) : mId(id) {}
+		explicit Entity(EntityId id) : mId(id) {}
 
 		bool operator ==(Entity b) const { return mId == b.mId; }
 		bool operator !=(Entity b) const { return !(*this == b); }
 		bool operator <(Entity b) const { return mId < b.mId; }
 
-		[[nodiscard]] EntityID getID() const { return mId; }
+		[[nodiscard]] EntityId getId() const { return mId; }
 
 	private:
-		EntityID mId;
+		EntityId mId;
 	};
 
 	class OptionalEntity
@@ -25,15 +25,15 @@ namespace Ecs
 	public:
 		OptionalEntity() = default;
 		// implicit conversion
-		OptionalEntity(Entity entity) : mId(entity.getID()), mIsValid(true) {}
-		explicit OptionalEntity(Entity::EntityID id) : mId(id), mIsValid(true) {}
+		OptionalEntity(Entity entity) : mId(entity.getId()), mIsValid(true) {}
+		explicit OptionalEntity(Entity::EntityId id) : mId(id), mIsValid(true) {}
 
 		[[nodiscard]] bool isValid() const { return mIsValid; }
 		[[nodiscard]] Entity getEntity() const noexcept;
-		[[nodiscard]] Entity::EntityID getID() const noexcept;
+		[[nodiscard]] Entity::EntityId getId() const noexcept;
 
 	private:
-		Entity::EntityID mId = 0;
+		Entity::EntityId mId = 0;
 		bool mIsValid = false;
 	};
 } // namespace Ecs

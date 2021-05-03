@@ -9,7 +9,7 @@ namespace Ecs
 		return Entity(mId);
 	}
 
-	Entity::EntityID OptionalEntity::getID() const noexcept
+	Entity::EntityId OptionalEntity::getId() const noexcept
 	{
 		Assert(mIsValid, "Getting uninitialized entity ID");
 		return mId;

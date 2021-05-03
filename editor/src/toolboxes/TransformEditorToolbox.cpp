@@ -175,17 +175,17 @@ void TransformEditorToolbox::updateEntitiesFromChangeEntityGroupLocationCommand(
 	const std::vector<SpatialEntity>& oldEntities = isLastUndo ? command.getModifiedEntities() : command.getOriginalEntities();
 	const std::vector<SpatialEntity>& newEntities = isLastUndo ? command.getOriginalEntities() : command.getModifiedEntities();
 
-	std::unordered_map<Entity::EntityID, size_t> transformMap;
+	std::unordered_map<Entity::EntityId, size_t> transformMap;
 
 	for (size_t i = 0; i < oldEntities.size(); ++i)
 	{
 		const SpatialEntity& oldSpatialEntity = oldEntities[i];
-		transformMap[oldSpatialEntity.entity.getEntity().getID()] = i;
+		transformMap[oldSpatialEntity.entity.getEntity().getId()] = i;
 	}
 
 	for (SpatialEntity& spatialEntity : mContent->mSelectedEntities)
 	{
-		if (const auto it = transformMap.find(spatialEntity.entity.getEntity().getID()); it != transformMap.end())
+		if (const auto it = transformMap.find(spatialEntity.entity.getEntity().getId()); it != transformMap.end())
 		{
 			spatialEntity = newEntities[it->second];
 		}
