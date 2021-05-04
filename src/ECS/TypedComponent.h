@@ -12,4 +12,15 @@ namespace Ecs
 		ComponentTypeId typeId;
 		void* component;
 	};
+
+	template <typename ComponentTypeId>
+	struct ConstTypedComponentImpl {
+		ConstTypedComponentImpl(ComponentTypeId typeId, const void* component)
+			: typeId(typeId)
+			, component(component)
+		{}
+
+		ComponentTypeId typeId;
+		const void* component;
+	};
 } // namespace Ecs

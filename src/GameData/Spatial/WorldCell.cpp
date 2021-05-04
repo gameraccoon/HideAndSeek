@@ -1,6 +1,7 @@
 #include "Base/precomp.h"
 
 #include "GameData/Spatial/WorldCell.h"
+#include "GameData/Serialization/Json/ComponentSetHolder.h"
 
 #include <nlohmann/json.hpp>
 
@@ -15,14 +16,15 @@ nlohmann::json WorldCell::toJson(const Ecs::ComponentSerializersHolder& componen
 {
 	return nlohmann::json{
 		{"entity_manager", mEntityManager.toJson(componentSerializers)},
-		{"cell_components", mCellComponents.toJson(componentSerializers)},
+		{"cell_components", Json::SerializeComponentSetHolder(mCellComponents, componentSerializers)},
 	};
 }
 
 void WorldCell::fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers)
 {
 	mEntityManager.fromJson(json.at("entity_manager"), componentSerializers);
-	mCellComponents.fromJson(json.at("cell_components"), componentSerializers);
+
+	Json::DeserializeComponentSetHolder(mCellComponents, json.at("cell_components"), componentSerializers);
 }
 
 void WorldCell::packForJsonSaving()

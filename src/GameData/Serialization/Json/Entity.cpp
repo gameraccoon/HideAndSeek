@@ -1,6 +1,6 @@
 #include "Base/precomp.h"
 
-#include "ECS/Entity.h"
+#include "GameData/Serialization/Json/Entity.h"
 
 #include <nlohmann/json.hpp>
 

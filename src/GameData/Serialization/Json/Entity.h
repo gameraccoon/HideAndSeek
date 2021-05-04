@@ -1,7 +1,8 @@
 #pragma once
 
-#include "ECS/Entity.h"
 #include <nlohmann/json_fwd.hpp>
+
+#include "ECS/Entity.h"
 
 namespace Ecs
 {

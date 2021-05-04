@@ -20,6 +20,7 @@ namespace Ecs
 	{
 	public:
 		using TypedComponent = TypedComponentImpl<ComponentTypeId>;
+		using ConstTypedComponent = ConstTypedComponentImpl<ComponentTypeId>;
 		using ComponentFactory = ComponentFactoryImpl<ComponentTypeId>;
 
 		ComponentSetHolderImpl(const ComponentFactory& componentFactory)
@@ -28,11 +29,7 @@ namespace Ecs
 
 		~ComponentSetHolderImpl()
 		{
-			for (auto& component : mComponents)
-			{
-				auto deleterFn = mComponentFactory.getDeletionFn(component.first);
-				deleterFn(component.second);
-			}
+			removeAllComponents();
 		}
 
 		ComponentSetHolderImpl(const ComponentSetHolderImpl&) = delete;
@@ -43,6 +40,18 @@ namespace Ecs
 		std::vector<TypedComponent> getAllComponents()
 		{
 			std::vector<TypedComponent> components;
+
+			for (auto& componentData : mComponents)
+			{
+				components.emplace_back(componentData.first, componentData.second);
+			}
+
+			return components;
+		}
+
+		std::vector<ConstTypedComponent> getAllComponents() const
+		{
+			std::vector<ConstTypedComponent> components;
 
 			for (auto& componentData : mComponents)
 			{
@@ -66,6 +75,14 @@ namespace Ecs
 			return component;
 		}
 
+		void* addComponentByType(ComponentTypeId typeId) noexcept
+		{
+			auto createFn = mComponentFactory.getCreationFn(typeId);
+			void* component = createFn();
+			addComponent(component, typeId);
+			return component;
+		}
+
 		template<typename T>
 		T* getOrAddComponent()
 		{
@@ -79,7 +96,7 @@ namespace Ecs
 
 		void addComponent(void* component, ComponentTypeId typeId)
 		{
-			if (component != nullptr)
+			if (component != nullptr && !mComponents.contains(typeId))
 			{
 				mComponents[typeId] = component;
 			}
@@ -107,45 +124,19 @@ namespace Ecs
 			return std::make_tuple(getSingleComponent<Components>()...);
 		}
 
-		[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const
-		{
-			nlohmann::json outJson;
-
-			auto components = nlohmann::json{};
-
-			for (auto component : mComponents)
-			{
-				auto componentObj = nlohmann::json{};
-				componentSerializers.jsonSerializer.getComponentSerializerFromClassName(component.first)->toJson(componentObj, component.second);
-				components[ID_TO_STR(component.first)] = componentObj;
-			}
-			outJson["components"] = components;
-
-			return outJson;
-		}
-
-		void fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers)
-		{
-			const auto& components = json.at("components");
-			for (const auto& [stringType, componentData] : components.items())
-			{
-				StringId className = STR_TO_ID(stringType);
-				typename ComponentFactory::CreationFn componentCreateFn = mComponentFactory.getCreationFn(className);
-				if (componentCreateFn != nullptr)
-				{
-					if (!componentData.is_null())
-					{
-						void* component = componentCreateFn();
-						componentSerializers.jsonSerializer.getComponentSerializerFromClassName(className)->fromJson(componentData, component);
-						mComponents[className] = component;
-					}
-				}
-			}
-		}
-
 		[[nodiscard]] bool hasAnyComponents() const
 		{
 			return !mComponents.empty();
+		}
+
+		void removeAllComponents()
+		{
+			for (auto& component : mComponents)
+			{
+				auto deleterFn = mComponentFactory.getDeletionFn(component.first);
+				deleterFn(component.second);
+			}
+			mComponents.clear();
 		}
 
 	private:
