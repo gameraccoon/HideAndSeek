@@ -9,9 +9,9 @@ class GameData;
 
 namespace GameDataLoader
 {
-	void SaveWorld(const World& world, const std::string& levelName, const Ecs::ComponentSerializersHolder& componentSerializers);
-	void LoadWorld(World& world, const std::string& levelName, const Ecs::ComponentSerializersHolder& componentSerializers);
+	void SaveWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void LoadWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
-	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const Ecs::ComponentSerializersHolder& componentSerializers);
-	void LoadGameData(GameData& gameData, const std::string& gameDataName, const Ecs::ComponentSerializersHolder& componentSerializers);
+	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void LoadGameData(GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 }

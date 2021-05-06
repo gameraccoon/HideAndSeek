@@ -4,11 +4,9 @@
 #include <map>
 #include <vector>
 
-#include <nlohmann/json.hpp>
-
 #include "ECS/Delegates.h"
-#include "ECS/Serialization/ComponentSerializersHolder.h"
 #include "ECS/TypedComponent.h"
+#include "ECS/ComponentFactory.h"
 
 namespace Ecs
 {

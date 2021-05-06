@@ -1,10 +1,10 @@
 #pragma once
 
 #include "ECS/SystemsManager.h"
-#include "ECS/Serialization/ComponentSerializersHolder.h"
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 #include "Utils/Application/ArgumentsParser.h"
 #include "Utils/Profiling/SystemFrameRecords.h"
@@ -44,7 +44,7 @@ private:
 	InputData mInputData;
 
 	Ecs::SystemsManager mSystemsManager;
-	Ecs::ComponentSerializersHolder mComponentSerializers;
+	Json::ComponentSerializationHolder mComponentSerializers;
 	Jobs::WorkerManager mJobsWorkerManager{Jobs::GetAvailableThreadsCount()};
 	TimeData mTime;
 

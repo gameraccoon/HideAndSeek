@@ -44,10 +44,9 @@ public:
 
 	static BoundingBox GetCellAABB(CellPos pos);
 
-	[[nodiscard]] nlohmann::json toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const;
-	void fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers);
+	[[nodiscard]] nlohmann::json toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
-	void packForJsonSaving();
 	void clearCaches();
 
 public:

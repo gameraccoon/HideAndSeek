@@ -68,12 +68,11 @@ namespace Utils
 		PathBlockingGeometry::CalculatePathBlockingGeometry(pathBlockingGeometry->getPolygonsRef(), components);
 	}
 
-	void SaveWorld(World& world, const std::string& fileName, const Ecs::ComponentSerializersHolder& serializationHolder)
+	void SaveWorld(World& world, const std::string& fileName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		RefreshLightBlockingGeometry(world);
 		RefreshPathBlockingGeometry(world);
-		world.packForJsonSaving();
 		world.clearCaches();
-		GameDataLoader::SaveWorld(world, fileName, serializationHolder);
+		GameDataLoader::SaveWorld(world, fileName, jsonSerializerHolder);
 	}
 }

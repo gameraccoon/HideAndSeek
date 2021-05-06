@@ -10,10 +10,10 @@
 #include "componenteditcontent/componentcontentfactory.h"
 
 #include "ECS/Delegates.h"
-#include "ECS/Serialization/ComponentSerializersHolder.h"
 
 #include "GameData/EcsDefinitions.h"
 #include "GameData/Spatial/SpatialEntity.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 #include "editorutils/componentreference.h"
 #include "editorutils/entityreference.h"
@@ -43,7 +43,7 @@ public:
 	~MainWindow();
 
 	World* getCurrentWorld() { return mCurrentWorld.get(); }
-	const Ecs::ComponentSerializersHolder& getComponentSerializationHolder() const { return mComponentSerializationHolder; }
+	const Json::ComponentSerializationHolder& getComponentSerializationHolder() const { return mComponentSerializationHolder; }
 	const ComponentFactory& getComponentFactory() const { return mComponentFactory; }
 	ComponentContentFactory& getComponentContentFactory() { return mComponentContentFactory; }
 	EditorCommandsStack& getCommandStack() { return mCommandStack; }
@@ -99,7 +99,7 @@ private:
 	std::unique_ptr<ads::CDockManager> mDockManager;
 	ComponentFactory mComponentFactory;
 	std::unique_ptr<class World> mCurrentWorld;
-	Ecs::ComponentSerializersHolder mComponentSerializationHolder;
+	Json::ComponentSerializationHolder mComponentSerializationHolder;
 	ComponentContentFactory mComponentContentFactory;
 	std::string mOpenedWorldPath;
 	EditorCommandsStack mCommandStack;

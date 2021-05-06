@@ -5,10 +5,6 @@
 #include <algorithm>
 #include <ranges>
 
-#include <nlohmann/json.hpp>
-
-#include <soasort.h>
-
 #include "Base/Types/TemplateAliases.h"
 #include "Base/Random/Random.h"
 #include "Base/Types/String/StringId.h"
@@ -17,7 +13,6 @@
 #include "ECS/Delegates.h"
 #include "ECS/ComponentMap.h"
 #include "ECS/ComponentFactory.h"
-#include "ECS/Serialization/ComponentSerializersHolder.h"
 #include "ECS/TypedComponent.h"
 
 namespace Ecs
@@ -28,24 +23,20 @@ namespace Ecs
 	public:
 		using EntityManager = EntityManagerImpl<ComponentTypeId>;
 		using TypedComponent = TypedComponentImpl<ComponentTypeId>;
+		using ConstTypedComponent = ConstTypedComponentImpl<ComponentTypeId>;
 		using ComponentMap = ComponentMapImpl<ComponentTypeId>;
 		using ComponentFactory = ComponentFactoryImpl<ComponentTypeId>;
 
+		using EntityIndex = size_t;
+
+	public:
 		EntityManagerImpl(const ComponentFactory& componentFactory)
 			: mComponentFactory(componentFactory)
 		{}
 
 		~EntityManagerImpl()
 		{
-			for (auto& componentVector : mComponents)
-			{
-				auto deleterFn = mComponentFactory.getDeletionFn(componentVector.first);
-
-				for (auto component : componentVector.second)
-				{
-					deleterFn(component);
-				}
-			}
+			clear();
 		}
 
 		EntityManagerImpl(const EntityManagerImpl&) = delete;
@@ -120,7 +111,7 @@ namespace Ecs
 			onEntityRemoved.broadcast();
 		}
 
-		[[nodiscard]] const std::unordered_map<Entity::EntityId, size_t>& getEntities() const { return mEntityIndexMap; }
+		[[nodiscard]] const std::unordered_map<Entity::EntityId, EntityIndex>& getEntities() const { return mEntityIndexMap; }
 
 		// these two should be used carefully (added for the editor)
 		Entity getNonExistentEntity()
@@ -152,6 +143,22 @@ namespace Ecs
 		}
 
 		void getAllEntityComponents(Entity entity, std::vector<TypedComponent>& outComponents)
+		{
+			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
+			if (entityIdxItr != mEntityIndexMap.end())
+			{
+				EntityIndex index = entityIdxItr->second;
+				for (auto& componentArray : mComponents)
+				{
+					if (componentArray.second.size() > index && componentArray.second[index] != nullptr)
+					{
+						outComponents.emplace_back(componentArray.first, componentArray.second[index]);
+					}
+				}
+			}
+		}
+
+		void getAllEntityComponents(Entity entity, std::vector<ConstTypedComponent>& outComponents) const
 		{
 			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr != mEntityIndexMap.end())
@@ -206,6 +213,14 @@ namespace Ecs
 
 			addComponentToEntity(entityIdxItr->second, component, ComponentType::GetTypeName());
 
+			return component;
+		}
+
+		void* addComponentByType(Entity entity, ComponentTypeId typeId)
+		{
+			auto createFn = mComponentFactory.getCreationFn(typeId);
+			void* component = createFn();
+			addComponent(entity, component, typeId);
 			return component;
 		}
 
@@ -454,44 +469,6 @@ namespace Ecs
 			return mEntityIndexMap.find(entity.getId()) != mEntityIndexMap.end();
 		}
 
-		// methods for the editor
-		void getPrefabFromEntity(nlohmann::json& json, Entity entity, const JsonComponentSerializationHolder& jsonSerializationHolder)
-		{
-			std::vector<TypedComponent> components;
-			getAllEntityComponents(entity, components);
-
-			for (const TypedComponent& componentData : components)
-			{
-				auto componentObj = nlohmann::json{};
-				StringId componentTypeName = componentData.typeId;
-				jsonSerializationHolder.getComponentSerializerFromClassName(componentTypeName)->toJson(componentObj, componentData.component);
-				json[ID_TO_STR(componentData.typeId)] = componentObj;
-			}
-		}
-
-		Entity createPrefabInstance(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers)
-		{
-			Entity entity = addEntity();
-			applyPrefabToExistentEntity(json, entity, componentSerializers);
-			return entity;
-		}
-
-		void applyPrefabToExistentEntity(const nlohmann::json& json, Entity entity, const ComponentSerializersHolder& componentSerializers)
-		{
-			for (const auto& [componentTypeNameStr, componentObj] : json.items())
-			{
-				ComponentTypeId componentTypeName = STR_TO_ID(componentTypeNameStr);
-				void* component = mComponentFactory.createComponent(componentTypeName);
-
-				componentSerializers.jsonSerializer.getComponentSerializerFromClassName(componentTypeName)->fromJson(componentObj, component);
-
-				addComponent(
-					entity,
-					component,
-					componentTypeName
-				);
-			}
-		}
 
 		void transferEntityTo(EntityManager& otherManager, Entity entity)
 		{
@@ -550,120 +527,6 @@ namespace Ecs
 			mIndexEntityMap.erase(mNextEntityIndex);
 		}
 
-		[[nodiscard]] nlohmann::json toJson(const ComponentSerializersHolder& componentSerializers) const
-		{
-			std::vector<std::pair<Entity::EntityId, EntityIndex>> sortedEntityIndexMap;
-			sortedEntityIndexMap.reserve(mEntityIndexMap.size());
-			for (const auto& indexPair : mEntityIndexMap)
-			{
-				sortedEntityIndexMap.emplace_back(indexPair);
-			}
-
-			std::ranges::sort(sortedEntityIndexMap);
-
-			nlohmann::json outJson{
-				{"entityIndexMap", sortedEntityIndexMap}
-			};
-
-			auto components = nlohmann::json{};
-
-			for (auto& componentArray : mComponents)
-			{
-				auto componentArrayObject = nlohmann::json::array();
-				const JsonComponentSerializer* jsonSerializer = componentSerializers.jsonSerializer.getComponentSerializerFromClassName(componentArray.first);
-				for (auto& component : componentArray.second)
-				{
-					auto componentObj = nlohmann::json{};
-					if (component != nullptr)
-					{
-						jsonSerializer->toJson(componentObj, component);
-					}
-					componentArrayObject.push_back(componentObj);
-				}
-				components[ID_TO_STR(componentArray.first)] = componentArrayObject;
-			}
-			outJson["components"] = components;
-
-			return outJson;
-		}
-
-		void fromJson(const nlohmann::json& json, const ComponentSerializersHolder& componentSerializers)
-		{
-			json.at("entityIndexMap").get_to(mEntityIndexMap);
-
-			for (const auto& item : mEntityIndexMap)
-			{
-				mIndexEntityMap[item.second] = item.first;
-			}
-
-			auto maxElementIt = std::max_element(mIndexEntityMap.begin(), mIndexEntityMap.end());
-			if (maxElementIt != mIndexEntityMap.end())
-			{
-				mNextEntityIndex = maxElementIt->first + 1;
-			}
-			else
-			{
-				mNextEntityIndex = 0;
-			}
-
-			const auto& components = json.at("components");
-			for (const auto& [typeStr, vector] : components.items())
-			{
-				StringId type = STR_TO_ID(typeStr);
-				typename ComponentFactory::CreationFn componentCreateFn = mComponentFactory.getCreationFn(type);
-				if (componentCreateFn != nullptr)
-				{
-					const JsonComponentSerializer* jsonSerializer = componentSerializers.jsonSerializer.getComponentSerializerFromClassName(type);
-					std::vector<void*>& componentsVector = mComponents.getOrCreateComponentVectorById(type);
-					componentsVector.reserve(vector.size());
-					for (const auto& componentData : vector)
-					{
-						if (!componentData.is_null())
-						{
-							void* component = componentCreateFn();
-							jsonSerializer->fromJson(componentData, component);
-							componentsVector.push_back(component);
-						}
-						else
-						{
-							componentsVector.push_back(nullptr);
-						}
-					}
-				}
-			}
-		}
-
-		// helper functions for cleanup before saving
-		void stableSortEntitiesById()
-		{
-			std::vector<Entity::EntityId> ids;
-			ids.resize(mNextEntityIndex);
-			for (auto [entityId, idx] : mEntityIndexMap)
-			{
-				ids[idx] = entityId;
-			}
-
-			std::vector<size_t> positions;
-			soasort::getSortedPositions(positions, ids);
-
-			std::vector<soasort::Swap> swaps;
-			soasort::generateSwaps(swaps, positions);
-
-			for (auto& componentVectorPair : mComponents)
-			{
-				componentVectorPair.second.resize(mNextEntityIndex, nullptr);
-				soasort::applySwaps(componentVectorPair.second, swaps);
-			}
-
-			soasort::applySwaps(ids, swaps);
-			for (EntityIndex idx = 0u; idx < mNextEntityIndex; ++idx)
-			{
-				Entity::EntityId id = ids[idx];
-				mEntityIndexMap[id] = idx;
-				mIndexEntityMap[idx] = id;
-			}
-		}
-
 		void clearCaches()
 		{
 			for (auto& componentVectorPair : mComponents)
@@ -687,6 +550,32 @@ namespace Ecs
 			mComponents.cleanEmptyVectors();
 		}
 
+		void clear()
+		{
+			for (auto& componentVector : mComponents)
+			{
+				auto deleterFn = mComponentFactory.getDeletionFn(componentVector.first);
+
+				for (auto component : componentVector.second)
+				{
+					deleterFn(component);
+				}
+				componentVector.second.clear();
+			}
+			mComponents.cleanEmptyVectors();
+
+			mEntityIndexMap.clear();
+			mIndexEntityMap.clear();
+
+			mScheduledComponentAdditions.clear();
+			mScheduledComponentRemovements.clear();
+			mNextEntityIndex = 0;
+		}
+
+		const ComponentMap& getComponentsData() const { return mComponents; }
+
+		auto getSortableData() { return std::make_tuple(std::ref(mComponents), std::ref(mEntityIndexMap), std::ref(mIndexEntityMap)); }
+
 		[[nodiscard]] bool hasAnyEntities() const
 		{
 			return !mEntityIndexMap.empty();
@@ -697,8 +586,6 @@ namespace Ecs
 		MulticastDelegate<> onEntityRemoved;
 
 	private:
-		using EntityIndex = size_t;
-
 		struct ComponentToAdd
 		{
 			Entity entity;

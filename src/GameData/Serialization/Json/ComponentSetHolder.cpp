@@ -6,7 +6,7 @@
 
 namespace Json
 {
-	nlohmann::json SerializeComponentSetHolder(const ComponentSetHolder& componentSetHolder, const Ecs::ComponentSerializersHolder& componentSerializers)
+	nlohmann::json SerializeComponentSetHolder(const ComponentSetHolder& componentSetHolder, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		nlohmann::json outJson;
 		auto components = nlohmann::json{};
@@ -14,14 +14,14 @@ namespace Json
 		for (const ConstTypedComponent& componentData : componentSetHolder.getAllComponents())
 		{
 			auto componentObj = nlohmann::json{};
-			componentSerializers.jsonSerializer.getComponentSerializerFromClassName(componentData.typeId)->toJson(componentObj, componentData.component);
+			jsonSerializerHolder.getComponentSerializerFromClassName(componentData.typeId)->toJson(componentObj, componentData.component);
 			components[ID_TO_STR(componentData.typeId)] = componentObj;
 		}
 		outJson["components"] = components;
 		return outJson;
 	}
 
-	void DeserializeComponentSetHolder(ComponentSetHolder& outComponentSetHolder, const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers)
+	void DeserializeComponentSetHolder(ComponentSetHolder& outComponentSetHolder, const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		outComponentSetHolder.removeAllComponents();
 		const auto& components = json.at("components");
@@ -31,7 +31,7 @@ namespace Json
 			if (!componentData.is_null())
 			{
 				void* component = outComponentSetHolder.addComponentByType(className);
-				componentSerializers.jsonSerializer.getComponentSerializerFromClassName(className)->fromJson(componentData, component);
+				jsonSerializerHolder.getComponentSerializerFromClassName(className)->fromJson(componentData, component);
 			}
 		}
 	}

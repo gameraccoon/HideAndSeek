@@ -1,23 +1,23 @@
 #pragma once
 
-namespace Ecs
+namespace Json
 {
-	class JsonComponentSerializer
+	class ComponentSerializer
 	{
 	public:
-		virtual ~JsonComponentSerializer() = default;
+		virtual ~ComponentSerializer() = default;
 		virtual void toJson(nlohmann::json& outJson, const void* component) const = 0;
 		virtual void fromJson(const nlohmann::json& json, void* outComponent) const = 0;
 	};
 
-	class JsonComponentSerializationHolder
+	class ComponentSerializationHolder
 	{
 	public:
-		JsonComponentSerializationHolder() = default;
-		JsonComponentSerializationHolder(JsonComponentSerializationHolder&) = delete;
-		JsonComponentSerializationHolder& operator=(JsonComponentSerializationHolder&) = delete;
+		ComponentSerializationHolder() = default;
+		ComponentSerializationHolder(ComponentSerializationHolder&) = delete;
+		ComponentSerializationHolder& operator=(ComponentSerializationHolder&) = delete;
 
-		[[nodiscard]] const JsonComponentSerializer* getComponentSerializerFromClassName(StringId className) const
+		[[nodiscard]] const ComponentSerializer* getComponentSerializerFromClassName(StringId className) const
 		{
 			const auto& it = mClassNameToSerializer.find(className);
 			if (it != mClassNameToSerializer.end())
@@ -30,14 +30,14 @@ namespace Ecs
 		}
 
 		template<typename T>
-		void registerSerializer(StringId className, std::unique_ptr<JsonComponentSerializer>&& serializer)
+		void registerSerializer(StringId className, std::unique_ptr<ComponentSerializer>&& serializer)
 		{
 			mSerializers.push_back(std::move(serializer));
 			mClassNameToSerializer.emplace(className, mSerializers.size() - 1);
 		}
 
 	private:
-		std::vector<std::unique_ptr<JsonComponentSerializer>> mSerializers;
+		std::vector<std::unique_ptr<ComponentSerializer>> mSerializers;
 		std::unordered_map<StringId, size_t> mClassNameToSerializer;
 	};
 

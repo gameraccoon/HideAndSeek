@@ -20,14 +20,13 @@ public:
 	[[nodiscard]] SpatialWorldData& getSpatialData() { return mSpatialData; }
 	[[nodiscard]] const SpatialWorldData& getSpatialData() const { return mSpatialData; }
 
-	[[nodiscard]] nlohmann::json toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const;
-	void fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers);
+	[[nodiscard]] nlohmann::json toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
 	std::optional<std::pair<EntityView, CellPos>> getTrackedSpatialEntity(StringId entityStringId);
 	EntityView createTrackedSpatialEntity(StringId entityStringId, CellPos pos);
 	EntityView createSpatialEntity(CellPos pos);
 
-	void packForJsonSaving();
 	void clearCaches();
 
 private:

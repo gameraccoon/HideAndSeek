@@ -8,7 +8,7 @@
 
 namespace ComponentsRegistration
 {{
-	void RegisterJsonSerializers(Ecs::JsonComponentSerializationHolder& jsonSerializerHolder)
+	void RegisterJsonSerializers(Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{{
 		{serialization/json/component_json_serializer_register}
 	}}

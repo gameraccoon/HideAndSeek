@@ -38,7 +38,7 @@ Game::Game(int width, int height)
 void Game::start(ArgumentsParser& arguments)
 {
 	ComponentsRegistration::RegisterComponents(mComponentFactory);
-	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializers.jsonSerializer);
+	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializers);
 
 	initSystems();
 

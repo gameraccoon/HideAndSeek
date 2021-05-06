@@ -2,11 +2,11 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "ECS/Serialization/ComponentSerializersHolder.h"
 #include "GameData/EcsDefinitions.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 namespace Json
 {
-	nlohmann::json SerializeComponentSetHolder(const ComponentSetHolder& componentSetHolder, const Ecs::ComponentSerializersHolder& componentSerializers);
-	void DeserializeComponentSetHolder(ComponentSetHolder& outComponentSetHolder, const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers);
+	nlohmann::json SerializeComponentSetHolder(const ComponentSetHolder& componentSetHolder, const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void DeserializeComponentSetHolder(ComponentSetHolder& outComponentSetHolder, const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 }

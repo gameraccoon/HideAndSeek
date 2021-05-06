@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ECS/Serialization/JsonComponentSerializer.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 namespace ComponentsRegistration
 {
-	void RegisterJsonSerializers(Ecs::JsonComponentSerializationHolder& jsonSerializerHolder);
+	void RegisterJsonSerializers(Json::ComponentSerializationHolder& jsonSerializerHolder);
 }

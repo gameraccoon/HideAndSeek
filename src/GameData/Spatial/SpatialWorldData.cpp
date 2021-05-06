@@ -148,13 +148,13 @@ BoundingBox SpatialWorldData::GetCellAABB(CellPos pos)
 	return BoundingBox(pos.x * CellSize, pos.y * CellSize, (pos.x + 1) * CellSize, (pos.y + 1) * CellSize);
 }
 
-nlohmann::json SpatialWorldData::toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const
+nlohmann::json SpatialWorldData::toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
 	nlohmann::json cellsJson;
 
-	std::vector<std::pair<CellPos, const WorldCell*>> sortedCells;
+	std::vector<std::pair<CellPos, WorldCell*>> sortedCells;
 	sortedCells.reserve(mCells.size());
-	for (const auto& cell : mCells)
+	for (auto& cell : mCells)
 	{
 		sortedCells.emplace_back(cell.first, &cell.second);
 	}
@@ -167,11 +167,11 @@ nlohmann::json SpatialWorldData::toJson(const Ecs::ComponentSerializersHolder& c
 		);
 	});
 
-	for (const auto& cell : sortedCells)
+	for (auto& cell : sortedCells)
 	{
 		cellsJson.push_back({
 			{"pos", cell.first},
-			{"cell", cell.second->toJson(componentSerializers)}
+			{"cell", cell.second->toJson(jsonSerializerHolder)}
 		});
 	}
 
@@ -218,28 +218,20 @@ static void RedistributeSpatialEntitiesBetweenCells(SpatialWorldData& spatialDat
 	}
 }
 
-void SpatialWorldData::fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers)
+void SpatialWorldData::fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
 	const auto& cellsJson = json.at("cells");
 	for (const auto& cellJson : cellsJson)
 	{
 		CellPos pos = cellJson.at("pos");
 		auto res = mCells.try_emplace(pos, pos, mComponentFactory);
-		res.first->second.fromJson(cellJson.at("cell"), componentSerializers);
+		res.first->second.fromJson(cellJson.at("cell"), jsonSerializerHolder);
 	}
 
 	int cellSize = json.at("cell_size");
 	if (cellSize != CellSizeInt)
 	{
 		RedistributeSpatialEntitiesBetweenCells(*this, static_cast<float>(cellSize));
-	}
-}
-
-void SpatialWorldData::packForJsonSaving()
-{
-	for (auto& cellPair : mCells)
-	{
-		cellPair.second.packForJsonSaving();
 	}
 }
 

@@ -17,6 +17,8 @@
 
 #include "ECS/ComponentFactory.h"
 
+#include "GameData/Serialization/Json/EntityManager.h"
+
 #include "src/editorcommands/addcomponentcommand.h"
 
 const QString PrefabListToolbox::WidgetName = "Prefabs";
@@ -144,11 +146,11 @@ void PrefabListToolbox::createPrefabFromEntity(const QString& prefabName, Entity
 		return;
 	}
 
-	const auto& jsonSerializationHolder = mMainWindow->getComponentSerializationHolder().jsonSerializer;
+	const auto& jsonSerializationHolder = mMainWindow->getComponentSerializationHolder();
 
 	PrefabData prefabData;
 	prefabData.name = prefabName;
-	currentWorld->getEntityManager().getPrefabFromEntity(prefabData.data, entity, jsonSerializationHolder);
+	Json::GetPrefabFromEntity(currentWorld->getEntityManager(), prefabData.data, entity, jsonSerializationHolder);
 	mPrefabs.push_back(prefabData);
 	updateContent();
 }
@@ -262,7 +264,7 @@ void PrefabListToolbox::createInstance()
 		return;
 	}
 
-	currentWorld->getEntityManager().createPrefabInstance(it->data, mMainWindow->getComponentSerializationHolder());
+	Json::CreatePrefabInstance(currentWorld->getEntityManager(), it->data, mMainWindow->getComponentSerializationHolder());
 }
 
 void to_json(nlohmann::json& outJson, const PrefabListToolbox::PrefabData& data)

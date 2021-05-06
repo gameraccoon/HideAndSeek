@@ -4,11 +4,11 @@
 
 #include <nlohmann/json.hpp>
 
-#include "ECS/Serialization/ComponentSerializersHolder.h"
-
 #include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 #include "GameData/Components/SpatialTrackComponent.generated.h"
 #include "GameData/Serialization/Json/ComponentSetHolder.h"
+#include "GameData/Serialization/Json/EntityManager.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 World::World(const ComponentFactory& componentFactory)
 	: mEntityManager(componentFactory)
@@ -17,12 +17,12 @@ World::World(const ComponentFactory& componentFactory)
 {
 }
 
-nlohmann::json World::toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const
+nlohmann::json World::toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
 	return nlohmann::json{
-		{"entity_manager", mEntityManager.toJson(componentSerializers)},
-		{"world_components", Json::SerializeComponentSetHolder(mWorldComponents, componentSerializers)},
-		{"spatial_data", mSpatialData.toJson(componentSerializers)}
+		{"entity_manager", Json::SerializeEntityManager(mEntityManager, jsonSerializerHolder)},
+		{"world_components", Json::SerializeComponentSetHolder(mWorldComponents, jsonSerializerHolder)},
+		{"spatial_data", mSpatialData.toJson(jsonSerializerHolder)}
 	};
 }
 
@@ -44,11 +44,11 @@ static void InitSpatialTrackedEntities(SpatialWorldData& spatialData, ComponentS
 	});
 }
 
-void World::fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers)
+void World::fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
-	mEntityManager.fromJson(json.at("entity_manager"), componentSerializers);
-	Json::DeserializeComponentSetHolder(mWorldComponents, json.at("world_components"), componentSerializers);
-	mSpatialData.fromJson(json.at("spatial_data"), componentSerializers);
+	Json::DeserializeEntityManager(mEntityManager, json.at("entity_manager"), jsonSerializerHolder);
+	Json::DeserializeComponentSetHolder(mWorldComponents, json.at("world_components"), jsonSerializerHolder);
+	mSpatialData.fromJson(json.at("spatial_data"), jsonSerializerHolder);
 
 	InitSpatialTrackedEntities(mSpatialData, mWorldComponents);
 }
@@ -91,12 +91,6 @@ EntityView World::createSpatialEntity(CellPos pos)
 {
 	WorldCell& cell = getSpatialData().getOrCreateCell(pos);
 	return EntityView(cell.getEntityManager().addEntity(), cell.getEntityManager());
-}
-
-void World::packForJsonSaving()
-{
-	mEntityManager.stableSortEntitiesById();
-	mSpatialData.packForJsonSaving();
 }
 
 void World::clearCaches()

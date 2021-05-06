@@ -21,8 +21,8 @@
 
 #include "Base/Math/Float.h"
 
-#include "ECS/Serialization/ComponentSerializersHolder.h"
-
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
+#include "GameData/Serialization/Json/EntityManager.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
 
@@ -306,7 +306,7 @@ void TransformEditorToolbox::onCopyCommand()
 		return;
 	}
 
-	const auto& jsonSerializationHolder = mMainWindow->getComponentSerializationHolder().jsonSerializer;
+	const auto& jsonSerializationHolder = mMainWindow->getComponentSerializationHolder();
 
 	Vector2D center{ZERO_VECTOR};
 	mCopiedObjects.clear();
@@ -316,7 +316,7 @@ void TransformEditorToolbox::onCopyCommand()
 		if (cell != nullptr)
 		{
 			nlohmann::json serializedEntity;
-			cell->getEntityManager().getPrefabFromEntity(serializedEntity, spatialEntity.entity.getEntity(), jsonSerializationHolder);
+			Json::GetPrefabFromEntity(cell->getEntityManager(), serializedEntity, spatialEntity.entity.getEntity(), jsonSerializationHolder);
 			mCopiedObjects.push_back(serializedEntity);
 			auto [transform] = cell->getEntityManager().getEntityComponents<TransformComponent>(spatialEntity.entity.getEntity());
 			if (transform)
@@ -350,7 +350,7 @@ void TransformEditorToolbox::onPasteCommand()
 		return;
 	}
 
-	const Ecs::ComponentSerializersHolder& serializationHolder = mMainWindow->getComponentSerializationHolder();
+	const Json::ComponentSerializationHolder& serializationHolder = mMainWindow->getComponentSerializationHolder();
 
 	mMainWindow->getCommandStack().executeNewCommand<AddEntityGroupCommand>(world,
 		mCopiedObjects,

@@ -167,7 +167,7 @@ namespace GameDataLoader
 		geometryJson["geometry"].get_to(pathBlockingCompontnt->getPolygonsRef());
 	}
 
-	void SaveWorld(const World& world, const std::string& levelName, const Ecs::ComponentSerializersHolder& componentSerializers)
+	void SaveWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		namespace fs = std::filesystem;
 		fs::path levelPath(levelName);
@@ -192,7 +192,7 @@ namespace GameDataLoader
 			std::ofstream mapFile(levelPath);
 			nlohmann::json mapJson({
 				{"version", levelVersion},
-				{"world", world.toJson(componentSerializers)}
+				{"world", world.toJson(jsonSerializerHolder)}
 			});
 
 			mapFile << std::setw(4) << mapJson << std::endl;
@@ -206,7 +206,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void LoadWorld(World& world, const std::string& levelName, const Ecs::ComponentSerializersHolder& componentSerializers)
+	void LoadWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		namespace fs = std::filesystem;
 		fs::path levelPath(levelName);
@@ -227,7 +227,7 @@ namespace GameDataLoader
 
 			if (const auto& worldObject = mapJson.at("world"); worldObject.is_object())
 			{
-				world.fromJson(worldObject, componentSerializers);
+				world.fromJson(worldObject, jsonSerializerHolder);
 			}
 			LoadLightBlockingGeometry(world, levelPath, levelVersion);
 			LoadPathBlockingGeometry(world, levelPath, levelVersion);
@@ -242,7 +242,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const Ecs::ComponentSerializersHolder& componentSerializers)
+	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		namespace fs = std::filesystem;
 		fs::path gameDataPath(gameDataName);
@@ -263,7 +263,7 @@ namespace GameDataLoader
 		try
 		{
 			std::ofstream mapFile(gameDataPath);
-			nlohmann::json mapJson({{"gameData", gameData.toJson(componentSerializers)}});
+			nlohmann::json mapJson({{"gameData", gameData.toJson(jsonSerializerHolder)}});
 
 			mapFile << std::setw(4) << mapJson << std::endl;
 		}
@@ -273,7 +273,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void LoadGameData(GameData& gameData, const std::string& gameDataName, const Ecs::ComponentSerializersHolder& componentSerializers)
+	void LoadGameData(GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		namespace fs = std::filesystem;
 		fs::path gameDataPath(gameDataName);
@@ -292,7 +292,7 @@ namespace GameDataLoader
 
 			if (const auto& worldObject = mapJson.at("gameData"); worldObject.is_object())
 			{
-				gameData.fromJson(worldObject, componentSerializers);
+				gameData.fromJson(worldObject, jsonSerializerHolder);
 			}
 		}
 		catch(const nlohmann::detail::exception& e)

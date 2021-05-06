@@ -53,7 +53,7 @@ MainWindow::~MainWindow()
 void MainWindow::registerFactories()
 {
 	ComponentsRegistration::RegisterComponents(mComponentFactory);
-	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializationHolder.jsonSerializer);
+	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializationHolder);
 	mComponentContentFactory.registerComponents();
 }
 

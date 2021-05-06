@@ -2,16 +2,15 @@
 
 #include <QtWidgets/qcombobox.h>
 
-#include "ECS/Serialization/ComponentSerializersHolder.h"
 #include "GameData/World.h"
 
 #include "src/editorutils/componentreferenceutils.h"
 
-RemoveComponentCommand::RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const Ecs::ComponentSerializersHolder& serializerHolder, const ComponentFactory& componentFactory)
+RemoveComponentCommand::RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const Json::ComponentSerializationHolder& jsonSerializerHolder, const ComponentFactory& componentFactory)
 	: EditorCommand(EffectBitset(EffectType::Components))
 	, mSource(source)
 	, mComponentTypeName(typeName)
-	, mComponentSerializerHolder(serializerHolder)
+	, mComponentSerializerHolder(jsonSerializerHolder)
 	, mComponentFactory(componentFactory)
 {
 }
@@ -32,7 +31,7 @@ void RemoveComponentCommand::doCommand(World* world)
 			return;
 		}
 
-		const Ecs::JsonComponentSerializer* jsonSerializer = mComponentSerializerHolder.jsonSerializer.getComponentSerializerFromClassName(mComponentTypeName);
+		const Json::ComponentSerializer* jsonSerializer = mComponentSerializerHolder.getComponentSerializerFromClassName(mComponentTypeName);
 		jsonSerializer->toJson(mSerializedComponent, it->component);
 	}
 
@@ -47,7 +46,7 @@ void RemoveComponentCommand::undoCommand(World* world)
 {
 	void* component = mComponentFactory.createComponent(mComponentTypeName);
 
-	const Ecs::JsonComponentSerializer* jsonSerializer = mComponentSerializerHolder.jsonSerializer.getComponentSerializerFromClassName(mComponentTypeName);
+	const Json::ComponentSerializer* jsonSerializer = mComponentSerializerHolder.getComponentSerializerFromClassName(mComponentTypeName);
 	jsonSerializer->fromJson(mSerializedComponent, component);
 
 	Utils::AddComponent(

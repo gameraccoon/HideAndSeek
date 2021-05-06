@@ -4,11 +4,12 @@
 
 #include "GameData/World.h"
 #include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Serialization/Json/EntityManager.h"
 
-AddEntityGroupCommand::AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, const Ecs::ComponentSerializersHolder& serializationHolder, const Vector2D& shift)
+AddEntityGroupCommand::AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, const Json::ComponentSerializationHolder& jsonSerializerHolder, const Vector2D& shift)
 	: EditorCommand(EffectBitset(EffectType::Entities))
 	, mEntities(entities)
-	, mSerializationHolder(serializationHolder)
+	, mSerializationHolder(jsonSerializerHolder)
 	, mShift(shift)
 {
 }
@@ -21,7 +22,7 @@ void AddEntityGroupCommand::doCommand(World* world)
 	for (const auto& serializedObject : mEntities)
 	{
 		CellPos cellPos = initialPos;
-		Entity entity = cell.getEntityManager().createPrefabInstance(serializedObject, mSerializationHolder);
+		Entity entity = Json::CreatePrefabInstance(cell.getEntityManager(), serializedObject, mSerializationHolder);
 		auto [transform] = cell.getEntityManager().getEntityComponents<TransformComponent>(entity);
 		if (transform)
 		{

@@ -2,6 +2,7 @@
 
 #include "GameData/Spatial/WorldCell.h"
 #include "GameData/Serialization/Json/ComponentSetHolder.h"
+#include "GameData/Serialization/Json/EntityManager.h"
 
 #include <nlohmann/json.hpp>
 
@@ -12,24 +13,18 @@ WorldCell::WorldCell(const CellPos& pos, const ComponentFactory& componentFactor
 {
 }
 
-nlohmann::json WorldCell::toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const
+nlohmann::json WorldCell::toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
 	return nlohmann::json{
-		{"entity_manager", mEntityManager.toJson(componentSerializers)},
-		{"cell_components", Json::SerializeComponentSetHolder(mCellComponents, componentSerializers)},
+		{"entity_manager", Json::SerializeEntityManager(mEntityManager, jsonSerializerHolder)},
+		{"cell_components", Json::SerializeComponentSetHolder(mCellComponents, jsonSerializerHolder)},
 	};
 }
 
-void WorldCell::fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers)
+void WorldCell::fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
-	mEntityManager.fromJson(json.at("entity_manager"), componentSerializers);
-
-	Json::DeserializeComponentSetHolder(mCellComponents, json.at("cell_components"), componentSerializers);
-}
-
-void WorldCell::packForJsonSaving()
-{
-	mEntityManager.stableSortEntitiesById();
+	Json::DeserializeEntityManager(mEntityManager, json.at("entity_manager"), jsonSerializerHolder);
+	Json::DeserializeComponentSetHolder(mCellComponents, json.at("cell_components"), jsonSerializerHolder);
 }
 
 void WorldCell::clearCaches()

@@ -1,9 +1,12 @@
 #pragma once
 
+#include <nlohmann/json_fwd.hpp>
+
 #include "GameData/EcsDefinitions.h"
 
 #include "GameData/Core/Vector2D.h"
 #include "GameData/Spatial/CellPos.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 class WorldCell
 {
@@ -17,10 +20,9 @@ public:
 
 	[[nodiscard]] CellPos getPos() const { return mPos; }
 
-	[[nodiscard]] nlohmann::json toJson(const Ecs::ComponentSerializersHolder& componentSerializers) const;
-	void fromJson(const nlohmann::json& json, const Ecs::ComponentSerializersHolder& componentSerializers);
+	[[nodiscard]] nlohmann::json toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
-	void packForJsonSaving();
 	void clearCaches();
 	[[nodiscard]] bool hasAnyData() const;
 
