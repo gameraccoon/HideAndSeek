@@ -6,7 +6,6 @@
 #include <unordered_map>
 
 #include "Base/Random/Random.h"
-#include "Base/Types/TemplateAliases.h"
 
 #include "ComponentFactory.h"
 #include "ComponentMap.h"
@@ -317,7 +316,7 @@ namespace Ecs
 		}
 
 		template<typename FirstComponent, typename... Components, typename... AdditionalData>
-		void getComponents(TupleVector<AdditionalData..., FirstComponent*, Components*...>& inOutComponents, AdditionalData... data)
+		void getComponents(std::vector<std::tuple<AdditionalData..., FirstComponent*, Components*...>>& inOutComponents, AdditionalData... data)
 		{
 			auto componentVectors = mComponents.template getComponentVectors<FirstComponent, Components...>();
 			auto& firstComponentVector = std::get<0>(componentVectors);
@@ -343,7 +342,7 @@ namespace Ecs
 		}
 
 		template<typename FirstComponent, typename... Components, typename... AdditionalData>
-		void getComponentsWithEntities(TupleVector<Entity, AdditionalData..., FirstComponent*, Components*...>& inOutComponents, AdditionalData... data)
+		void getComponentsWithEntities(std::vector<std::tuple<Entity, AdditionalData..., FirstComponent*, Components*...>>& inOutComponents, AdditionalData... data)
 		{
 			auto componentVectors = mComponents.template getComponentVectors<FirstComponent, Components...>();
 			auto& firstComponentVector = std::get<0>(componentVectors);

@@ -12,7 +12,7 @@ public:
 	explicit SpatialEntityManager(const std::vector<WorldCell*>& cells);
 
 	template<typename FirstComponent, typename... Components>
-	void getComponents(TupleVector<FirstComponent*, Components*...>& inOutComponents)
+	void getComponents(std::vector<std::tuple<FirstComponent*, Components*...>>& inOutComponents)
 	{
 		for (WorldCell* cell : mCells)
 		{
@@ -21,7 +21,7 @@ public:
 	}
 
 	template<typename FirstComponent, typename... Components>
-	void getSpatialComponents(TupleVector<WorldCell*, FirstComponent*, Components*...>& inOutComponents)
+	void getSpatialComponents(std::vector<std::tuple<WorldCell*, FirstComponent*, Components*...>>& inOutComponents)
 	{
 		for (WorldCell* cell : mCells)
 		{
@@ -30,7 +30,7 @@ public:
 	}
 
 	template<typename FirstComponent, typename... Components>
-	void getSpatialComponentsWithEntities(TupleVector<Entity, WorldCell*, FirstComponent*, Components*...>& inOutComponents)
+	void getSpatialComponentsWithEntities(std::vector<std::tuple<Entity, WorldCell*, FirstComponent*, Components*...>>& inOutComponents)
 	{
 		for (WorldCell* cell : mCells)
 		{
@@ -69,7 +69,7 @@ public:
 
 	void getAllEntityComponents(Entity entity, std::vector<TypedComponent>& outComponents);
 
-	void getSpatialEntitiesHavingComponents(const std::vector<StringId>& componentIndexes, TupleVector<WorldCell*, Entity>& inOutEntities) const;
+	void getSpatialEntitiesHavingComponents(const std::vector<StringId>& componentIndexes, std::vector<std::tuple<WorldCell*, Entity>>& inOutEntities) const;
 
 	// debug function for imgui
 	WorldCell* findEntityCell(Entity entity);
@@ -84,7 +84,7 @@ public:
 	explicit ConstSpatialEntityManager(const std::vector<const WorldCell*>& cells);
 
 	template<typename FirstComponent, typename... Components>
-	void getComponents(TupleVector<FirstComponent*, Components*...>& inOutComponents) const
+	void getComponents(std::vector<std::tuple<FirstComponent*, Components*...>>& inOutComponents) const
 	{
 		for (const WorldCell* cell : mCells)
 		{
@@ -93,7 +93,7 @@ public:
 	}
 
 	template<typename FirstComponent, typename... Components>
-	void getSpatialComponents(TupleVector<const WorldCell*, const FirstComponent*, const Components*...>& inOutComponents) const
+	void getSpatialComponents(std::vector<std::tuple<const WorldCell*, const FirstComponent*, const Components*...>>& inOutComponents) const
 	{
 		for (const WorldCell* cell : mCells)
 		{
@@ -102,7 +102,7 @@ public:
 	}
 
 	template<typename FirstComponent, typename... Components>
-	void getSpatialComponentsWithEntities(TupleVector<Entity, const WorldCell*, const FirstComponent*, const Components*...>& inOutComponents) const
+	void getSpatialComponentsWithEntities(std::vector<std::tuple<Entity, const WorldCell*, const FirstComponent*, const Components*...>>& inOutComponents) const
 	{
 		for (const WorldCell* cell : mCells)
 		{

@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#include "Base/Types/TemplateAliases.h"
+
 #include "GameLogic/Systems/CollisionSystem.h"
 
 #include "GameData/Components/CollisionComponent.generated.h"

@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "Base/Types/TemplateAliases.h"
+
 #include "GameData/EcsDefinitions.h"
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/Components/TransformComponent.generated.h"
