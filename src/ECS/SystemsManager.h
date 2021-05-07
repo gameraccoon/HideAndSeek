@@ -1,10 +1,10 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-#include "ECS/System.h"
-
 #include <chrono>
+#include <memory>
+#include <vector>
+
+#include "System.h"
 
 namespace Ecs
 {
@@ -23,24 +23,24 @@ namespace Ecs
 		template <typename T, typename... Args>
 		void registerSystem(Args&&... args)
 		{
-			mSystems.emplace_back(HS_NEW T(std::forward<Args>(args)...));
+			mSystems.emplace_back(new T(std::forward<Args>(args)...));
 		}
 
 		void update();
 		void initResources();
 		void shutdown();
 
-	#ifdef PROFILE_SYSTEMS
+#ifdef PROFILE_SYSTEMS
 		SystemsFrameTime getPreviousFrameTimeData();
-	#endif // PROFILE_SYSTEMS
+#endif // PROFILE_SYSTEMS
 		std::vector<std::string> getSystemNames();
 
 	private:
 		std::vector<std::unique_ptr<System>> mSystems;
-	#ifdef PROFILE_SYSTEMS
+#ifdef PROFILE_SYSTEMS
 		SystemsFrameTime mThisFrameTime;
 		SystemsFrameTime mPreviousFrameTime;
-	#endif // PROFILE_SYSTEMS
+#endif // PROFILE_SYSTEMS
 	};
 
 } // namespace Ecs

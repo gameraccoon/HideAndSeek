@@ -100,12 +100,17 @@ namespace std
 {
 	template<> struct hash<StringId>
 	{
-		size_t operator()(const StringId& stringID) const noexcept
+		size_t operator()(const StringId& stringId) const noexcept
 		{
 			// it's already a unique hash
-			return static_cast<size_t>(stringID.mHash);
+			return static_cast<size_t>(stringId.mHash);
 		}
 	};
+
+	inline std::string to_string(StringId stringId)
+	{
+		return ID_TO_STR(stringId);
+	}
 }
 
 void to_json(nlohmann::json& outJson, const StringId& stringId);

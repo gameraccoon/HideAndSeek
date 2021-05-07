@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ECS/Entity.h"
-#include "ECS/EntityManager.h"
+#include "Entity.h"
+#include "EntityManager.h"
 
 namespace Ecs
 {

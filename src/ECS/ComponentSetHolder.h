@@ -1,12 +1,12 @@
 #pragma once
 
-#include <tuple>
 #include <map>
+#include <tuple>
 #include <vector>
 
-#include "ECS/Delegates.h"
-#include "ECS/TypedComponent.h"
-#include "ECS/ComponentFactory.h"
+#include "ComponentFactory.h"
+#include "Delegates.h"
+#include "TypedComponent.h"
 
 namespace Ecs
 {

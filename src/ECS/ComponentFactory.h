@@ -1,8 +1,10 @@
 #pragma once
 
-#include <unordered_map>
 #include <functional>
 #include <optional>
+#include <unordered_map>
+
+#include "ErrorHandling.h"
 
 namespace Ecs
 {
@@ -21,7 +23,7 @@ namespace Ecs
 		void registerComponent()
 		{
 			mComponentCreators[T::GetTypeName()] = []{
-				return HS_NEW T();
+				return new T();
 			};
 			mComponentDeleters[T::GetTypeName()] = [](void* component){
 				return delete static_cast<T*>(component);
@@ -36,7 +38,9 @@ namespace Ecs
 				return it->second;
 			}
 
-			ReportFatalError("Unknown component type: '%s'", className);
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+			gErrorHandler(std::string("Unknown component type: '") + std::to_string(className) + "'");
+#endif // ECS_DEBUG_CHECKS_ENABLED
 			return nullptr;
 		}
 
@@ -48,7 +52,9 @@ namespace Ecs
 				return it->second;
 			}
 
-			ReportFatalError("Unknown component type: '%s'", className);
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+			gErrorHandler(std::string("Unknown component type: '") + std::to_string(className) + "'");
+#endif // ECS_DEBUG_CHECKS_ENABLED
 			return nullptr;
 		}
 

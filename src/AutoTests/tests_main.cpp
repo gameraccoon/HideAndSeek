@@ -4,6 +4,8 @@
 
 #include "Base/Random/Random.h"
 
+#include "ECS/ErrorHandling.h"
+
 #include "Utils/Application/ArgumentsParser.h"
 
 #include "AutoTests/Tests/CollidingCircularUnits/TestCase.h"
@@ -58,6 +60,10 @@ int main(int argc, char** argv)
 	}
 
 	Random::gGlobalGenerator = std::mt19937(seed);
+
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+	Ecs::gErrorHandler = [](const std::string& error) { ReportFatalError(error); };
+#endif // ECS_DEBUG_CHECKS_ENABLED
 
 	auto cases = GetCases();
 

@@ -1,17 +1,26 @@
-#include "Base/precomp.h"
-
-#include "ECS/Entity.h"
+#include "Entity.h"
+#include "ErrorHandling.h"
 
 namespace Ecs
 {
 	Entity OptionalEntity::getEntity() const noexcept {
-		Assert(mIsValid, "Getting uninitialized entity");
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+		if (!mIsValid)
+		{
+			gErrorHandler("Getting uninitialized entity");
+		}
+#endif // ECS_DEBUG_CHECKS_ENABLED
 		return Entity(mId);
 	}
 
 	Entity::EntityId OptionalEntity::getId() const noexcept
 	{
-		Assert(mIsValid, "Getting uninitialized entity ID");
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+		if (!mIsValid)
+		{
+			gErrorHandler("Getting uninitialized entity");
+		}
+#endif // ECS_DEBUG_CHECKS_ENABLED
 		return mId;
 	}
 

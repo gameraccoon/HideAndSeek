@@ -1,7 +1,9 @@
 #pragma once
 
-#include <unordered_map>
 #include <algorithm>
+#include <unordered_map>
+
+#include "ErrorHandling.h"
 
 namespace Ecs
 {
@@ -18,7 +20,16 @@ namespace Ecs
 		ComponentMapImpl& operator=(const ComponentMapImpl&) = delete;
 		ComponentMapImpl(ComponentMapImpl&&) = delete;
 		ComponentMapImpl& operator=(ComponentMapImpl&&) = delete;
-		~ComponentMapImpl() { AssertFatal(mEmptyVector.empty(), "mEmptyVector has changed during runtime, that should never happen"); }
+
+		~ComponentMapImpl()
+		{
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+			if (!mEmptyVector.empty())
+			{
+				gErrorHandler("mEmptyVector has changed during runtime, that should never happen");
+			}
+#endif // ECS_DEBUG_CHECKS_ENABLED
+		}
 
 		template<typename FirstComponent, typename... Components>
 		[[nodiscard]] auto getComponentVectors()
@@ -62,7 +73,13 @@ namespace Ecs
 					++it;
 				}
 			}
-			AssertFatal(mEmptyVector.empty(), "mEmptyVector should be empty");
+
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+			if (!mEmptyVector.empty())
+			{
+				gErrorHandler("mEmptyVector should be empty");
+			}
+#endif // ECS_DEBUG_CHECKS_ENABLED
 		}
 
 		[[nodiscard]] Iterator begin() noexcept { return mData.begin(); }

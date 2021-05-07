@@ -1,19 +1,19 @@
 #pragma once
 
-#include <tuple>
-#include <unordered_map>
 #include <algorithm>
 #include <ranges>
+#include <tuple>
+#include <unordered_map>
 
-#include "Base/Types/TemplateAliases.h"
 #include "Base/Random/Random.h"
-#include "Base/Types/String/StringId.h"
+#include "Base/Types/TemplateAliases.h"
 
-#include "ECS/Entity.h"
-#include "ECS/Delegates.h"
-#include "ECS/ComponentMap.h"
-#include "ECS/ComponentFactory.h"
-#include "ECS/TypedComponent.h"
+#include "ComponentFactory.h"
+#include "ComponentMap.h"
+#include "Delegates.h"
+#include "Entity.h"
+#include "ErrorHandling.h"
+#include "TypedComponent.h"
 
 namespace Ecs
 {
@@ -63,7 +63,9 @@ namespace Ecs
 				++insertionTrial;
 			}
 
-			ReportError("Can't generate unique ID for an entity");
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+			gErrorHandler("Can't generate unique ID for an entity");
+#endif // ECS_DEBUG_CHECKS_ENABLED
 			return Entity(0);
 		}
 
@@ -129,7 +131,9 @@ namespace Ecs
 				++generationTrial;
 			}
 
-			ReportError("Can't generate unique ID for an entity");
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+			gErrorHandler("Can't generate unique ID for an entity");
+#endif // ECS_DEBUG_CHECKS_ENABLED
 			return Entity(0);
 		}
 
@@ -440,7 +444,7 @@ namespace Ecs
 			EntityIndex endIdx = std::numeric_limits<EntityIndex>::max();
 			std::vector<const std::vector<void*>*> componentVectors;
 			componentVectors.reserve(componentIndexes.size());
-			for (StringId typeId : componentIndexes)
+			for (ComponentTypeId typeId : componentIndexes)
 			{
 				auto& componentVector = mComponents.getComponentVectorById(typeId);
 
@@ -481,8 +485,13 @@ namespace Ecs
 			}
 
 			// ToDo use global entity ID collision detection
-			MAYBE_UNUSED auto insertionResult = otherManager.mEntityIndexMap.try_emplace(entity.getId(), otherManager.mNextEntityIndex);
-			AssertFatal(insertionResult.second, "EntityId is not unique, two entities have just collided");
+			[[maybe_unused]] auto insertionResult = otherManager.mEntityIndexMap.try_emplace(entity.getId(), otherManager.mNextEntityIndex);
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+			if (!insertionResult.second)
+			{
+				gErrorHandler("EntityId is not unique, two entities have just collided");
+			}
+#endif // ECS_DEBUG_CHECKS_ENABLED
 			otherManager.mIndexEntityMap.emplace(otherManager.mNextEntityIndex, entity.getId());
 			++otherManager.mNextEntityIndex;
 
@@ -683,10 +692,12 @@ namespace Ecs
 			{
 				componentsVector[entityIdx] = component;
 			}
+#ifdef ECS_DEBUG_CHECKS_ENABLED
 			else
 			{
-				ReportFatalError("Trying to add a component when the entity already has one of the same type. This will result in memory leak");
+				gErrorHandler("Trying to add a component when the entity already has one of the same type. This will result in memory leak");
 			}
+#endif // ECS_DEBUG_CHECKS_ENABLED
 		}
 
 	private:
