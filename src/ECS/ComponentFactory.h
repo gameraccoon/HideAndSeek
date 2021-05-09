@@ -1,10 +1,12 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <optional>
 #include <unordered_map>
 
 #include "ErrorHandling.h"
+#include "ComponentPool.h"
 
 namespace Ecs
 {
@@ -21,14 +23,21 @@ namespace Ecs
 		ComponentFactoryImpl(ComponentFactoryImpl&&) = delete;
 		ComponentFactoryImpl& operator=(ComponentFactoryImpl&&) = delete;
 
-		template<typename T>
-		void registerComponent()
+		template<typename ComponentType, std::size_t PageSize = std::max(static_cast<std::size_t>(1), static_cast<std::size_t>(4096u / sizeof(ComponentType)))>
+		void registerComponent(size_t preallocatedPagesCount = 0)
 		{
-			mComponentCreators[T::GetTypeName()] = []{
-				return new (std::nothrow) T();
+			const ComponentTypeId componentTypeId = ComponentType::GetTypeName();
+
+			auto componentPoolRawPtr = new (std::nothrow) ComponentPool<ComponentType, PageSize>(preallocatedPagesCount);
+			mComponentPools.emplace_back(componentPoolRawPtr);
+
+			mComponentCreators[componentTypeId] = [componentPoolRawPtr]{
+				return componentPoolRawPtr->acquireComponent();
 			};
-			mComponentDeleters[T::GetTypeName()] = [](void* component){
-				return delete static_cast<T*>(component);
+			mComponentDeleters[componentTypeId] = [componentPoolRawPtr](void* component){
+				if (component) {
+					return componentPoolRawPtr->releaseComponent(component);
+				}
 			};
 		}
 
@@ -83,6 +92,7 @@ namespace Ecs
 	private:
 		std::unordered_map<ComponentTypeId, CreationFn> mComponentCreators;
 		std::unordered_map<ComponentTypeId, DeletionFn> mComponentDeleters;
+		std::vector<std::unique_ptr<ComponentPoolBase>> mComponentPools;
 	};
 
 } // namespace Ecs

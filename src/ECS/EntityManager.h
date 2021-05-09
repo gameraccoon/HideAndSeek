@@ -75,13 +75,17 @@ namespace Ecs
 
 			for (auto& componentVector : mComponents)
 			{
-				auto deleterFn = mComponentFactory.getDeletionFn(componentVector.first);
 				// if the vector contains deleted entity
 				if (oldEntityIdx < componentVector.second.size())
 				{
-					// remove the element
-					deleterFn(componentVector.second[oldEntityIdx]);
-					componentVector.second[oldEntityIdx] = nullptr;
+					// if the entity contains the component
+					if (void*& componentPtrRef = componentVector.second[oldEntityIdx])
+					{
+						// remove the element
+						auto deleterFn = mComponentFactory.getDeletionFn(componentVector.first);
+						deleterFn(componentPtrRef);
+						componentPtrRef = nullptr;
+					}
 
 					// if the vector contains the last entity
 					if (mNextEntityIndex < componentVector.second.size() && oldEntityIdx != mNextEntityIndex)
