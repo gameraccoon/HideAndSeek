@@ -117,7 +117,6 @@ function(add_folder_as_library folder_path name)
 endfunction()
 
 add_folder_as_library(${GAME_SRC_DIR}/Base Base)
-add_folder_as_library(${GAME_SRC_DIR}/ECS Ecs)
 add_folder_as_library(${GAME_SRC_DIR}/GameData GameData)
 add_folder_as_library(${GAME_SRC_DIR}/GameLogic GameLogic)
 add_folder_as_library(${GAME_SRC_DIR}/Utils Utils)
@@ -157,7 +156,6 @@ set(GENERAL_PROJECT_LIBS
 	Hal
 	Utils
 	GameData
-	Ecs
 	Base
 
 	Polypartition
