@@ -2,7 +2,9 @@
 
 #include <QtWidgets/qcombobox.h>
 
-#include <GameData/World.h>
+#include "Base/Debug/Assert.h"
+
+#include "GameData/World.h"
 
 AddEntityCommand::AddEntityCommand(Entity entity)
 	: EditorCommand(EffectBitset(EffectType::Entities))
@@ -12,7 +14,11 @@ AddEntityCommand::AddEntityCommand(Entity entity)
 
 void AddEntityCommand::doCommand(World* world)
 {
-	world->getEntityManager().insertEntityUnsafe(mEntity);
+	bool isSuccessful = world->getEntityManager().tryInsertEntity(mEntity);
+	if (!isSuccessful)
+	{
+		ReportError("Collision when adding/readding an entity. State is corrupted, no recovery can be performed. Make backups before saving.");
+	}
 }
 
 void AddEntityCommand::undoCommand(World* world)

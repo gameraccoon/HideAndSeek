@@ -2,6 +2,8 @@
 
 #include "GameLogic/Game.h"
 
+#include "Base/Random/Random.h"
+
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 
@@ -32,6 +34,7 @@
 
 Game::Game(int width, int height)
 	: HAL::GameBase(width, height)
+	, mEntityGenerator(Random::gGlobalGenerator())
 {
 }
 

@@ -95,7 +95,8 @@ namespace Json
 		for (const auto& entityData : entitiesJson)
 		{
 			Entity entity(entityData.get<Entity::EntityId>());
-			outEntityManager.insertEntityUnsafe(entity);
+			[[maybe_unused]] bool isInserted = outEntityManager.tryInsertEntity(entity);
+			Assert(isInserted, "Can't create entity because of ID collision");
 			entities.push_back(entity);
 		}
 

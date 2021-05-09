@@ -5,12 +5,11 @@
 #include <tuple>
 #include <unordered_map>
 
-#include "Base/Random/Random.h"
-
 #include "ComponentFactory.h"
 #include "ComponentMap.h"
 #include "Delegates.h"
 #include "Entity.h"
+#include "EntityGenerator.h"
 #include "ErrorHandling.h"
 #include "TypedComponent.h"
 
@@ -29,8 +28,13 @@ namespace Ecs
 		using EntityIndex = size_t;
 
 	public:
-		EntityManagerImpl(const ComponentFactory& componentFactory)
+		/**
+		 * @param componentFactory should be a reference to a ComponentFactory object that has longer lifetime than this EntityManager
+		 * @param entityGenerator should be a reference to an EntityGenerator object that has longer lifetime than this EntityManager
+		 */
+		EntityManagerImpl(const ComponentFactory& componentFactory, EntityGenerator& entityGenerator)
 			: mComponentFactory(componentFactory)
+			, mEntityGenerator(entityGenerator)
 		{}
 
 		~EntityManagerImpl()
@@ -45,27 +49,12 @@ namespace Ecs
 
 		Entity addEntity()
 		{
-			const int EntityInsertionTrialsLimit = 10;
-			int insertionTrial = 0;
-
-			while (insertionTrial < EntityInsertionTrialsLimit)
-			{
-				Entity::EntityId id = static_cast<Entity::EntityId>(Random::gGlobalGenerator());
-				auto insertionResult = mEntityIndexMap.try_emplace(id, mNextEntityIndex);
-				if (insertionResult.second)
-				{
-					mIndexEntityMap.emplace(mNextEntityIndex, id);
-					++mNextEntityIndex;
-					onEntityAdded.broadcast();
-					return Entity(id);
-				}
-				++insertionTrial;
-			}
-
-#ifdef ECS_DEBUG_CHECKS_ENABLED
-			gErrorHandler("Can't generate unique ID for an entity");
-#endif // ECS_DEBUG_CHECKS_ENABLED
-			return Entity(0);
+			Entity::EntityId id = mEntityGenerator.generateAndRegisterEntityId();
+			mEntityIndexMap.emplace(id, mNextEntityIndex);
+			mIndexEntityMap.emplace(mNextEntityIndex, id);
+			++mNextEntityIndex;
+			onEntityAdded.broadcast();
+			return Entity(id);
 		}
 
 		void removeEntity(Entity entity)
@@ -73,8 +62,13 @@ namespace Ecs
 			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
 			if (entityIdxItr == mEntityIndexMap.end())
 			{
+#ifdef ECS_DEBUG_CHECKS_ENABLED
+			gErrorHandler("Trying to remove an entity that doesn't exist");
+#endif // ECS_DEBUG_CHECKS_ENABLED
 				return;
 			}
+			mEntityGenerator.unregisterEntityId(entity.getId());
+
 			EntityIndex oldEntityIdx = entityIdxItr->second;
 
 			--mNextEntityIndex; // now it points to the element that going to be removed
@@ -114,35 +108,42 @@ namespace Ecs
 
 		[[nodiscard]] const std::unordered_map<Entity::EntityId, EntityIndex>& getEntities() const { return mEntityIndexMap; }
 
-		// these two should be used carefully (added for the editor)
+		/**
+		 * @brief Generates yet unused Entity. Should be used together with tryInsertEntity
+		 * @return Not yet used Entity
+		 *
+		 * Can produce collisions if between call to this function and call to tryInsertEntity
+		 * any work with entity happened that could produce new Entity registration
+		 */
 		Entity getNonExistentEntity()
 		{
-			const int EntityInsertionTrialsLimit = 10;
-			int generationTrial = 0;
-
-			while (generationTrial < EntityInsertionTrialsLimit)
-			{
-				Entity::EntityId id = static_cast<Entity::EntityId>(Random::gGlobalGenerator());
-				if (mEntityIndexMap.find(id) == mEntityIndexMap.end())
-				{
-					return Entity(id);
-				}
-				++generationTrial;
-			}
-
-#ifdef ECS_DEBUG_CHECKS_ENABLED
-			gErrorHandler("Can't generate unique ID for an entity");
-#endif // ECS_DEBUG_CHECKS_ENABLED
-			return Entity(0);
+			return Entity(mEntityGenerator.generateEntityId());
 		}
 
-		void insertEntityUnsafe(Entity entity)
+		/**
+		 * @brief Try to insert an entity to then reconstruct its previous state (e.g. during deserialization)
+		 * @param entity  an entity that need to be inserted
+		 * @return true if entity was added, false if it collided with some existent entity
+		 *
+		 * This function should succeed if no other entities were created between removing this
+		 * entity and calling this function with it, or all the new entities were removed before calling it.
+		 * The function checks not only for collisions inside this EntityManager but with all that share the
+		 * same EntityGenerator instance.
+		 *
+		 * Use cases: readding deleted entity by "undo" editor command, loading the game from save.
+		 */
+		bool tryInsertEntity(Entity entity)
 		{
-			mEntityIndexMap.emplace(entity.getId(), mNextEntityIndex);
-			mIndexEntityMap.emplace(mNextEntityIndex, entity.getId());
-			++mNextEntityIndex;
+			bool successfullyRegistered = mEntityGenerator.registerEntityId(entity.getId());
+			if (successfullyRegistered)
+			{
+				mEntityIndexMap.emplace(entity.getId(), mNextEntityIndex);
+				mIndexEntityMap.emplace(mNextEntityIndex, entity.getId());
+				++mNextEntityIndex;
 
-			onEntityAdded.broadcast();
+				onEntityAdded.broadcast();
+			}
+			return successfullyRegistered;
 		}
 
 		void getAllEntityComponents(Entity entity, std::vector<TypedComponent>& outComponents)
@@ -455,9 +456,9 @@ namespace Ecs
 			for (EntityIndex idx = 0; idx < endIdx; ++idx)
 			{
 				bool hasAllComponents = std::all_of(
-							componentVectors.cbegin(),
-							componentVectors.cend(),
-							[idx](const std::vector<void*>* componentVector){ return (*componentVector)[idx] != nullptr; }
+					componentVectors.cbegin(),
+					componentVectors.cend(),
+					[idx](const std::vector<void*>* componentVector){ return (*componentVector)[idx] != nullptr; }
 				);
 
 				if (hasAllComponents)
@@ -483,7 +484,6 @@ namespace Ecs
 				return;
 			}
 
-			// ToDo use global entity ID collision detection
 			[[maybe_unused]] auto insertionResult = otherManager.mEntityIndexMap.try_emplace(entity.getId(), otherManager.mNextEntityIndex);
 #ifdef ECS_DEBUG_CHECKS_ENABLED
 			if (!insertionResult.second)
@@ -505,10 +505,10 @@ namespace Ecs
 					if (componentVector.second[oldEntityIdx] != nullptr)
 					{
 						otherManager.addComponent(
-									entity,
-									componentVector.second[oldEntityIdx],
-									componentVector.first
-									);
+							entity,
+							componentVector.second[oldEntityIdx],
+							componentVector.first
+						);
 					}
 
 					// remove the element from the old manager
@@ -541,7 +541,7 @@ namespace Ecs
 			{
 				auto& componentVector = componentVectorPair.second;
 				auto lastFilledRIt = std::find_if(componentVector.rbegin(), componentVector.rend(),
-												  [](const void* component){ return component != nullptr; }
+					[](const void* component){ return component != nullptr; }
 				);
 
 				if (lastFilledRIt != componentVector.rend())
@@ -571,6 +571,11 @@ namespace Ecs
 				componentVector.second.clear();
 			}
 			mComponents.cleanEmptyVectors();
+
+			for (auto& pair : mEntityIndexMap)
+			{
+				mEntityGenerator.unregisterEntityId(pair.first);
+			}
 
 			mEntityIndexMap.clear();
 			mIndexEntityMap.clear();
@@ -709,8 +714,8 @@ namespace Ecs
 
 		EntityIndex mNextEntityIndex = 0;
 
-		// it's a temporary solution to store it here
 		const ComponentFactory& mComponentFactory;
+		EntityGenerator& mEntityGenerator;
 	};
 
 } // namespace Ecs

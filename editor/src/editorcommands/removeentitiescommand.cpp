@@ -2,6 +2,8 @@
 
 #include <QtWidgets/qcombobox.h>
 
+#include "Base/Debug/Assert.h"
+
 #include "GameData/World.h"
 #include "GameData/Serialization/Json/EntityManager.h"
 
@@ -43,7 +45,12 @@ void RemoveEntitiesCommand::undoCommand(World* world)
 	for (size_t i = 0, iSize = mEntities.size(); i < iSize; ++i)
 	{
 		WorldCell& cell = world->getSpatialData().getOrCreateCell(mEntities[i].cell);
-		cell.getEntityManager().insertEntityUnsafe(mEntities[i].entity.getEntity());
+		bool isInserted = cell.getEntityManager().tryInsertEntity(mEntities[i].entity.getEntity());
+		if (!isInserted)
+		{
+			ReportError("Entity can't be created because of ID collision. Can't recover. Back up your data before saving.");
+			return;
+		}
 		Json::ApplyPrefabToExistentEntity(cell.getEntityManager(), mSerializedComponents[i], mEntities[i].entity.getEntity(), mComponentSerializerHolder);
 	}
 }

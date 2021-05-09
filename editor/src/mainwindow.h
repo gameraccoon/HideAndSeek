@@ -98,6 +98,7 @@ private:
 	Ui::mainwindow* ui;
 	std::unique_ptr<ads::CDockManager> mDockManager;
 	ComponentFactory mComponentFactory;
+	Ecs::EntityGenerator mEntityGenerator;
 	std::unique_ptr<class World> mCurrentWorld;
 	Json::ComponentSerializationHolder mComponentSerializationHolder;
 	ComponentContentFactory mComponentContentFactory;

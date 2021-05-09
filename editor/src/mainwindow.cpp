@@ -11,6 +11,8 @@
 #include "DockWidget.h"
 #include "DockAreaWidget.h"
 
+#include "Base/Random/Random.h"
+
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 #include "GameData/World.h"
@@ -29,6 +31,7 @@
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
 	, ui(HS_NEW Ui::mainwindow)
+	, mEntityGenerator(Random::gGlobalGenerator())
 {
 	ui->setupUi(this);
 
@@ -87,7 +90,7 @@ void MainWindow::fillWindowContent()
 
 void MainWindow::createWorld()
 {
-	mCurrentWorld = std::make_unique<World>(mComponentFactory);
+	mCurrentWorld = std::make_unique<World>(mComponentFactory, mEntityGenerator);
 	mCommandStack.clear();
 	ui->actionRun_Game->setEnabled(true);
 	ui->actionSave_World->setEnabled(true);

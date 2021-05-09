@@ -11,9 +11,10 @@
 TEST(Components, EntityCreationAndRemovement)
 {
 	ComponentFactory componentFactory;
+	Ecs::EntityGenerator entityGenerator(42);
 	ComponentsRegistration::RegisterComponents(componentFactory);
 
-	EntityManager entityManager(componentFactory);
+	EntityManager entityManager(componentFactory, entityGenerator);
 	Entity testEntity1 = entityManager.addEntity();
 	Entity testEntity2 = entityManager.addEntity();
 
@@ -31,11 +32,12 @@ TEST(Components, EntityCreationAndRemovement)
 TEST(Components, ComponentsAttachment)
 {
 	ComponentFactory componentFactory;
+	Ecs::EntityGenerator entityGenerator(42);
 	ComponentsRegistration::RegisterComponents(componentFactory);
 
 	Vector2D location(Vector2D(1.0f, 0.0f));
 
-	EntityManager entityManager(componentFactory);
+	EntityManager entityManager(componentFactory, entityGenerator);
 	Entity testEntity = entityManager.addEntity();
 	TransformComponent* transform = entityManager.addComponent<TransformComponent>(testEntity);
 	transform->setLocation(location);
@@ -49,13 +51,14 @@ TEST(Components, ComponentsAttachment)
 TEST(Components, RemoveEntityWithComponents)
 {
 	ComponentFactory componentFactory;
+	Ecs::EntityGenerator entityGenerator(42);
 	ComponentsRegistration::RegisterComponents(componentFactory);
 
 	Vector2D location1(Vector2D(1.0f, 0.0f));
 	Vector2D location2(Vector2D(0.0f, 1.0f));
 	Vector2D location3(Vector2D(1.0f, 1.0f));
 
-	EntityManager entityManager(componentFactory);
+	EntityManager entityManager(componentFactory, entityGenerator);
 	Entity testEntity1 = entityManager.addEntity();
 	TransformComponent* transform1 = entityManager.addComponent<TransformComponent>(testEntity1);
 	transform1->setLocation(location1);

@@ -18,6 +18,8 @@ namespace Ecs
 		ComponentFactoryImpl() = default;
 		ComponentFactoryImpl(ComponentFactoryImpl&) = delete;
 		ComponentFactoryImpl& operator=(ComponentFactoryImpl&) = delete;
+		ComponentFactoryImpl(ComponentFactoryImpl&&) = delete;
+		ComponentFactoryImpl& operator=(ComponentFactoryImpl&&) = delete;
 
 		template<typename T>
 		void registerComponent()

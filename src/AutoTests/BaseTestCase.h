@@ -33,7 +33,8 @@ protected:
 
 protected:
 	ComponentFactory mComponentFactory;
-	World mWorld{mComponentFactory};
+	Ecs::EntityGenerator mEntityGenerator;
+	World mWorld{mComponentFactory, mEntityGenerator};
 	GameData mGameData{mComponentFactory};
 	WorldHolder mWorldHolder{&mWorld, mGameData};
 	Ecs::SystemsManager mSystemsManager;

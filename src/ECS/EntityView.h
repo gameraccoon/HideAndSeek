@@ -6,7 +6,7 @@
 namespace Ecs
 {
 	/**
-	 * @brief Non-owning wrapper around entity amd its current entity manager
+	 * @brief Non-owning wrapper around entity and its current entity manager
 	 */
 	template <typename ComponentTypeId>
 	class EntityViewImpl
