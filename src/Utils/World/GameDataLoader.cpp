@@ -79,7 +79,7 @@ namespace GameDataLoader
 
 		if (!fs::exists(geometryPath))
 		{
-			LogInfo("Light blocking geometry not found for level '%s', rebuilding", levelPath.c_str());
+			LogInfo("Light blocking geometry not found for level '%s', rebuilding", levelPath.filename().string().c_str());
 			GenerateLightBlockingGeometry(world);
 			return;
 		}
@@ -90,7 +90,7 @@ namespace GameDataLoader
 
 		if (geometryJson["version"] != levelVersion)
 		{
-			LogWarning("Light blocking geometry for level '%s' has incorrect version, discarding it and rebuilding", levelPath.c_str());
+			LogWarning("Light blocking geometry for level '%s' has incorrect version, discarding it and rebuilding", levelPath.filename().string().c_str());
 			GenerateLightBlockingGeometry(world);
 			return;
 		}
@@ -147,7 +147,7 @@ namespace GameDataLoader
 
 		if (!fs::exists(geometryPath))
 		{
-			LogInfo("Path blocking geometry not found for level '%s', rebuilding", levelPath.c_str());
+			LogInfo("Path blocking geometry not found for level '%s', rebuilding", levelPath.filename().string().c_str());
 			GeneratePathBlockingGeometry(world);
 			return;
 		}
@@ -158,7 +158,7 @@ namespace GameDataLoader
 
 		if (geometryJson["version"] != levelVersion)
 		{
-			LogWarning("Path blocking geometry for level '%s' has incorrect version, discarding it and rebuilding", levelPath.c_str());
+			LogWarning("Path blocking geometry for level '%s' has incorrect version, discarding it and rebuilding", levelPath.filename().string().c_str());
 			GenerateLightBlockingGeometry(world);
 			return;
 		}
