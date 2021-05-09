@@ -65,12 +65,10 @@ namespace Ecs
 			return mComponents[ComponentType::GetTypeName()] != nullptr;
 		}
 
-		template<typename T>
-		T* addComponent() noexcept
+		template<typename ComponentType>
+		ComponentType* addComponent() noexcept
 		{
-			T* component = HS_NEW T();
-			addComponent(component, T::GetTypeName());
-			return component;
+			return static_cast<ComponentType*>(addComponentByType(ComponentType::GetTypeName()));
 		}
 
 		void* addComponentByType(ComponentTypeId typeId) noexcept
@@ -81,15 +79,15 @@ namespace Ecs
 			return component;
 		}
 
-		template<typename T>
-		T* getOrAddComponent()
+		template<typename ComponentType>
+		ComponentType* getOrAddComponent()
 		{
-			auto it = mComponents.find(T::GetTypeName());
+			auto it = mComponents.find(ComponentType::GetTypeName());
 			if (it == mComponents.end())
 			{
-				it = mComponents.emplace(T::GetTypeName(), HS_NEW T()).first;
+				return addComponent<ComponentType>();
 			}
-			return static_cast<T*>(it->second);
+			return static_cast<ComponentType*>(it->second);
 		}
 
 		void addComponent(void* component, ComponentTypeId typeId)
@@ -169,7 +167,6 @@ namespace Ecs
 	private:
 		std::unordered_map<ComponentTypeId, void*> mComponents;
 
-		// it's a temporary solution to store it here
 		const ComponentFactory& mComponentFactory;
 	};
 

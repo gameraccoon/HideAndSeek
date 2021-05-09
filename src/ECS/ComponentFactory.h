@@ -25,7 +25,7 @@ namespace Ecs
 		void registerComponent()
 		{
 			mComponentCreators[T::GetTypeName()] = []{
-				return new T();
+				return new (std::nothrow) T();
 			};
 			mComponentDeleters[T::GetTypeName()] = [](void* component){
 				return delete static_cast<T*>(component);

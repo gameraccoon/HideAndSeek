@@ -207,17 +207,7 @@ namespace Ecs
 		template<typename ComponentType>
 		ComponentType* addComponent(Entity entity)
 		{
-			auto entityIdxItr = mEntityIndexMap.find(entity.getId());
-			if (entityIdxItr == mEntityIndexMap.end())
-			{
-				return nullptr;
-			}
-
-			ComponentType* component = HS_NEW ComponentType();
-
-			addComponentToEntity(entityIdxItr->second, component, ComponentType::GetTypeName());
-
-			return component;
+			return static_cast<ComponentType*>(addComponentByType(entity, ComponentType::GetTypeName()));
 		}
 
 		void* addComponentByType(Entity entity, ComponentTypeId typeId)
@@ -266,8 +256,10 @@ namespace Ecs
 		template<typename ComponentType>
 		ComponentType* scheduleAddComponent(Entity entity)
 		{
-			ComponentType* component = HS_NEW ComponentType();
-			scheduleAddComponentToEntity(entity, component, ComponentType::GetTypeName());
+			const ComponentTypeId componentTypeId = ComponentType::GetTypeName();
+			const auto createFn = mComponentFactory.getCreationFn(componentTypeId);
+			ComponentType* component = static_cast<ComponentType*>(createFn());
+			scheduleAddComponentToEntity(entity, component, componentTypeId);
 			return component;
 		}
 
