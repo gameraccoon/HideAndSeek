@@ -1,9 +1,9 @@
 #pragma once
 
-#include "editorcommand.h"
+#include <raccoon-ecs/entity.h>
+#include <raccoon-ecs/component_factory.h>
 
-#include "ECS/Entity.h"
-#include "ECS/ComponentFactory.h"
+#include "editorcommand.h"
 
 #include "src/editorutils/componentreference.h"
 

@@ -2,14 +2,14 @@
 
 #include <unordered_map>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
 /**
  * System that resolve object collisions
  */
-class CollisionSystem : public Ecs::System
+class CollisionSystem : public RaccoonEcs::System
 {
 public:
 	explicit CollisionSystem(WorldHolder& worldHolder) noexcept;

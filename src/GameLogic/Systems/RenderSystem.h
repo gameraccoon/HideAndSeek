@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "Utils/Jobs/WorkerManager.h"
 
@@ -18,7 +18,7 @@ struct Vector2D;
 /**
  * System that handles rendering of world objects
  */
-class RenderSystem : public Ecs::System
+class RenderSystem : public RaccoonEcs::System
 {
 public:
 	RenderSystem(WorldHolder& worldHolder,

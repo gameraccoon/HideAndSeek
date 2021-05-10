@@ -10,7 +10,7 @@
 
 #include "GameData/Components/TransformComponent.generated.h"
 
-SpatialWorldData::SpatialWorldData(const ComponentFactory& componentFactory, Ecs::EntityGenerator& entityGenerator)
+SpatialWorldData::SpatialWorldData(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator)
 	: mComponentFactory(componentFactory)
 	, mEntityGenerator(entityGenerator)
 {}

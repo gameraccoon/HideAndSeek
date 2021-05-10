@@ -15,7 +15,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#include "ECS/ComponentFactory.h"
+#include <raccoon-ecs/component_factory.h>
 
 #include "GameData/Serialization/Json/EntityManager.h"
 

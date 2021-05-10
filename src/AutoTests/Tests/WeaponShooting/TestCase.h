@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ECS/SystemsManager.h"
-#include "ECS/ComponentFactory.h"
+#include <raccoon-ecs/systems_manager.h>
+#include <raccoon-ecs/component_factory.h>
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"

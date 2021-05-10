@@ -2,7 +2,7 @@
 
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptors/{class_name}{attribute_name_capital}PropertyDescriptor.generated.h"
 
-#include "ECS/EntityManager.h"
+#include <raccoon-ecs/entity_manager.h>
 
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/FilterRegistration/FilterRegistration.h"
 

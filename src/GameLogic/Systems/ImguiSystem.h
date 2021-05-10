@@ -4,7 +4,7 @@
 #include <vector>
 
 #ifdef IMGUI_ENABLED
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "HAL/EngineFwd.h"
 
@@ -18,7 +18,7 @@
 /**
  * System that handles dear imgui debug tool
  */
-class ImguiSystem : public Ecs::System
+class ImguiSystem : public RaccoonEcs::System
 {
 public:
 	ImguiSystem(ImguiDebugData& debugData, HAL::Engine& engine) noexcept;

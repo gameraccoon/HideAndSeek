@@ -10,7 +10,7 @@
 class SpatialWorldData
 {
 public:
-	SpatialWorldData(const ComponentFactory& componentFactory, Ecs::EntityGenerator& entityGenerator);
+	SpatialWorldData(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator);
 	/**
 	 * @brief getCellsAround returns cells that are inside or toucing a rect that have center in
 	 * `centerPosition` and size of `rect`
@@ -60,5 +60,5 @@ private:
 	std::unordered_map<CellPos, WorldCell> mCells;
 
 	const ComponentFactory& mComponentFactory;
-	Ecs::EntityGenerator& mEntityGenerator;
+	RaccoonEcs::EntityGenerator& mEntityGenerator;
 };

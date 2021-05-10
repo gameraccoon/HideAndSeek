@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
@@ -10,7 +10,7 @@
 /**
  * System that updates animations
  */
-class AnimationSystem : public Ecs::System
+class AnimationSystem : public RaccoonEcs::System
 {
 public:
 	AnimationSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;

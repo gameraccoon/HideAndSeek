@@ -3,8 +3,8 @@
 #include <QString>
 #include <QWidget>
 
-#include "ECS/Delegates.h"
-#include "ECS/Entity.h"
+#include <raccoon-ecs/delegates.h>
+#include <raccoon-ecs/entity.h>
 
 #include "GameData/Spatial/SpatialEntity.h"
 
@@ -50,8 +50,8 @@ private:
 	MainWindow* mMainWindow;
 	ads::CDockManager* mDockManager;
 
-	Ecs::Delegates::Handle mOnEntityAddedHandle;
-	Ecs::Delegates::Handle mOnEntityRemovedHandle;
-	Ecs::Delegates::Handle mOnWorldChangedHandle;
-	Ecs::Delegates::Handle mOnSelectedEntityChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnEntityAddedHandle;
+	RaccoonEcs::Delegates::Handle mOnEntityRemovedHandle;
+	RaccoonEcs::Delegates::Handle mOnWorldChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnSelectedEntityChangedHandle;
 };

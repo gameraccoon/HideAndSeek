@@ -9,8 +9,8 @@
 
 #include "imgui.h"
 
-#include "ECS/EntityManager.h"
-#include "ECS/ComponentFactory.h"
+#include <raccoon-ecs/entity_manager.h>
+#include <raccoon-ecs/component_factory.h>
 
 #include "GameData/Spatial/SpatialEntityManager.h"
 #include "GameData/World.h"

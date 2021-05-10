@@ -1,7 +1,8 @@
 #pragma once
 
+#include <raccoon-ecs/entity.h>
+
 #include "editorcommand.h"
-#include "ECS/Entity.h"
 
 class World;
 

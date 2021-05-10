@@ -5,8 +5,8 @@
 #include <QString>
 #include <QWidget>
 
-#include "ECS/Delegates.h"
-#include "ECS/Entity.h"
+#include <raccoon-ecs/delegates.h>
+#include <raccoon-ecs/entity.h>
 
 class MainWindow;
 

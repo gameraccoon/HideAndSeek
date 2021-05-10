@@ -2,11 +2,11 @@
 
 #include <unordered_map>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-class TestUnitsCountControlSystem : public Ecs::System
+class TestUnitsCountControlSystem : public RaccoonEcs::System
 {
 public:
 	explicit TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept;

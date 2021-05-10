@@ -2,15 +2,15 @@
 
 #include <string>
 
-#include "ECS/SystemsManager.h"
+#include <raccoon-ecs/systems_manager.h>
 
 class SystemFrameRecords
 {
 public:
 	void setRecordsLimit(unsigned int newLimit);
 
-	void addFrame(Ecs::SystemsFrameTime&& frameTime);
-	std::vector<Ecs::SystemsFrameTime>& getFramesRef();
+	void addFrame(RaccoonEcs::SystemsFrameTime&& frameTime);
+	std::vector<RaccoonEcs::SystemsFrameTime>& getFramesRef();
 
 	void pauseRecording();
 	void resumeRecording();
@@ -20,7 +20,7 @@ public:
 	void print(const std::vector<std::string>& systemNames, std::ostream& stream) const;
 
 private:
-	std::vector<Ecs::SystemsFrameTime> mSystemFrameRecords;
+	std::vector<RaccoonEcs::SystemsFrameTime> mSystemFrameRecords;
 	unsigned int mRecordsLimit = 0;
 	bool mIsRecordingActive = true;
 };

@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "ECS/Delegates.h"
+#include <raccoon-ecs/delegates.h>
 
 #include "editorcommand.h"
 
@@ -66,5 +66,5 @@ private:
 	int mLastExecutedCommandIdx = -1;
 	bool mIsLastExecutedUndo = false;
 
-	Ecs::Delegates::Handle mOnCommandEffectHandle;
+	RaccoonEcs::Delegates::Handle mOnCommandEffectHandle;
 };

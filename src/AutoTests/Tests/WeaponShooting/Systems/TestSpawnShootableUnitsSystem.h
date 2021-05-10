@@ -7,7 +7,7 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-class TestSpawnShootableUnitsSystem : public Ecs::System
+class TestSpawnShootableUnitsSystem : public RaccoonEcs::System
 {
 public:
 	explicit TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept;

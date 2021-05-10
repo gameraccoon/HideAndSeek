@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ECS/Entity.h"
+#include <raccoon-ecs/entity.h>
 #include <map>
 
 #include "GameLogic/Imgui/ComponentInspector/AbstractComponentImguiWidget.h"

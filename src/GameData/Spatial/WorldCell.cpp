@@ -6,7 +6,7 @@
 
 #include <nlohmann/json.hpp>
 
-WorldCell::WorldCell(const CellPos& pos, const ComponentFactory& componentFactory, Ecs::EntityGenerator& entityGenerator)
+WorldCell::WorldCell(const CellPos& pos, const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator)
 	: mEntityManager(componentFactory, entityGenerator)
 	, mCellComponents(componentFactory)
 	, mPos(pos)

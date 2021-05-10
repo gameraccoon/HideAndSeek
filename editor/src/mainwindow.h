@@ -6,10 +6,10 @@
 #include <QMainWindow>
 #include <QListWidgetItem>
 
+#include <raccoon-ecs/delegates.h>
+
 #include "editorcommands/editorcommandsstack.h"
 #include "componenteditcontent/componentcontentfactory.h"
-
-#include "ECS/Delegates.h"
 
 #include "GameData/EcsDefinitions.h"
 #include "GameData/Spatial/SpatialEntity.h"
@@ -50,11 +50,11 @@ public:
 	PrefabListToolbox* getPrefabToolbox() { return mPrefabListToolbox.get(); }
 
 public:
-	Ecs::MulticastDelegate<> OnWorldChanged;
-	Ecs::MulticastDelegate<const std::optional<EntityReference>&> OnSelectedEntityChanged;
-	Ecs::MulticastDelegate<const std::optional<ComponentSourceReference>&> OnSelectedComponentSourceChanged;
-	Ecs::MulticastDelegate<const std::optional<ComponentReference>&> OnSelectedComponentChanged;
-	Ecs::MulticastDelegate<EditorCommand::EffectBitset, bool> OnCommandEffectApplied;
+	RaccoonEcs::MulticastDelegate<> OnWorldChanged;
+	RaccoonEcs::MulticastDelegate<const std::optional<EntityReference>&> OnSelectedEntityChanged;
+	RaccoonEcs::MulticastDelegate<const std::optional<ComponentSourceReference>&> OnSelectedComponentSourceChanged;
+	RaccoonEcs::MulticastDelegate<const std::optional<ComponentReference>&> OnSelectedComponentChanged;
+	RaccoonEcs::MulticastDelegate<EditorCommand::EffectBitset, bool> OnCommandEffectApplied;
 
 private slots:
 	void on_actionTransform_Editor_triggered();
@@ -98,7 +98,7 @@ private:
 	Ui::mainwindow* ui;
 	std::unique_ptr<ads::CDockManager> mDockManager;
 	ComponentFactory mComponentFactory;
-	Ecs::EntityGenerator mEntityGenerator;
+	RaccoonEcs::EntityGenerator mEntityGenerator;
 	std::unique_ptr<class World> mCurrentWorld;
 	Json::ComponentSerializationHolder mComponentSerializationHolder;
 	ComponentContentFactory mComponentContentFactory;

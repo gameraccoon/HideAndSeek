@@ -9,7 +9,7 @@
 class World
 {
 public:
-	World(const ComponentFactory& componentFactory, Ecs::EntityGenerator& entityGenerator);
+	World(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator);
 
 	[[nodiscard]] EntityManager& getEntityManager() { return mEntityManager; }
 	[[nodiscard]] const EntityManager& getEntityManager() const { return mEntityManager; }

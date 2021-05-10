@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
@@ -10,7 +10,7 @@
 /**
  * System that calculates AI
  */
-class AiSystem : public Ecs::System
+class AiSystem : public RaccoonEcs::System
 {
 public:
 	AiSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;

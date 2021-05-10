@@ -5,7 +5,7 @@
 #include <QString>
 #include <QWidget>
 
-#include "ECS/Delegates.h"
+#include <raccoon-ecs/delegates.h>
 
 #include "src/editorcommands/editorcommand.h"
 #include "src/editorutils/componentreference.h"
@@ -40,6 +40,6 @@ private:
 	ads::CDockManager* mDockManager;
 	std::optional<ComponentReference> mLastSelectedComponent;
 
-	Ecs::Delegates::Handle mOnComponentChangedHandle;
-	Ecs::Delegates::Handle mOnCommandEffectHandle;
+	RaccoonEcs::Delegates::Handle mOnComponentChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnCommandEffectHandle;
 };

@@ -9,7 +9,7 @@
 #include <QVector2D>
 #include <QWidget>
 
-#include "ECS/Delegates.h"
+#include <raccoon-ecs/delegates.h>
 
 #include "GameData/EcsDefinitions.h"
 #include "GameData/Core/Vector2D.h"
@@ -67,7 +67,7 @@ public:
 	float mScale = 1.0f;
 	Vector2D mCursorObjectOffset;
 
-	Ecs::SinglecastDelegate<std::vector<SpatialEntity>, const Vector2D&> OnEntitiesMoved;
+	RaccoonEcs::SinglecastDelegate<std::vector<SpatialEntity>, const Vector2D&> OnEntitiesMoved;
 
 	std::vector<SpatialEntity> mSelectedEntities;
 	Vector2D mSelectedGroupCenter;
@@ -113,7 +113,7 @@ private:
 	std::vector<nlohmann::json> mCopiedObjects;
 	Vector2D mCopiedGroupCenter;
 
-	Ecs::Delegates::Handle mOnWorldChangedHandle;
-	Ecs::Delegates::Handle mOnSelectedEntityChangedHandle;
-	Ecs::Delegates::Handle mOnCommandEffectHandle;
+	RaccoonEcs::Delegates::Handle mOnWorldChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnSelectedEntityChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnCommandEffectHandle;
 };

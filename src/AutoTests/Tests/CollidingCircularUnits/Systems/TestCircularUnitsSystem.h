@@ -1,12 +1,12 @@
 #pragma once
 
 #include <memory>
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 
-class TestCircularUnitsSystem : public Ecs::System
+class TestCircularUnitsSystem : public RaccoonEcs::System
 {
 public:
 	TestCircularUnitsSystem(WorldHolder& worldHolder, TimeData& time) noexcept;

@@ -2,10 +2,8 @@
 
 #include <optional>
 
-#include <ECS/Entity.h>
-
-#include <GameData/Spatial/CellPos.h>
-#include <GameData/Spatial/SpatialEntity.h>
+#include "GameData/Spatial/CellPos.h"
+#include "GameData/Spatial/SpatialEntity.h"
 
 struct EntityReference
 {

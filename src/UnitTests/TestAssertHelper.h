@@ -1,9 +1,9 @@
 #pragma once
 
 #include <gtest/gtest.h>
+#include <raccoon-ecs/error_handling.h>
 
 #include "Base/Debug/Assert.h"
-#include "ECS/ErrorHandling.h"
 
 inline void EnableFailOnAssert() noexcept
 {
@@ -14,7 +14,7 @@ inline void EnableFailOnAssert() noexcept
 #endif // DEBUG_CHECKS
 
 #ifdef ECS_DEBUG_CHECKS_ENABLED
-	Ecs::gErrorHandler = [](const std::string& error) { ReportFatalError(error); };
+	RaccoonEcs::gErrorHandler = [](const std::string& error) { ReportFatalError(error); };
 #endif // ECS_DEBUG_CHECKS_ENABLED
 }
 

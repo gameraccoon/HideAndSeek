@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
@@ -10,7 +10,7 @@
 /**
  * System that process characters and objects movement
  */
-class MovementSystem : public Ecs::System
+class MovementSystem : public RaccoonEcs::System
 {
 public:
 	MovementSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;

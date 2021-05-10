@@ -3,7 +3,8 @@
 #include <QString>
 #include <QWidget>
 
-#include "ECS/Delegates.h"
+#include <raccoon-ecs/delegates.h>
+
 #include "GameData/EcsDefinitions.h"
 
 #include "src/editorutils/entityreference.h"
@@ -47,6 +48,6 @@ private:
 	QPushButton* mAddComponentButton = nullptr;
 	std::optional<ComponentSourceReference> mLastSelectedComponentSource;
 
-	Ecs::Delegates::Handle mOnWorldChangedHandle;
-	Ecs::Delegates::Handle mOnComponentSourceChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnWorldChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnComponentSourceChangedHandle;
 };

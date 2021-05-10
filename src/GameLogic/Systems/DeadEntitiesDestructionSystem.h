@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
@@ -10,7 +10,7 @@
 /**
  * System that destructs enemies marked with DeathComponent
  */
-class DeadEntitiesDestructionSystem : public Ecs::System
+class DeadEntitiesDestructionSystem : public RaccoonEcs::System
 {
 public:
 	explicit DeadEntitiesDestructionSystem(WorldHolder& worldHolder) noexcept;

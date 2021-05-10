@@ -1,10 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <raccoon-ecs/entity.h>
 
 #include "Base/Types/TemplateAliases.h"
-
-#include "ECS/Entity.h"
 
 #include "GameData/Core/Hull.h"
 

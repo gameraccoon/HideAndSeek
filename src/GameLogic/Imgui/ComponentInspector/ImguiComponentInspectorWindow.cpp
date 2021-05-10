@@ -10,7 +10,7 @@
 
 #include "imgui/imgui.h"
 
-#include "ECS/ComponentFactory.h"
+#include <raccoon-ecs/component_factory.h>
 
 #include "GameData/GameData.h"
 #include "GameData/World.h"

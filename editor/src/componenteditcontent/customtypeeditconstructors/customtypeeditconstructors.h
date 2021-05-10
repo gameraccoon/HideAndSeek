@@ -1,11 +1,12 @@
 #pragma once
 
+#include <raccoon-ecs/entity.h>
+
 #include "src/componenteditcontent/typeseditconstructor.h"
 
 #include "GameData/Resources/AnimationClipParams.h"
 #include "GameData/Resources/AnimationClipDescription.h"
 #include "GameData/Spatial/CellPos.h"
-#include "ECS/Entity.h"
 #include "GameData/Core/Border.h"
 #include "GameData/Core/Hull.h"
 #include "GameData/Core/Rotator.h"

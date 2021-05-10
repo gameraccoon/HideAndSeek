@@ -33,11 +33,11 @@ protected:
 
 protected:
 	ComponentFactory mComponentFactory;
-	Ecs::EntityGenerator mEntityGenerator;
+	RaccoonEcs::EntityGenerator mEntityGenerator;
 	World mWorld{mComponentFactory, mEntityGenerator};
 	GameData mGameData{mComponentFactory};
 	WorldHolder mWorldHolder{&mWorld, mGameData};
-	Ecs::SystemsManager mSystemsManager;
+	RaccoonEcs::SystemsManager mSystemsManager;
 	Jobs::WorkerManager mWorkerManager{1};
 	TimeData mTime;
 	InputData mInputData;

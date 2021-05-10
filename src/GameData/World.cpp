@@ -10,7 +10,7 @@
 #include "GameData/Serialization/Json/EntityManager.h"
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
-World::World(const ComponentFactory& componentFactory, Ecs::EntityGenerator& entityGenerator)
+World::World(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator)
 	: mEntityManager(componentFactory, entityGenerator)
 	, mWorldComponents(componentFactory)
 	, mSpatialData(componentFactory, entityGenerator)

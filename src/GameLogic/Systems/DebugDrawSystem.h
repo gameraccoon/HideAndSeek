@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "HAL/Base/ResourceManager.h"
 #include "HAL/EngineFwd.h"
@@ -18,7 +18,7 @@ struct Vector2D;
 /**
  * System that handles rendering of world objects
  */
-class DebugDrawSystem : public Ecs::System
+class DebugDrawSystem : public RaccoonEcs::System
 {
 public:
 	using KeyStatesMap = std::unordered_map<int, bool>;

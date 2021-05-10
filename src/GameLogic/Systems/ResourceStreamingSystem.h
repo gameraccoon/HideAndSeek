@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "HAL/Base/ResourceManager.h"
 
@@ -11,7 +11,7 @@
 /**
  * System that loads and distributes resources
  */
-class ResourceStreamingSystem : public Ecs::System
+class ResourceStreamingSystem : public RaccoonEcs::System
 {
 public:
 	ResourceStreamingSystem(WorldHolder& worldHolder, HAL::ResourceManager& resourceManager) noexcept;

@@ -2,13 +2,13 @@
 
 #include <unordered_map>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
 #include "AutoTests/Tests/WeaponShooting/DestroyedEntitiesTestCheck.h"
 
-class TestDestroyedEntitiesRegistrationSystem : public Ecs::System
+class TestDestroyedEntitiesRegistrationSystem : public RaccoonEcs::System
 {
 public:
 	TestDestroyedEntitiesRegistrationSystem(WorldHolder& worldHolder, DestroyedEntitiesTestCheck& testCheck) noexcept;

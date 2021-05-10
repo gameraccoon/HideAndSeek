@@ -2,9 +2,8 @@
 
 #include <optional>
 
-#include <ECS/Entity.h>
-
-#include <GameData/Spatial/CellPos.h>
+#include "GameData/EcsDefinitions.h"
+#include "GameData/Spatial/CellPos.h"
 
 /**
  * @brief A component can be stored in variety of ways and reference combinations

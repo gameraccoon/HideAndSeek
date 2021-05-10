@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#include "ECS/Delegates.h"
+#include <raccoon-ecs/delegates.h>
 
 
 TEST(Delegates, SingleCast)
 {
-	Ecs::SinglecastDelegate<int> delegate;
+	RaccoonEcs::SinglecastDelegate<int> delegate;
 
 	int testVal = 1;
 
@@ -41,14 +41,14 @@ TEST(Delegates, SingleCast)
 
 TEST(Delegates, MultiCast)
 {
-	Ecs::MulticastDelegate<int> delegate;
+	RaccoonEcs::MulticastDelegate<int> delegate;
 
 	int testVal1 = 1;
 	int testVal2 = 1;
 
 	delegate.broadcast(2);
 
-	Ecs::Delegates::Handle handle = delegate.bind([&testVal1](int test)
+	RaccoonEcs::Delegates::Handle handle = delegate.bind([&testVal1](int test)
 	{
 		testVal1 += test;
 	});

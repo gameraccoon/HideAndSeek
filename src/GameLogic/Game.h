@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ECS/SystemsManager.h"
+#include <raccoon-ecs/systems_manager.h>
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
@@ -37,14 +37,14 @@ private:
 
 private:
 	ComponentFactory mComponentFactory;
-	Ecs::EntityGenerator mEntityGenerator;
+	RaccoonEcs::EntityGenerator mEntityGenerator;
 	World mWorld{mComponentFactory, mEntityGenerator};
 	GameData mGameData{mComponentFactory};
 	WorldHolder mWorldHolder{&mWorld, mGameData};
 
 	InputData mInputData;
 
-	Ecs::SystemsManager mSystemsManager;
+	RaccoonEcs::SystemsManager mSystemsManager;
 	Json::ComponentSerializationHolder mComponentSerializers;
 	Jobs::WorkerManager mJobsWorkerManager{Jobs::GetAvailableThreadsCount()};
 	TimeData mTime;

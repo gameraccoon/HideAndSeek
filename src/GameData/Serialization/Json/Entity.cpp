@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace Ecs
+namespace RaccoonEcs
 {
 	void to_json(nlohmann::json& outJson, Entity entity)
 	{
@@ -35,4 +35,4 @@ namespace Ecs
 			outEntity = OptionalEntity();
 		}
 	}
-} // namespace Ecs
+} // namespace RaccoonEcs
