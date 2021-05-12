@@ -1,1 +1,1 @@
-factories.try_emplace({class_name}::GetTypeName(), std::make_unique<{class_name}EditFactory>());{delim_endl}{delim_tab}
+factories.try_emplace({class_name}::GetTypeId(), std::make_unique<{class_name}EditFactory>());{delim_endl}{delim_tab}

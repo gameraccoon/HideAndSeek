@@ -22,7 +22,7 @@ namespace Utils
 		TupleVector<Entity, Component*> components;
 		for (std::pair<const CellPos, WorldCell>& cell : world.getSpatialData().getAllCells())
 		{
-			cell.second.getCellComponents().removeComponent(Component::GetTypeName());
+			cell.second.getCellComponents().removeComponent(Component::GetTypeId());
 		}
 	}
 

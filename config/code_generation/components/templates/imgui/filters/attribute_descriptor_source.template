@@ -35,6 +35,6 @@ namespace ImguiPropertyFiltration
 
 	StringId {class_name}{attribute_name_capital}PropertyDescriptor::getComponentType() const
 	{{
-		return {class_name}::GetTypeName();
+		return {class_name}::GetTypeId();
 	}}
 }} // namespace ImguiPropertyFiltration

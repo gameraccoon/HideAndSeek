@@ -17,7 +17,7 @@ public:
 	{attribute_setters}
 
 public:
-	[[nodiscard]] static constexpr StringId GetTypeName() {{ return STR_TO_ID("{class_name}"); }}
+	[[nodiscard]] static constexpr StringId GetTypeId() {{ return STR_TO_ID("{class_name}"); }}
 
 private:
 	{attribute_fields}
