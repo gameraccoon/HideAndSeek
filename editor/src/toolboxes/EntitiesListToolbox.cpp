@@ -119,10 +119,10 @@ void EntitiesListToolbox::updateContent()
 	const auto& entities = currentWorld->getEntityManager().getEntities();
 	if (QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName))
 	{
-		for (auto& entity : entities)
+		for (Entity entity : entities)
 		{
-			QListWidgetItem* newItem = HS_NEW QListWidgetItem(QString::number(entity.first));
-			newItem->setData(0, entity.first);
+			QListWidgetItem* newItem = HS_NEW QListWidgetItem(QString::number(entity.getId()));
+			newItem->setData(0, entity.getId());
 			newItem->setData(1, false);
 			entitiesList->addItem(newItem);
 		}

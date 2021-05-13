@@ -7,57 +7,42 @@
 
 namespace Json
 {
-	static void StableSortEntitiesById(EntityManager& entityManager)
+	static void StableSortEntitiesById(RaccoonEcs::ComponentMapImpl<StringId>& components, std::vector<Entity>& entities, std::unordered_map<Entity::EntityId, size_t>& entityIndexMap)
 	{
-		std::vector<Entity::EntityId> ids;
-
-		auto [components, entityIndexMap, indexEntityMap] = entityManager.getSortableData();
-
-		ids.resize(entityIndexMap.size());
-		for (auto [entityId, idx] : entityIndexMap)
-		{
-			ids[idx] = entityId;
-		}
-
 		std::vector<size_t> positions;
-		soasort::getSortedPositions(positions, ids);
+		soasort::getSortedPositions(positions, entities);
 
 		std::vector<soasort::Swap> swaps;
 		soasort::generateSwaps(swaps, positions);
 
 		for (auto& componentVectorPair : components)
 		{
-			componentVectorPair.second.resize(ids.size(), nullptr);
+			componentVectorPair.second.resize(entities.size(), nullptr);
 			soasort::applySwaps(componentVectorPair.second, swaps);
 		}
 
-		soasort::applySwaps(ids, swaps);
-		for (EntityManager::EntityIndex idx = 0u; idx < ids.size(); ++idx)
+		soasort::applySwaps(entities, swaps);
+		for (EntityManager::EntityIndex idx = 0u; idx < entities.size(); ++idx)
 		{
-			Entity::EntityId id = ids[idx];
-			entityIndexMap[id] = idx;
-			indexEntityMap[idx] = id;
+			entityIndexMap[entities[idx].getId()] = idx;
 		}
 	}
 
 	nlohmann::json SerializeEntityManager(EntityManager& entityManager, const Json::ComponentSerializationHolder& jsonSerializationHolder)
 	{
-		StableSortEntitiesById(entityManager);
-
+		entityManager.applySortingFunction(&StableSortEntitiesById);
 		entityManager.clearCaches();
 
-		std::vector<Entity::EntityId> sortedEntities;
-		const auto& entityIndexMap = entityManager.getEntities();
-		sortedEntities.reserve(entityIndexMap.size());
-		for (const auto& indexPair : entityIndexMap)
+		// we sorted them two lines above
+		const std::vector<Entity>& sortedEntities = entityManager.getEntities();
+		nlohmann::json entitiesJson;
+		for (Entity entity : sortedEntities)
 		{
-			sortedEntities.emplace_back(indexPair.first);
+			entitiesJson.push_back(entity.getId());
 		}
 
-		std::ranges::sort(sortedEntities);
-
 		nlohmann::json outJson{
-			{"entities", sortedEntities}
+			{"entities", entitiesJson}
 		};
 
 		auto components = nlohmann::json{};
