@@ -12,6 +12,7 @@
 #include <QInputDialog>
 #include <QPushButton>
 
+#include "src/componenteditcontent/editablecomponentsset.h"
 #include "src/editorcommands/removecomponentcommand.h"
 #include "src/editorutils/componentreferenceutils.h"
 #include "src/editorcommands/addcomponentcommand.h"
@@ -175,11 +176,25 @@ void ComponentsListToolbox::addComponentCommand()
 	dialog->setLabelText("Select Component Type:");
 	dialog->setCancelButtonText("Cancel");
 	dialog->setComboBoxEditable(false);
+
 	QStringList items;
-	mMainWindow->getComponentFactory().forEachComponentType([&items](StringId name)
+	std::vector<std::string> componentNames;
+	std::unordered_set<StringId> editableComponents = Editor::getEditableComponents();
+	mMainWindow->getComponentFactory().forEachComponentType([&componentNames, &editableComponents](StringId name)
 	{
-		items.append(QString::fromStdString(ID_TO_STR(name)));
+		if (editableComponents.contains(name))
+		{
+			componentNames.push_back(ID_TO_STR(name));
+		}
 	});
+
+	std::sort(componentNames.begin(), componentNames.end());
+
+	for (const std::string& itemName : componentNames)
+	{
+		items.append(QString::fromStdString(itemName));
+	}
+
 	dialog->setComboBoxItems(items);
 	connect(dialog, &QInputDialog::textValueSelected, this, &ComponentsListToolbox::addComponent);
 	dialog->show();

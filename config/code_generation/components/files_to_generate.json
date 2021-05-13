@@ -95,5 +95,11 @@
 		"template": "editor/components_registration_source",
 		"output_dir": "editor/src/componenteditcontent/",
 		"flags": ["list"]
+	},
+	{
+		"name_template": "editablecomponentsset.generated.cpp",
+		"template": "editor/editable_components_set_source",
+		"output_dir": "editor/src/componenteditcontent/",
+		"flags": ["list"]
 	}
 ]

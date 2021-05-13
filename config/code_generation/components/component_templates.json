@@ -28,5 +28,9 @@
 	{
 		"name": "editor/component_edit_factory_register",
 		"blacklist": ["transient"]
+	},
+	{
+		"name": "editor/component_editable_item",
+		"blacklist": ["transient"]
 	}
 ]
