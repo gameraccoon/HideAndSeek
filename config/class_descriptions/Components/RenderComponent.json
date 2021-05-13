@@ -1,6 +1,7 @@
 {
 	"component": "render",
 	"description": "Component that stores information about things that should be rendered",
+	"flags": ["transient"],
 	"attributes": [
 		{
 			"name": "spriteDatas",

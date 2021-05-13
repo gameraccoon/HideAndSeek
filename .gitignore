@@ -6,6 +6,10 @@ cmake_install.cmake
 # generated binaries
 *.exe
 
+# optional level data
+*.lbg.json
+*.pbg.json
+
 # vs files
 *.user
 *.sdf

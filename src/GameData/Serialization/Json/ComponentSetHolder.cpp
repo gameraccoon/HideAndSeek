@@ -13,9 +13,12 @@ namespace Json
 
 		for (const ConstTypedComponent& componentData : componentSetHolder.getAllComponents())
 		{
-			auto componentObj = nlohmann::json{};
-			jsonSerializerHolder.getComponentSerializerFromClassName(componentData.typeId)->toJson(componentObj, componentData.component);
-			components[ID_TO_STR(componentData.typeId)] = componentObj;
+			if (const ComponentSerializer* jsonSerializer = jsonSerializerHolder.getComponentSerializerFromClassName(componentData.typeId))
+			{
+				auto componentObj = nlohmann::json{};
+				jsonSerializer->toJson(componentObj, componentData.component);
+				components[ID_TO_STR(componentData.typeId)] = componentObj;
+			}
 		}
 		outJson["components"] = components;
 		return outJson;
@@ -31,7 +34,14 @@ namespace Json
 			if (!componentData.is_null())
 			{
 				void* component = outComponentSetHolder.addComponentByType(className);
-				jsonSerializerHolder.getComponentSerializerFromClassName(className)->fromJson(componentData, component);
+				if (const ComponentSerializer* jsonSerializer = jsonSerializerHolder.getComponentSerializerFromClassName(className))
+				{
+					jsonSerializer->fromJson(componentData, component);
+				}
+				else
+				{
+					ReportFatalError("Unknown component %s", className);
+				}
 			}
 		}
 	}

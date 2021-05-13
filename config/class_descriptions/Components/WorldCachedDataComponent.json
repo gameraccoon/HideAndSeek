@@ -1,6 +1,7 @@
 {
 	"component": "worldCachedData",
 	"description": "Component that stores cached information about world",
+	"flags": ["transient"],
 	"attributes": [
 		{
 			"name": "cameraPos",

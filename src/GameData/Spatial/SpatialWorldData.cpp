@@ -8,6 +8,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include "Base/Types/TemplateAliases.h"
+
 #include "GameData/Components/TransformComponent.generated.h"
 
 SpatialWorldData::SpatialWorldData(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator)

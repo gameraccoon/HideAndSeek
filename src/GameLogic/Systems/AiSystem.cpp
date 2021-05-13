@@ -28,12 +28,7 @@ void AiSystem::update()
 	World& world = mWorldHolder.getWorld();
 	const GameplayTimestamp timestampNow = mTime.currentTimestamp;
 
-	auto [navMeshComponent] = world.getWorldComponents().getComponents<NavMeshComponent>();
-
-	if (navMeshComponent == nullptr)
-	{
-		return;
-	}
+	NavMeshComponent* navMeshComponent = world.getWorldComponents().getOrAddComponent<NavMeshComponent>();
 
 	auto [pathBlockingGeometry] = world.getWorldComponents().getComponents<PathBlockingGeometryComponent>();
 

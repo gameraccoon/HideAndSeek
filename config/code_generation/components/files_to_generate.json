@@ -37,22 +37,26 @@
 	{
 		"name_template": "{class_name}JsonSerializer.generated.h",
 		"template": "serialization/json/component_json_serializer_header",
-		"output_dir": "src/GameData/Serialization/Json/Generated"
+		"output_dir": "src/GameData/Serialization/Json/Generated",
+		"blacklist": ["transient"]
 	},
 	{
 		"name_template": "{class_name}JsonSerializer.generated.cpp",
 		"template": "serialization/json/component_json_serializer_source",
-		"output_dir": "src/GameData/Serialization/Json/Generated"
+		"output_dir": "src/GameData/Serialization/Json/Generated",
+		"blacklist": ["transient"]
 	},
 	{
 		"name_template": "{class_name}EditFactory.generated.h",
 		"template": "editor/component_edit_factory_header",
-		"output_dir": "editor/src/componenteditcontent/generated/"
+		"output_dir": "editor/src/componenteditcontent/generated/",
+		"blacklist": ["transient"]
 	},
 	{
 		"name_template": "{class_name}EditFactory.generated.cpp",
 		"template": "editor/component_edit_factory_source",
-		"output_dir": "editor/src/componenteditcontent/generated/"
+		"output_dir": "editor/src/componenteditcontent/generated/",
+		"blacklist": ["transient"]
 	},
 	{
 		"name_template": "Change{class_name}{attribute_name_capital}Command.generated.h",

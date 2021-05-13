@@ -1,6 +1,7 @@
 {
 	"component": "navMesh",
 	"description": "Component that stores part of NavMesh",
+	"flags": ["transient"],
 	"attributes": [
 		{
 			"name": "navMesh",

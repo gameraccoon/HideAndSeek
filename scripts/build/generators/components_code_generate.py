@@ -25,7 +25,8 @@ def get_base_data_dictionary(data_description):
         "component_name_capital": capitalize(data_description["component"]),
         "class_name": "%sComponent" % capitalize(data_description["component"]),
         "component_tolower" : data_description["component"].lower(),
-        "component_description": data_description["description"]
+        "component_description": data_description["description"],
+        "component_flags": data_description["flags"] if ("flags" in data_description) else []
     }
 
 
@@ -66,6 +67,20 @@ def does_attribute_pass_filters(attribute, template_params, attribute_template_d
     # if we have whitelist, skip attributes without whitelisted flags
     if "whitelist" in attribute_template_data:
         if not any(x in attribute["data_dict"]["attribute_flags"] for x in attribute_template_data["whitelist"]):
+            return False
+
+    return True
+
+
+def does_component_pass_filters(component, template_data):
+    # skip blacklisted attributes
+    if "blacklist" in template_data:
+        if any(x in component["component_flags"] for x in template_data["blacklist"]):
+            return False
+
+    # if we have whitelist, skip attributes without whitelisted flags
+    if "whitelist" in template_data:
+        if not any(x in attribute["component_flags"] for x in template_data["whitelist"]):
             return False
 
     return True
@@ -164,10 +179,11 @@ def generate_files(file_infos, data_description, full_data_dict):
         elif "flags" in file_info and "list" in file_info["flags"]:
             pass # generated in another function
         else:
-            generate_cpp_file(file_info["template"],
-                path.join(working_dir, file_info["output_dir"]),
-                file_info["name_template"],
-                full_data_dict)
+            if does_component_pass_filters(full_data_dict, file_info):
+                generate_cpp_file(file_info["template"],
+                    path.join(working_dir, file_info["output_dir"]),
+                    file_info["name_template"],
+                    full_data_dict)
 
 
 def load_component_data_description(file_path):
@@ -184,7 +200,13 @@ def generate_component_list_descriptions(components):
     for component_template in component_templates:
         template = read_template(component_template["name"], templates_dir)
         filled_template = ""
+
+        filtered_components = []
         for component in components:
+            if does_component_pass_filters(component, component_template):
+                filtered_components.append(component)
+
+        for component in filtered_components:
             # skip delimiters for the last item
             if component is components[len(components) - 1]:
                 delimiter_dict = empty_delimiter_dictionary

@@ -1,9 +1,9 @@
 {
-    "version": "d_xmwP58wMGV",
+    "version": "d_F4whM5cvC4",
     "world": {
         "entity_manager": {
             "components": null,
-            "entities": []
+            "entities": null
         },
         "spatial_data": {
             "cell_size": 200,
@@ -11,9 +11,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -87,9 +85,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -284,9 +280,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -428,9 +422,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -675,9 +667,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -802,9 +792,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -976,9 +964,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -1012,9 +998,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -1209,9 +1193,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -1353,9 +1335,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -1600,9 +1580,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -1727,9 +1705,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -1871,9 +1847,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -2100,9 +2074,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -2278,9 +2250,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -2474,9 +2444,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -2618,9 +2586,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -2865,9 +2831,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -2992,9 +2956,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -3137,9 +3099,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -3296,9 +3256,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -3453,9 +3411,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -3598,9 +3554,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -3846,9 +3800,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -4018,9 +3970,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -4178,9 +4128,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -4373,9 +4321,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -4532,9 +4478,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -4692,9 +4636,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -4836,9 +4778,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -4980,13 +4920,11 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": null,
-                            "entities": []
+                            "entities": null
                         }
                     },
                     "pos": {
@@ -4997,9 +4935,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -5124,9 +5060,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -5251,9 +5185,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -5327,9 +5259,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -5454,9 +5384,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -5683,9 +5611,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -5759,9 +5685,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -5937,9 +5861,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -6132,9 +6054,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -6276,9 +6196,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -6420,9 +6338,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -6496,9 +6412,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -6623,13 +6537,11 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": null,
-                            "entities": []
+                            "entities": null
                         }
                     },
                     "pos": {
@@ -6640,9 +6552,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -6716,9 +6626,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -6843,9 +6751,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -7015,9 +6921,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -7172,9 +7076,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -7367,9 +7269,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -7578,9 +7478,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -7737,9 +7635,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -7881,9 +7777,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -8077,9 +7971,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -8273,9 +8165,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -8521,9 +8411,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -8666,9 +8554,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -8811,9 +8697,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -8938,9 +8822,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -9186,9 +9068,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -9330,9 +9210,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -9406,9 +9284,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -9603,9 +9479,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -9747,9 +9621,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -9891,9 +9763,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -10035,9 +9905,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -10231,9 +10099,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -10474,9 +10340,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -10722,9 +10586,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -10897,9 +10759,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -11002,9 +10862,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -11199,9 +11057,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -11358,9 +11214,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -11502,9 +11356,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -11662,9 +11514,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -11807,9 +11657,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -11883,9 +11731,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -12080,9 +11926,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -12329,9 +12173,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -12473,9 +12315,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -12617,9 +12457,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -12865,9 +12703,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -12992,9 +12828,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -13136,9 +12970,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -13365,9 +13197,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -13561,9 +13391,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -13688,9 +13516,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -13884,9 +13710,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -14011,9 +13835,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -14207,9 +14029,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -14352,9 +14172,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -14479,9 +14297,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -14653,9 +14469,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -14760,9 +14574,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -14955,9 +14767,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -15167,9 +14977,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -15274,9 +15082,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -15434,9 +15240,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -15663,9 +15467,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -15887,9 +15689,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -16083,9 +15883,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -16279,9 +16077,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -16372,9 +16168,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -16568,9 +16362,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -16817,9 +16609,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -16944,13 +16734,11 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": null,
-                            "entities": []
+                            "entities": null
                         }
                     },
                     "pos": {
@@ -16961,9 +16749,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -17088,9 +16874,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -17164,9 +16948,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -17240,9 +17022,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -17367,9 +17147,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -17596,9 +17374,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -17672,9 +17448,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -17850,9 +17624,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -17994,9 +17766,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -18087,9 +17857,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -18231,9 +17999,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -18376,9 +18142,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -18452,9 +18216,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -18545,9 +18307,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -18689,9 +18449,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -18900,9 +18658,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -19060,9 +18816,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -19204,9 +18958,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -19401,9 +19153,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -19597,9 +19347,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -19846,9 +19594,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -19990,9 +19736,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -20134,9 +19878,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -20330,9 +20072,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -20406,9 +20146,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -20655,9 +20393,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -20830,9 +20566,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -20935,9 +20669,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -21132,13 +20864,11 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": null,
-                            "entities": []
+                            "entities": null
                         }
                     },
                     "pos": {
@@ -21149,9 +20879,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -21276,9 +21004,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -21352,9 +21078,7 @@
                 {
                     "cell": {
                         "cell_components": {
-                            "components": {
-                                "LightBlockingGeometryComponent": {}
-                            }
+                            "components": null
                         },
                         "entity_manager": {
                             "components": {
@@ -21429,8 +21153,6 @@
         },
         "world_components": {
             "components": {
-                "NavMeshComponent": {},
-                "PathBlockingGeometryComponent": {},
                 "TrackedSpatialEntitiesComponent": {
                     "entities": [
                         [

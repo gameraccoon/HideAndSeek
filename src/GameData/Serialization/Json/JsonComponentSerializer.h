@@ -25,7 +25,6 @@ namespace Json
 				return mSerializers[it->second].get();
 			}
 
-			ReportFatalError("Unknown component type: '%s'", className);
 			return nullptr;
 		}
 

@@ -50,17 +50,19 @@ namespace Json
 		for (auto& componentArray : entityManager.getComponentsData())
 		{
 			auto componentArrayObject = nlohmann::json::array();
-			const ComponentSerializer* jsonSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(componentArray.first);
-			for (auto& component : componentArray.second)
+			if (const ComponentSerializer* jsonSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(componentArray.first))
 			{
-				auto componentObj = nlohmann::json{};
-				if (component != nullptr)
+				for (auto& component : componentArray.second)
 				{
-					jsonSerializer->toJson(componentObj, component);
+					auto componentObj = nlohmann::json{};
+					if (component != nullptr)
+					{
+						jsonSerializer->toJson(componentObj, component);
+					}
+					componentArrayObject.push_back(componentObj);
 				}
-				componentArrayObject.push_back(componentObj);
+				components[ID_TO_STR(componentArray.first)] = componentArrayObject;
 			}
-			components[ID_TO_STR(componentArray.first)] = componentArrayObject;
 		}
 		outJson["components"] = components;
 
@@ -89,16 +91,22 @@ namespace Json
 		for (const auto& [typeStr, vector] : components.items())
 		{
 			StringId type = STR_TO_ID(typeStr);
-			const ComponentSerializer* jsonSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(type);
-			size_t entityIndex = 0;
-			for (const auto& componentData : vector)
+			if (const ComponentSerializer* jsonSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(type))
 			{
-				if (!componentData.is_null())
+				size_t entityIndex = 0;
+				for (const auto& componentData : vector)
 				{
-					void* component = outEntityManager.addComponentByType(entities[entityIndex], type);
-					jsonSerializer->fromJson(componentData, component);
+					if (!componentData.is_null())
+					{
+						void* component = outEntityManager.addComponentByType(entities[entityIndex], type);
+						jsonSerializer->fromJson(componentData, component);
+					}
+					++entityIndex;
 				}
-				++entityIndex;
+			}
+			else
+			{
+				ReportFatalError("Unknown component %s", type);
 			}
 		}
 	}
@@ -112,8 +120,11 @@ namespace Json
 		{
 			auto componentObj = nlohmann::json{};
 			StringId componentTypeName = componentData.typeId;
-			jsonSerializationHolder.getComponentSerializerFromClassName(componentTypeName)->toJson(componentObj, componentData.component);
-			json[ID_TO_STR(componentData.typeId)] = componentObj;
+			if (const ComponentSerializer* componentSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(componentTypeName))
+			{
+				componentSerializer->toJson(componentObj, componentData.component);
+				json[ID_TO_STR(componentData.typeId)] = componentObj;
+			}
 		}
 	}
 
@@ -131,7 +142,10 @@ namespace Json
 			StringId componentTypeName = STR_TO_ID(componentTypeNameStr);
 
 			void* component = entityManager.addComponentByType(entity, componentTypeName);
-			jsonSerializationHolder.getComponentSerializerFromClassName(componentTypeName)->fromJson(componentObj, component);
+			if (const ComponentSerializer* componentSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(componentTypeName))
+			{
+				componentSerializer->fromJson(componentObj, component);
+			}
 		}
 	}
 }
