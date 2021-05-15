@@ -37,7 +37,7 @@ void MovementSystem::update()
 
 	std::vector<CellScheduledTransfers> transfers;
 
-	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<MovementComponent, TransformComponent>([timestampNow, &transfers](Entity entity, WorldCell* cell, MovementComponent* movement, TransformComponent* transform)
+	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<MovementComponent, TransformComponent>([timestampNow, &transfers](WorldCell* cell, Entity entity, MovementComponent* movement, TransformComponent* transform)
 	{
 		EntityView entityView{ entity, cell->getEntityManager() };
 

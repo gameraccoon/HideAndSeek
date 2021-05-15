@@ -85,7 +85,7 @@ namespace RayTrace
 		float minRayQLength = (startPoint - endPoint).qSize() + 20.0f;
 
 		// ToDo: choose only potentially intersected cells
-		world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<CollisionComponent, TransformComponent>([&result, &minRayQLength, startPoint, endPoint](Entity entity, WorldCell* cell, CollisionComponent* collision, TransformComponent* transform)
+		world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<CollisionComponent, TransformComponent>([&result, &minRayQLength, startPoint, endPoint](WorldCell* cell, Entity entity, CollisionComponent* collision, TransformComponent* transform)
 		{
 			Vector2D transformedStartPoint = startPoint - transform->getLocation();
 			Vector2D transformedEndPoint = endPoint - transform->getLocation();

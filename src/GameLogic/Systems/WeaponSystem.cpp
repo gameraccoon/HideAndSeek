@@ -48,7 +48,7 @@ void WeaponSystem::update()
 	GameplayTimestamp currentTime = mTime.currentTimestamp;
 
 	std::vector<ShotInfo> shotsToMake;
-	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<WeaponComponent, CharacterStateComponent>([currentTime, &shotsToMake](Entity entity, WorldCell* cell, WeaponComponent* weapon, CharacterStateComponent* characterState)
+	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<WeaponComponent, CharacterStateComponent>([currentTime, &shotsToMake](WorldCell* cell, Entity entity, WeaponComponent* weapon, CharacterStateComponent* characterState)
 	{
 		if (characterState->getState() == CharacterState::Shoot || characterState->getState() == CharacterState::WalkAndShoot)
 		{

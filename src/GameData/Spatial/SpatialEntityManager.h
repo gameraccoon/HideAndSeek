@@ -30,7 +30,7 @@ public:
 	}
 
 	template<typename FirstComponent, typename... Components>
-	void getSpatialComponentsWithEntities(std::vector<std::tuple<Entity, WorldCell*, FirstComponent*, Components*...>>& inOutComponents)
+	void getSpatialComponentsWithEntities(std::vector<std::tuple<WorldCell*, Entity, FirstComponent*, Components*...>>& inOutComponents)
 	{
 		for (WorldCell* cell : mCells)
 		{
@@ -102,7 +102,7 @@ public:
 	}
 
 	template<typename FirstComponent, typename... Components>
-	void getSpatialComponentsWithEntities(std::vector<std::tuple<Entity, const WorldCell*, const FirstComponent*, const Components*...>>& inOutComponents) const
+	void getSpatialComponentsWithEntities(std::vector<std::tuple<const WorldCell*, Entity, const FirstComponent*, const Components*...>>& inOutComponents) const
 	{
 		for (const WorldCell* cell : mCells)
 		{

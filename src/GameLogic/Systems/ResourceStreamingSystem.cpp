@@ -37,7 +37,7 @@ void ResourceStreamingSystem::update()
 
 	// load sprites
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(worldCachedData->getCameraPos(), workingRect);
-	spatialManager.forEachSpatialComponentSetWithEntity<SpriteCreatorComponent>([&resourceManager = mResourceManager](Entity entity, WorldCell* cell, SpriteCreatorComponent* spriteCreator)
+	spatialManager.forEachSpatialComponentSetWithEntity<SpriteCreatorComponent>([&resourceManager = mResourceManager](WorldCell* cell, Entity entity, SpriteCreatorComponent* spriteCreator)
 	{
 		EntityView entityView{entity, cell->getEntityManager() };
 		const auto& descriptions = spriteCreator->getDescriptions();
@@ -60,7 +60,7 @@ void ResourceStreamingSystem::update()
 	spatialManager.executeScheduledActions();
 
 	// load single animations clips
-	spatialManager.forEachSpatialComponentSetWithEntity<AnimationClipCreatorComponent>([&resourceManager = mResourceManager](Entity entity, WorldCell* cell, AnimationClipCreatorComponent* animationClipCreator)
+	spatialManager.forEachSpatialComponentSetWithEntity<AnimationClipCreatorComponent>([&resourceManager = mResourceManager](WorldCell* cell, Entity entity, AnimationClipCreatorComponent* animationClipCreator)
 	{
 		EntityView entityView{entity, cell->getEntityManager() };
 		const auto& descriptions = animationClipCreator->getDescriptionsRef();
@@ -101,7 +101,7 @@ void ResourceStreamingSystem::update()
 	spatialManager.executeScheduledActions();
 
 	// load animation groups
-	spatialManager.forEachSpatialComponentSetWithEntity<AnimationGroupCreatorComponent>([&resourceManager = mResourceManager](Entity entity, WorldCell* cell, AnimationGroupCreatorComponent* animationGroupCreator)
+	spatialManager.forEachSpatialComponentSetWithEntity<AnimationGroupCreatorComponent>([&resourceManager = mResourceManager](WorldCell* cell, Entity entity, AnimationGroupCreatorComponent* animationGroupCreator)
 	{
 		EntityView entityView{entity, cell->getEntityManager() };
 		AnimationGroupsComponent* animationGroups = entityView.scheduleAddComponent<AnimationGroupsComponent>();

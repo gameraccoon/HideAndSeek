@@ -2,6 +2,8 @@
 
 #include "GameLogic/Systems/DeadEntitiesDestructionSystem.h"
 
+#include "Base/Types/TemplateAliases.h"
+
 #include "GameData/Components/DeathComponent.generated.h"
 
 #include "GameData/World.h"
@@ -16,11 +18,11 @@ void DeadEntitiesDestructionSystem::update()
 {
 	World& world = mWorldHolder.getWorld();
 
-	TupleVector<Entity, WorldCell*, DeathComponent*> components;
+	TupleVector<WorldCell*, Entity, DeathComponent*> components;
 	world.getSpatialData().getAllCellManagers().getSpatialComponentsWithEntities<DeathComponent>(components);
 
 	for (auto& componentTuple : components)
 	{
-		std::get<1>(componentTuple)->getEntityManager().removeEntity(std::get<0>(componentTuple));
+		std::get<0>(componentTuple)->getEntityManager().removeEntity(std::get<1>(componentTuple));
 	}
 }
