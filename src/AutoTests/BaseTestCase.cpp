@@ -4,15 +4,12 @@
 
 #include <memory>
 
-#include "Base/Random/Random.h"
-
 #include "HAL/Base/Engine.h"
 
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 
 BaseTestCase::BaseTestCase(int width, int height)
 	: HAL::GameBase(width, height)
-	, mEntityGenerator(Random::gGlobalGenerator())
 {
 }
 

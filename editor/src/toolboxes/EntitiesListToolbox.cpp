@@ -122,7 +122,7 @@ void EntitiesListToolbox::updateContent()
 		for (Entity entity : entities)
 		{
 			QListWidgetItem* newItem = HS_NEW QListWidgetItem(QString::number(entity.getId()));
-			newItem->setData(0, entity.getId());
+			newItem->setData(0, static_cast<unsigned long long>(entity.getId()));
 			newItem->setData(1, false);
 			entitiesList->addItem(newItem);
 		}

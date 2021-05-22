@@ -59,7 +59,7 @@ CollidableObjects FillCollidableObjects(World& world)
 TEST(Raytrace, FastTraceRect1)
 {
 	ComponentFactory componentFactory;
-	RaccoonEcs::EntityGenerator entityGenerator(42);
+	RaccoonEcs::EntityGenerator entityGenerator;
 	ComponentsRegistration::RegisterComponents(componentFactory);
 	World world(componentFactory, entityGenerator);
 	FillCollidableObjects(world);
@@ -78,7 +78,7 @@ TEST(Raytrace, FastTraceRect1)
 TEST(Raytrace, FastTraceRect2)
 {
 	ComponentFactory componentFactory;
-	RaccoonEcs::EntityGenerator entityGenerator(42);
+	RaccoonEcs::EntityGenerator entityGenerator;
 	ComponentsRegistration::RegisterComponents(componentFactory);
 	World world(componentFactory, entityGenerator);
 	FillCollidableObjects(world);
@@ -91,7 +91,7 @@ TEST(Raytrace, FastTraceRect2)
 TEST(Raytrace, TraceRect)
 {
 	ComponentFactory componentFactory;
-	RaccoonEcs::EntityGenerator entityGenerator(42);
+	RaccoonEcs::EntityGenerator entityGenerator;
 	ComponentsRegistration::RegisterComponents(componentFactory);
 	World world(componentFactory, entityGenerator);
 
@@ -106,7 +106,7 @@ TEST(Raytrace, TraceRect)
 TEST(Raytrace, FastTraceCircle)
 {
 	ComponentFactory componentFactory;
-	RaccoonEcs::EntityGenerator entityGenerator(42);
+	RaccoonEcs::EntityGenerator entityGenerator;
 	ComponentsRegistration::RegisterComponents(componentFactory);
 	World world(componentFactory, entityGenerator);
 	FillCollidableObjects(world);
@@ -129,7 +129,7 @@ TEST(Raytrace, FastTraceCircle)
 TEST(Raytrace, TraceCircle)
 {
 	ComponentFactory componentFactory;
-	RaccoonEcs::EntityGenerator entityGenerator(42);
+	RaccoonEcs::EntityGenerator entityGenerator;
 	ComponentsRegistration::RegisterComponents(componentFactory);
 	World world(componentFactory, entityGenerator);
 

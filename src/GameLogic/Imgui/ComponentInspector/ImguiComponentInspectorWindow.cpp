@@ -47,12 +47,12 @@ void ImguiComponentInspectorWindow::showEntityId()
 {
 	if (mSelectedEntity.has_value())
 	{
-		ImGui::Text("0x%x", std::get<1>(*mSelectedEntity).getId());
+		ImGui::Text("id:%llu", static_cast<unsigned long long>(std::get<1>(*mSelectedEntity).getId()));
 		ImGui::SameLine();
 		if (ImGui::Button("Copy"))
 		{
 			ImGui::LogToClipboard();
-			ImGui::LogText("0x%x", std::get<1>(*mSelectedEntity).getId());
+			ImGui::LogText("id:%llu", static_cast<unsigned long long>(std::get<1>(*mSelectedEntity).getId()));
 			ImGui::LogFinish();
 		}
 	}
@@ -72,7 +72,7 @@ void ImguiComponentInspectorWindow::showFilteredEntities()
 				{
 					const Entity& entity = std::get<1>(filteredEntity);
 					char buf[32];
-					sprintf(buf, "0x%x", entity.getId());
+					sprintf(buf, "id:%llu", static_cast<unsigned long long>(entity.getId()));
 					if (ImGui::Selectable(buf, mSelectedEntity.has_value() && std::get<1>(*mSelectedEntity) == entity))
 					{
 						mSelectedEntity = filteredEntity;

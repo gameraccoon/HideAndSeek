@@ -82,8 +82,7 @@ namespace Json
 		for (const auto& entityData : entitiesJson)
 		{
 			Entity entity(entityData.get<Entity::EntityId>());
-			[[maybe_unused]] bool isInserted = outEntityManager.tryInsertEntity(entity);
-			Assert(isInserted, "Can't create entity because of ID collision");
+			outEntityManager.reinsertPrevioslyExistingEntity(entity);
 			entities.push_back(entity);
 		}
 

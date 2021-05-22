@@ -2,7 +2,6 @@
 
 #include <QtWidgets/qcombobox.h>
 
-#include "Base/Debug/Assert.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/World.h"
 
@@ -16,16 +15,9 @@ AddSpatialEntityCommand::AddSpatialEntityCommand(const SpatialEntity& entity, co
 void AddSpatialEntityCommand::doCommand(World* world)
 {
 	WorldCell& cell = world->getSpatialData().getOrCreateCell(mEntity.cell);
-	bool hasInserted = cell.getEntityManager().tryInsertEntity(mEntity.entity.getEntity());
-	if (hasInserted)
-	{
-		TransformComponent* transform = cell.getEntityManager().addComponent<TransformComponent>(mEntity.entity.getEntity());
-		transform->setLocation(mLocation);
-	}
-	else
-	{
-		ReportError("Entity can't be created because of ID collision. Can't recover. Back up your data before saving.");
-	}
+	cell.getEntityManager().reinsertPrevioslyExistingEntity(mEntity.entity.getEntity());
+	TransformComponent* transform = cell.getEntityManager().addComponent<TransformComponent>(mEntity.entity.getEntity());
+	transform->setLocation(mLocation);
 }
 
 void AddSpatialEntityCommand::undoCommand(World* world)
