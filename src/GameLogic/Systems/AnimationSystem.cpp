@@ -12,8 +12,18 @@
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 
-AnimationSystem::AnimationSystem(WorldHolder& worldHolder, const TimeData& time) noexcept
-	: mWorldHolder(worldHolder)
+AnimationSystem::AnimationSystem(
+		RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent>&& animUpdateFilter,
+		RaccoonEcs::ComponentFilter<AnimationClipsComponent, RenderComponent>&& animRenderFilter,
+		RaccoonEcs::ComponentFilter<const StateMachineComponent>&& stateMachineFilter,
+		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
+		WorldHolder& worldHolder,
+		const TimeData& time) noexcept
+	: mAnimUpdateFilter(std::move(animUpdateFilter))
+	, mAnimRenderFilter(std::move(animRenderFilter))
+	, mStateMachineFilter(std::move(stateMachineFilter))
+	, mWorldCachedDataFilter(std::move(worldCachedDataFilter))
+	, mWorldHolder(worldHolder)
 	, mTime(time)
 {
 }
@@ -24,16 +34,18 @@ void AnimationSystem::update()
 	GameData& gameData = mWorldHolder.getGameData();
 	float dt = mTime.dt;
 
-	auto [stateMachines] = gameData.getGameComponents().getComponents<StateMachineComponent>();
+	const auto [stateMachines] = mStateMachineFilter.getComponents(gameData.getGameComponents());
 
-	auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
+	const auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
 	Vector2D workingRect = worldCachedData->getScreenSize();
 	Vector2D cameraLocation = worldCachedData->getCameraPos();
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(cameraLocation, workingRect);
 
 	// update animation clip from FSM
-	spatialManager.forEachComponentSet<AnimationGroupsComponent, AnimationClipsComponent>([dt, stateMachines](AnimationGroupsComponent* animationGroups, AnimationClipsComponent* animationClips)
+	spatialManager.forEachComponentSetN(
+		mAnimUpdateFilter,
+		[dt, stateMachines](AnimationGroupsComponent* animationGroups, AnimationClipsComponent* animationClips)
 	{
 		for (auto& data : animationGroups->getDataRef())
 		{
@@ -49,7 +61,9 @@ void AnimationSystem::update()
 	});
 
 	// update animation frame
-	spatialManager.forEachComponentSet<AnimationClipsComponent, RenderComponent>([dt](AnimationClipsComponent* animationClips, RenderComponent* render)
+	spatialManager.forEachComponentSetN(
+			mAnimRenderFilter,
+			[dt](AnimationClipsComponent* animationClips, RenderComponent* render)
 	{
 		std::vector<AnimationClip>& animationDatas = animationClips->getDatasRef();
 		for (auto& data : animationDatas)

@@ -27,7 +27,7 @@ public:
 	void update() override;
 	void initResources() override;
 	void shutdown() override;
-	std::string getName() override { return "ImguiSystem"; }
+	std::string getName() const override { return "ImguiSystem"; }
 
 private:
 	HAL::Engine& mEngine;

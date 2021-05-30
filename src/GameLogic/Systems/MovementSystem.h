@@ -17,7 +17,7 @@ public:
 	~MovementSystem() override = default;
 
 	void update() override;
-	std::string getName() override { return "MovementSystem"; }
+	std::string getName() const override { return "MovementSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;

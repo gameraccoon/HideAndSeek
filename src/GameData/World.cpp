@@ -53,10 +53,10 @@ void World::fromJson(const nlohmann::json& json, const Json::ComponentSerializat
 	InitSpatialTrackedEntities(mSpatialData, mWorldComponents);
 }
 
-std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(StringId entityStringId)
+std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(TrackedListConstFilter& filter, StringId entityStringId)
 {
 	std::optional<std::pair<EntityView, CellPos>> result;
-	auto [trackedSpatialEntities] = getWorldComponents().getComponents<TrackedSpatialEntitiesComponent>();
+	const auto [trackedSpatialEntities] = filter.getComponents(getWorldComponents());
 
 	if (trackedSpatialEntities)
 	{
@@ -73,24 +73,21 @@ std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(Str
 	return result;
 }
 
-EntityView World::createTrackedSpatialEntity(StringId entityStringId, CellPos pos)
+EntityView World::createTrackedSpatialEntity(TrackedListAdder& trackingAdder, TrackAdder& trackAdder, EntityAdder& entityAdder, StringId entityStringId, CellPos pos)
 {
-	auto result = createSpatialEntity(pos);
-	auto [trackedSpatialEntities] = getWorldComponents().getComponents<TrackedSpatialEntitiesComponent>();
-	if (trackedSpatialEntities == nullptr)
-	{
-		trackedSpatialEntities = getWorldComponents().addComponent<TrackedSpatialEntitiesComponent>();
-	}
+	auto result = createSpatialEntity(entityAdder, pos);
+	TrackedSpatialEntitiesComponent* trackedSpatialEntities = trackingAdder.getOrAddComponent(getWorldComponents());
+
 	trackedSpatialEntities->getEntitiesRef().insert_or_assign(entityStringId, SpatialEntity(result.getEntity(), pos));
-	SpatialTrackComponent* trackComponent = result.addComponent<SpatialTrackComponent>();
+	SpatialTrackComponent* trackComponent = trackAdder.addComponent(result);
 	trackComponent->setId(entityStringId);
 	return result;
 }
 
-EntityView World::createSpatialEntity(CellPos pos)
+EntityView World::createSpatialEntity(EntityAdder& entityAdder, CellPos pos)
 {
 	WorldCell& cell = getSpatialData().getOrCreateCell(pos);
-	return EntityView(cell.getEntityManager().addEntity(), cell.getEntityManager());
+	return EntityView(entityAdder.addEntity(cell.getEntityManager()), cell.getEntityManager());
 }
 
 void World::clearCaches()

@@ -11,8 +11,12 @@
 #include "GameData/Components/MovementComponent.generated.h"
 
 
-TestCircularUnitsSystem::TestCircularUnitsSystem(WorldHolder& worldHolder, TimeData& time) noexcept
-	: mWorldHolder(worldHolder)
+TestCircularUnitsSystem::TestCircularUnitsSystem(
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
+		WorldHolder& worldHolder,
+		TimeData& time) noexcept
+	: mTrackedFilter(std::move(trackedFilter))
+	, mWorldHolder(worldHolder)
 	, mTime(time)
 {
 }
@@ -22,7 +26,7 @@ void TestCircularUnitsSystem::update()
 	World& world = mWorldHolder.getWorld();
 	float dt = mTime.dt;
 
-	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
 	if (!playerEntity.has_value())
 	{
 		return;

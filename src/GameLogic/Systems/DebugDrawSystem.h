@@ -29,7 +29,7 @@ public:
 
 	void update() override;
 	void initResources() override;
-	std::string getName() override { return "DebugDrawSystem"; }
+	std::string getName() const override { return "DebugDrawSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;

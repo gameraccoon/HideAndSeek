@@ -2,6 +2,8 @@
 
 #include "GameLogic/Game.h"
 
+#include <raccoon-ecs/async_operations.h>
+
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 
@@ -91,16 +93,83 @@ void Game::update(float dt)
 
 void Game::initSystems()
 {
-	mSystemsManager.registerSystem<ControlSystem>(mWorldHolder, mInputData);
-	mSystemsManager.registerSystem<AiSystem>(mWorldHolder, mTime);
-	mSystemsManager.registerSystem<WeaponSystem>(mWorldHolder, mTime);
-	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem>(mWorldHolder);
+	mSystemsManager.registerSystem<ControlSystem>(
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::ComponentFilter<CharacterStateComponent>(),
+		RaccoonEcs::ComponentFilter<ImguiComponent>(),
+		RaccoonEcs::ComponentFilter<RenderModeComponent>(),
+		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>(),
+		RaccoonEcs::ComponentFilter<const TransformComponent>(),
+		mWorldHolder,
+		mInputData
+	);
+
+	mSystemsManager.registerSystem<AiSystem>(
+		RaccoonEcs::ComponentAdder<NavMeshComponent>(),
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<AiControllerComponent, const TransformComponent, MovementComponent, CharacterStateComponent>(),
+		RaccoonEcs::ComponentFilter<DebugDrawComponent>(),
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::ComponentFilter<const PathBlockingGeometryComponent>(),
+		mWorldHolder,
+		mTime
+	);
+
+	mSystemsManager.registerSystem<WeaponSystem>(
+		RaccoonEcs::ComponentFilter<WeaponComponent, CharacterStateComponent>(),
+		RaccoonEcs::ComponentFilter<const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<HealthComponent>(),
+		RaccoonEcs::ComponentAdder<DeathComponent>(),
+		mWorldHolder,
+		mTime
+	);
+
+	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem>(
+		RaccoonEcs::ComponentFilter<const DeathComponent>(),
+		RaccoonEcs::EntityRemover(),
+		mWorldHolder
+	);
+
 	mSystemsManager.registerSystem<CollisionSystem>(mWorldHolder);
-	mSystemsManager.registerSystem<CameraSystem>(mWorldHolder, mInputData);
+
+	mSystemsManager.registerSystem<CameraSystem>(
+		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>(),
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::ComponentFilter<const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<const ImguiComponent>(),
+		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>(),
+		mWorldHolder,
+		mInputData
+	);
+
 	mSystemsManager.registerSystem<MovementSystem>(mWorldHolder, mTime);
 	mSystemsManager.registerSystem<CharacterStateSystem>(mWorldHolder, mTime);
-	mSystemsManager.registerSystem<ResourceStreamingSystem>(mWorldHolder, getResourceManager());
-	mSystemsManager.registerSystem<AnimationSystem>(mWorldHolder, mTime);
+
+	mSystemsManager.registerSystem<ResourceStreamingSystem>(
+		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>(),
+		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>(),
+		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>(),
+		RaccoonEcs::ComponentAdder<RenderComponent>(),
+		RaccoonEcs::ComponentAdder<AnimationClipsComponent>(),
+		RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent>(),
+		RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent>(),
+		RaccoonEcs::ComponentAdder<AnimationGroupsComponent>(),
+		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>(),
+		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>(),
+		mWorldHolder,
+		getResourceManager()
+	);
+
+	mSystemsManager.registerSystem<AnimationSystem>(
+		RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent>(),
+		RaccoonEcs::ComponentFilter<AnimationClipsComponent, RenderComponent>(),
+		RaccoonEcs::ComponentFilter<const StateMachineComponent>(),
+		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>(),
+		mWorldHolder,
+		mTime
+	);
+
 	mSystemsManager.registerSystem<RenderSystem>(mWorldHolder, mTime, getEngine(), getResourceManager(), mJobsWorkerManager);
 	mSystemsManager.registerSystem<DebugDrawSystem>(mWorldHolder, mTime, getEngine(), getResourceManager());
 #ifdef IMGUI_ENABLED

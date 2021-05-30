@@ -39,19 +39,69 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	DestroyedEntitiesTestCheck& destroyedEntitiesTestCheck = *static_cast<DestroyedEntitiesTestCheck*>(mTestChecklist.checks["destroyedEntities"].get());
 
 	mSystemsManager.registerSystem<TestSpawnShootableUnitsSystem>(mWorldHolder);
-	mSystemsManager.registerSystem<TestShootingControlSystem>(mWorldHolder, mTime);
-	mSystemsManager.registerSystem<WeaponSystem>(mWorldHolder, mTime);
+
+	mSystemsManager.registerSystem<TestShootingControlSystem>(
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
+		mWorldHolder,
+		mTime
+	);
+
+	mSystemsManager.registerSystem<WeaponSystem>(
+		RaccoonEcs::ComponentFilter<WeaponComponent, CharacterStateComponent>(),
+		RaccoonEcs::ComponentFilter<const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<HealthComponent>(),
+		RaccoonEcs::ComponentAdder<DeathComponent>(),
+		mWorldHolder,
+		mTime
+	);
+
 	mSystemsManager.registerSystem<TestDestroyedEntitiesRegistrationSystem>(mWorldHolder, destroyedEntitiesTestCheck);
-	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem>(mWorldHolder);
+
+	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem>(
+		RaccoonEcs::ComponentFilter<const DeathComponent>(),
+		RaccoonEcs::EntityRemover(),
+		mWorldHolder
+	);
+
 	mSystemsManager.registerSystem<CollisionSystem>(mWorldHolder);
-	mSystemsManager.registerSystem<CameraSystem>(mWorldHolder, mInputData);
+
+	mSystemsManager.registerSystem<CameraSystem>(
+		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>(),
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::ComponentFilter<const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<const ImguiComponent>(),
+		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>(),
+		mWorldHolder,
+		mInputData);
+
 	mSystemsManager.registerSystem<MovementSystem>(mWorldHolder, mTime);
 	mSystemsManager.registerSystem<CharacterStateSystem>(mWorldHolder, mTime);
-	mSystemsManager.registerSystem<ResourceStreamingSystem>(mWorldHolder, getResourceManager());
+
+	mSystemsManager.registerSystem<ResourceStreamingSystem>(
+		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>(),
+		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>(),
+		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>(),
+		RaccoonEcs::ComponentAdder<RenderComponent>(),
+		RaccoonEcs::ComponentAdder<AnimationClipsComponent>(),
+		RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent>(),
+		RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent>(),
+		RaccoonEcs::ComponentAdder<AnimationGroupsComponent>(),
+		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>(),
+		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>(),
+		mWorldHolder,
+		getResourceManager()
+	);
+
 	mSystemsManager.registerSystem<RenderSystem>(mWorldHolder, mTime, getEngine(), getResourceManager(), mWorkerManager);
 
 	Vector2D playerPos{ZERO_VECTOR};
-	EntityView playerEntity = mWorld.createTrackedSpatialEntity(STR_TO_ID("ControlledEntity"), SpatialWorldData::GetCellForPos(playerPos));
+	EntityView playerEntity = mWorld.createTrackedSpatialEntity(
+		RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(),
+		RaccoonEcs::EntityAdder(),
+		STR_TO_ID("ControlledEntity"), SpatialWorldData::GetCellForPos(playerPos)
+	);
+
 	{
 		TransformComponent* transform = playerEntity.addComponent<TransformComponent>();
 		transform->setLocation(playerPos);
@@ -79,7 +129,13 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	playerEntity.addComponent<CharacterStateComponent>();
 
 	Vector2D cameraPos{ZERO_VECTOR};
-	EntityView camera = mWorld.createTrackedSpatialEntity(STR_TO_ID("CameraEntity"), SpatialWorldData::GetCellForPos(cameraPos));
+	EntityView camera = mWorld.createTrackedSpatialEntity(
+		RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(),
+		RaccoonEcs::EntityAdder(),
+		STR_TO_ID("CameraEntity"), SpatialWorldData::GetCellForPos(cameraPos)
+	);
+
 	{
 		TransformComponent* transform = camera.addComponent<TransformComponent>();
 		transform->setLocation(cameraPos);

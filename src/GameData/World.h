@@ -1,5 +1,7 @@
 #pragma once
 
+#include <raccoon-ecs/async_operations.h>
+
 #include <optional>
 
 #include "GameData/EcsDefinitions.h"
@@ -8,6 +10,12 @@
 
 class World
 {
+public:
+	using TrackedListConstFilter = const RaccoonEcs::ComponentFilter<const class TrackedSpatialEntitiesComponent>;
+	using TrackedListAdder = const RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>;
+	using TrackAdder = const RaccoonEcs::ComponentAdder<class SpatialTrackComponent>;
+	using EntityAdder = const RaccoonEcs::EntityAdder;
+
 public:
 	World(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator);
 
@@ -23,9 +31,10 @@ public:
 	[[nodiscard]] nlohmann::json toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder);
 	void fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
-	std::optional<std::pair<EntityView, CellPos>> getTrackedSpatialEntity(StringId entityStringId);
-	EntityView createTrackedSpatialEntity(StringId entityStringId, CellPos pos);
-	EntityView createSpatialEntity(CellPos pos);
+	std::optional<std::pair<EntityView, CellPos>> getTrackedSpatialEntity(TrackedListConstFilter& filter, StringId entityStringId);
+	EntityView createTrackedSpatialEntity(TrackedListAdder& trackingAdder, TrackAdder& trackAdder, EntityAdder& entityAdder, StringId entityStringId, CellPos pos);
+
+	EntityView createSpatialEntity(EntityAdder& entityAdder, CellPos pos);
 
 	void clearCaches();
 

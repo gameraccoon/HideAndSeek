@@ -14,7 +14,7 @@ public:
 	TestDestroyedEntitiesRegistrationSystem(WorldHolder& worldHolder, DestroyedEntitiesTestCheck& testCheck) noexcept;
 
 	void update() override;
-	std::string getName() override { return "TestSpawnShootableUnitsSystem"; }
+	std::string getName() const override { return "TestSpawnShootableUnitsSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;

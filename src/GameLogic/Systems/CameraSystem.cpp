@@ -10,8 +10,20 @@
 #include "GameData/GameData.h"
 
 
-CameraSystem::CameraSystem(WorldHolder& worldHolder, const InputData& inputData) noexcept
-	: mWorldHolder(worldHolder)
+CameraSystem::CameraSystem(
+		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>&& cameraMoveFilter,
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
+		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
+		RaccoonEcs::ComponentFilter<const ImguiComponent>&& imguiFilter,
+		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>&& worldDataAdder,
+		WorldHolder& worldHolder,
+		const InputData& inputData) noexcept
+	: mCameraMoveFilter(std::move(cameraMoveFilter))
+	, mTrackedFilter(std::move(trackedFilter))
+	, mTransformFilter(std::move(transformFilter))
+	, mImguiFilter(std::move(imguiFilter))
+	, mWorldDataAdder(std::move(worldDataAdder))
+	, mWorldHolder(worldHolder)
 	, mInputData(inputData)
 {
 }
@@ -28,15 +40,15 @@ void CameraSystem::update()
 
 	World& world = mWorldHolder.getWorld();
 
-	std::optional<std::pair<EntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<EntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
 
 	if (controlledEntity.has_value())
 	{
-		std::optional<std::pair<EntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(STR_TO_ID("CameraEntity"));
+		std::optional<std::pair<EntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("CameraEntity"));
 
 		if (mainCamera.has_value())
 		{
-			auto [cameraTransform, cameraMovement] = mainCamera->first.getComponents<TransformComponent, MovementComponent>();
+			auto [cameraTransform, cameraMovement] = mCameraMoveFilter.getComponents(mainCamera->first);
 			if (cameraTransform == nullptr)
 			{
 				return;
@@ -48,19 +60,14 @@ void CameraSystem::update()
 
 			const float cameraMobilityRate = 0.7f;
 
-			auto [controledEntityTransform] = controlledEntity->first.getComponents<TransformComponent>();
+			auto [controledEntityTransform] = mTransformFilter.getComponents(controlledEntity->first);
 
 			Vector2D cameraNewPos = controledEntityTransform->getLocation() + (mouseScreenPos - screenHalfSize) * cameraMobilityRate;
 			Vector2D cameraMove = cameraNewPos - cameraTransform->getLocation();
 
 			cameraMovement->setNextStep(cameraMove);
 
-			auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
-			if (worldCachedData == nullptr)
-			{
-				world.getWorldComponents().addComponent<WorldCachedDataComponent>();
-				std::tie(worldCachedData) = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
-			}
+			WorldCachedDataComponent* worldCachedData = mWorldDataAdder.getOrAddComponent(world.getWorldComponents());
 			worldCachedData->setCameraPos(cameraNewPos);
 			worldCachedData->setScreenSize(screenSize);
 		}

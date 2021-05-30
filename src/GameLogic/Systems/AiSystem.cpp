@@ -8,7 +8,6 @@
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 #include "GameData/Components/PathBlockingGeometryComponent.generated.h"
 #include "GameData/Components/DebugDrawComponent.generated.h"
 #include "GameData/World.h"
@@ -17,8 +16,25 @@
 #include "Utils/AI/NavMeshGenerator.h"
 #include "Utils/AI/PathFinding.h"
 
-AiSystem::AiSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept
-	: mWorldHolder(worldHolder)
+AiSystem::AiSystem(
+		RaccoonEcs::ComponentAdder<NavMeshComponent>&& navMeshDataFilter,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>&& collisionDataFilter,
+		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
+		NavDataReader&& navDataFilter,
+		RaccoonEcs::ComponentFilter<DebugDrawComponent>&& debugDrawFilter,
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
+		RaccoonEcs::ComponentFilter<const PathBlockingGeometryComponent>&& pathBlockingGeometryFilter,
+		WorldHolder& worldHolder,
+		const TimeData& timeData
+	) noexcept
+	: mNavMeshDataFilter(std::move(navMeshDataFilter))
+	, mCollisionDataFilter(std::move(collisionDataFilter))
+	, mTransformFilter(std::move(transformFilter))
+	, mNavDataFilter(std::move(navDataFilter))
+	, mDebugDrawFilter(std::move(debugDrawFilter))
+	, mTrackedFilter(std::move(trackedFilter))
+	, mPathBlockingGeometryFilter(std::move(pathBlockingGeometryFilter))
+	, mWorldHolder(worldHolder)
 	, mTime(timeData)
 {
 }
@@ -28,22 +44,22 @@ void AiSystem::update()
 	World& world = mWorldHolder.getWorld();
 	const GameplayTimestamp timestampNow = mTime.currentTimestamp;
 
-	NavMeshComponent* navMeshComponent = world.getWorldComponents().getOrAddComponent<NavMeshComponent>();
+	NavMeshComponent* navMeshComponent = mNavMeshDataFilter.getOrAddComponent(world.getWorldComponents());
 
-	auto [pathBlockingGeometry] = world.getWorldComponents().getComponents<PathBlockingGeometryComponent>();
+	auto [pathBlockingGeometry] = mPathBlockingGeometryFilter.getComponents(world.getWorldComponents());
 
 	if (pathBlockingGeometry == nullptr)
 	{
 		return;
 	}
 
-	TupleVector<CollisionComponent*, TransformComponent*> collisions;
-	world.getSpatialData().getAllCellManagers().getComponents<CollisionComponent, TransformComponent>(collisions);
+	TupleVector<const CollisionComponent*, const TransformComponent*> collisions;
+	world.getSpatialData().getAllCellManagers().getComponentsN(mCollisionDataFilter, collisions);
 
 	bool needUpdate = !navMeshComponent->getNavMesh().geometry.isCalculated;
 	if (!needUpdate)
 	{
-		needUpdate = std::any_of(std::begin(collisions), std::end(collisions), [lastUpdateTimestamp = navMeshComponent->getUpdateTimestamp()](const std::tuple<CollisionComponent*, TransformComponent*>& set)
+		needUpdate = std::any_of(std::begin(collisions), std::end(collisions), [lastUpdateTimestamp = navMeshComponent->getUpdateTimestamp()](const std::tuple<const CollisionComponent*, const TransformComponent*>& set)
 		{
 			GameplayTimestamp objectUpdateTimestamp = std::get<1>(set)->getUpdateTimestamp();
 			return objectUpdateTimestamp > lastUpdateTimestamp && std::get<0>(set)->getGeometry().type == HullType::Angular;
@@ -59,14 +75,14 @@ void AiSystem::update()
 		navMeshComponent->setUpdateTimestamp(timestampNow);
 	}
 
-	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
 
 	if (!playerEntity.has_value())
 	{
 		return;
 	}
 
-	auto [playerTransform] = playerEntity->first.getComponents<TransformComponent>();
+	auto [playerTransform] = mTransformFilter.getComponents(playerEntity->first);
 	if (playerTransform == nullptr)
 	{
 		return;
@@ -74,13 +90,16 @@ void AiSystem::update()
 
 	GameplayTimestamp navmeshUpdateTimestamp = navMeshComponent->getUpdateTimestamp();
 
-	auto [debugDraw] = mWorldHolder.getGameData().getGameComponents().getComponents<DebugDrawComponent>();
+	auto [debugDraw] = mDebugDrawFilter.getComponents(mWorldHolder.getGameData().getGameComponents());
 
 	Vector2D targetLocation = playerTransform->getLocation();
 
 	const NavMesh& navMesh = navMeshComponent->getNavMesh();
 
-	world.getSpatialData().getAllCellManagers().forEachComponentSet<AiControllerComponent, TransformComponent, MovementComponent, CharacterStateComponent>([targetLocation, &navMesh, timestampNow, navmeshUpdateTimestamp, debugDraw](AiControllerComponent* aiController, TransformComponent* transform, MovementComponent* movement, CharacterStateComponent* characterState)
+	world.getSpatialData().getAllCellManagers().forEachComponentSetN(
+		mNavDataFilter,
+		[targetLocation, &navMesh, timestampNow, navmeshUpdateTimestamp, debugDraw]
+			(AiControllerComponent* aiController, const TransformComponent* transform, MovementComponent* movement, CharacterStateComponent* characterState)
 	{
 		Vector2D currentLocation = transform->getLocation();
 

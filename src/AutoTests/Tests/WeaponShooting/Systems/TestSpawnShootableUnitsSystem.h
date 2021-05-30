@@ -13,7 +13,7 @@ public:
 	explicit TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
-	std::string getName() override { return "TestSpawnShootableUnitsSystem"; }
+	std::string getName() const override { return "TestSpawnShootableUnitsSystem"; }
 
 private:
 	static void spawnUnit(EntityManager& entityManager, Vector2D pos);

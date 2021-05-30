@@ -12,7 +12,7 @@ public:
 	explicit TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
-	std::string getName() override { return "TestUnitsCountControlSystem"; }
+	std::string getName() const override { return "TestUnitsCountControlSystem"; }
 
 private:
 	static void SpawnUnit(EntityManager& entityManager, Vector2D pos);

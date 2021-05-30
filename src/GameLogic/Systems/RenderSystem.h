@@ -14,6 +14,7 @@
 #include "GameLogic/SharedManagers/TimeData.h"
 
 struct Vector2D;
+class TrackedSpatialEntitiesComponent;
 
 /**
  * System that handles rendering of world objects
@@ -21,7 +22,8 @@ struct Vector2D;
 class RenderSystem : public RaccoonEcs::System
 {
 public:
-	RenderSystem(WorldHolder& worldHolder,
+	RenderSystem(
+		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::Engine& engine,
 		HAL::ResourceManager& resourceManager,
@@ -30,12 +32,11 @@ public:
 	~RenderSystem() override = default;
 
 	void update() override;
-	std::string getName() override { return "RenderSystem"; }
+	std::string getName() const override { return "RenderSystem"; }
 
 private:
 	static void DrawVisibilityPolygon(const Graphics::Sprite& lightSprite, const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift);
 	void drawBackground(World& world, const Vector2D& drawShift);
-	static Vector2D GetPlayerSightPosition(World& world);
 	void drawLights(class SpatialEntityManager& managerGroup, std::vector<class WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize);
 
 private:

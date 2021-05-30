@@ -127,24 +127,6 @@ void RenderSystem::drawBackground(World& world, const Vector2D& drawShift)
 	}
 }
 
-Vector2D RenderSystem::GetPlayerSightPosition(World& world)
-{
-	Vector2D result(0.0f, 0.0f);
-
-	std::optional<std::pair<EntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
-	if (controlledEntity.has_value())
-	{
-		auto [playerTransform] = controlledEntity->first.getComponents<TransformComponent>();
-
-		if (playerTransform != nullptr)
-		{
-			result = playerTransform->getLocation();
-		}
-	}
-
-	return result;
-}
-
 class VisibilityPolygonCalculationJob : public Jobs::BaseJob
 {
 public:

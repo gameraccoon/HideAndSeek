@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "raccoon-ecs/async_operations.h"
+
 #include "GameData/EcsDefinitions.h"
 
 #include "GameData/Spatial/WorldCell.h"
@@ -17,6 +19,15 @@ public:
 		for (WorldCell* cell : mCells)
 		{
 			cell->getEntityManager().getComponents<FirstComponent, Components...>(inOutComponents);
+		}
+	}
+
+	template<typename Operation, typename DataVector>
+	void getComponentsN(const Operation& operation, DataVector& inOutComponents)
+	{
+		for (WorldCell* cell : mCells)
+		{
+			operation.template getComponents(cell->getEntityManager(), inOutComponents);
 		}
 	}
 
@@ -38,12 +49,30 @@ public:
 		}
 	}
 
-	template<typename FirstComponent, typename... Components, typename FunctionType>
+	template<typename Operation, typename DataVector>
+	void getSpatialComponentsWithEntitiesN(Operation& operation, DataVector& inOutComponents)
+	{
+		for (WorldCell* cell : mCells)
+		{
+			operation.template getComponentsWithEntities(cell->getEntityManager(), inOutComponents, cell);
+		}
+	}
+
+	template<typename... Components, typename FunctionType>
 	void forEachComponentSet(FunctionType processor)
 	{
 		for (WorldCell* cell : mCells)
 		{
-			cell->getEntityManager().forEachComponentSet<FirstComponent, Components...>(processor);
+			cell->getEntityManager().forEachComponentSet<Components...>(processor);
+		}
+	}
+
+	template<typename Operation, typename FunctionType>
+	void forEachComponentSetN(const Operation& operation, FunctionType processor)
+	{
+		for (WorldCell* cell : mCells)
+		{
+			operation.template forEachComponentSet(cell->getEntityManager(), processor);
 		}
 	}
 
@@ -62,6 +91,15 @@ public:
 		for (WorldCell* cell : mCells)
 		{
 			cell->getEntityManager().forEachComponentSetWithEntity<FirstComponent, Components...>(processor, cell);
+		}
+	}
+
+	template<typename Operation, typename FunctionType>
+	void forEachSpatialComponentSetWithEntityN(const Operation& operation, FunctionType processor)
+	{
+		for (WorldCell* cell : mCells)
+		{
+			operation.template forEachComponentSetWithEntity(cell->getEntityManager(), processor, cell);
 		}
 	}
 
@@ -92,6 +130,15 @@ public:
 		}
 	}
 
+	template<typename Operation, typename DataVector>
+	void getComponentsN(const Operation& operation, DataVector& inOutComponents) const
+	{
+		for (const WorldCell* cell : mCells)
+		{
+			operation.template getComponents(cell->getEntityManager(), inOutComponents);
+		}
+	}
+
 	template<typename FirstComponent, typename... Components>
 	void getSpatialComponents(std::vector<std::tuple<const WorldCell*, const FirstComponent*, const Components*...>>& inOutComponents) const
 	{
@@ -110,12 +157,30 @@ public:
 		}
 	}
 
-	template<typename FirstComponent, typename... Components, typename FunctionType>
+	template<typename Operation, typename DataVector>
+	void getSpatialComponentsWithEntitiesN(Operation& operation, DataVector& inOutComponents) const
+	{
+		for (const WorldCell* cell : mCells)
+		{
+			operation.template getComponentsWithEntities(cell->getEntityManager(), inOutComponents, cell);
+		}
+	}
+
+	template<typename... Components, typename FunctionType>
 	void forEachComponentSet(FunctionType processor) const
 	{
 		for (const WorldCell* cell : mCells)
 		{
-			cell->getEntityManager().forEachComponentSet<const FirstComponent, const Components...>(processor);
+			cell->getEntityManager().forEachComponentSet<const Components...>(processor);
+		}
+	}
+
+	template<typename Operation, typename FunctionType>
+	void forEachComponentSetN(const Operation& operation, FunctionType processor) const
+	{
+		for (const WorldCell* cell : mCells)
+		{
+			operation.template forEachComponentSet(cell->getEntityManager(), processor);
 		}
 	}
 

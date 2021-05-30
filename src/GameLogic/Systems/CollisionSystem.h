@@ -16,7 +16,7 @@ public:
 	~CollisionSystem() override = default;
 
 	void update() override;
-	std::string getName() override { return "CollisionSystem"; }
+	std::string getName() const override { return "CollisionSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;
