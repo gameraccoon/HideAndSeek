@@ -12,12 +12,15 @@
 
 #include "GameData/GameData.h"
 #include "GameData/Components/ImguiComponent.generated.h"
-#include "GameData/Components/RenderModeComponent.generated.h"
 
 #include "HAL/Base/Engine.h"
 
-ImguiSystem::ImguiSystem(ImguiDebugData& debugData, HAL::Engine& engine) noexcept
-	: mEngine(engine)
+ImguiSystem::ImguiSystem(
+		RaccoonEcs::ComponentAdder<ImguiComponent>&& imguiAdder,
+		ImguiDebugData& debugData,
+		HAL::Engine& engine) noexcept
+	: mImguiAdder(std::move(imguiAdder))
+	, mEngine(engine)
 	, mDebugData(debugData)
 {
 }
@@ -27,16 +30,11 @@ void ImguiSystem::update()
 	GameData& gameData = mDebugData.worldHolder.getGameData();
 
 	// check if we need to render imgui
-	if (auto [imgui] = gameData.getGameComponents().getComponents<ImguiComponent>(); imgui)
+	ImguiComponent* imgui = mImguiAdder.getOrAddComponent(gameData.getGameComponents());
+
+	if (!imgui->getIsImguiVisible())
 	{
-		if (!imgui->getIsImguiVisible())
-		{
-			return;
-		}
-	}
-	else
-	{
-		gameData.getGameComponents().addComponent<ImguiComponent>();
+		return;
 	}
 
 	ImGui_ImplSDL2_ProcessEvent(&mEngine.getLastEventRef());

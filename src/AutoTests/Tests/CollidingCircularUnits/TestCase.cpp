@@ -28,15 +28,30 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 {
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 
-	mSystemsManager.registerSystem<TestUnitsCountControlSystem>(mWorldHolder);
+	mSystemsManager.registerSystem<TestUnitsCountControlSystem>(
+		RaccoonEcs::EntityAdder(),
+		RaccoonEcs::ComponentAdder<TransformComponent>(),
+		RaccoonEcs::ComponentAdder<MovementComponent>(),
+		RaccoonEcs::ComponentAdder<SpriteCreatorComponent>(),
+		RaccoonEcs::ComponentAdder<CollisionComponent>(),
+		RaccoonEcs::ComponentAdder<AiControllerComponent>(),
+		RaccoonEcs::ComponentAdder<CharacterStateComponent>(),
+		mWorldHolder
+	);
 
 	mSystemsManager.registerSystem<TestCircularUnitsSystem>(
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::ComponentFilter<const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<const AiControllerComponent, const TransformComponent, MovementComponent>(),
 		mWorldHolder,
 		mTime
 	);
 
-	mSystemsManager.registerSystem<CollisionSystem>(mWorldHolder);
+	mSystemsManager.registerSystem<CollisionSystem>(
+		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>(),
+		mWorldHolder
+	);
 
 	mSystemsManager.registerSystem<CameraSystem>(
 		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>(),
@@ -48,8 +63,22 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		mInputData
 	);
 
-	mSystemsManager.registerSystem<MovementSystem>(mWorldHolder, mTime);
-	mSystemsManager.registerSystem<CharacterStateSystem>(mWorldHolder, mTime);
+	mSystemsManager.registerSystem<MovementSystem>(
+		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>(),
+		RaccoonEcs::ComponentFilter<SpatialTrackComponent>(),
+		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>(),
+		mWorldHolder,
+		mTime
+	);
+
+	mSystemsManager.registerSystem<CharacterStateSystem>(
+		RaccoonEcs::ComponentFilter<const StateMachineComponent>(),
+		RaccoonEcs::ComponentFilter<CharacterStateComponent>(),
+		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>(),
+		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>(),
+		mWorldHolder,
+		mTime
+	);
 
 	mSystemsManager.registerSystem<ResourceStreamingSystem>(
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>(),
@@ -66,14 +95,26 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		getResourceManager()
 	);
 
-	mSystemsManager.registerSystem<RenderSystem>(mWorldHolder, mTime, getEngine(), getResourceManager(), mWorkerManager);
+	mSystemsManager.registerSystem<RenderSystem>(
+		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>(),
+		RaccoonEcs::ComponentFilter<const RenderModeComponent>(),
+		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>(),
+		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>(),
+		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>(),
+		mWorldHolder,
+		mTime,
+		getEngine(),
+		getResourceManager(),
+		mWorkerManager
+	);
 
 	Vector2D playerPos{ZERO_VECTOR};
 	EntityView playerEntity = mWorld.createTrackedSpatialEntity(
 		RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(),
 		RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(),
 		RaccoonEcs::EntityAdder(),
-		STR_TO_ID("ControlledEntity"), SpatialWorldData::GetCellForPos(playerPos)
+		STR_TO_ID("ControlledEntity"),
+		SpatialWorldData::GetCellForPos(playerPos)
 	);
 
 	{

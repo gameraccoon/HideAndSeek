@@ -60,7 +60,7 @@ TEST(VisibilityPolygon, TestPlygonsEqualityTest)
 TEST(VisibilityPolygon, Empty)
 {
 	VisibilityPolygonCalculator calc;
-	std::vector<LightBlockingGeometryComponent*> components;
+	std::vector<const LightBlockingGeometryComponent*> components;
 	Vector2D pos(-10.0f, 20.0f);
 
 	std::vector<Vector2D> result;
@@ -78,7 +78,7 @@ TEST(VisibilityPolygon, OneBorder)
 	geometry.points = {{-60.0f, -50.0f}, {60.0f, -50.0f}, {60.0f, 50.0f}, {-60.0f, 50.0f}};
 	geometry.generateBorders();
 	Vector2D location(-10.0f, -210.0f);
-	std::vector<LightBlockingGeometryComponent*> components;
+	std::vector<const LightBlockingGeometryComponent*> components;
 	LightBlockingGeometryComponent component;
 	FillTestLightBlockingGeometry(component, geometry, location);
 	components.push_back(&component);
@@ -98,7 +98,7 @@ TEST(VisibilityPolygon, OneBorderEqualAngles)
 	geometry.points = {{60.0f, -60.0f}, {60.0f, 60.0f}, {-60.0f, 60.0f}, {-60.0f, -60.0f}};
 	geometry.generateBorders();
 	Vector2D location(260.0f, 39.0f);
-	std::vector<LightBlockingGeometryComponent*> components;
+	std::vector<const LightBlockingGeometryComponent*> components;
 	LightBlockingGeometryComponent component;
 	FillTestLightBlockingGeometry(component, geometry, location);
 	components.push_back(&component);
@@ -113,7 +113,7 @@ TEST(VisibilityPolygon, ApertureDirection1)
 	VisibilityPolygonCalculator calc;
 	Vector2D pos(0.0f, 0.0f);
 
-	std::vector<LightBlockingGeometryComponent*> components;
+	std::vector<const LightBlockingGeometryComponent*> components;
 	LightBlockingGeometryComponent component;
 	{
 		Hull geometry;
@@ -165,7 +165,7 @@ TEST(VisibilityPolygon, ApertureDirection2)
 	VisibilityPolygonCalculator calc;
 	Vector2D pos(0.0f, 0.0f);
 
-	std::vector<LightBlockingGeometryComponent*> components;
+	std::vector<const LightBlockingGeometryComponent*> components;
 	LightBlockingGeometryComponent component;
 	{
 		Hull geometry;

@@ -13,9 +13,13 @@
 
 TestCircularUnitsSystem::TestCircularUnitsSystem(
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
+		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
+		RaccoonEcs::ComponentFilter<const AiControllerComponent, const TransformComponent, MovementComponent>&& aiMovementFilter,
 		WorldHolder& worldHolder,
 		TimeData& time) noexcept
 	: mTrackedFilter(std::move(trackedFilter))
+	, mTransformFilter(std::move(transformFilter))
+	, mAiMovementFilter(std::move(aiMovementFilter))
 	, mWorldHolder(worldHolder)
 	, mTime(time)
 {
@@ -32,7 +36,7 @@ void TestCircularUnitsSystem::update()
 		return;
 	}
 
-	auto [playerTransform] = playerEntity->first.getComponents<TransformComponent>();
+	const auto [playerTransform] = mTransformFilter.getComponents(playerEntity->first);
 	if (playerTransform == nullptr)
 	{
 		return;
@@ -41,7 +45,9 @@ void TestCircularUnitsSystem::update()
 	Vector2D targetLocation = playerTransform->getLocation();
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getAllCellManagers();
-	spatialManager.forEachComponentSet<AiControllerComponent, TransformComponent, MovementComponent>([targetLocation, dt](AiControllerComponent* /*aiController*/, TransformComponent* transform, MovementComponent* movement)
+	spatialManager.forEachComponentSetN(
+			mAiMovementFilter,
+			[targetLocation, dt](const AiControllerComponent* /*aiController*/, const TransformComponent* transform, MovementComponent* movement)
 	{
 		Vector2D nextStep = targetLocation - transform->getLocation();
 		movement->setMoveDirection(nextStep);

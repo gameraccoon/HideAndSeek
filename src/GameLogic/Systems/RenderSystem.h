@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <raccoon-ecs/system.h>
+#include <raccoon-ecs/async_operations.h>
 
 #include "Utils/Jobs/WorkerManager.h"
 
@@ -14,7 +15,12 @@
 #include "GameLogic/SharedManagers/TimeData.h"
 
 struct Vector2D;
-class TrackedSpatialEntitiesComponent;
+class WorldCachedDataComponent;
+class RenderModeComponent;
+class BackgroundTextureComponent;
+class LightBlockingGeometryComponent;
+class RenderComponent;
+class TransformComponent;
 
 /**
  * System that handles rendering of world objects
@@ -23,6 +29,11 @@ class RenderSystem : public RaccoonEcs::System
 {
 public:
 	RenderSystem(
+		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
+		RaccoonEcs::ComponentFilter<const RenderModeComponent>&& renderModeFilter,
+		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>&& backgroundTextureFilter,
+		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
+		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>&& renderFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::Engine& engine,
@@ -40,6 +51,11 @@ private:
 	void drawLights(class SpatialEntityManager& managerGroup, std::vector<class WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize);
 
 private:
+	RaccoonEcs::ComponentFilter<const WorldCachedDataComponent> mWorldCachedDataFilter;
+	RaccoonEcs::ComponentFilter<const RenderModeComponent> mRenderModeFilter;
+	RaccoonEcs::ComponentFilter<BackgroundTextureComponent> mBackgroundTextureFilter;
+	RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent> mLightBlockingGeometryFilter;
+	RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent> mRenderFilter;
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
 	HAL::Engine& mEngine;

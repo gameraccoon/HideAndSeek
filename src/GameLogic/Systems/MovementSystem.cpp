@@ -12,8 +12,16 @@
 #include "GameData/World.h"
 
 
-MovementSystem::MovementSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept
-	: mWorldHolder(worldHolder)
+MovementSystem::MovementSystem(
+		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>&& movementFilter,
+		RaccoonEcs::ComponentFilter<SpatialTrackComponent>&& spatialTrackFilter,
+		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>&& trackedSpatialEntitiesFilter,
+		WorldHolder& worldHolder,
+		const TimeData& timeData) noexcept
+	: mMovementFilter(std::move(movementFilter))
+	, mSpatialTrackFilter(std::move(spatialTrackFilter))
+	, mTrackedSpatialEntitiesFilter(std::move(trackedSpatialEntitiesFilter))
+	, mWorldHolder(worldHolder)
 	, mTime(timeData)
 {
 }
@@ -37,7 +45,9 @@ void MovementSystem::update()
 
 	std::vector<CellScheduledTransfers> transfers;
 
-	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<MovementComponent, TransformComponent>([timestampNow, &transfers](WorldCell* cell, Entity entity, MovementComponent* movement, TransformComponent* transform)
+	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntityN(
+		mMovementFilter,
+		[timestampNow, &transfers](WorldCell* cell, Entity entity, MovementComponent* movement, TransformComponent* transform)
 	{
 		EntityView entityView{ entity, cell->getEntityManager() };
 
@@ -65,10 +75,10 @@ void MovementSystem::update()
 
 	for (auto& transfer : transfers)
 	{
-		if (auto [spatialTracked] = transfer.entityView.getComponents<SpatialTrackComponent>(); spatialTracked != nullptr)
+		if (auto [spatialTracked] = mSpatialTrackFilter.getComponents(transfer.entityView); spatialTracked != nullptr)
 		{
 			StringId spatialTrackId = spatialTracked->getId();
-			auto [trackedComponents] = world.getWorldComponents().getComponents<TrackedSpatialEntitiesComponent>();
+			auto [trackedComponents] = mTrackedSpatialEntitiesFilter.getComponents(world.getWorldComponents());
 			auto it = trackedComponents->getEntitiesRef().find(spatialTrackId);
 			if (it != trackedComponents->getEntitiesRef().end())
 			{

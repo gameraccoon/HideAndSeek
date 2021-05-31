@@ -14,37 +14,52 @@
 #include "GameData/World.h"
 #include "GameData/Spatial/SpatialWorldData.h"
 
-TestUnitsCountControlSystem::TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept
-	: mWorldHolder(worldHolder)
+TestUnitsCountControlSystem::TestUnitsCountControlSystem(
+		RaccoonEcs::EntityAdder&& entityAdder,
+		RaccoonEcs::ComponentAdder<TransformComponent>&& transformAdder,
+		RaccoonEcs::ComponentAdder<MovementComponent>&& movementAdder,
+		RaccoonEcs::ComponentAdder<SpriteCreatorComponent>&& spriteCreatorAdder,
+		RaccoonEcs::ComponentAdder<CollisionComponent>&& collisionAdder,
+		RaccoonEcs::ComponentAdder<AiControllerComponent>&& aiControllerAdder,
+		RaccoonEcs::ComponentAdder<CharacterStateComponent>&& characterStateAdder,
+		WorldHolder& worldHolder) noexcept
+	: mEntityAdder(std::move(entityAdder))
+	, mTransformAdder(std::move(transformAdder))
+	, mMovementAdder(std::move(movementAdder))
+	, mSpriteCreatorAdder(std::move(spriteCreatorAdder))
+	, mCollisionAdder(std::move(collisionAdder))
+	, mAiControllerAdder(std::move(aiControllerAdder))
+	, mCharacterStateAdder(std::move(characterStateAdder))
+	, mWorldHolder(worldHolder)
 {
 }
 
 void TestUnitsCountControlSystem::SpawnUnit(EntityManager& entityManager, Vector2D pos)
 {
-	Entity entity = entityManager.addEntity();
+	Entity entity = mEntityAdder.addEntity(entityManager);
 	{
-		TransformComponent* transform = entityManager.addComponent<TransformComponent>(entity);
+		TransformComponent* transform = mTransformAdder.addComponent(entityManager, entity);
 		transform->setLocation(pos);
 	}
 	{
-		MovementComponent* movement = entityManager.addComponent<MovementComponent>(entity);
+		MovementComponent* movement = mMovementAdder.addComponent(entityManager, entity);
 		movement->setOriginalSpeed(2.0f);
 	}
 	{
-		SpriteCreatorComponent* sprite = entityManager.addComponent<SpriteCreatorComponent>(entity);
+		SpriteCreatorComponent* sprite = mSpriteCreatorAdder.addComponent(entityManager, entity);
 		SpriteDescription spriteDesc;
 		spriteDesc.params.size = Vector2D(20.0f, 20.0f);
 		spriteDesc.path = "resources/textures/hero.png";
 		sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
 	}
 	{
-		CollisionComponent* collision = entityManager.addComponent<CollisionComponent>(entity);
+		CollisionComponent* collision = mCollisionAdder.addComponent(entityManager, entity);
 		Hull& hull = collision->getGeometryRef();
 		hull.type = HullType::Circular;
 		hull.setRadius(10.0f);
 	}
-	entityManager.addComponent<AiControllerComponent>(entity);
-	entityManager.addComponent<CharacterStateComponent>(entity);
+	mAiControllerAdder.addComponent(entityManager, entity);
+	mCharacterStateAdder.addComponent(entityManager, entity);
 }
 
 void TestUnitsCountControlSystem::SpawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData)

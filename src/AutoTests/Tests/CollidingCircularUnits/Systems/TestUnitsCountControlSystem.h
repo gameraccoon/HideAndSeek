@@ -3,23 +3,46 @@
 #include <unordered_map>
 
 #include <raccoon-ecs/system.h>
+#include <raccoon-ecs/async_operations.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
+
+class TransformComponent;
+class MovementComponent;
+class SpriteCreatorComponent;
+class CollisionComponent;
+class AiControllerComponent;
+class CharacterStateComponent;
 
 class TestUnitsCountControlSystem : public RaccoonEcs::System
 {
 public:
-	explicit TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept;
+	TestUnitsCountControlSystem(
+		RaccoonEcs::EntityAdder&& entityAdder,
+		RaccoonEcs::ComponentAdder<TransformComponent>&& transformAdder,
+		RaccoonEcs::ComponentAdder<MovementComponent>&& movementAdder,
+		RaccoonEcs::ComponentAdder<SpriteCreatorComponent>&& spriteCreatorAdder,
+		RaccoonEcs::ComponentAdder<CollisionComponent>&& collisionAdder,
+		RaccoonEcs::ComponentAdder<AiControllerComponent>&& aiControllerAdder,
+		RaccoonEcs::ComponentAdder<CharacterStateComponent>&& characterStateAdder,
+		WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 	std::string getName() const override { return "TestUnitsCountControlSystem"; }
 
 private:
-	static void SpawnUnit(EntityManager& entityManager, Vector2D pos);
-	static void SpawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData);
-	static void SpawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos);
+	void SpawnUnit(EntityManager& entityManager, Vector2D pos);
+	void SpawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData);
+	void SpawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos);
 
 private:
+	RaccoonEcs::EntityAdder mEntityAdder;
+	RaccoonEcs::ComponentAdder<TransformComponent> mTransformAdder;
+	RaccoonEcs::ComponentAdder<MovementComponent> mMovementAdder;
+	RaccoonEcs::ComponentAdder<SpriteCreatorComponent> mSpriteCreatorAdder;
+	RaccoonEcs::ComponentAdder<CollisionComponent> mCollisionAdder;
+	RaccoonEcs::ComponentAdder<AiControllerComponent> mAiControllerAdder;
+	RaccoonEcs::ComponentAdder<CharacterStateComponent> mCharacterStateAdder;
 	WorldHolder& mWorldHolder;
 	int mTicksPassed = 0;
 

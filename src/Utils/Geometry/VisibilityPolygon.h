@@ -32,7 +32,7 @@ public:
 	VisibilityPolygonCalculator() = default;
 
 	// returns reference to the calculated polygon
-	void calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<LightBlockingGeometryComponent*>& components, Vector2D sourcePos, Vector2D polygonMaxSize);
+	void calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<const LightBlockingGeometryComponent*>& components, Vector2D sourcePos, Vector2D polygonMaxSize);
 
 	// copying objects of this class has a little sense and usually indicates a poor use
 	VisibilityPolygonCalculator(VisibilityPolygonCalculator const&) = delete;

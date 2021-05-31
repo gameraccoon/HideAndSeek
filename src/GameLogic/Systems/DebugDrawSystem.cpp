@@ -28,8 +28,26 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-DebugDrawSystem::DebugDrawSystem(WorldHolder& worldHolder, const TimeData& timeData, HAL::Engine& engine, HAL::ResourceManager& resourceManager) noexcept
-	: mWorldHolder(worldHolder)
+DebugDrawSystem::DebugDrawSystem(
+		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
+		RaccoonEcs::ComponentFilter<const RenderModeComponent>&& renderModeFilter,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>&& collisionDataFilter,
+		RaccoonEcs::ComponentFilter<const NavMeshComponent>&& navMeshFilter,
+		RaccoonEcs::ComponentFilter<const AiControllerComponent>&& aiControllerFilter,
+		RaccoonEcs::ComponentFilter<const DebugDrawComponent>&& debugDrawFilter,
+		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>&& characterStateFilter,
+		WorldHolder& worldHolder,
+		const TimeData& timeData,
+		HAL::Engine& engine,
+		HAL::ResourceManager& resourceManager) noexcept
+	: mWorldCachedDataFilter(std::move(worldCachedDataFilter))
+	, mRenderModeFilter(std::move(renderModeFilter))
+	, mCollisionDataFilter(std::move(collisionDataFilter))
+	, mNavMeshFilter(std::move(navMeshFilter))
+	, mAiControllerFilter(std::move(aiControllerFilter))
+	, mDebugDrawFilter(std::move(debugDrawFilter))
+	, mCharacterStateFilter(std::move(characterStateFilter))
+	, mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mEngine(engine)
 	, mResourceManager(resourceManager)
@@ -100,7 +118,7 @@ void DebugDrawSystem::update()
 	GameData& gameData = mWorldHolder.getGameData();
 	Graphics::Renderer& renderer = mEngine.getRenderer();
 
-	auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
+	auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
 	Vector2D workingRect = worldCachedData->getScreenSize();
 	Vector2D cameraLocation = worldCachedData->getCameraPos();
 	CellPos cameraCell = worldCachedData->getCameraCellPos();
@@ -111,7 +129,7 @@ void DebugDrawSystem::update()
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(cameraLocation, workingRect);
 
-	auto [renderMode] = gameData.getGameComponents().getComponents<RenderModeComponent>();
+	auto [renderMode] = mRenderModeFilter.getComponents(gameData.getGameComponents());
 
 	if (renderMode && renderMode->getIsDrawDebugCellInfoEnabled())
 	{
@@ -143,7 +161,9 @@ void DebugDrawSystem::update()
 	{
 		const Graphics::Sprite& collisionSprite = mResourceManager.getResource<Graphics::Sprite>(mCollisionSpriteHandle);
 		Graphics::QuadUV quadUV = collisionSprite.getUV();
-		spatialManager.forEachComponentSet<CollisionComponent, TransformComponent>([&collisionSprite, &quadUV, drawShift](CollisionComponent* collision, TransformComponent* transform)
+		spatialManager.forEachComponentSetN(
+			mCollisionDataFilter,
+			[&collisionSprite, &quadUV, drawShift](const CollisionComponent* collision, const TransformComponent* transform)
 		{
 			Vector2D location = transform->getLocation() + drawShift;
 			Graphics::Render::DrawQuad(*collisionSprite.getSurface(),
@@ -161,7 +181,7 @@ void DebugDrawSystem::update()
 	{
 		const Graphics::Sprite& navMeshSprite = mResourceManager.getResource<Graphics::Sprite>(mNavmeshSpriteHandle);
 		Graphics::QuadUV quadUV = navMeshSprite.getUV();
-		auto [navMeshComponent] = world.getWorldComponents().getComponents<NavMeshComponent>();
+		auto [navMeshComponent] = mNavMeshFilter.getComponents(world.getWorldComponents());
 
 		if (navMeshComponent)
 		{
@@ -198,15 +218,17 @@ void DebugDrawSystem::update()
 			}*/
 		}
 
-		spatialManager.forEachComponentSet<AiControllerComponent>([&navMeshSprite, &quadUV, drawShift](AiControllerComponent* aiController)
+		spatialManager.forEachComponentSetN(
+			mAiControllerFilter,
+			[&navMeshSprite, &quadUV, drawShift](const AiControllerComponent* aiController)
 		{
-			DrawPath(aiController->getPathRef().smoothPath, navMeshSprite, quadUV, drawShift);
+			DrawPath(aiController->getPath().smoothPath, navMeshSprite, quadUV, drawShift);
 		});
 	}
 
 	if (renderMode && renderMode->getIsDrawDebugPrimitivesEnabled())
 	{
-		auto [debugDraw] = gameData.getGameComponents().getComponents<DebugDrawComponent>();
+		auto [debugDraw] = mDebugDrawFilter.getComponents(gameData.getGameComponents());
 		if (debugDraw != nullptr)
 		{
 			Vector2D pointSize(6, 6);
@@ -252,7 +274,9 @@ void DebugDrawSystem::update()
 	if (renderMode && renderMode->getIsDrawDebugCharacterInfoEnabled())
 	{
 		const Graphics::Font& font = mResourceManager.getResource<Graphics::Font>(mFontHandle);
-		spatialManager.forEachComponentSet<CharacterStateComponent, TransformComponent>([&renderer, &font, drawShift, cameraCell](CharacterStateComponent* characterState, TransformComponent* transform)
+		spatialManager.forEachComponentSetN(
+			mCharacterStateFilter,
+			[&renderer, &font, drawShift, cameraCell](const CharacterStateComponent* characterState, const TransformComponent* transform)
 		{
 			Vector2D location = transform->getLocation() + drawShift;
 			renderer.renderText(font, location, {255, 255, 255, 255}, ID_TO_STR(enum_to_string(characterState->getState())).c_str());

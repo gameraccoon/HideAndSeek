@@ -81,7 +81,7 @@ std::tuple<size_t, Vector2D> VisibilityPolygonCalculator::getNextClosestBorderFr
 	return std::make_tuple(closestBorderIdx, closestIntersectionPoint);
 }
 
-void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<LightBlockingGeometryComponent*>& components, Vector2D sourcePos, Vector2D polygonMaxSize)
+void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<const LightBlockingGeometryComponent*>& components, Vector2D sourcePos, Vector2D polygonMaxSize)
 {
 	outVisibilityPolygon.clear();
 

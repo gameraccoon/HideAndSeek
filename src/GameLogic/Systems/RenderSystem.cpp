@@ -25,13 +25,23 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 RenderSystem::RenderSystem(
+		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
+		RaccoonEcs::ComponentFilter<const RenderModeComponent>&& renderModeFilter,
+		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>&& backgroundTextureFilter,
+		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
+		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>&& renderFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::Engine& engine,
 		HAL::ResourceManager& resourceManager,
 		Jobs::WorkerManager& jobsWorkerManager
 	) noexcept
-	: mWorldHolder(worldHolder)
+	: mWorldCachedDataFilter(std::move(worldCachedDataFilter))
+	, mRenderModeFilter(std::move(renderModeFilter))
+	, mBackgroundTextureFilter(std::move(backgroundTextureFilter))
+	, mLightBlockingGeometryFilter(std::move(lightBlockingGeometryFilter))
+	, mRenderFilter(std::move(renderFilter))
+	, mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mEngine(engine)
 	, mResourceManager(resourceManager)
@@ -45,13 +55,13 @@ void RenderSystem::update()
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
 
-	auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
+	const auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
 	Vector2D workingRect = worldCachedData->getScreenSize();
 	Vector2D cameraLocation = worldCachedData->getCameraPos();
 
 	static const Vector2D maxFov(500.0f, 500.0f);
 
-	auto [renderMode] = gameData.getGameComponents().getComponents<RenderModeComponent>();
+	const auto [renderMode] = mRenderModeFilter.getComponents(gameData.getGameComponents());;
 
 	Vector2D screenHalfSize = mEngine.getWindowSize() * 0.5f;
 
@@ -72,7 +82,9 @@ void RenderSystem::update()
 
 	if (!renderMode || renderMode->getIsDrawVisibleEntitiesEnabled())
 	{
-		spatialManager.forEachComponentSet<RenderComponent, TransformComponent>([&drawShift, &resourceManager = mResourceManager](RenderComponent* render, TransformComponent* transform)
+		spatialManager.forEachComponentSetN(
+			mRenderFilter,
+			[&drawShift, &resourceManager = mResourceManager](const RenderComponent* render, const TransformComponent* transform)
 		{
 			Vector2D location = transform->getLocation() + drawShift;
 			float rotation = transform->getRotation().getValue();
@@ -108,7 +120,7 @@ void RenderSystem::DrawVisibilityPolygon(const Graphics::Sprite& lightSprite, co
 
 void RenderSystem::drawBackground(World& world, const Vector2D& drawShift)
 {
-	auto [backgroundTexture] = world.getWorldComponents().getComponents<BackgroundTextureComponent>();
+	auto [backgroundTexture] = mBackgroundTextureFilter.getComponents(world.getWorldComponents());
 	if (backgroundTexture != nullptr)
 	{
 		if (!backgroundTexture->getSprite().spriteHandle.isValid())
@@ -145,7 +157,7 @@ public:
 	};
 
 	using FinalizeFn = std::function<void(std::vector<Result>&&)>;
-	using LightBlockingComponents = std::vector<LightBlockingGeometryComponent*>;
+	using LightBlockingComponents = std::vector<const LightBlockingGeometryComponent*>;
 
 public:
 	VisibilityPolygonCalculationJob(Vector2D maxFov, const LightBlockingComponents& lightBlockingComponents, GameplayTimestamp timestamp, FinalizeFn finalizeFn) noexcept
@@ -222,11 +234,11 @@ void RenderSystem::drawLights(SpatialEntityManager& managerGroup, std::vector<Wo
 	}
 
 	// get all the collidable components
-	std::vector<LightBlockingGeometryComponent*> lightBlockingComponents;
+	std::vector<const LightBlockingGeometryComponent*> lightBlockingComponents;
 	lightBlockingComponents.reserve(cells.size());
 	for (WorldCell* cell : cells)
 	{
-		auto [lightBlockingGeometry] = cell->getCellComponents().getComponents<LightBlockingGeometryComponent>();
+		auto [lightBlockingGeometry] = mLightBlockingGeometryFilter.getComponents(cell->getCellComponents());
 		if ALMOST_ALWAYS(lightBlockingGeometry)
 		{
 			lightBlockingComponents.push_back(lightBlockingGeometry);

@@ -12,8 +12,13 @@
 #include "Utils/Geometry/Collide.h"
 
 
-CollisionSystem::CollisionSystem(WorldHolder& worldHolder) noexcept
-	: mWorldHolder(worldHolder)
+CollisionSystem::CollisionSystem(
+		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>&& collidingFilter,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>&& movingCollisionsFilter,
+		WorldHolder& worldHolder) noexcept
+	: mCollidingFilter(std::move(collidingFilter))
+	, mMovingCollisionsFilter(std::move(movingCollisionsFilter))
+	, mWorldHolder(worldHolder)
 {
 }
 
@@ -22,7 +27,7 @@ void CollisionSystem::update()
 	struct SpatialComponents
 	{
 		WorldCell* cell;
-		TupleVector<Entity, CollisionComponent*, TransformComponent*> components;
+		TupleVector<Entity, CollisionComponent*, const TransformComponent*> components;
 	};
 
 	World& world = mWorldHolder.getWorld();
@@ -32,7 +37,7 @@ void CollisionSystem::update()
 	size_t i = 0;
 	for (auto& pair : allCellsMap)
 	{
-		pair.second.getEntityManager().getComponentsWithEntities<CollisionComponent, TransformComponent>(collidableComponentGroups[i].components);
+		mCollidingFilter.getComponentsWithEntities(pair.second.getEntityManager(), collidableComponentGroups[i].components);
 		collidableComponentGroups[i].cell = &pair.second;
 		++i;
 	}
@@ -45,7 +50,9 @@ void CollisionSystem::update()
 		}
 	}
 
-	world.getSpatialData().getAllCellManagers().forEachComponentSet<CollisionComponent, TransformComponent, MovementComponent>([&collidableComponentGroups](CollisionComponent* collisionComponent, TransformComponent* transformComponent, MovementComponent* movementComponent)
+	world.getSpatialData().getAllCellManagers().forEachComponentSetN(
+			mMovingCollisionsFilter,
+			[&collidableComponentGroups](const CollisionComponent* collisionComponent, const TransformComponent* transformComponent, MovementComponent* movementComponent)
 	{
 		Vector2D resist = ZERO_VECTOR;
 		for (auto& pair : collidableComponentGroups)

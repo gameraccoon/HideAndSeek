@@ -32,7 +32,7 @@ void CameraSystem::update()
 {
 	GameData& gameData = mWorldHolder.getGameData();
 
-	auto [imgui] = gameData.getGameComponents().getComponents<ImguiComponent>();
+	auto [imgui] = mImguiFilter.getComponents(gameData.getGameComponents());
 	if (imgui && imgui->getIsImguiVisible())
 	{
 		return;
