@@ -38,9 +38,9 @@ static void HelpMarker(const char* desc)
 	}
 }
 
-void ImguiComponentInspectorWindow::applyFilters(ImguiDebugData& debugData)
+void ImguiComponentInspectorWindow::applyFilters(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor)
 {
-	 mPropertyFiltersWidget.getFilteredEntities(debugData, mFilteredEntities);
+	 mPropertyFiltersWidget.getFilteredEntities(debugData, dataAccessor, mFilteredEntities);
 }
 
 void ImguiComponentInspectorWindow::showEntityId()
@@ -87,7 +87,7 @@ void ImguiComponentInspectorWindow::showFilteredEntities()
 	}
 }
 
-void ImguiComponentInspectorWindow::showComponentsInspector()
+void ImguiComponentInspectorWindow::showComponentsInspector(const RaccoonEcs::InnerDataAccessor& dataAccessor)
 {
 	bool hasFoundAnything = false;
 	if (mSelectedEntity.has_value())
@@ -95,7 +95,7 @@ void ImguiComponentInspectorWindow::showComponentsInspector()
 		auto [cell, entity] = *mSelectedEntity;
 
 		std::vector<TypedComponent> components;
-		cell->getEntityManager().getAllEntityComponents(entity, components);
+		dataAccessor.getSingleThreadedEntityManager(cell->getEntityManager()).getAllEntityComponents(entity, components);
 		std::ranges::sort(components, [](const auto& a, const auto& b)
 		{
 			return a.typeId < b.typeId;
@@ -126,15 +126,15 @@ void ImguiComponentInspectorWindow::showComponentsInspector()
 	}
 }
 
-void ImguiComponentInspectorWindow::update(ImguiDebugData& debugData)
+void ImguiComponentInspectorWindow::update(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor)
 {
 	if (isVisible)
 	{
 		ImGui::Begin("Component Inspector", &isVisible);
 
-		mPropertyFiltersWidget.update(debugData);
+		mPropertyFiltersWidget.update(debugData, dataAccessor);
 
-		applyFilters(debugData);
+		applyFilters(debugData, dataAccessor);
 
 		ImGui::Text("Entities matching the filter: %lu", mFilteredEntities.size());
 
@@ -142,7 +142,7 @@ void ImguiComponentInspectorWindow::update(ImguiDebugData& debugData)
 
 		showEntityId();
 
-		showComponentsInspector();
+		showComponentsInspector(dataAccessor);
 
 		ImGui::End();
 	}

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <raccoon-ecs/async_operations.h>
+
 #include "Base/Types/TemplateAliases.h"
 
 #include "GameData/Spatial/WorldCell.h"
@@ -23,13 +25,16 @@ namespace ImguiPropertyFiltration
 			return getDescriptor()->getComponentType();
 		}
 
-		void filterEntities(TupleVector<WorldCell*, Entity>& inOutEntities)
+		void filterEntities(TupleVector<WorldCell*, Entity>& inOutEntities, const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
 			std::erase_if(
 				inOutEntities,
-				[this](const auto& tuple)
+				[this, &dataAccessor](const auto& tuple)
 				{
-					return !isConditionPassed(std::get<0>(tuple)->getEntityManager(), std::get<1>(tuple));
+					return !isConditionPassed(
+						dataAccessor.getSingleThreadedEntityManager(std::get<0>(tuple)->getEntityManager()),
+						std::get<1>(tuple)
+					);
 				}
 			);
 		}

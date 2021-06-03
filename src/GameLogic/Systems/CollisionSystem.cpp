@@ -14,9 +14,11 @@
 
 CollisionSystem::CollisionSystem(
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>&& collidingFilter,
+		RaccoonEcs::ComponentFilter<MovementComponent>&& movementFilter,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>&& movingCollisionsFilter,
 		WorldHolder& worldHolder) noexcept
 	: mCollidingFilter(std::move(collidingFilter))
+	, mMovementFilter(std::move(movementFilter))
 	, mMovingCollisionsFilter(std::move(movingCollisionsFilter))
 	, mWorldHolder(worldHolder)
 {
@@ -50,9 +52,9 @@ void CollisionSystem::update()
 		}
 	}
 
-	world.getSpatialData().getAllCellManagers().forEachComponentSetN(
+	world.getSpatialData().getAllCellManagers().forEachComponentSet(
 			mMovingCollisionsFilter,
-			[&collidableComponentGroups](const CollisionComponent* collisionComponent, const TransformComponent* transformComponent, MovementComponent* movementComponent)
+			[&collidableComponentGroups, this](const CollisionComponent* collisionComponent, const TransformComponent* transformComponent, MovementComponent* movementComponent)
 	{
 		Vector2D resist = ZERO_VECTOR;
 		for (auto& pair : collidableComponentGroups)
@@ -65,7 +67,7 @@ void CollisionSystem::update()
 
 					if (doCollide)
 					{
-						auto [movement] = pair.cell->getEntityManager().getEntityComponents<MovementComponent>(entity);
+						auto [movement] = mMovementFilter.getEntityComponents(pair.cell->getEntityManager(), entity);
 						if (movement)
 						{
 							movementComponent->setNextStep(movementComponent->getNextStep() + resist/2);

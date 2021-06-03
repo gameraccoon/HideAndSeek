@@ -13,6 +13,7 @@ class CharacterStateComponent;
 class TransformComponent;
 class HealthComponent;
 class DeathComponent;
+class CollisionComponent;
 
 /**
  * System that handles weapon manipulation
@@ -25,6 +26,7 @@ public:
 		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
 		RaccoonEcs::ComponentFilter<HealthComponent>&& healthFilter,
 		RaccoonEcs::ComponentAdder<DeathComponent>&& deathAdder,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>&& collisionFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData
 	) noexcept;
@@ -37,6 +39,7 @@ private:
 	RaccoonEcs::ComponentFilter<const TransformComponent> mTransformFilter;
 	RaccoonEcs::ComponentFilter<HealthComponent> mHealthFilter;
 	RaccoonEcs::ComponentAdder<DeathComponent> mDeathAdder;
+	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> mCollisionFilter;
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
 };

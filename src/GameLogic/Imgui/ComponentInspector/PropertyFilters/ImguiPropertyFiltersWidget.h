@@ -25,9 +25,9 @@ namespace ImguiPropertyFiltration
 	public:
 		~ImguiPropertyFiltersWidget();
 
-		void update(ImguiDebugData& debugData);
+		void update(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor);
 
-		void getFilteredEntities(ImguiDebugData& debugData, TupleVector<WorldCell*, Entity>& inOutEntities);
+		void getFilteredEntities(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor, TupleVector<WorldCell*, Entity>& inOutEntities);
 
 	private:
 		[[nodiscard]] std::vector<StringId> getFilteredComponentTypes() const;

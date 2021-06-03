@@ -17,9 +17,11 @@
 
 ImguiSystem::ImguiSystem(
 		RaccoonEcs::ComponentAdder<ImguiComponent>&& imguiAdder,
+		RaccoonEcs::InnerDataAccessor&& innerDataAccessor,
 		ImguiDebugData& debugData,
 		HAL::Engine& engine) noexcept
 	: mImguiAdder(std::move(imguiAdder))
+	, mInnerDataAccessor(std::move(innerDataAccessor))
 	, mEngine(engine)
 	, mDebugData(debugData)
 {
@@ -45,7 +47,7 @@ void ImguiSystem::update()
 	ImGui::NewFrame();
 
 	// update the window hierarchy
-	mImguiMainMenu.update(mDebugData);
+	mImguiMainMenu.update(mDebugData, mInnerDataAccessor);
 
 	// rendering imgui to the viewport
 	ImGui::Render();

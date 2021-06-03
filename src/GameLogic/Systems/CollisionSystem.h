@@ -19,6 +19,7 @@ class CollisionSystem : public RaccoonEcs::System
 public:
 	explicit CollisionSystem(
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>&& collidingFilter,
+		RaccoonEcs::ComponentFilter<MovementComponent>&& movementFilter,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>&& movingCollisionsFilter,
 		WorldHolder& worldHolder) noexcept;
 	~CollisionSystem() override = default;
@@ -28,6 +29,7 @@ public:
 
 private:
 	RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent> mCollidingFilter;
+	RaccoonEcs::ComponentFilter<MovementComponent> mMovementFilter;
 	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent> mMovingCollisionsFilter;
 	WorldHolder& mWorldHolder;
 };

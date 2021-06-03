@@ -13,8 +13,8 @@ class WorldCell
 public:
 	WorldCell(const CellPos& pos, const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator);
 
-	EntityManager& getEntityManager() { return mEntityManager; }
-	[[nodiscard]] const EntityManager& getEntityManager() const { return mEntityManager; }
+	AsyncEntityManager& getEntityManager() { return mAsycnEntityManager; }
+	[[nodiscard]] const AsyncEntityManager& getEntityManager() const { return mAsycnEntityManager; }
 	ComponentSetHolder& getCellComponents() { return mCellComponents; }
 	[[nodiscard]] const ComponentSetHolder& getCellComponents() const { return mCellComponents; }
 
@@ -28,6 +28,7 @@ public:
 
 private:
 	EntityManager mEntityManager;
+	AsyncEntityManager mAsycnEntityManager{mEntityManager};
 	ComponentSetHolder mCellComponents;
 	CellPos mPos;
 };

@@ -38,10 +38,19 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	mTestChecklist.checks.emplace("destroyedEntities", std::make_unique<DestroyedEntitiesTestCheck>(100));
 	DestroyedEntitiesTestCheck& destroyedEntitiesTestCheck = *static_cast<DestroyedEntitiesTestCheck*>(mTestChecklist.checks["destroyedEntities"].get());
 
-	mSystemsManager.registerSystem<TestSpawnShootableUnitsSystem>(mWorldHolder);
+	mSystemsManager.registerSystem<TestSpawnShootableUnitsSystem>(
+		RaccoonEcs::ComponentAdder<TransformComponent>(),
+		RaccoonEcs::ComponentAdder<CollisionComponent>(),
+		RaccoonEcs::ComponentAdder<HealthComponent>(),
+		RaccoonEcs::ComponentAdder<SpriteCreatorComponent>(),
+		RaccoonEcs::EntityAdder(),
+		mWorldHolder
+	);
 
 	mSystemsManager.registerSystem<TestShootingControlSystem>(
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::ComponentFilter<const TransformComponent, const WeaponComponent, CharacterStateComponent, MovementComponent>(),
+		RaccoonEcs::ComponentFilter<const HealthComponent, const TransformComponent>(),
 		mWorldHolder,
 		mTime
 	);
@@ -51,6 +60,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<const TransformComponent>(),
 		RaccoonEcs::ComponentFilter<HealthComponent>(),
 		RaccoonEcs::ComponentAdder<DeathComponent>(),
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>(),
 		mWorldHolder,
 		mTime
 	);
@@ -69,6 +79,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 
 	mSystemsManager.registerSystem<CollisionSystem>(
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<MovementComponent>(),
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>(),
 		mWorldHolder
 	);
@@ -86,6 +97,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>(),
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>(),
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::EntityTransferer(),
 		mWorldHolder,
 		mTime
 	);
@@ -110,6 +122,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentAdder<AnimationGroupsComponent>(),
 		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>(),
 		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>(),
+		RaccoonEcs::ScheduledActionsExecutor(),
 		mWorldHolder,
 		getResourceManager()
 	);
@@ -120,6 +133,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>(),
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>(),
 		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>(),
 		mWorldHolder,
 		mTime,
 		getEngine(),
@@ -128,7 +142,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	);
 
 	Vector2D playerPos{ZERO_VECTOR};
-	EntityView playerEntity = mWorld.createTrackedSpatialEntity(
+	AsyncEntityView playerEntity = mWorld.createTrackedSpatialEntity(
 		RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(),
 		RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(),
 		RaccoonEcs::EntityAdder(),
@@ -136,33 +150,33 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	);
 
 	{
-		TransformComponent* transform = playerEntity.addComponent<TransformComponent>();
+		TransformComponent* transform = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class TransformComponent>());
 		transform->setLocation(playerPos);
 	}
 	{
-		SpriteCreatorComponent* sprite = playerEntity.addComponent<SpriteCreatorComponent>();
+		SpriteCreatorComponent* sprite = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class SpriteCreatorComponent>());
 		SpriteDescription spriteDesc;
 		spriteDesc.params.size = Vector2D(30.0f, 30.0f);
 		spriteDesc.path = "resources/textures/hero.png";
 		sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
 	}
 	{
-		CollisionComponent* collision = playerEntity.addComponent<CollisionComponent>();
+		CollisionComponent* collision = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class CollisionComponent>());
 		Hull& hull = collision->getGeometryRef();
 		hull.type = HullType::Circular;
 		hull.setRadius(15.0f);
 	}
-	playerEntity.addComponent<MovementComponent>();
+	playerEntity.addComponent(RaccoonEcs::ComponentAdder<class MovementComponent>());
 	{
-		WeaponComponent* weapon = playerEntity.addComponent<WeaponComponent>();
+		WeaponComponent* weapon = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class WeaponComponent>());
 		weapon->setShotDistance(1000.0f);
 		weapon->setDamageValue(70.0f);
 		weapon->setShotPeriod(0.0001f);
 	}
-	playerEntity.addComponent<CharacterStateComponent>();
+	playerEntity.addComponent(RaccoonEcs::ComponentAdder<class CharacterStateComponent>());
 
 	Vector2D cameraPos{ZERO_VECTOR};
-	EntityView camera = mWorld.createTrackedSpatialEntity(
+	AsyncEntityView camera = mWorld.createTrackedSpatialEntity(
 		RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(),
 		RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(),
 		RaccoonEcs::EntityAdder(),
@@ -170,10 +184,10 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	);
 
 	{
-		TransformComponent* transform = camera.addComponent<TransformComponent>();
+		TransformComponent* transform = camera.addComponent(RaccoonEcs::ComponentAdder<class TransformComponent>());
 		transform->setLocation(cameraPos);
 	}
-	camera.addComponent<MovementComponent>();
+	camera.addComponent(RaccoonEcs::ComponentAdder<class MovementComponent>());
 
 	{
 		StateMachineComponent* stateMachine = mGameData.getGameComponents().addComponent<StateMachineComponent>();

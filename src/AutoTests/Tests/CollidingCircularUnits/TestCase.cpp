@@ -49,6 +49,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 
 	mSystemsManager.registerSystem<CollisionSystem>(
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<MovementComponent>(),
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>(),
 		mWorldHolder
 	);
@@ -67,6 +68,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>(),
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>(),
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::EntityTransferer(),
 		mWorldHolder,
 		mTime
 	);
@@ -91,6 +93,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentAdder<AnimationGroupsComponent>(),
 		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>(),
 		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>(),
+		RaccoonEcs::ScheduledActionsExecutor(),
 		mWorldHolder,
 		getResourceManager()
 	);
@@ -101,6 +104,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>(),
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>(),
 		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>(),
 		mWorldHolder,
 		mTime,
 		getEngine(),
@@ -109,7 +113,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 	);
 
 	Vector2D playerPos{ZERO_VECTOR};
-	EntityView playerEntity = mWorld.createTrackedSpatialEntity(
+	AsyncEntityView playerEntity = mWorld.createTrackedSpatialEntity(
 		RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(),
 		RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(),
 		RaccoonEcs::EntityAdder(),
@@ -118,26 +122,26 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 	);
 
 	{
-		TransformComponent* transform = playerEntity.addComponent<TransformComponent>();
+		TransformComponent* transform = playerEntity.addComponent(RaccoonEcs::ComponentAdder<TransformComponent>());
 		transform->setLocation(playerPos);
 	}
 	{
-		SpriteCreatorComponent* sprite = playerEntity.addComponent<SpriteCreatorComponent>();
+		SpriteCreatorComponent* sprite = playerEntity.addComponent(RaccoonEcs::ComponentAdder<SpriteCreatorComponent>());
 		SpriteDescription spriteDesc;
 		spriteDesc.params.size = Vector2D(30.0f, 30.0f);
 		spriteDesc.path = "resources/textures/hero.png";
 		sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
 	}
 	{
-		CollisionComponent* collision = playerEntity.addComponent<CollisionComponent>();
+		CollisionComponent* collision = playerEntity.addComponent(RaccoonEcs::ComponentAdder<CollisionComponent>());
 		Hull& hull = collision->getGeometryRef();
 		hull.type = HullType::Circular;
 		hull.setRadius(15.0f);
 	}
-	playerEntity.addComponent<MovementComponent>();
+	playerEntity.addComponent(RaccoonEcs::ComponentAdder<MovementComponent>());
 
 	Vector2D cameraPos{ZERO_VECTOR};
-	EntityView camera = mWorld.createTrackedSpatialEntity(
+	AsyncEntityView camera = mWorld.createTrackedSpatialEntity(
 		RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(),
 		RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(),
 		RaccoonEcs::EntityAdder(),
@@ -145,12 +149,12 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 	);
 
 	{
-		TransformComponent* transform = camera.addComponent<TransformComponent>();
+		TransformComponent* transform = camera.addComponent(RaccoonEcs::ComponentAdder<TransformComponent>());
 		transform->setLocation(cameraPos);
 	}
-	camera.addComponent<MovementComponent>();
+	camera.addComponent(RaccoonEcs::ComponentAdder<MovementComponent>());
 
-	mGameData.getGameComponents().addComponent<StateMachineComponent>();
+	RaccoonEcs::ComponentAdder<StateMachineComponent>().addComponent(mGameData.getGameComponents());
 
 	mInputData.windowSize = getEngine().getWindowSize();
 	mInputData.mousePos = mInputData.windowSize * 0.5f;

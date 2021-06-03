@@ -7,7 +7,7 @@
 class ImguiMainMenu
 {
 public:
-	void update(struct ImguiDebugData& debugData);
+	void update(struct ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor);
 
 private:
 	bool mShowImguiDemoWindow = false;

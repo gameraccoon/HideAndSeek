@@ -121,6 +121,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<const TransformComponent>(),
 		RaccoonEcs::ComponentFilter<HealthComponent>(),
 		RaccoonEcs::ComponentAdder<DeathComponent>(),
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>(),
 		mWorldHolder,
 		mTime
 	);
@@ -133,6 +134,7 @@ void Game::initSystems()
 
 	mSystemsManager.registerSystem<CollisionSystem>(
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<MovementComponent>(),
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>(),
 		mWorldHolder
 	);
@@ -151,6 +153,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>(),
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>(),
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>(),
+		RaccoonEcs::EntityTransferer(),
 		mWorldHolder,
 		mTime
 	);
@@ -175,6 +178,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentAdder<AnimationGroupsComponent>(),
 		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>(),
 		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>(),
+		RaccoonEcs::ScheduledActionsExecutor(),
 		mWorldHolder,
 		getResourceManager()
 	);
@@ -194,6 +198,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>(), // hey, why isn't it const?
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>(),
 		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>(),
+		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>(),
 		mWorldHolder,
 		mTime,
 		getEngine(),
@@ -218,6 +223,7 @@ void Game::initSystems()
 #ifdef IMGUI_ENABLED
 	mSystemsManager.registerSystem<ImguiSystem>(
 		RaccoonEcs::ComponentAdder<ImguiComponent>(),
+		RaccoonEcs::InnerDataAccessor(),
 		mImguiDebugData,
 		getEngine()
 	);

@@ -34,6 +34,7 @@ public:
 		RaccoonEcs::ComponentAdder<AnimationGroupsComponent>&& animationGroupsAdder,
 		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>&& animationGroupCreatorRemover,
 		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>&& animationGroupCreatorFilter,
+		RaccoonEcs::ScheduledActionsExecutor&& scheduledActionsExecutor,
 		WorldHolder& worldHolder,
 		HAL::ResourceManager& resourceManager) noexcept;
 	~ResourceStreamingSystem() override = default;
@@ -52,6 +53,7 @@ private:
 	RaccoonEcs::ComponentAdder<AnimationGroupsComponent> mAnimationGroupsAdder;
 	RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent> mAnimationGroupCreatorRemover;
 	RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent> mAnimationGroupCreatorFilter;
+	RaccoonEcs::ScheduledActionsExecutor mScheduledActionsExecutor;
 	WorldHolder& mWorldHolder;
 	HAL::ResourceManager& mResourceManager;
 };

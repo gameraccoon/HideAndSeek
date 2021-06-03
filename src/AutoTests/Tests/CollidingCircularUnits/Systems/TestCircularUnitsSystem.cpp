@@ -30,13 +30,13 @@ void TestCircularUnitsSystem::update()
 	World& world = mWorldHolder.getWorld();
 	float dt = mTime.dt;
 
-	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<AsyncEntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
 	if (!playerEntity.has_value())
 	{
 		return;
 	}
 
-	const auto [playerTransform] = mTransformFilter.getComponents(playerEntity->first);
+	const auto [playerTransform] = playerEntity->first.getComponents(mTransformFilter);
 	if (playerTransform == nullptr)
 	{
 		return;
@@ -45,7 +45,7 @@ void TestCircularUnitsSystem::update()
 	Vector2D targetLocation = playerTransform->getLocation();
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getAllCellManagers();
-	spatialManager.forEachComponentSetN(
+	spatialManager.forEachComponentSet(
 			mAiMovementFilter,
 			[targetLocation, dt](const AiControllerComponent* /*aiController*/, const TransformComponent* transform, MovementComponent* movement)
 	{

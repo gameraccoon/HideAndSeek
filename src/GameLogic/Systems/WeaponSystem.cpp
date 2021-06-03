@@ -20,12 +20,14 @@ WeaponSystem::WeaponSystem(
 		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
 		RaccoonEcs::ComponentFilter<HealthComponent>&& healthFilter,
 		RaccoonEcs::ComponentAdder<DeathComponent>&& deathAdder,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>&& collisionFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData) noexcept
 	: mStateAndWeaponFilter(std::move(stateAndWeaponFilter))
 	, mTransformFilter(std::move(transformFilter))
 	, mHealthFilter(std::move(healthFilter))
 	, mDeathAdder(std::move(deathAdder))
+	, mCollisionFilter(std::move(collisionFilter))
 	, mWorldHolder(worldHolder)
 	, mTime(timeData)
 {
@@ -58,9 +60,9 @@ void WeaponSystem::update()
 	GameplayTimestamp currentTime = mTime.currentTimestamp;
 
 	std::vector<ShotInfo> shotsToMake;
-	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntityN(
-				mStateAndWeaponFilter,
-				[currentTime, &shotsToMake](WorldCell* cell, Entity entity, WeaponComponent* weapon, CharacterStateComponent* characterState)
+	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity(
+		mStateAndWeaponFilter,
+		[currentTime, &shotsToMake](WorldCell* cell, Entity entity, WeaponComponent* weapon, CharacterStateComponent* characterState)
 	{
 		if (characterState->getState() == CharacterState::Shoot || characterState->getState() == CharacterState::WalkAndShoot)
 		{
@@ -86,6 +88,7 @@ void WeaponSystem::update()
 			Vector2D traceEndPoint = transform->getLocation() + Vector2D(transform->getRotation()) * shotInfo.distance;
 			RayTrace::TraceResult result = RayTrace::Trace(
 				world,
+				mCollisionFilter,
 				transform->getLocation(),
 				traceEndPoint
 			);

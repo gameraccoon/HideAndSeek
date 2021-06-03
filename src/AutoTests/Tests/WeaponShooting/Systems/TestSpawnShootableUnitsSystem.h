@@ -2,25 +2,43 @@
 
 #include <unordered_map>
 
+#include <raccoon-ecs/async_operations.h>
+
 #include "GameData/EcsDefinitions.h"
 #include "GameData/Core/Vector2D.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
+class TransformComponent;
+class CollisionComponent;
+class HealthComponent;
+class SpriteCreatorComponent;
+
 class TestSpawnShootableUnitsSystem : public RaccoonEcs::System
 {
 public:
-	explicit TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept;
+	explicit TestSpawnShootableUnitsSystem(
+		RaccoonEcs::ComponentAdder<TransformComponent>&& transformAdder,
+		RaccoonEcs::ComponentAdder<CollisionComponent>&& collisionAdder,
+		RaccoonEcs::ComponentAdder<HealthComponent>&& healthAdder,
+		RaccoonEcs::ComponentAdder<SpriteCreatorComponent>&& spriteCreatorAdder,
+		RaccoonEcs::EntityAdder&& entityAdder,
+		WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 	std::string getName() const override { return "TestSpawnShootableUnitsSystem"; }
 
 private:
-	static void spawnUnit(EntityManager& entityManager, Vector2D pos);
-	static void spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, class SpatialWorldData& spatialData);
-	static void spawnUnits(class SpatialWorldData& spatialData, int count, Vector2D pos);
+	void spawnUnit(AsyncEntityManager& entityManager, Vector2D pos);
+	void spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, class SpatialWorldData& spatialData);
+	void spawnUnits(class SpatialWorldData& spatialData, int count, Vector2D pos);
 
 private:
+	RaccoonEcs::ComponentAdder<TransformComponent> mTransformAdder;
+	RaccoonEcs::ComponentAdder<CollisionComponent> mCollisionAdder;
+	RaccoonEcs::ComponentAdder<HealthComponent> mHealthAdder;
+	RaccoonEcs::ComponentAdder<SpriteCreatorComponent> mSpriteCreatorAdder;
+	RaccoonEcs::EntityAdder mEntityAdder;
 	WorldHolder& mWorldHolder;
 	int mTicksPassed = 0;
 

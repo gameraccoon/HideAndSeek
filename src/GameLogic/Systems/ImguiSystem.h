@@ -26,6 +26,7 @@ class ImguiSystem : public RaccoonEcs::System
 public:
 	ImguiSystem(
 		RaccoonEcs::ComponentAdder<ImguiComponent>&& imguiAdder,
+		RaccoonEcs::InnerDataAccessor&& innerDataAccessor,
 		ImguiDebugData& debugData,
 		HAL::Engine& engine) noexcept;
 	~ImguiSystem() override = default;
@@ -37,6 +38,7 @@ public:
 
 private:
 	RaccoonEcs::ComponentAdder<ImguiComponent> mImguiAdder;
+	RaccoonEcs::InnerDataAccessor mInnerDataAccessor;
 	HAL::Engine& mEngine;
 	ImguiDebugData& mDebugData;
 

@@ -15,7 +15,7 @@ namespace PathBlockingGeometry
 {
 	static const float GEOMETRY_EXTENT = 0.0f;
 
-	void CalculatePathBlockingGeometry(std::vector<std::vector<Vector2D>>& outGeometry, const TupleVector<CollisionComponent*, TransformComponent*>& components)
+	void CalculatePathBlockingGeometry(std::vector<std::vector<Vector2D>>& outGeometry, const TupleVector<const CollisionComponent*, const TransformComponent*>& components)
 	{
 		// extend all geometry by defined radius
 		std::vector<ShapeOperations::MergedGeometry> mergedGeometry;

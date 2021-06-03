@@ -184,9 +184,9 @@ nlohmann::json SpatialWorldData::toJson(const Json::ComponentSerializationHolder
 	};
 }
 
-static void RedistributeSpatialEntitiesBetweenCells(SpatialWorldData& spatialData, float oldCellSize)
+static void RedistributeSpatialEntitiesBetweenCells(SpatialWorldData& /*spatialData*/, float /*oldCellSize*/)
 {
-	struct CellEntities
+	/*struct CellEntities
 	{
 		TupleVector<Entity, TransformComponent*> entities;
 		WorldCell& cell;
@@ -218,7 +218,7 @@ static void RedistributeSpatialEntitiesBetweenCells(SpatialWorldData& spatialDat
 				cellData.cell.getEntityManager().transferEntityTo(newCell.getEntityManager(), entity);
 			}
 		}
-	}
+	}*/
 }
 
 void SpatialWorldData::fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder)

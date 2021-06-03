@@ -14,33 +14,44 @@
 #include "GameData/World.h"
 #include "GameData/Spatial/SpatialWorldData.h"
 
-TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept
-	: mWorldHolder(worldHolder)
+TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(
+		RaccoonEcs::ComponentAdder<TransformComponent>&& transformAdder,
+		RaccoonEcs::ComponentAdder<CollisionComponent>&& collisionAdder,
+		RaccoonEcs::ComponentAdder<HealthComponent>&& healthAdder,
+		RaccoonEcs::ComponentAdder<SpriteCreatorComponent>&& spriteCreatorAdder,
+		RaccoonEcs::EntityAdder&& entityAdder,
+		WorldHolder& worldHolder) noexcept
+	: mTransformAdder(std::move(transformAdder))
+	, mCollisionAdder(std::move(collisionAdder))
+	, mHealthAdder(std::move(healthAdder))
+	, mSpriteCreatorAdder(std::move(spriteCreatorAdder))
+	, mEntityAdder(std::move(entityAdder))
+	, mWorldHolder(worldHolder)
 {
 }
 
-void TestSpawnShootableUnitsSystem::spawnUnit(EntityManager& entityManager, Vector2D pos)
+void TestSpawnShootableUnitsSystem::spawnUnit(AsyncEntityManager& entityManager, Vector2D pos)
 {
-	Entity entity = entityManager.addEntity();
+	Entity entity = mEntityAdder.addEntity(entityManager);
 	{
-		TransformComponent* transform = entityManager.addComponent<TransformComponent>(entity);
+		TransformComponent* transform = mTransformAdder.addComponent(entityManager, entity);
 		transform->setLocation(pos);
 	}
 	{
-		SpriteCreatorComponent* sprite = entityManager.addComponent<SpriteCreatorComponent>(entity);
+		SpriteCreatorComponent* sprite = mSpriteCreatorAdder.addComponent(entityManager, entity);
 		SpriteDescription spriteDesc;
 		spriteDesc.params.size = Vector2D(20.0f, 20.0f);
 		spriteDesc.path = "resources/textures/hero.png";
 		sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
 	}
 	{
-		CollisionComponent* collision = entityManager.addComponent<CollisionComponent>(entity);
+		CollisionComponent* collision = mCollisionAdder.addComponent(entityManager, entity);
 		Hull& hull = collision->getGeometryRef();
 		hull.type = HullType::Circular;
 		hull.setRadius(10.0f);
 	}
 	{
-		HealthComponent* health = entityManager.addComponent<HealthComponent>(entity);
+		HealthComponent* health = mHealthAdder.addComponent(entityManager, entity);
 		health->setHealthValue(100.0f);
 	}
 }

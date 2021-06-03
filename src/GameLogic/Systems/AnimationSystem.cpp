@@ -43,7 +43,7 @@ void AnimationSystem::update()
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(cameraLocation, workingRect);
 
 	// update animation clip from FSM
-	spatialManager.forEachComponentSetN(
+	spatialManager.forEachComponentSet(
 		mAnimUpdateFilter,
 		[dt, stateMachines](AnimationGroupsComponent* animationGroups, AnimationClipsComponent* animationClips)
 	{
@@ -61,7 +61,7 @@ void AnimationSystem::update()
 	});
 
 	// update animation frame
-	spatialManager.forEachComponentSetN(
+	spatialManager.forEachComponentSet(
 			mAnimRenderFilter,
 			[dt](AnimationClipsComponent* animationClips, RenderComponent* render)
 	{

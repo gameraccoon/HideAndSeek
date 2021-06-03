@@ -34,7 +34,7 @@ TestUnitsCountControlSystem::TestUnitsCountControlSystem(
 {
 }
 
-void TestUnitsCountControlSystem::SpawnUnit(EntityManager& entityManager, Vector2D pos)
+void TestUnitsCountControlSystem::SpawnUnit(AsyncEntityManager& entityManager, Vector2D pos)
 {
 	Entity entity = mEntityAdder.addEntity(entityManager);
 	{

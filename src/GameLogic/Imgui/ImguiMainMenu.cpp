@@ -7,7 +7,7 @@
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/Imgui/ImguiDebugData.h"
 
-void ImguiMainMenu::update(ImguiDebugData& debugData)
+void ImguiMainMenu::update(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor)
 {
 	ImGui::Begin("Debug Menu");
 
@@ -37,7 +37,7 @@ void ImguiMainMenu::update(ImguiDebugData& debugData)
 
 	mRenderModeWindow.update(debugData);
 	mSystemsTimeReportWindow.update(debugData);
-	mComponentInspectorWindow.update(debugData);
+	mComponentInspectorWindow.update(debugData, dataAccessor);
 
 	if (mShowImguiDemoWindow)
 	{

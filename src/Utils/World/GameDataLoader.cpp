@@ -56,8 +56,9 @@ namespace GameDataLoader
 
 	static void GenerateLightBlockingGeometry(World& world)
 	{
-		TupleVector<WorldCell*, CollisionComponent*, TransformComponent*> components;
-		world.getSpatialData().getAllCellManagers().getSpatialComponents<CollisionComponent, TransformComponent>(components);
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter;
+		TupleVector<WorldCell*, const CollisionComponent*, const TransformComponent*> components;
+		world.getSpatialData().getAllCellManagers().getSpatialComponents(collisionFilter, components);
 		std::unordered_map<CellPos, std::vector<SimpleBorder>> lightBlockingGeometryPieces;
 		LightBlockingGeometry::CalculateLightGeometry(lightBlockingGeometryPieces, components);
 
@@ -130,8 +131,9 @@ namespace GameDataLoader
 
 	static void GeneratePathBlockingGeometry(World& world)
 	{
-		TupleVector<CollisionComponent*, TransformComponent*> components;
-		world.getSpatialData().getAllCellManagers().getComponents<CollisionComponent, TransformComponent>(components);
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter;
+		TupleVector<const CollisionComponent*, const TransformComponent*> components;
+		world.getSpatialData().getAllCellManagers().getComponents(collisionFilter, components);
 
 		PathBlockingGeometryComponent* pathBlockingGeometry = world.getWorldComponents().getOrAddComponent<PathBlockingGeometryComponent>();
 

@@ -22,7 +22,7 @@ void TestDestroyedEntitiesRegistrationSystem::update()
 	World& world = mWorldHolder.getWorld();
 
 	int count = 0;
-	world.getSpatialData().getAllCellManagers().forEachComponentSetN(mDeathFilter, [&count](const DeathComponent*)
+	world.getSpatialData().getAllCellManagers().forEachComponentSet(mDeathFilter, [&count](const DeathComponent*)
 	{
 		++count;
 	});

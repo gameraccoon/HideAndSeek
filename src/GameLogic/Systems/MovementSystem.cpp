@@ -16,11 +16,13 @@ MovementSystem::MovementSystem(
 		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>&& movementFilter,
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>&& spatialTrackFilter,
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>&& trackedSpatialEntitiesFilter,
+		RaccoonEcs::EntityTransferer&& entityTransferer,
 		WorldHolder& worldHolder,
 		const TimeData& timeData) noexcept
 	: mMovementFilter(std::move(movementFilter))
 	, mSpatialTrackFilter(std::move(spatialTrackFilter))
 	, mTrackedSpatialEntitiesFilter(std::move(trackedSpatialEntitiesFilter))
+	, mEntityTransferer(std::move(entityTransferer))
 	, mWorldHolder(worldHolder)
 	, mTime(timeData)
 {
@@ -34,9 +36,9 @@ void MovementSystem::update()
 	struct CellScheduledTransfers
 	{
 		CellPos cellTo;
-		EntityView entityView;
+		AsyncEntityView entityView;
 
-		MAYBE_UNUSED CellScheduledTransfers(CellPos to, EntityView entity)
+		MAYBE_UNUSED CellScheduledTransfers(CellPos to, AsyncEntityView entity)
 			: cellTo(to)
 			, entityView(entity)
 		{
@@ -45,11 +47,11 @@ void MovementSystem::update()
 
 	std::vector<CellScheduledTransfers> transfers;
 
-	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntityN(
+	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity(
 		mMovementFilter,
 		[timestampNow, &transfers](WorldCell* cell, Entity entity, MovementComponent* movement, TransformComponent* transform)
 	{
-		EntityView entityView{ entity, cell->getEntityManager() };
+		AsyncEntityView entityView{ entity, cell->getEntityManager() };
 
 		if (!movement->getNextStep().isZeroLength())
 		{
@@ -75,7 +77,7 @@ void MovementSystem::update()
 
 	for (auto& transfer : transfers)
 	{
-		if (auto [spatialTracked] = mSpatialTrackFilter.getComponents(transfer.entityView); spatialTracked != nullptr)
+		if (auto [spatialTracked] = transfer.entityView.getComponents(mSpatialTrackFilter); spatialTracked != nullptr)
 		{
 			StringId spatialTrackId = spatialTracked->getId();
 			auto [trackedComponents] = mTrackedSpatialEntitiesFilter.getComponents(world.getWorldComponents());
@@ -85,7 +87,9 @@ void MovementSystem::update()
 				it->second.cell = transfer.cellTo;
 			}
 		}
+		AsyncEntityManager& oldEntityManager = transfer.entityView.getManager();
+		AsyncEntityManager& newEntityManager = world.getSpatialData().getOrCreateCell(transfer.cellTo).getEntityManager();
 		// the component pointer get invalidated from this line
-		transfer.entityView.getManager().transferEntityTo(world.getSpatialData().getOrCreateCell(transfer.cellTo).getEntityManager(), transfer.entityView.getEntity());
+		mEntityTransferer.transferEntity(oldEntityManager, newEntityManager, transfer.entityView.getEntity());
 	}
 }

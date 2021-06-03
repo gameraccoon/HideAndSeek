@@ -21,6 +21,8 @@ class BackgroundTextureComponent;
 class LightBlockingGeometryComponent;
 class RenderComponent;
 class TransformComponent;
+class LightComponent;
+class TransformComponent;
 
 /**
  * System that handles rendering of world objects
@@ -34,6 +36,7 @@ public:
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>&& backgroundTextureFilter,
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
 		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>&& renderFilter,
+		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>&& lightFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::Engine& engine,
@@ -56,6 +59,7 @@ private:
 	RaccoonEcs::ComponentFilter<BackgroundTextureComponent> mBackgroundTextureFilter;
 	RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent> mLightBlockingGeometryFilter;
 	RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent> mRenderFilter;
+	RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent> mLightFilter;
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
 	HAL::Engine& mEngine;

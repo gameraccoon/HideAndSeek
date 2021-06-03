@@ -28,9 +28,14 @@ nlohmann::json World::toJson(const Json::ComponentSerializationHolder& jsonSeria
 
 static void InitSpatialTrackedEntities(SpatialWorldData& spatialData, ComponentSetHolder& worldComponents)
 {
-	auto [trackedSpatialEntities] = worldComponents.getComponents<TrackedSpatialEntitiesComponent>();
+	RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent> trackedEntitiesFilter;
+	RaccoonEcs::ComponentFilter<const SpatialTrackComponent> trackFilter;
 
-	spatialData.getAllCellManagers().forEachSpatialComponentSet<SpatialTrackComponent>([trackedSpatialEntities](WorldCell* cell, SpatialTrackComponent* spatialTrack)
+	auto [trackedSpatialEntities] = trackedEntitiesFilter.getComponents(worldComponents);
+
+	spatialData.getAllCellManagers().forEachSpatialComponentSet(
+		trackFilter,
+		[trackedSpatialEntities](WorldCell* cell, const SpatialTrackComponent* spatialTrack)
 	{
 		auto it = trackedSpatialEntities->getEntitiesRef().find(spatialTrack->getId());
 		if (it != trackedSpatialEntities->getEntitiesRef().end())
@@ -53,9 +58,9 @@ void World::fromJson(const nlohmann::json& json, const Json::ComponentSerializat
 	InitSpatialTrackedEntities(mSpatialData, mWorldComponents);
 }
 
-std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(TrackedListConstFilter& filter, StringId entityStringId)
+std::optional<std::pair<AsyncEntityView, CellPos>> World::getTrackedSpatialEntity(TrackedListConstFilter& filter, StringId entityStringId)
 {
-	std::optional<std::pair<EntityView, CellPos>> result;
+	std::optional<std::pair<AsyncEntityView, CellPos>> result;
 	const auto [trackedSpatialEntities] = filter.getComponents(getWorldComponents());
 
 	if (trackedSpatialEntities)
@@ -65,7 +70,7 @@ std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(Tra
 		{
 			if (WorldCell* cell = getSpatialData().getCell(it->second.cell))
 			{
-				result.emplace(EntityView(it->second.entity.getEntity(), cell->getEntityManager()), cell->getPos());
+				result.emplace(AsyncEntityView(it->second.entity.getEntity(), cell->getEntityManager()), cell->getPos());
 			}
 		}
 	}
@@ -73,21 +78,21 @@ std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(Tra
 	return result;
 }
 
-EntityView World::createTrackedSpatialEntity(TrackedListAdder& trackingAdder, TrackAdder& trackAdder, EntityAdder& entityAdder, StringId entityStringId, CellPos pos)
+AsyncEntityView World::createTrackedSpatialEntity(TrackedListAdder& trackingAdder, TrackAdder& trackAdder, EntityAdder& entityAdder, StringId entityStringId, CellPos pos)
 {
-	auto result = createSpatialEntity(entityAdder, pos);
+	AsyncEntityView result = createSpatialEntity(entityAdder, pos);
 	TrackedSpatialEntitiesComponent* trackedSpatialEntities = trackingAdder.getOrAddComponent(getWorldComponents());
 
 	trackedSpatialEntities->getEntitiesRef().insert_or_assign(entityStringId, SpatialEntity(result.getEntity(), pos));
-	SpatialTrackComponent* trackComponent = trackAdder.addComponent(result);
+	SpatialTrackComponent* trackComponent = result.addComponent(trackAdder);
 	trackComponent->setId(entityStringId);
 	return result;
 }
 
-EntityView World::createSpatialEntity(EntityAdder& entityAdder, CellPos pos)
+AsyncEntityView World::createSpatialEntity(EntityAdder& entityAdder, CellPos pos)
 {
 	WorldCell& cell = getSpatialData().getOrCreateCell(pos);
-	return EntityView(entityAdder.addEntity(cell.getEntityManager()), cell.getEntityManager());
+	return AsyncEntityView(entityAdder.addEntity(cell.getEntityManager()), cell.getEntityManager());
 }
 
 void World::clearCaches()

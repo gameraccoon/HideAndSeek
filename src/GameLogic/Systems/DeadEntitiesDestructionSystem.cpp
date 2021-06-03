@@ -24,10 +24,10 @@ void DeadEntitiesDestructionSystem::update()
 	World& world = mWorldHolder.getWorld();
 
 	TupleVector<WorldCell*, Entity, const DeathComponent*> components;
-	world.getSpatialData().getAllCellManagers().getSpatialComponentsWithEntitiesN(mDeathFilter, components);
+	world.getSpatialData().getAllCellManagers().getSpatialComponentsWithEntities(mDeathFilter, components);
 
 	for (const auto& componentTuple : components)
 	{
-		std::get<0>(componentTuple)->getEntityManager().removeEntity(std::get<1>(componentTuple));
+		mEntityRemover.removeEntity(std::get<0>(componentTuple)->getEntityManager(), std::get<1>(componentTuple));
 	}
 }

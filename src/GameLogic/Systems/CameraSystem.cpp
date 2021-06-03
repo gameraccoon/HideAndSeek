@@ -40,15 +40,15 @@ void CameraSystem::update()
 
 	World& world = mWorldHolder.getWorld();
 
-	std::optional<std::pair<EntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<AsyncEntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
 
 	if (controlledEntity.has_value())
 	{
-		std::optional<std::pair<EntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("CameraEntity"));
+		std::optional<std::pair<AsyncEntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("CameraEntity"));
 
 		if (mainCamera.has_value())
 		{
-			auto [cameraTransform, cameraMovement] = mCameraMoveFilter.getComponents(mainCamera->first);
+			auto [cameraTransform, cameraMovement] = mainCamera->first.getComponents(mCameraMoveFilter);
 			if (cameraTransform == nullptr)
 			{
 				return;
@@ -60,7 +60,7 @@ void CameraSystem::update()
 
 			const float cameraMobilityRate = 0.7f;
 
-			auto [controledEntityTransform] = mTransformFilter.getComponents(controlledEntity->first);
+			auto [controledEntityTransform] = controlledEntity->first.getComponents(mTransformFilter);
 
 			Vector2D cameraNewPos = controledEntityTransform->getLocation() + (mouseScreenPos - screenHalfSize) * cameraMobilityRate;
 			Vector2D cameraMove = cameraNewPos - cameraTransform->getLocation();

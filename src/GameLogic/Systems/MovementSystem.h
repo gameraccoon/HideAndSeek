@@ -23,6 +23,7 @@ public:
 		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>&& movementFilter,
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>&& spatialTrackFilter,
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>&& trackedSpatialEntitiesFilter,
+		RaccoonEcs::EntityTransferer&& entityTransferer,
 		WorldHolder& worldHolder,
 		const TimeData& timeData) noexcept;
 	~MovementSystem() override = default;
@@ -34,6 +35,7 @@ private:
 	RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent> mMovementFilter;
 	RaccoonEcs::ComponentFilter<SpatialTrackComponent> mSpatialTrackFilter;
 	RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent> mTrackedSpatialEntitiesFilter;
+	RaccoonEcs::EntityTransferer mEntityTransferer;
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
 };

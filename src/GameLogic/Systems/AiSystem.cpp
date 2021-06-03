@@ -54,7 +54,7 @@ void AiSystem::update()
 	}
 
 	TupleVector<const CollisionComponent*, const TransformComponent*> collisions;
-	world.getSpatialData().getAllCellManagers().getComponentsN(mCollisionDataFilter, collisions);
+	world.getSpatialData().getAllCellManagers().getComponents(mCollisionDataFilter, collisions);
 
 	bool needUpdate = !navMeshComponent->getNavMesh().geometry.isCalculated;
 	if (!needUpdate)
@@ -75,14 +75,14 @@ void AiSystem::update()
 		navMeshComponent->setUpdateTimestamp(timestampNow);
 	}
 
-	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<AsyncEntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
 
 	if (!playerEntity.has_value())
 	{
 		return;
 	}
 
-	auto [playerTransform] = mTransformFilter.getComponents(playerEntity->first);
+	auto [playerTransform] = playerEntity->first.getComponents(mTransformFilter);
 	if (playerTransform == nullptr)
 	{
 		return;
@@ -96,7 +96,7 @@ void AiSystem::update()
 
 	const NavMesh& navMesh = navMeshComponent->getNavMesh();
 
-	world.getSpatialData().getAllCellManagers().forEachComponentSetN(
+	world.getSpatialData().getAllCellManagers().forEachComponentSet(
 		mNavDataFilter,
 		[targetLocation, &navMesh, timestampNow, navmeshUpdateTimestamp, debugDraw]
 			(AiControllerComponent* aiController, const TransformComponent* transform, MovementComponent* movement, CharacterStateComponent* characterState)

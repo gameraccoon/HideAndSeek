@@ -19,8 +19,8 @@ public:
 public:
 	World(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator);
 
-	[[nodiscard]] EntityManager& getEntityManager() { return mEntityManager; }
-	[[nodiscard]] const EntityManager& getEntityManager() const { return mEntityManager; }
+	[[nodiscard]] AsyncEntityManager& getEntityManager() { return mAsyncEntityManager; }
+	[[nodiscard]] const AsyncEntityManager& getEntityManager() const { return mAsyncEntityManager; }
 
 	[[nodiscard]] ComponentSetHolder& getWorldComponents() { return mWorldComponents; }
 	[[nodiscard]] const ComponentSetHolder& getWorldComponents() const { return mWorldComponents; }
@@ -31,15 +31,16 @@ public:
 	[[nodiscard]] nlohmann::json toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder);
 	void fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
-	std::optional<std::pair<EntityView, CellPos>> getTrackedSpatialEntity(TrackedListConstFilter& filter, StringId entityStringId);
-	EntityView createTrackedSpatialEntity(TrackedListAdder& trackingAdder, TrackAdder& trackAdder, EntityAdder& entityAdder, StringId entityStringId, CellPos pos);
+	std::optional<std::pair<AsyncEntityView, CellPos>> getTrackedSpatialEntity(TrackedListConstFilter& filter, StringId entityStringId);
+	AsyncEntityView createTrackedSpatialEntity(TrackedListAdder& trackingAdder, TrackAdder& trackAdder, EntityAdder& entityAdder, StringId entityStringId, CellPos pos);
 
-	EntityView createSpatialEntity(EntityAdder& entityAdder, CellPos pos);
+	AsyncEntityView createSpatialEntity(EntityAdder& entityAdder, CellPos pos);
 
 	void clearCaches();
 
 private:
 	EntityManager mEntityManager;
+	AsyncEntityManager mAsyncEntityManager{mEntityManager};
 	ComponentSetHolder mWorldComponents;
 	SpatialWorldData mSpatialData;
 };

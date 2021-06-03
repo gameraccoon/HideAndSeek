@@ -84,7 +84,7 @@ void ControlSystem::processPlayerInput()
 	const HAL::KeyStatesMap& mouseKeyStates = mInputData.mouseKeyStates;
 	World& world = mWorldHolder.getWorld();
 
-	std::optional<std::pair<EntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<AsyncEntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
 
 	if (!controlledEntity.has_value())
 	{
@@ -116,21 +116,21 @@ void ControlSystem::processPlayerInput()
 		movementDirection += DOWN_DIRECTION;
 	}
 
-	if (auto [characterState] = mCharacterStateFilter.getComponents(controlledEntity->first); characterState != nullptr)
+	if (auto [characterState] = controlledEntity->first.getComponents(mCharacterStateFilter); characterState != nullptr)
 	{
 		characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::TryingToMove, !movementDirection.isZeroLength());
 		characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::ReadyToRun, isRunPressed);
 		characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::TryingToShoot, isShootPressed);
 	}
 
-	auto [transform, movement] = mMoveFilter.getComponents(controlledEntity->first);
+	auto [transform, movement] = controlledEntity->first.getComponents(mMoveFilter);
 	movement->setMoveDirection(movementDirection);
 
-	std::optional<std::pair<EntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("CameraEntity"));
+	std::optional<std::pair<AsyncEntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("CameraEntity"));
 
 	if (mainCamera.has_value())
 	{
-		auto [cameraTransform] = mTransformFilter.getComponents(mainCamera->first);
+		auto [cameraTransform] = mainCamera->first.getComponents(mTransformFilter);
 		if (cameraTransform == nullptr)
 		{
 			return;

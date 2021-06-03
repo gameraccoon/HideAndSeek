@@ -52,7 +52,7 @@ void CharacterStateSystem::update()
 	{
 		auto allCellManagers = world.getSpatialData().getAllCellManagers();
 		// update states
-		allCellManagers.forEachComponentSetN(
+		allCellManagers.forEachComponentSet(
 			mCharacterStateFilter,
 			[stateMachine, dt](CharacterStateComponent* characterState)
 		{
@@ -62,7 +62,7 @@ void CharacterStateSystem::update()
 		});
 
 		// update movements
-		allCellManagers.forEachComponentSetN(
+		allCellManagers.forEachComponentSet(
 			mCharacterMovementFilter,
 			[stateMachine, dt](const CharacterStateComponent* characterState, MovementComponent* movement)
 		{
@@ -79,7 +79,7 @@ void CharacterStateSystem::update()
 		});
 
 		// update animation
-		allCellManagers.forEachComponentSetN(
+		allCellManagers.forEachComponentSet(
 			mCharacterMovementAnimationFilter,
 			[stateMachine, dt](const CharacterStateComponent* characterState, const MovementComponent* movement, AnimationGroupsComponent* animationGroups)
 		{

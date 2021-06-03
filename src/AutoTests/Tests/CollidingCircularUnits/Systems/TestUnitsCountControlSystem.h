@@ -31,7 +31,7 @@ public:
 	std::string getName() const override { return "TestUnitsCountControlSystem"; }
 
 private:
-	void SpawnUnit(EntityManager& entityManager, Vector2D pos);
+	void SpawnUnit(AsyncEntityManager& entityManager, Vector2D pos);
 	void SpawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData);
 	void SpawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos);
 

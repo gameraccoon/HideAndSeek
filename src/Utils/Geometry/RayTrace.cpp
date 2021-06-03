@@ -16,11 +16,11 @@
 
 namespace RayTrace
 {
-	bool FastTrace(World& world, const Vector2D& startPoint, const Vector2D& endPoint)
+	bool FastTrace(World& world, CollisionsFilter& collisionsFilter, const Vector2D& startPoint, const Vector2D& endPoint)
 	{
-		TupleVector<CollisionComponent*, TransformComponent*> components;
+		TupleVector<const CollisionComponent*, const TransformComponent*> components;
 		// ToDo: choose only potentially intersected cells
-		world.getSpatialData().getAllCellManagers().getComponents(components);
+		world.getSpatialData().getAllCellManagers().getComponents(collisionsFilter, components);
 
 		for (auto [collision, transform] : components)
 		{
@@ -78,14 +78,16 @@ namespace RayTrace
 		return false;
 	}
 
-	TraceResult Trace(World& world, Vector2D startPoint, Vector2D endPoint)
+	TraceResult Trace(World& world, CollisionsFilter& collisionsFilter, Vector2D startPoint, Vector2D endPoint)
 	{
 		TraceResult result;
 
 		float minRayQLength = (startPoint - endPoint).qSize() + 20.0f;
 
 		// ToDo: choose only potentially intersected cells
-		world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<CollisionComponent, TransformComponent>([&result, &minRayQLength, startPoint, endPoint](WorldCell* cell, Entity entity, CollisionComponent* collision, TransformComponent* transform)
+		world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity(
+			collisionsFilter,
+			[&result, &minRayQLength, startPoint, endPoint](WorldCell* cell, Entity entity, const CollisionComponent* collision, const TransformComponent* transform)
 		{
 			Vector2D transformedStartPoint = startPoint - transform->getLocation();
 			Vector2D transformedEndPoint = endPoint - transform->getLocation();

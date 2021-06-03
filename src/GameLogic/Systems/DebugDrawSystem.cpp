@@ -161,7 +161,7 @@ void DebugDrawSystem::update()
 	{
 		const Graphics::Sprite& collisionSprite = mResourceManager.getResource<Graphics::Sprite>(mCollisionSpriteHandle);
 		Graphics::QuadUV quadUV = collisionSprite.getUV();
-		spatialManager.forEachComponentSetN(
+		spatialManager.forEachComponentSet(
 			mCollisionDataFilter,
 			[&collisionSprite, &quadUV, drawShift](const CollisionComponent* collision, const TransformComponent* transform)
 		{
@@ -218,7 +218,7 @@ void DebugDrawSystem::update()
 			}*/
 		}
 
-		spatialManager.forEachComponentSetN(
+		spatialManager.forEachComponentSet(
 			mAiControllerFilter,
 			[&navMeshSprite, &quadUV, drawShift](const AiControllerComponent* aiController)
 		{
@@ -274,7 +274,7 @@ void DebugDrawSystem::update()
 	if (renderMode && renderMode->getIsDrawDebugCharacterInfoEnabled())
 	{
 		const Graphics::Font& font = mResourceManager.getResource<Graphics::Font>(mFontHandle);
-		spatialManager.forEachComponentSetN(
+		spatialManager.forEachComponentSet(
 			mCharacterStateFilter,
 			[&renderer, &font, drawShift, cameraCell](const CharacterStateComponent* characterState, const TransformComponent* transform)
 		{

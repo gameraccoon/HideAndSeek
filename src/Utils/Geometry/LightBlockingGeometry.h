@@ -16,7 +16,7 @@ class TransformComponent;
 
 namespace LightBlockingGeometry
 {
-	using CollisionGeometry = TupleVector<WorldCell*, CollisionComponent*, TransformComponent*>;
+	using CollisionGeometry = TupleVector<WorldCell*, const CollisionComponent*, const TransformComponent*>;
 	using CalculatedGeometry = std::unordered_map<CellPos, std::vector<SimpleBorder>>;
 
 	void CalculateLightGeometry(CalculatedGeometry& outGeometry, const CollisionGeometry& collisionGeometry);

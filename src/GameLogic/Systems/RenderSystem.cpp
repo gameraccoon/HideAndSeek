@@ -30,6 +30,7 @@ RenderSystem::RenderSystem(
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>&& backgroundTextureFilter,
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
 		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>&& renderFilter,
+		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>&& lightFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::Engine& engine,
@@ -41,6 +42,7 @@ RenderSystem::RenderSystem(
 	, mBackgroundTextureFilter(std::move(backgroundTextureFilter))
 	, mLightBlockingGeometryFilter(std::move(lightBlockingGeometryFilter))
 	, mRenderFilter(std::move(renderFilter))
+	, mLightFilter(std::move(lightFilter))
 	, mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mEngine(engine)
@@ -82,7 +84,7 @@ void RenderSystem::update()
 
 	if (!renderMode || renderMode->getIsDrawVisibleEntitiesEnabled())
 	{
-		spatialManager.forEachComponentSetN(
+		spatialManager.forEachComponentSet(
 			mRenderFilter,
 			[&drawShift, &resourceManager = mResourceManager](const RenderComponent* render, const TransformComponent* transform)
 		{
@@ -200,7 +202,7 @@ public:
 	}
 
 public:
-	TupleVector<LightComponent*, TransformComponent*> componentsToProcess;
+	TupleVector<LightComponent*, const TransformComponent*> componentsToProcess;
 
 private:
 	Vector2D mMaxFov;
@@ -246,8 +248,8 @@ void RenderSystem::drawLights(SpatialEntityManager& managerGroup, std::vector<Wo
 	}
 
 	// get lights
-	TupleVector<LightComponent*, TransformComponent*> lightComponentSets;
-	managerGroup.getComponents<LightComponent, TransformComponent>(lightComponentSets);
+	TupleVector<LightComponent*, const TransformComponent*> lightComponentSets;
+	managerGroup.getComponents(mLightFilter, lightComponentSets);
 
 	// determine the borders of the location we're interested in
 	Vector2D emitterPositionBordersLT = playerSightPosition - screenHalfSize - maxFov;
