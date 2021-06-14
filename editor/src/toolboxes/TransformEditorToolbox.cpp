@@ -26,6 +26,8 @@
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
 
+#include "src/EditorDataAccessor.h"
+
 const QString TransformEditorToolbox::WidgetName = "TransformEditor";
 const QString TransformEditorToolbox::ToolboxName = TransformEditorToolbox::WidgetName + "Toolbox";
 
@@ -48,7 +50,9 @@ static Vector2D GetEntityPosition(SpatialEntity entity, World* world)
 		return ZERO_VECTOR;
 	}
 
-	auto [transform] = cell->getEntityManager().getEntityComponents<TransformComponent>(entity.entity.getEntity());
+	RaccoonEcs::ComponentFilter<const TransformComponent> transformFilter(gEditorDataAccessor);
+
+	auto [transform] = transformFilter.getEntityComponents(cell->getEntityManager(), entity.entity.getEntity());
 
 	if (transform)
 	{
@@ -232,7 +236,8 @@ void TransformEditorToolbox::onEntitySelected(const std::optional<EntityReferenc
 	if (entityRef.has_value() && entityRef->cellPos.has_value())
 	{
 		WorldCell* cell = world->getSpatialData().getCell(*entityRef->cellPos);
-		if (cell != nullptr && cell->getEntityManager().doesEntityHaveComponent<TransformComponent>(entityRef->entity))
+		RaccoonEcs::EntitySelector<TransformComponent> entitySelector(gEditorDataAccessor);
+		if (cell != nullptr && entitySelector.doesEntityHaveComponent(cell->getEntityManager(), entityRef->entity))
 		{
 			SpatialEntity spatialEntity(entityRef->entity, *entityRef->cellPos);
 			mContent->mSelectedEntities.push_back(spatialEntity);
@@ -316,9 +321,10 @@ void TransformEditorToolbox::onCopyCommand()
 		if (cell != nullptr)
 		{
 			nlohmann::json serializedEntity;
-			Json::GetPrefabFromEntity(cell->getEntityManager(), serializedEntity, spatialEntity.entity.getEntity(), jsonSerializationHolder);
+			EntityManager& cellEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(cell->getEntityManager());
+			Json::GetPrefabFromEntity(cellEntityManager, serializedEntity, spatialEntity.entity.getEntity(), jsonSerializationHolder);
 			mCopiedObjects.push_back(serializedEntity);
-			auto [transform] = cell->getEntityManager().getEntityComponents<TransformComponent>(spatialEntity.entity.getEntity());
+			auto [transform] = cellEntityManager.getEntityComponents<TransformComponent>(spatialEntity.entity.getEntity());
 			if (transform)
 			{
 				center += transform->getLocation();
@@ -500,15 +506,20 @@ void TransformEditorWidget::paintEvent(QPaintEvent*)
 
 	int crossSize = static_cast<int>(5.0f * mScale);
 
+	RaccoonEcs::ComponentFilter<const TransformComponent> transformFilter(gEditorDataAccessor);
+	RaccoonEcs::ComponentFilter<const CollisionComponent> collisionFilter(gEditorDataAccessor);
+
 	std::vector<WorldCell*> cells = getCellsOnScreen();
 	for (WorldCell* cell : cells)
 	{
-		cell->getEntityManager().forEachComponentSetWithEntity<TransformComponent>([&painter, cell, crossSize, this](Entity entity, TransformComponent* transform)
+		transformFilter.forEachComponentSetWithEntity(
+			cell->getEntityManager(),
+			[&painter, cell, crossSize, &collisionFilter, this](Entity entity, const TransformComponent* transform)
 		{
 			CellPos cellPos = cell->getPos();
 			Vector2D location = transform->getLocation();
 
-			auto [collision] = cell->getEntityManager().getEntityComponents<CollisionComponent>(entity);
+			auto [collision] = collisionFilter.getEntityComponents(cell->getEntityManager(), entity);
 
 			if (std::find(mSelectedEntities.begin(), mSelectedEntities.end(), SpatialEntity(entity, cellPos)) != mSelectedEntities.end())
 			{
@@ -651,10 +662,14 @@ SpatialEntity TransformEditorWidget::getEntityUnderPoint(const QPoint& pos)
 
 	if (mWorld)
 	{
+		RaccoonEcs::ComponentFilter<const TransformComponent> transformFilter(gEditorDataAccessor);
+
 		std::vector<WorldCell*> cells = getCellsOnScreen();
 		for (WorldCell* cell : cells)
 		{
-			cell->getEntityManager().forEachComponentSetWithEntity<TransformComponent>([worldPos, cellPos = cell->getPos(), &findResult](Entity entity, TransformComponent* transform)
+			transformFilter.forEachComponentSetWithEntity(
+				cell->getEntityManager(),
+				[worldPos, cellPos = cell->getPos(), &findResult](Entity entity, const TransformComponent* transform)
 			{
 				Vector2D location = transform->getLocation();
 				if (location.x - 10 < worldPos.x && location.x + 10 > worldPos.x
@@ -744,10 +759,13 @@ void TransformEditorWidget::addEntitiesInRectToSelection(const Vector2D& start, 
 
 	if (mWorld)
 	{
+		RaccoonEcs::ComponentFilter<const TransformComponent> transformFilter(gEditorDataAccessor);
 		std::vector<WorldCell*> cells = getCellsOnScreen();
 		for (WorldCell* cell : cells)
 		{
-			cell->getEntityManager().forEachComponentSetWithEntity<TransformComponent>([this, lt, rd, cellPos = cell->getPos()](Entity entity, TransformComponent* transform)
+			transformFilter.forEachComponentSetWithEntity(
+				cell->getEntityManager(),
+				[this, lt, rd, cellPos = cell->getPos()](Entity entity, const TransformComponent* transform)
 			{
 				Vector2D location = transform->getLocation();
 				if (lt.x < location.x && location.x < rd.x && lt.y < location.y && location.y < rd.y)

@@ -208,8 +208,8 @@ set(UNITTESTS_SRC
 )
 include_directories(${EXTERNALS_DIR}/sources/googletest)
 add_executable(${UNITTESTS_NAME} ${UNITTESTS_SRC})
+target_compile_definitions(${UNITTESTS_NAME}  PRIVATE -DRACCOON_ECS_TOOLMODE)
 target_compile_options(${UNITTESTS_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
-#set_target_properties(${UNITTESTS_NAME} PROPERTIES UNITY_BUILD ON)
 target_link_libraries(${UNITTESTS_NAME}
 	${GENERAL_PROJECT_LIBS}
 )

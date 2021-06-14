@@ -5,14 +5,14 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
+#include "GameData/Components/SpriteCreatorComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/AiControllerComponent.generated.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
 
-class TransformComponent;
-class MovementComponent;
-class SpriteCreatorComponent;
-class CollisionComponent;
-class AiControllerComponent;
-class CharacterStateComponent;
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 class TestUnitsCountControlSystem : public RaccoonEcs::System
 {

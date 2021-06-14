@@ -1,5 +1,7 @@
 #pragma once
 
+#include <raccoon-ecs/async_systems_manager.h>
+
 #include "GameData/EcsDefinitions.h"
 #include "GameData/World.h"
 #include "GameData/GameData.h"
@@ -37,7 +39,7 @@ protected:
 	World mWorld{mComponentFactory, mEntityGenerator};
 	GameData mGameData{mComponentFactory};
 	WorldHolder mWorldHolder{&mWorld, mGameData};
-	RaccoonEcs::SystemsManager mSystemsManager;
+	RaccoonEcs::AsyncSystemsManager mSystemsManager;
 	Jobs::WorkerManager mWorkerManager{1};
 	TimeData mTime;
 	InputData mInputData;

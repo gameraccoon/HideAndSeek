@@ -4,15 +4,15 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/HealthComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/WeaponComponent.generated.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 
-class TrackedSpatialEntitiesComponent;
-class TransformComponent;
-class WeaponComponent;
-class CharacterStateComponent;
-class MovementComponent;
-class HealthComponent;
 
 class TestShootingControlSystem : public RaccoonEcs::System
 {

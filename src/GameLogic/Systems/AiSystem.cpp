@@ -2,14 +2,6 @@
 
 #include "GameLogic/Systems/AiSystem.h"
 
-#include "GameData/Components/NavMeshComponent.generated.h"
-#include "GameData/Components/AiControllerComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
-#include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/PathBlockingGeometryComponent.generated.h"
-#include "GameData/Components/DebugDrawComponent.generated.h"
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 

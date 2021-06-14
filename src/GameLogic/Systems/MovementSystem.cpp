@@ -4,11 +4,6 @@
 
 #include <sdl/SDL_keycode.h>
 
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
-#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
-#include "GameData/Components/SpatialTrackComponent.generated.h"
-
 #include "GameData/World.h"
 
 

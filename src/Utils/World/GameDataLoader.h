@@ -7,10 +7,17 @@
 class World;
 class GameData;
 
+namespace RaccoonEcs
+{
+	class InnerDataAccessor;
+}
+
 namespace GameDataLoader
 {
-	void SaveWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
-	void LoadWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	using DataAccessor = const RaccoonEcs::InnerDataAccessor;
+
+	void SaveWorld(World& world, DataAccessor& dataAccessor, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void LoadWorld(World& world, DataAccessor& dataAccessor, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
 	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 	void LoadGameData(GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder);

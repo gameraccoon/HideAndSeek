@@ -8,6 +8,8 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/ImguiComponent.generated.h"
+
 #include "HAL/EngineFwd.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"

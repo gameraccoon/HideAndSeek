@@ -8,11 +8,11 @@
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 
-class AnimationGroupsComponent;
-class AnimationClipsComponent;
-class RenderComponent;
-class StateMachineComponent;
-class WorldCachedDataComponent;
+#include "GameData/Components/RenderComponent.generated.h"
+#include "GameData/Components/AnimationClipsComponent.generated.h"
+#include "GameData/Components/AnimationGroupsComponent.generated.h"
+#include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
 
 /**
  * System that updates animations

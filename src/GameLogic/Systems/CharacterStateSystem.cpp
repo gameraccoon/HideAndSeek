@@ -3,10 +3,6 @@
 #include "GameLogic/Systems/CharacterStateSystem.h"
 
 #include "GameData/Core/Rotator.h"
-#include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/StateMachineComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
-#include "GameData/Components/AnimationGroupsComponent.generated.h"
 
 #include "GameData/Enums/MoveDirection4.generated.h"
 

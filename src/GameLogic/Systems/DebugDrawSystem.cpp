@@ -6,14 +6,6 @@
 
 #include <algorithm>
 
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/NavMeshComponent.generated.h"
-#include "GameData/Components/RenderModeComponent.generated.h"
-#include "GameData/Components/AiControllerComponent.generated.h"
-#include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/WorldCachedDataComponent.generated.h"
-#include "GameData/Components/DebugDrawComponent.generated.h"
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 

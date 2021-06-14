@@ -4,15 +4,16 @@
 
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/SpriteCreatorComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/HealthComponent.generated.h"
+
 #include "GameData/EcsDefinitions.h"
 #include "GameData/Core/Vector2D.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-class TransformComponent;
-class CollisionComponent;
-class HealthComponent;
-class SpriteCreatorComponent;
 
 class TestSpawnShootableUnitsSystem : public RaccoonEcs::System
 {

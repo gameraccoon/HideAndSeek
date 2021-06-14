@@ -10,6 +10,7 @@
 #include "Utils/Geometry/RayTrace.h"
 #include "Utils/Geometry/Collide.h"
 
+#include "UnitTests/TestDataAccessor.h"
 
 struct CollidableObjects
 {
@@ -20,11 +21,11 @@ struct CollidableObjects
 CollidableObjects FillCollidableObjects(World& world)
 {
 	CollidableObjects result;
+
 	{
 		Vector2D rectPos(50.0f, 30.0f);
 		WorldCell& cell = world.getSpatialData().getOrCreateCell(SpatialWorldData::GetCellForPos(rectPos));
-		RaccoonEcs::InnerDataAccessor dataAccessor;
-		EntityManager& cellEntityManager = dataAccessor.getSingleThreadedEntityManager(cell.getEntityManager());
+		EntityManager& cellEntityManager = gTestDataAccessor.getSingleThreadedEntityManager(cell.getEntityManager());
 		Entity entity = cellEntityManager.addEntity();
 		TransformComponent* transform = cellEntityManager.addComponent<TransformComponent>(entity);
 		transform->setLocation(rectPos);
@@ -42,8 +43,7 @@ CollidableObjects FillCollidableObjects(World& world)
 	{
 		Vector2D circlePos(550.0f, 30.0f);
 		WorldCell& cell = world.getSpatialData().getOrCreateCell(SpatialWorldData::GetCellForPos(circlePos));
-		RaccoonEcs::InnerDataAccessor dataAccessor;
-		EntityManager& cellEntityManager = dataAccessor.getSingleThreadedEntityManager(cell.getEntityManager());
+		EntityManager& cellEntityManager = gTestDataAccessor.getSingleThreadedEntityManager(cell.getEntityManager());
 		Entity entity = cellEntityManager.addEntity();
 		TransformComponent* transform = cellEntityManager.addComponent<TransformComponent>(entity);
 		transform->setLocation(circlePos);
@@ -68,7 +68,7 @@ TEST(Raytrace, FastTraceRect1)
 	World world(componentFactory, entityGenerator);
 	FillCollidableObjects(world);
 
-	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter;
+	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter(gTestDataAccessor);
 
 	EXPECT_TRUE(RayTrace::FastTrace(world, collisionFilter, Vector2D(20.f, 20.f), Vector2D(80.f, 60.f))); // out-pierce-out
 
@@ -89,7 +89,7 @@ TEST(Raytrace, FastTraceRect2)
 	World world(componentFactory, entityGenerator);
 	FillCollidableObjects(world);
 
-	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter;
+	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter(gTestDataAccessor);
 
 	EXPECT_TRUE(RayTrace::FastTrace(world, collisionFilter, Vector2D(35.f, 15.f), Vector2D(65.f, 45.f)));
 
@@ -105,7 +105,7 @@ TEST(Raytrace, TraceRect)
 
 	CollidableObjects objects = FillCollidableObjects(world);
 
-	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter;
+	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter(gTestDataAccessor);
 
 	RayTrace::TraceResult traceResult = RayTrace::Trace(world, collisionFilter, Vector2D(20.f, 20.f), Vector2D(80.f, 60.f));
 
@@ -121,7 +121,7 @@ TEST(Raytrace, FastTraceCircle)
 	World world(componentFactory, entityGenerator);
 	FillCollidableObjects(world);
 
-	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter;
+	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter(gTestDataAccessor);
 
 	EXPECT_TRUE(RayTrace::FastTrace(world, collisionFilter, Vector2D(520.f, 20.f), Vector2D(580.f, 60.f))); // out-pierce-out
 
@@ -147,7 +147,7 @@ TEST(Raytrace, TraceCircle)
 
 	CollidableObjects objects = FillCollidableObjects(world);
 
-	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter;
+	RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter(gTestDataAccessor);
 
 	RayTrace::TraceResult traceResult = RayTrace::Trace(world, collisionFilter, Vector2D(520.f, 20.f), Vector2D(580.f, 60.f));
 

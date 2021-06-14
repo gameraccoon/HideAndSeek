@@ -5,9 +5,9 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
+#include "GameData/Components/DeathComponent.generated.h"
 
-class DeathComponent;
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 /**
  * System that destructs enemies marked with DeathComponent

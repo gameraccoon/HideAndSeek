@@ -4,11 +4,6 @@
 
 #include <algorithm>
 
-#include "GameData/Components/RenderComponent.generated.h"
-#include "GameData/Components/AnimationClipsComponent.generated.h"
-#include "GameData/Components/AnimationGroupsComponent.generated.h"
-#include "GameData/Components/StateMachineComponent.generated.h"
-#include "GameData/Components/WorldCachedDataComponent.generated.h"
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 

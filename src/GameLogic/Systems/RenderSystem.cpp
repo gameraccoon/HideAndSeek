@@ -5,13 +5,6 @@
 #include <algorithm>
 #include <ranges>
 
-#include "GameData/Components/RenderComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/LightComponent.generated.h"
-#include "GameData/Components/LightBlockingGeometryComponent.generated.h"
-#include "GameData/Components/RenderModeComponent.generated.h"
-#include "GameData/Components/WorldCachedDataComponent.generated.h"
-#include "GameData/Components/BackgroundTextureComponent.generated.h"
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 

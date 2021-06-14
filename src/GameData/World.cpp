@@ -26,36 +26,37 @@ nlohmann::json World::toJson(const Json::ComponentSerializationHolder& jsonSeria
 	};
 }
 
-static void InitSpatialTrackedEntities(SpatialWorldData& spatialData, ComponentSetHolder& worldComponents)
+static void InitSpatialTrackedEntities(SpatialWorldData& spatialData, const RaccoonEcs::InnerDataAccessor& dataAccessor, ComponentSetHolder& worldComponents)
 {
-	RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent> trackedEntitiesFilter;
-	RaccoonEcs::ComponentFilter<const SpatialTrackComponent> trackFilter;
+	auto [trackedSpatialEntities] = worldComponents.getComponents<TrackedSpatialEntitiesComponent>();
 
-	auto [trackedSpatialEntities] = trackedEntitiesFilter.getComponents(worldComponents);
-
-	spatialData.getAllCellManagers().forEachSpatialComponentSet(
-		trackFilter,
-		[trackedSpatialEntities](WorldCell* cell, const SpatialTrackComponent* spatialTrack)
+	auto& cells = spatialData.getAllCells();
+	for (auto& cellPair : cells)
 	{
-		auto it = trackedSpatialEntities->getEntitiesRef().find(spatialTrack->getId());
-		if (it != trackedSpatialEntities->getEntitiesRef().end())
+		EntityManager& entityManager = dataAccessor.getSingleThreadedEntityManager(cellPair.second.getEntityManager());
+		entityManager.forEachComponentSet<const SpatialTrackComponent>(
+			[trackedSpatialEntities, cell = &cellPair.second](const SpatialTrackComponent* spatialTrack)
 		{
-			it->second.cell = cell->getPos();
-		}
-		else
-		{
-			ReportError("No tracked spatial entity record found for entity %d", spatialTrack->getId());
-		}
-	});
+			auto it = trackedSpatialEntities->getEntitiesRef().find(spatialTrack->getId());
+			if (it != trackedSpatialEntities->getEntitiesRef().end())
+			{
+				it->second.cell = cell->getPos();
+			}
+			else
+			{
+				ReportError("No tracked spatial entity record found for entity %d", spatialTrack->getId());
+			}
+		});
+	}
 }
 
-void World::fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder)
+void World::fromJson(const nlohmann::json& json, const RaccoonEcs::InnerDataAccessor& dataAccessor, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
 	Json::DeserializeEntityManager(mEntityManager, json.at("entity_manager"), jsonSerializerHolder);
 	Json::DeserializeComponentSetHolder(mWorldComponents, json.at("world_components"), jsonSerializerHolder);
 	mSpatialData.fromJson(json.at("spatial_data"), jsonSerializerHolder);
 
-	InitSpatialTrackedEntities(mSpatialData, mWorldComponents);
+	InitSpatialTrackedEntities(mSpatialData, dataAccessor, mWorldComponents);
 }
 
 std::optional<std::pair<AsyncEntityView, CellPos>> World::getTrackedSpatialEntity(TrackedListConstFilter& filter, StringId entityStringId)

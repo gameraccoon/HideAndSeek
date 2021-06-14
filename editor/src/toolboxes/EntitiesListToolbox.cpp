@@ -15,6 +15,8 @@
 
 #include "src/toolboxes/PrefabListToolbox.h"
 
+#include "src/EditorDataAccessor.h"
+
 const QString EntitiesListToolbox::WidgetName = "EntitiesList";
 const QString EntitiesListToolbox::ToolboxName = EntitiesListToolbox::WidgetName + "Toolbox";
 const QString EntitiesListToolbox::ContainerName = EntitiesListToolbox::WidgetName + "Container";
@@ -116,7 +118,7 @@ void EntitiesListToolbox::updateContent()
 		return;
 	}
 
-	const auto& entities = currentWorld->getEntityManager().getEntities();
+	const auto& entities = gEditorDataAccessor.getSingleThreadedEntityManager(currentWorld->getEntityManager()).getEntities();
 	if (QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName))
 	{
 		for (Entity entity : entities)
@@ -239,8 +241,9 @@ void EntitiesListToolbox::bindEvents()
 {
 	if (World* currentWorld = mMainWindow->getCurrentWorld())
 	{
-		mOnEntityAddedHandle = currentWorld->getEntityManager().onEntityAdded.bind([this]{updateContent();});
-		mOnEntityRemovedHandle = currentWorld->getEntityManager().onEntityRemoved.bind([this]{updateContent();});
+		EntityManager& worldEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(currentWorld->getEntityManager());
+		mOnEntityAddedHandle = worldEntityManager.onEntityAdded.bind([this]{updateContent();});
+		mOnEntityRemovedHandle = worldEntityManager.onEntityRemoved.bind([this]{updateContent();});
 	}
 }
 
@@ -248,7 +251,8 @@ void EntitiesListToolbox::unbindEvents()
 {
 	if (World* currentWorld = mMainWindow->getCurrentWorld())
 	{
-		currentWorld->getEntityManager().onEntityAdded.unbind(mOnEntityAddedHandle);
-		currentWorld->getEntityManager().onEntityRemoved.unbind(mOnEntityRemovedHandle);
+		EntityManager& worldEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(currentWorld->getEntityManager());
+		worldEntityManager.onEntityAdded.unbind(mOnEntityAddedHandle);
+		worldEntityManager.onEntityRemoved.unbind(mOnEntityRemovedHandle);
 	}
 }

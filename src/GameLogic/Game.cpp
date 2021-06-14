@@ -44,8 +44,11 @@ void Game::start(ArgumentsParser& arguments)
 
 	initSystems();
 
-	GameDataLoader::LoadWorld(mWorld, arguments.getArgumentValue("world", "test"), mComponentSerializers);
-	GameDataLoader::LoadGameData(mGameData, arguments.getArgumentValue("gameData", "gameData"), mComponentSerializers);
+	mSystemsManager.preStartInit([this, &arguments](const RaccoonEcs::InnerDataAccessor& dataAccessor)
+	{
+		GameDataLoader::LoadWorld(mWorld, dataAccessor, arguments.getArgumentValue("world", "test"), mComponentSerializers);
+		GameDataLoader::LoadGameData(mGameData, arguments.getArgumentValue("gameData", "gameData"), mComponentSerializers);
+	});
 
 	// ToDo: make an editor not to hardcode SM data
 	auto [sm] = mGameData.getGameComponents().getComponents<StateMachineComponent>();
@@ -93,112 +96,123 @@ void Game::update(float dt)
 
 void Game::initSystems()
 {
-	mSystemsManager.registerSystem<ControlSystem>(
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
-		RaccoonEcs::ComponentFilter<CharacterStateComponent>(),
-		RaccoonEcs::ComponentFilter<ImguiComponent>(),
-		RaccoonEcs::ComponentFilter<RenderModeComponent>(),
-		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>(),
-		RaccoonEcs::ComponentFilter<const TransformComponent>(),
+	mSystemsManager.registerSystem<ControlSystem,
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
+		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
+		RaccoonEcs::ComponentFilter<ImguiComponent>,
+		RaccoonEcs::ComponentFilter<RenderModeComponent>,
+		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>,
+		RaccoonEcs::ComponentFilter<const TransformComponent>>(
+		RaccoonEcs::SystemDependencies().dependsOn<AiSystem>(),
 		mWorldHolder,
 		mInputData
 	);
 
-	mSystemsManager.registerSystem<AiSystem>(
-		RaccoonEcs::ComponentAdder<NavMeshComponent>(),
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>(),
-		RaccoonEcs::ComponentFilter<const TransformComponent>(),
-		RaccoonEcs::ComponentFilter<AiControllerComponent, const TransformComponent, MovementComponent, CharacterStateComponent>(),
-		RaccoonEcs::ComponentFilter<DebugDrawComponent>(),
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
-		RaccoonEcs::ComponentFilter<const PathBlockingGeometryComponent>(),
+	mSystemsManager.registerSystem<AiSystem,
+		RaccoonEcs::ComponentAdder<NavMeshComponent>,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>,
+		RaccoonEcs::ComponentFilter<const TransformComponent>,
+		RaccoonEcs::ComponentFilter<AiControllerComponent, const TransformComponent, MovementComponent, CharacterStateComponent>,
+		RaccoonEcs::ComponentFilter<DebugDrawComponent>,
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
+		RaccoonEcs::ComponentFilter<const PathBlockingGeometryComponent>>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime
 	);
 
-	mSystemsManager.registerSystem<WeaponSystem>(
-		RaccoonEcs::ComponentFilter<WeaponComponent, CharacterStateComponent>(),
-		RaccoonEcs::ComponentFilter<const TransformComponent>(),
-		RaccoonEcs::ComponentFilter<HealthComponent>(),
-		RaccoonEcs::ComponentAdder<DeathComponent>(),
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>(),
+	mSystemsManager.registerSystem<WeaponSystem,
+		RaccoonEcs::ComponentFilter<WeaponComponent, CharacterStateComponent>,
+		RaccoonEcs::ComponentFilter<const TransformComponent>,
+		RaccoonEcs::ComponentFilter<HealthComponent>,
+		RaccoonEcs::ComponentAdder<DeathComponent>,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime
 	);
 
-	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem>(
-		RaccoonEcs::ComponentFilter<const DeathComponent>(),
-		RaccoonEcs::EntityRemover(),
+	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem,
+		RaccoonEcs::ComponentFilter<const DeathComponent>,
+		RaccoonEcs::EntityRemover>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder
 	);
 
-	mSystemsManager.registerSystem<CollisionSystem>(
-		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>(),
-		RaccoonEcs::ComponentFilter<MovementComponent>(),
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>(),
+	mSystemsManager.registerSystem<CollisionSystem,
+		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>,
+		RaccoonEcs::ComponentFilter<MovementComponent>,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder
 	);
 
-	mSystemsManager.registerSystem<CameraSystem>(
-		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>(),
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>(),
-		RaccoonEcs::ComponentFilter<const TransformComponent>(),
-		RaccoonEcs::ComponentFilter<const ImguiComponent>(),
-		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>(),
+	mSystemsManager.registerSystem<CameraSystem,
+		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>,
+		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
+		RaccoonEcs::ComponentFilter<const TransformComponent>,
+		RaccoonEcs::ComponentFilter<const ImguiComponent>,
+		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mInputData
 	);
 
-	mSystemsManager.registerSystem<MovementSystem>(
-		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>(),
-		RaccoonEcs::ComponentFilter<SpatialTrackComponent>(),
-		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>(),
-		RaccoonEcs::EntityTransferer(),
+	mSystemsManager.registerSystem<MovementSystem,
+		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>,
+		RaccoonEcs::ComponentFilter<SpatialTrackComponent>,
+		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>,
+		RaccoonEcs::EntityTransferer>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime
 	);
 
-	mSystemsManager.registerSystem<CharacterStateSystem>(
-		RaccoonEcs::ComponentFilter<const StateMachineComponent>(),
-		RaccoonEcs::ComponentFilter<CharacterStateComponent>(),
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>(),
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>(),
+	mSystemsManager.registerSystem<CharacterStateSystem,
+		RaccoonEcs::ComponentFilter<const StateMachineComponent>,
+		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
+		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>,
+		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime
 	);
 
-	mSystemsManager.registerSystem<ResourceStreamingSystem>(
-		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>(),
-		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>(),
-		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>(),
-		RaccoonEcs::ComponentAdder<RenderComponent>(),
-		RaccoonEcs::ComponentAdder<AnimationClipsComponent>(),
-		RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent>(),
-		RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent>(),
-		RaccoonEcs::ComponentAdder<AnimationGroupsComponent>(),
-		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>(),
-		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>(),
-		RaccoonEcs::ScheduledActionsExecutor(),
+	mSystemsManager.registerSystem<ResourceStreamingSystem,
+		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>,
+		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>,
+		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>,
+		RaccoonEcs::ComponentAdder<RenderComponent>,
+		RaccoonEcs::ComponentAdder<AnimationClipsComponent>,
+		RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent>,
+		RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent>,
+		RaccoonEcs::ComponentAdder<AnimationGroupsComponent>,
+		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>,
+		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>,
+		RaccoonEcs::ScheduledActionsExecutor>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		getResourceManager()
 	);
 
-	mSystemsManager.registerSystem<AnimationSystem>(
-		RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent>(),
-		RaccoonEcs::ComponentFilter<AnimationClipsComponent, RenderComponent>(),
-		RaccoonEcs::ComponentFilter<const StateMachineComponent>(),
-		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>(),
+	mSystemsManager.registerSystem<AnimationSystem,
+		RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent>,
+		RaccoonEcs::ComponentFilter<AnimationClipsComponent, RenderComponent>,
+		RaccoonEcs::ComponentFilter<const StateMachineComponent>,
+		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime
 	);
 
-	mSystemsManager.registerSystem<RenderSystem>(
-		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>(),
-		RaccoonEcs::ComponentFilter<const RenderModeComponent>(),
-		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>(), // hey, why isn't it const?
-		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>(),
-		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>(),
-		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>(),
+	mSystemsManager.registerSystem<RenderSystem,
+		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>,
+		RaccoonEcs::ComponentFilter<const RenderModeComponent>,
+		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>, // hey, why isn't it const?
+		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>,
+		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>,
+		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime,
 		getEngine(),
@@ -206,14 +220,15 @@ void Game::initSystems()
 		mJobsWorkerManager
 	);
 
-	mSystemsManager.registerSystem<DebugDrawSystem>(
-		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>(),
-		RaccoonEcs::ComponentFilter<const RenderModeComponent>(),
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>(),
-		RaccoonEcs::ComponentFilter<const NavMeshComponent>(),
-		RaccoonEcs::ComponentFilter<const AiControllerComponent>(),
-		RaccoonEcs::ComponentFilter<const DebugDrawComponent>(),
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>(),
+	mSystemsManager.registerSystem<DebugDrawSystem,
+		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>,
+		RaccoonEcs::ComponentFilter<const RenderModeComponent>,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>,
+		RaccoonEcs::ComponentFilter<const NavMeshComponent>,
+		RaccoonEcs::ComponentFilter<const AiControllerComponent>,
+		RaccoonEcs::ComponentFilter<const DebugDrawComponent>,
+		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>>(
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime,
 		getEngine(),
@@ -221,9 +236,10 @@ void Game::initSystems()
 	);
 
 #ifdef IMGUI_ENABLED
-	mSystemsManager.registerSystem<ImguiSystem>(
-		RaccoonEcs::ComponentAdder<ImguiComponent>(),
-		RaccoonEcs::InnerDataAccessor(),
+	mSystemsManager.registerSystem<ImguiSystem,
+		RaccoonEcs::ComponentAdder<ImguiComponent>,
+		RaccoonEcs::InnerDataAccessor>(
+		RaccoonEcs::SystemDependencies(),
 		mImguiDebugData,
 		getEngine()
 	);

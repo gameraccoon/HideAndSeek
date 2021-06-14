@@ -4,8 +4,6 @@
 
 #include "Base/Types/TemplateAliases.h"
 
-#include "GameData/Components/DeathComponent.generated.h"
-
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 

@@ -29,7 +29,7 @@ public:
 	[[nodiscard]] const SpatialWorldData& getSpatialData() const { return mSpatialData; }
 
 	[[nodiscard]] nlohmann::json toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder);
-	void fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void fromJson(const nlohmann::json& json, const RaccoonEcs::InnerDataAccessor& dataAccessor, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
 	std::optional<std::pair<AsyncEntityView, CellPos>> getTrackedSpatialEntity(TrackedListConstFilter& filter, StringId entityStringId);
 	AsyncEntityView createTrackedSpatialEntity(TrackedListAdder& trackingAdder, TrackAdder& trackAdder, EntityAdder& entityAdder, StringId entityStringId, CellPos pos);

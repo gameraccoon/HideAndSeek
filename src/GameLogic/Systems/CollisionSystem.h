@@ -5,11 +5,11 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
 
-class CollisionComponent;
-class TransformComponent;
-class MovementComponent;
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 /**
  * System that resolve object collisions

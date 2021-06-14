@@ -4,12 +4,6 @@
 
 #include "GameData/World.h"
 
-#include "GameData/Components/NavMeshComponent.generated.h"
-#include "GameData/Components/AiControllerComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
-
 
 TestCircularUnitsSystem::TestCircularUnitsSystem(
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,

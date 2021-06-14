@@ -5,13 +5,13 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/AnimationGroupsComponent.generated.h"
+
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
-
-class StateMachineComponent;
-class CharacterStateComponent;
-class MovementComponent;
-class AnimationGroupsComponent;
 
 /**
  * System that ensures correct character state

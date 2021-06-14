@@ -6,6 +6,14 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/RenderComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/LightComponent.generated.h"
+#include "GameData/Components/LightBlockingGeometryComponent.generated.h"
+#include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/BackgroundTextureComponent.generated.h"
+
 #include "Utils/Jobs/WorkerManager.h"
 
 #include "HAL/Base/ResourceManager.h"
@@ -13,16 +21,6 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
-
-struct Vector2D;
-class WorldCachedDataComponent;
-class RenderModeComponent;
-class BackgroundTextureComponent;
-class LightBlockingGeometryComponent;
-class RenderComponent;
-class TransformComponent;
-class LightComponent;
-class TransformComponent;
 
 /**
  * System that handles rendering of world objects

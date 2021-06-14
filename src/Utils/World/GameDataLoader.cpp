@@ -27,7 +27,7 @@ namespace GameDataLoader
 	static const std::filesystem::path MAPS_PATH = "./resources/maps";
 	static const std::filesystem::path GAME_DATA_PATH = "./resources/game";
 
-	static void SaveLightBlockingGeometry(const World& world, const std::filesystem::path& levelPath, const std::string& version)
+	static void SaveLightBlockingGeometry(const World& world, DataAccessor& /*dataAccessor*/, const std::filesystem::path& levelPath, const std::string& version)
 	{
 		namespace fs = std::filesystem;
 
@@ -54,9 +54,9 @@ namespace GameDataLoader
 		geometryFile << std::setw(4) << geometryJson << std::endl;
 	}
 
-	static void GenerateLightBlockingGeometry(World& world)
+	static void GenerateLightBlockingGeometry(World& world, DataAccessor& dataAccessor)
 	{
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter;
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter(dataAccessor);
 		TupleVector<WorldCell*, const CollisionComponent*, const TransformComponent*> components;
 		world.getSpatialData().getAllCellManagers().getSpatialComponents(collisionFilter, components);
 		std::unordered_map<CellPos, std::vector<SimpleBorder>> lightBlockingGeometryPieces;
@@ -71,7 +71,7 @@ namespace GameDataLoader
 		}
 	}
 
-	static void LoadLightBlockingGeometry(World& world, const std::filesystem::path& levelPath, const std::string& levelVersion)
+	static void LoadLightBlockingGeometry(World& world, DataAccessor& dataAccessor, const std::filesystem::path& levelPath, const std::string& levelVersion)
 	{
 		namespace fs = std::filesystem;
 
@@ -81,7 +81,7 @@ namespace GameDataLoader
 		if (!fs::exists(geometryPath))
 		{
 			LogInfo("Light blocking geometry not found for level '%s', rebuilding", levelPath.filename().string().c_str());
-			GenerateLightBlockingGeometry(world);
+			GenerateLightBlockingGeometry(world, dataAccessor);
 			return;
 		}
 
@@ -92,7 +92,7 @@ namespace GameDataLoader
 		if (geometryJson["version"] != levelVersion)
 		{
 			LogWarning("Light blocking geometry for level '%s' has incorrect version, discarding it and rebuilding", levelPath.filename().string().c_str());
-			GenerateLightBlockingGeometry(world);
+			GenerateLightBlockingGeometry(world, dataAccessor);
 			return;
 		}
 
@@ -107,7 +107,7 @@ namespace GameDataLoader
 		}
 	}
 
-	static void SavePathBlockingGeometry(const World& world, const std::filesystem::path& levelPath, const std::string& version)
+	static void SavePathBlockingGeometry(const World& world, DataAccessor& /*dataAccessor*/, const std::filesystem::path& levelPath, const std::string& version)
 	{
 		namespace fs = std::filesystem;
 
@@ -129,9 +129,9 @@ namespace GameDataLoader
 		}
 	}
 
-	static void GeneratePathBlockingGeometry(World& world)
+	static void GeneratePathBlockingGeometry(World& world, DataAccessor& dataAccessor)
 	{
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter;
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter(dataAccessor);
 		TupleVector<const CollisionComponent*, const TransformComponent*> components;
 		world.getSpatialData().getAllCellManagers().getComponents(collisionFilter, components);
 
@@ -140,7 +140,7 @@ namespace GameDataLoader
 		PathBlockingGeometry::CalculatePathBlockingGeometry(pathBlockingGeometry->getPolygonsRef(), components);
 	}
 
-	static void LoadPathBlockingGeometry(World& world, const std::filesystem::path& levelPath, const std::string& levelVersion)
+	static void LoadPathBlockingGeometry(World& world, DataAccessor& dataAccessor, const std::filesystem::path& levelPath, const std::string& levelVersion)
 	{
 		namespace fs = std::filesystem;
 
@@ -150,7 +150,7 @@ namespace GameDataLoader
 		if (!fs::exists(geometryPath))
 		{
 			LogInfo("Path blocking geometry not found for level '%s', rebuilding", levelPath.filename().string().c_str());
-			GeneratePathBlockingGeometry(world);
+			GeneratePathBlockingGeometry(world, dataAccessor);
 			return;
 		}
 
@@ -161,7 +161,7 @@ namespace GameDataLoader
 		if (geometryJson["version"] != levelVersion)
 		{
 			LogWarning("Path blocking geometry for level '%s' has incorrect version, discarding it and rebuilding", levelPath.filename().string().c_str());
-			GenerateLightBlockingGeometry(world);
+			GenerateLightBlockingGeometry(world, dataAccessor);
 			return;
 		}
 
@@ -169,7 +169,7 @@ namespace GameDataLoader
 		geometryJson["geometry"].get_to(pathBlockingCompontnt->getPolygonsRef());
 	}
 
-	void SaveWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
+	void SaveWorld(World& world, DataAccessor& dataAccessor, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		namespace fs = std::filesystem;
 		fs::path levelPath(levelName);
@@ -199,8 +199,8 @@ namespace GameDataLoader
 
 			mapFile << std::setw(4) << mapJson << std::endl;
 
-			SaveLightBlockingGeometry(world, levelPath, levelVersion);
-			SavePathBlockingGeometry(world, levelPath, levelVersion);
+			SaveLightBlockingGeometry(world, dataAccessor, levelPath, levelVersion);
+			SavePathBlockingGeometry(world, dataAccessor, levelPath, levelVersion);
 		}
 		catch (const std::exception& e)
 		{
@@ -208,7 +208,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void LoadWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
+	void LoadWorld(World& world, DataAccessor& dataAccessor, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		namespace fs = std::filesystem;
 		fs::path levelPath(levelName);
@@ -229,10 +229,10 @@ namespace GameDataLoader
 
 			if (const auto& worldObject = mapJson.at("world"); worldObject.is_object())
 			{
-				world.fromJson(worldObject, jsonSerializerHolder);
+				world.fromJson(worldObject, dataAccessor, jsonSerializerHolder);
 			}
-			LoadLightBlockingGeometry(world, levelPath, levelVersion);
-			LoadPathBlockingGeometry(world, levelPath, levelVersion);
+			LoadLightBlockingGeometry(world, dataAccessor, levelPath, levelVersion);
+			LoadPathBlockingGeometry(world, dataAccessor, levelPath, levelVersion);
 		}
 		catch(const nlohmann::detail::exception& e)
 		{

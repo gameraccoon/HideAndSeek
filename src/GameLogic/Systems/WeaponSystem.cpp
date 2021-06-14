@@ -4,12 +4,6 @@
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
-
-#include "GameData/Components/WeaponComponent.generated.h"
-#include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/HealthComponent.generated.h"
-#include "GameData/Components/DeathComponent.generated.h"
 #include "GameData/Spatial/SpatialEntity.h"
 
 #include "Utils/Geometry/RayTrace.h"

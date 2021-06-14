@@ -3,6 +3,8 @@
 #include <GameData/World.h>
 #include <GameData/Components/TransformComponent.generated.h>
 
+#include "src/EditorDataAccessor.h"
+
 ChangeEntityGroupLocationCommand::ChangeEntityGroupLocationCommand(const std::vector<SpatialEntity>& entities, Vector2D shift)
 	: EditorCommand(EffectBitset(EffectType::ComponentAttributes, EffectType::EntityLocations))
 	, mShift(shift)
@@ -16,12 +18,15 @@ void ChangeEntityGroupLocationCommand::doCommand(World* world)
 	mModifiedEntities.resize(mOriginalEntities.size());
 	mModifiedEntitiesPos.resize(mOriginalEntities.size());
 
+	RaccoonEcs::EntityTransferer entityTransferer(gEditorDataAccessor);
+	RaccoonEcs::ComponentFilter<TransformComponent> transformFilter(gEditorDataAccessor);
+
 	for (size_t i = 0; i < mOriginalEntities.size(); ++i)
 	{
 		const SpatialEntity& spatialEntity = mOriginalEntities[i];
 		if (WorldCell* cell = world->getSpatialData().getCell(spatialEntity.cell))
 		{
-			auto [component] = cell->getEntityManager().getEntityComponents<TransformComponent>(spatialEntity.entity.getEntity());
+			auto [component] = transformFilter.getEntityComponents(cell->getEntityManager(), spatialEntity.entity.getEntity());
 			if (component)
 			{
 				const Vector2D originalPos = component->getLocation();
@@ -36,7 +41,7 @@ void ChangeEntityGroupLocationCommand::doCommand(World* world)
 				if (newCellPos != spatialEntity.cell)
 				{
 					WorldCell& newCell = world->getSpatialData().getOrCreateCell(newCellPos);
-					cell->getEntityManager().transferEntityTo(newCell.getEntityManager(), spatialEntity.entity.getEntity());
+					entityTransferer.transferEntity(cell->getEntityManager(), newCell.getEntityManager(), spatialEntity.entity.getEntity());
 				}
 			}
 		}
@@ -45,12 +50,15 @@ void ChangeEntityGroupLocationCommand::doCommand(World* world)
 
 void ChangeEntityGroupLocationCommand::undoCommand(World* world)
 {
+	RaccoonEcs::EntityTransferer entityTransferer(gEditorDataAccessor);
+	RaccoonEcs::ComponentFilter<TransformComponent> transformFilter(gEditorDataAccessor);
+
 	for (size_t i = 0; i < mModifiedEntities.size(); ++i)
 	{
 		const SpatialEntity& spatialEntity = mModifiedEntities[i];
 		if (WorldCell* cell = world->getSpatialData().getCell(spatialEntity.cell))
 		{
-			auto [component] = cell->getEntityManager().getEntityComponents<TransformComponent>(spatialEntity.entity.getEntity());
+			auto [component] = transformFilter.getEntityComponents(cell->getEntityManager(), spatialEntity.entity.getEntity());
 			if (component)
 			{
 				const Vector2D newLocation = mOriginalEntitiesPos[i];
@@ -61,7 +69,7 @@ void ChangeEntityGroupLocationCommand::undoCommand(World* world)
 				{
 					Assert(mOriginalEntities[i].cell == newCellPos, "Inconsistent undo/redo transformations in ChangeEntityGroupLocationCommand");
 					WorldCell& newCell = world->getSpatialData().getOrCreateCell(newCellPos);
-					cell->getEntityManager().transferEntityTo(newCell.getEntityManager(), spatialEntity.entity.getEntity());
+					entityTransferer.transferEntity(cell->getEntityManager(), newCell.getEntityManager(), spatialEntity.entity.getEntity());
 				}
 			}
 		}

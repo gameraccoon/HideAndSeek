@@ -5,15 +5,15 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/WeaponComponent.generated.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/HealthComponent.generated.h"
+#include "GameData/Components/DeathComponent.generated.h"
+
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
-
-class WeaponComponent;
-class CharacterStateComponent;
-class TransformComponent;
-class HealthComponent;
-class DeathComponent;
-class CollisionComponent;
 
 /**
  * System that handles weapon manipulation

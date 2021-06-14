@@ -65,6 +65,6 @@ void BaseTestCase::finalizeTestCase()
 {
 	if (mProfileSystems)
 	{
-		mSystemFrameRecords.printToFile(mSystemsManager.getSystemNames(), mSystemProfileOutputPath);
+//		mSystemFrameRecords.printToFile(mSystemsManager.getSystemNames(), mSystemProfileOutputPath);
 	}
 }

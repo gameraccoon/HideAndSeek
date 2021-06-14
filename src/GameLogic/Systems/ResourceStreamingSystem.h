@@ -5,17 +5,17 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/SpriteCreatorComponent.generated.h"
+#include "GameData/Components/RenderComponent.generated.h"
+#include "GameData/Components/AnimationClipsComponent.generated.h"
+#include "GameData/Components/AnimationClipCreatorComponent.generated.h"
+#include "GameData/Components/AnimationGroupsComponent.generated.h"
+#include "GameData/Components/AnimationGroupCreatorComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+
 #include "HAL/Base/ResourceManager.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
-
-class WorldCachedDataComponent;
-class SpriteCreatorComponent;
-class RenderComponent;
-class AnimationClipsComponent;
-class AnimationClipCreatorComponent;
-class AnimationGroupsComponent;
-class AnimationGroupCreatorComponent;
 
 /**
  * System that loads and distributes resources

@@ -6,6 +6,8 @@
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Serialization/Json/EntityManager.h"
 
+#include "src/EditorDataAccessor.h"
+
 AddEntityGroupCommand::AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, const Json::ComponentSerializationHolder& jsonSerializerHolder, const Vector2D& shift)
 	: EditorCommand(EffectBitset(EffectType::Entities))
 	, mEntities(entities)
@@ -16,14 +18,16 @@ AddEntityGroupCommand::AddEntityGroupCommand(const std::vector<nlohmann::json>& 
 
 void AddEntityGroupCommand::doCommand(World* world)
 {
+	RaccoonEcs::EntityTransferer entityTransferer(gEditorDataAccessor);
 	mCreatedEntities.clear();
 	CellPos initialPos(0, 0);
 	WorldCell& cell = world->getSpatialData().getOrCreateCell(initialPos);
+	EntityManager& cellEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(cell.getEntityManager());
 	for (const auto& serializedObject : mEntities)
 	{
 		CellPos cellPos = initialPos;
-		Entity entity = Json::CreatePrefabInstance(cell.getEntityManager(), serializedObject, mSerializationHolder);
-		auto [transform] = cell.getEntityManager().getEntityComponents<TransformComponent>(entity);
+		Entity entity = Json::CreatePrefabInstance(cellEntityManager, serializedObject, mSerializationHolder);
+		auto [transform] = cellEntityManager.getEntityComponents<TransformComponent>(entity);
 		if (transform)
 		{
 			Vector2D newPos = transform->getLocation() + mShift;
@@ -32,8 +36,9 @@ void AddEntityGroupCommand::doCommand(World* world)
 			cellPos = SpatialWorldData::GetCellForPos(newPos);
 			if (cellPos != initialPos)
 			{
+				WorldCell& otherCell = world->getSpatialData().getOrCreateCell(cellPos);
 				// the component pointer get invalidated from this line
-				cell.getEntityManager().transferEntityTo(world->getSpatialData().getOrCreateCell(cellPos).getEntityManager(), entity);
+				entityTransferer.transferEntity(cell.getEntityManager(), otherCell.getEntityManager(), entity);
 			}
 		}
 		mCreatedEntities.emplace_back(entity, cellPos);
@@ -42,8 +47,10 @@ void AddEntityGroupCommand::doCommand(World* world)
 
 void AddEntityGroupCommand::undoCommand(World* world)
 {
+	RaccoonEcs::EntityRemover entityRemover(gEditorDataAccessor);
 	for (auto [entity, cellPos] : mCreatedEntities)
 	{
-		world->getSpatialData().getOrCreateCell(cellPos).getEntityManager().removeEntity(entity.getEntity());
+		WorldCell& cell = world->getSpatialData().getOrCreateCell(cellPos);
+		entityRemover.removeEntity(cell.getEntityManager(), entity.getEntity());
 	}
 }

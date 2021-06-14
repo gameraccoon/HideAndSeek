@@ -4,13 +4,14 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/NavMeshComponent.generated.h"
+#include "GameData/Components/AiControllerComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
-
-class TrackedSpatialEntitiesComponent;
-class TransformComponent;
-class AiControllerComponent;
-class MovementComponent;
 
 class TestCircularUnitsSystem : public RaccoonEcs::System
 {

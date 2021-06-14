@@ -5,11 +5,12 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/DeathComponent.generated.h"
+
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
 #include "AutoTests/Tests/WeaponShooting/DestroyedEntitiesTestCheck.h"
 
-class DeathComponent;
 
 class TestDestroyedEntitiesRegistrationSystem : public RaccoonEcs::System
 {

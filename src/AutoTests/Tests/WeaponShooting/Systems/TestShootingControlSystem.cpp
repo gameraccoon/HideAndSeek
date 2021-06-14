@@ -6,12 +6,6 @@
 
 #include "GameData/World.h"
 
-#include "GameData/Components/HealthComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/WeaponComponent.generated.h"
-#include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
-
 
 TestShootingControlSystem::TestShootingControlSystem(
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,

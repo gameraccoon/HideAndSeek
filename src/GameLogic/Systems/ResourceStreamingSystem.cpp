@@ -2,14 +2,6 @@
 
 #include "GameLogic/Systems/ResourceStreamingSystem.h"
 
-#include "GameData/Components/SpriteCreatorComponent.generated.h"
-#include "GameData/Components/RenderComponent.generated.h"
-#include "GameData/Components/AnimationClipsComponent.generated.h"
-#include "GameData/Components/AnimationClipCreatorComponent.generated.h"
-#include "GameData/Components/AnimationGroupsComponent.generated.h"
-#include "GameData/Components/AnimationGroupCreatorComponent.generated.h"
-#include "GameData/Components/WorldCachedDataComponent.generated.h"
-
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 

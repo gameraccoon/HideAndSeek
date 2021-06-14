@@ -22,6 +22,7 @@
 #include "toolboxes/EntitiesListToolbox.h"
 #include "toolboxes/PrefabListToolbox.h"
 #include "toolboxes/TransformEditorToolbox.h"
+#include "EditorDataAccessor.h"
 
 #include <QFileDialog>
 #include <QProcess>
@@ -191,7 +192,7 @@ void MainWindow::on_actionOpen_World_triggered()
 	}
 
 	createWorld();
-	GameDataLoader::LoadWorld(*mCurrentWorld.get(), fileName, mComponentSerializationHolder);
+	GameDataLoader::LoadWorld(*mCurrentWorld.get(), gEditorDataAccessor, fileName, mComponentSerializationHolder);
 	mOpenedWorldPath = fileName;
 	ui->actionCreate->setEnabled(true);
 	ui->actionCreate_Spatial->setEnabled(true);
@@ -260,7 +261,8 @@ void MainWindow::on_actionCreate_triggered()
 {
 	if (mCurrentWorld)
 	{
-		mCommandStack.executeNewCommand<AddEntityCommand>(mCurrentWorld.get(), mCurrentWorld->getEntityManager().getNonExistentEntity());
+		EntityManager& worldEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(mCurrentWorld->getEntityManager());
+		mCommandStack.executeNewCommand<AddEntityCommand>(mCurrentWorld.get(), worldEntityManager.getNonExistentEntity());
 	}
 }
 
@@ -295,7 +297,8 @@ void MainWindow::on_actionCreate_Spatial_triggered()
 {
 	if (mCurrentWorld)
 	{
-		SpatialEntity entity{mCurrentWorld->getEntityManager().getNonExistentEntity(), CellPos(0, 0)};
+		EntityManager& worldEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(mCurrentWorld->getEntityManager());
+		SpatialEntity entity{worldEntityManager.getNonExistentEntity(), CellPos(0, 0)};
 		Vector2D location{ZERO_VECTOR};
 		if (mTransformEditorToolbox->isShown())
 		{

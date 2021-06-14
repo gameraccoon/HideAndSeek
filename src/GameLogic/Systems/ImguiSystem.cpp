@@ -11,7 +11,6 @@
 #include <SDL_opengl.h>
 
 #include "GameData/GameData.h"
-#include "GameData/Components/ImguiComponent.generated.h"
 
 #include "HAL/Base/Engine.h"
 

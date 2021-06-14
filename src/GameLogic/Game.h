@@ -1,6 +1,6 @@
 #pragma once
 
-#include <raccoon-ecs/systems_manager.h>
+#include <raccoon-ecs/async_systems_manager.h>
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
@@ -44,7 +44,7 @@ private:
 
 	InputData mInputData;
 
-	RaccoonEcs::SystemsManager mSystemsManager;
+	RaccoonEcs::AsyncSystemsManager mSystemsManager;
 	Json::ComponentSerializationHolder mComponentSerializers;
 	Jobs::WorkerManager mJobsWorkerManager{Jobs::GetAvailableThreadsCount()};
 	TimeData mTime;

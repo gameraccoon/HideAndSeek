@@ -5,14 +5,13 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/ImguiComponent.generated.h"
+
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/InputData.h"
-
-class TransformComponent;
-class MovementComponent;
-class TrackedSpatialEntitiesComponent;
-class ImguiComponent;
-class WorldCachedDataComponent;
 
 /**
  * System that handles camera position

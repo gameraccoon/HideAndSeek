@@ -6,21 +6,20 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/NavMeshComponent.generated.h"
+#include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/Components/AiControllerComponent.generated.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/DebugDrawComponent.generated.h"
+
 #include "HAL/Base/ResourceManager.h"
 #include "HAL/EngineFwd.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
-
-struct Vector2D;
-class WorldCachedDataComponent;
-class TransformComponent;
-class CollisionComponent;
-class NavMeshComponent;
-class RenderModeComponent;
-class AiControllerComponent;
-class DebugDrawComponent;
-class CharacterStateComponent;
 
 /**
  * System that handles rendering of world objects

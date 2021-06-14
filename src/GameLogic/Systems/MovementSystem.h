@@ -5,13 +5,13 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
+#include "GameData/Components/SpatialTrackComponent.generated.h"
+
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
-
-class MovementComponent;
-class TransformComponent;
-class SpatialTrackComponent;
-class TrackedSpatialEntitiesComponent;
 
 /**
  * System that process characters and objects movement

@@ -14,6 +14,8 @@
 #include "Utils/Geometry/LightBlockingGeometry.h"
 #include "Utils/AI/PathBlockingGeometry.h"
 
+#include "src/EditorDataAccessor.h"
+
 namespace Utils
 {
 	template<typename Component>
@@ -30,8 +32,9 @@ namespace Utils
 	{
 		RemoveCellComponent<LightBlockingGeometryComponent>(world);
 
-		TupleVector<WorldCell*, CollisionComponent*, TransformComponent*> components;
-		world.getSpatialData().getAllCellManagers().getSpatialComponents<CollisionComponent, TransformComponent>(components);
+		TupleVector<WorldCell*, const CollisionComponent*, const TransformComponent*> components;
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter(gEditorDataAccessor);
+		world.getSpatialData().getAllCellManagers().getSpatialComponents(collisionFilter, components);
 		std::unordered_map<CellPos, std::vector<SimpleBorder>> lightBlockingGeometryPieces;
 		LightBlockingGeometry::CalculateLightGeometry(lightBlockingGeometryPieces, components);
 
@@ -60,8 +63,9 @@ namespace Utils
 
 	static void RefreshPathBlockingGeometry(World& world)
 	{
-		TupleVector<CollisionComponent*, TransformComponent*> components;
-		world.getSpatialData().getAllCellManagers().getComponents<CollisionComponent, TransformComponent>(components);
+		TupleVector<const CollisionComponent*, const TransformComponent*> components;
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent> collisionFilter(gEditorDataAccessor);
+		world.getSpatialData().getAllCellManagers().getComponents(collisionFilter, components);
 
 		PathBlockingGeometryComponent* pathBlockingGeometry = world.getWorldComponents().getOrAddComponent<PathBlockingGeometryComponent>();
 
@@ -73,6 +77,6 @@ namespace Utils
 		RefreshLightBlockingGeometry(world);
 		RefreshPathBlockingGeometry(world);
 		world.clearCaches();
-		GameDataLoader::SaveWorld(world, fileName, jsonSerializerHolder);
+		GameDataLoader::SaveWorld(world, gEditorDataAccessor, fileName, jsonSerializerHolder);
 	}
 }

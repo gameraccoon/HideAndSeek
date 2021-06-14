@@ -5,13 +5,6 @@
 #include <sdl/SDL_keycode.h>
 #include <sdl/SDL_mouse.h>
 
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
-#include "GameData/Components/RenderModeComponent.generated.h"
-#include "GameData/Components/ImguiComponent.generated.h"
-#include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/WorldCachedDataComponent.generated.h"
-
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 

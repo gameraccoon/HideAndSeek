@@ -6,11 +6,6 @@
 
 #include <sdl/SDL_keycode.h>
 
-#include "GameData/Components/SpriteCreatorComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/HealthComponent.generated.h"
-
 #include "GameData/World.h"
 #include "GameData/Spatial/SpatialWorldData.h"
 
