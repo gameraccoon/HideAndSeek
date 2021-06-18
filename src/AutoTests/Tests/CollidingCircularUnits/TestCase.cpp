@@ -120,7 +120,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		mWorkerManager
 	);
 
-	mSystemsManager.preStartInit([this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
+	mSystemsManager.init([this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 	{
 		Vector2D playerPos{ZERO_VECTOR};
 

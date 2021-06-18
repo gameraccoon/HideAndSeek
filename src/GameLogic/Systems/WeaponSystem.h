@@ -32,7 +32,7 @@ public:
 	) noexcept;
 
 	void update() override;
-	std::string getName() const override { return "WeaponSystem"; }
+	static std::string GetSystemId() { return "WeaponSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<WeaponComponent, CharacterStateComponent> mStateAndWeaponFilter;

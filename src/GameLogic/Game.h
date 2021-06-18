@@ -44,7 +44,7 @@ private:
 
 	InputData mInputData;
 
-	RaccoonEcs::AsyncSystemsManager mSystemsManager;
+	RaccoonEcs::AsyncSystemsManager<StringId> mSystemsManager;
 	Json::ComponentSerializationHolder mComponentSerializers;
 	Jobs::WorkerManager mJobsWorkerManager{Jobs::GetAvailableThreadsCount()};
 	TimeData mTime;

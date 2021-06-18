@@ -26,7 +26,7 @@ public:
 	~TestCircularUnitsSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "TestCircularUnitsSystem"; }
+	static std::string GetSystemId() { return "TestCircularUnitsSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent> mTrackedFilter;

@@ -30,7 +30,7 @@ public:
 	~AnimationSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "AnimationSystem"; }
+	static std::string GetSystemId() { return "AnimationSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent> mAnimUpdateFilter;

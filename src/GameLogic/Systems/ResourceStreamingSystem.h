@@ -40,7 +40,7 @@ public:
 	~ResourceStreamingSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "ResourceStreamingSystem"; }
+	static std::string GetSystemId() { return "ResourceStreamingSystem"; }
 
 private:
 	RaccoonEcs::ComponentAdder<WorldCachedDataComponent> mWorldCachedDataAdder;

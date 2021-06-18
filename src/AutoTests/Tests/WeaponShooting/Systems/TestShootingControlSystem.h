@@ -28,7 +28,7 @@ public:
 	~TestShootingControlSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "TestShootingControlSystem"; }
+	static std::string GetSystemId() { return "TestShootingControlSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent> mTrackedFilter;

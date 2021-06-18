@@ -46,7 +46,7 @@ public:
 	~AiSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "AiSystem"; }
+	static std::string GetSystemId() { return "AiSystem"; }
 
 private:
 	RaccoonEcs::ComponentAdder<NavMeshComponent> mNavMeshDataFilter;

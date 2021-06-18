@@ -39,7 +39,7 @@ protected:
 	World mWorld{mComponentFactory, mEntityGenerator};
 	GameData mGameData{mComponentFactory};
 	WorldHolder mWorldHolder{&mWorld, mGameData};
-	RaccoonEcs::AsyncSystemsManager mSystemsManager;
+	RaccoonEcs::AsyncSystemsManager<StringId> mSystemsManager;
 	Jobs::WorkerManager mWorkerManager{1};
 	TimeData mTime;
 	InputData mInputData;

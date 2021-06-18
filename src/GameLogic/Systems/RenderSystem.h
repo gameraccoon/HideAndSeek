@@ -44,7 +44,7 @@ public:
 	~RenderSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "RenderSystem"; }
+	static std::string GetSystemId() { return "RenderSystem"; }
 
 private:
 	static void DrawVisibilityPolygon(const Graphics::Sprite& lightSprite, const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift);

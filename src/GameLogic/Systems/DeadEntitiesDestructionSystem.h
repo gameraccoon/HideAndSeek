@@ -22,7 +22,7 @@ public:
 	~DeadEntitiesDestructionSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "DeadEnemiesDestructionSystem"; }
+	static std::string GetSystemId() { return "DeadEnemiesDestructionSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<const DeathComponent> mDeathFilter;

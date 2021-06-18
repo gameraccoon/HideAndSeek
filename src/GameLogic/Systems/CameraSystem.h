@@ -30,7 +30,7 @@ public:
 	~CameraSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "CameraSystem"; }
+	static std::string GetSystemId() { return "CameraSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent> mCameraMoveFilter;

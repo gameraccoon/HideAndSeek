@@ -34,7 +34,7 @@ public:
 	~ControlSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "ControlSystem"; }
+	static std::string GetSystemId() { return "ControlSystem"; }
 
 private:
 	void processPlayerInput();

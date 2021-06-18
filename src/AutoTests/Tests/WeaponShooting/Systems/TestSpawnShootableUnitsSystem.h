@@ -27,7 +27,7 @@ public:
 		WorldHolder& worldHolder) noexcept;
 
 	void update() override;
-	std::string getName() const override { return "TestSpawnShootableUnitsSystem"; }
+	static std::string GetSystemId() { return "TestSpawnShootableUnitsSystem"; }
 
 private:
 	void spawnUnit(AsyncEntityManager& entityManager, Vector2D pos);

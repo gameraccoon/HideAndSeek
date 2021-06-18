@@ -29,7 +29,7 @@ public:
 	~CharacterStateSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "CharacterStateSystem"; }
+	static std::string GetSystemId() { return "CharacterStateSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<const StateMachineComponent> mStateMachineFilter;

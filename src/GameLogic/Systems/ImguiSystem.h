@@ -36,7 +36,7 @@ public:
 	void update() override;
 	void initResources() override;
 	void shutdown() override;
-	std::string getName() const override { return "ImguiSystem"; }
+	static std::string GetSystemId() { return "ImguiSystem"; }
 
 private:
 	RaccoonEcs::ComponentAdder<ImguiComponent> mImguiAdder;

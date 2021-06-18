@@ -46,7 +46,7 @@ public:
 
 	void update() override;
 	void initResources() override;
-	std::string getName() const override { return "DebugDrawSystem"; }
+	static std::string GetSystemId() { return "DebugDrawSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<const WorldCachedDataComponent> mWorldCachedDataFilter;

@@ -29,7 +29,7 @@ public:
 	~MovementSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "MovementSystem"; }
+	static std::string GetSystemId() { return "MovementSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent> mMovementFilter;

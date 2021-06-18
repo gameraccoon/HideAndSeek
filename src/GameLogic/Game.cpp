@@ -44,7 +44,7 @@ void Game::start(ArgumentsParser& arguments)
 
 	initSystems();
 
-	mSystemsManager.preStartInit([this, &arguments](const RaccoonEcs::InnerDataAccessor& dataAccessor)
+	mSystemsManager.init([this, &arguments](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 	{
 		GameDataLoader::LoadWorld(mWorld, dataAccessor, arguments.getArgumentValue("world", "test"), mComponentSerializers);
 		GameDataLoader::LoadGameData(mGameData, arguments.getArgumentValue("gameData", "gameData"), mComponentSerializers);
@@ -61,7 +61,7 @@ void Game::start(ArgumentsParser& arguments)
 #endif // PROFILE_SYSTEMS
 
 #ifdef IMGUI_ENABLED
-	mImguiDebugData.systemNames = mSystemsManager.getSystemNames();
+	//mImguiDebugData.systemNames = mSystemsManager.getSystemNames();
 #endif // IMGUI_ENABLED
 
 	// start the main loop

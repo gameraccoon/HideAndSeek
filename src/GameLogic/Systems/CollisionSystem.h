@@ -25,7 +25,7 @@ public:
 	~CollisionSystem() override = default;
 
 	void update() override;
-	std::string getName() const override { return "CollisionSystem"; }
+	static std::string GetSystemId() { return "CollisionSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent> mCollidingFilter;
