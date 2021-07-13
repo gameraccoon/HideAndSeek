@@ -121,29 +121,29 @@ void LeakDetectorClass::printLeaks() noexcept
 		std::ofstream logFileStream("./logs/leaks_report.txt", std::ios_base::trunc);
 		logFileStream << std::showbase;
 
-        writeOstreamLine(logFileStream, "Memory leak report started");
+		writeOstreamLine(logFileStream, "Memory leak report started");
 
 		if (localLeaksList == nullptr)
 		{
-            writeOstreamLine(logFileStream, "No memory leaks detected");
+			writeOstreamLine(logFileStream, "No memory leaks detected");
 		}
 
 		MemoryLeak* item = localLeaksList;
 		size_t leakedBytes = 0;
 		while (item != nullptr)
 		{
-            writeOstreamLine(logFileStream, "Error: Leaked ", item->size, " bytes (", std::hex, item->pointer, std::dec,
-                             ") allocated in ", item->file, "(", item->line, ")");
+			writeOstreamLine(logFileStream, "Error: Leaked ", item->size, " bytes (", std::hex, item->pointer, std::dec,
+				") allocated in ", item->file, "(", item->line, ")");
 			leakedBytes += item->size;
 			item = item->next;
 		}
 
 		if (leakedBytes > 0)
 		{
-            writeOstreamLine(logFileStream, "Total leaked bytes: ", leakedBytes);
+			writeOstreamLine(logFileStream, "Total leaked bytes: ", leakedBytes);
 		}
 
-        writeOstreamLine(logFileStream, "Memory leak report finished");
+		writeOstreamLine(logFileStream, "Memory leak report finished");
 
 		FreeLeaksList(localLeaksList);
 	}
