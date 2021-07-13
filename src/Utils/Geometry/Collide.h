@@ -28,7 +28,7 @@ namespace Collide
 // macro that calls CODE for each border, where i and j are indexes of the vertices of this border
 #define FOR_EACH_BORDER(size, CODE) { \
 	do { \
-		for (size_t i = 0; i < (size) - 1; ++i) \
+		for (size_t i = 0; i + 1 < (size); ++i) \
 		{ \
 			size_t j = i + 1; \
 			CODE \
