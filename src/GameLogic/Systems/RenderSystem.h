@@ -6,7 +6,7 @@
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
 
-#include "GameData/Components/RenderComponent.generated.h"
+#include "GameData/Components/SpriteRenderComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/LightComponent.generated.h"
 #include "GameData/Components/LightBlockingGeometryComponent.generated.h"
@@ -33,7 +33,7 @@ public:
 		RaccoonEcs::ComponentFilter<const RenderModeComponent>&& renderModeFilter,
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>&& backgroundTextureFilter,
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
-		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>&& renderFilter,
+		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>&& spriteRenderFilter,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>&& lightFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
@@ -56,7 +56,7 @@ private:
 	RaccoonEcs::ComponentFilter<const RenderModeComponent> mRenderModeFilter;
 	RaccoonEcs::ComponentFilter<BackgroundTextureComponent> mBackgroundTextureFilter;
 	RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent> mLightBlockingGeometryFilter;
-	RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent> mRenderFilter;
+	RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent> mSpriteRenderFilter;
 	RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent> mLightFilter;
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;

@@ -13,7 +13,7 @@ ResourceStreamingSystem::ResourceStreamingSystem(
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>&& worldCachedDataAddeer,
 		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>&& spriteCreatorRemover,
 		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>&& spriteCreatorFilter,
-		RaccoonEcs::ComponentAdder<RenderComponent>&& renderComponentAdder,
+		RaccoonEcs::ComponentAdder<SpriteRenderComponent>&& spriteRenderComponentAdder,
 		RaccoonEcs::ComponentAdder<AnimationClipsComponent>&& animationClipsAdder,
 		RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent>&& animationClipCreatorRemover,
 		RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent>&& animationClipCreatorFilter,
@@ -26,7 +26,7 @@ ResourceStreamingSystem::ResourceStreamingSystem(
 	: mWorldCachedDataAdder(std::move(worldCachedDataAddeer))
 	, mSpriteCreatorRemover(std::move(spriteCreatorRemover))
 	, mSpriteCreatorFilter(std::move(spriteCreatorFilter))
-	, mRenderComponentAdder(std::move(renderComponentAdder))
+	, mSpriteRenderComponentAdder(std::move(spriteRenderComponentAdder))
 	, mAnimationClipsAdder(std::move(animationClipsAdder))
 	, mAnimationClipCreatorRemover(std::move(animationClipCreatorRemover))
 	, mAnimationClipCreatorFilter(std::move(animationClipCreatorFilter))
@@ -56,17 +56,17 @@ void ResourceStreamingSystem::update()
 		const auto& descriptions = spriteCreator->getDescriptions();
 		Assert(!descriptions.empty(), "Sprite descriptions should not be empty");
 
-		RenderComponent* render = entityView.scheduleAddComponent(mRenderComponentAdder);
+		SpriteRenderComponent* spriteRender = entityView.scheduleAddComponent(mSpriteRenderComponentAdder);
 		size_t spritesCount = descriptions.size();
-		auto& spriteDatas = render->getSpriteDatasRef();
+		auto& spriteDatas = spriteRender->getSpriteDatasRef();
 		spriteDatas.resize(spritesCount);
 		for (size_t i = 0; i < spritesCount; ++i)
 		{
 			spriteDatas[i].spriteHandle = mResourceManager.lockSprite(descriptions[i].path);
 			spriteDatas[i].params = descriptions[i].params;
-			int id = render->getMaxSpriteId();
-			render->getSpriteIdsRef().push_back(id++);
-			render->setMaxSpriteId(id);
+			int id = spriteRender->getMaxSpriteId();
+			spriteRender->getSpriteIdsRef().push_back(id++);
+			spriteRender->setMaxSpriteId(id);
 		}
 		entityView.scheduleRemoveComponent(mSpriteCreatorRemover);
 	});
@@ -87,13 +87,13 @@ void ResourceStreamingSystem::update()
 		auto& animations = animationClips->getDatasRef();
 		animations.resize(animationCount);
 
-		auto [render] = entityView.getComponents(mRenderComponentAdder);
-		if (render == nullptr)
+		auto [spriteRender] = entityView.getComponents(mSpriteRenderComponentAdder);
+		if (spriteRender == nullptr)
 		{
-			render = entityView.scheduleAddComponent(mRenderComponentAdder);
+			spriteRender = entityView.scheduleAddComponent(mSpriteRenderComponentAdder);
 		}
 
-		auto& spriteDatas = render->getSpriteDatasRef();
+		auto& spriteDatas = spriteRender->getSpriteDatasRef();
 		for (size_t i = 0; i < animationCount; ++i)
 		{
 			animations[i].animation = mResourceManager.lockSpriteAnimationClip(descriptions[i].path);
@@ -102,12 +102,12 @@ void ResourceStreamingSystem::update()
 
 			AssertFatal(!animations[i].sprites.empty(), "Empty SpriteAnimation '%s'", descriptions[i].path.c_str());
 			spriteDatas.emplace_back(descriptions[i].spriteParams, animations[i].sprites.front());
-			int id = render->getMaxSpriteId();
+			int id = spriteRender->getMaxSpriteId();
 			animations[i].spriteId = id;
-			render->getSpriteIdsRef().push_back(id++);
-			render->setMaxSpriteId(id);
+			spriteRender->getSpriteIdsRef().push_back(id++);
+			spriteRender->setMaxSpriteId(id);
 
-			Assert(render->getSpriteIds().size() == spriteDatas.size(), "Sprites and SpriteIds have diverged");
+			Assert(spriteRender->getSpriteIds().size() == spriteDatas.size(), "Sprites and SpriteIds have diverged");
 		}
 
 		entityView.scheduleAddComponent(mAnimationClipsAdder);
@@ -131,12 +131,12 @@ void ResourceStreamingSystem::update()
 		}
 		auto& clipDatas = animationClips->getDatasRef();
 
-		auto [render] = entityView.getComponents(mRenderComponentAdder);
-		if (render == nullptr)
+		auto [spriteRender] = entityView.getComponents(mSpriteRenderComponentAdder);
+		if (spriteRender == nullptr)
 		{
-			render = entityView.scheduleAddComponent(mRenderComponentAdder);
+			spriteRender = entityView.scheduleAddComponent(mSpriteRenderComponentAdder);
 		}
-		auto& spriteDatas = render->getSpriteDatasRef();
+		auto& spriteDatas = spriteRender->getSpriteDatasRef();
 
 		size_t i = 0;
 		for (const ResourcePath& groupPath : animationGroupCreator->getAnimationGroups())
@@ -157,10 +157,10 @@ void ResourceStreamingSystem::update()
 
 			spriteDatas.emplace_back(animationGroupCreator->getSpriteParams()[i], clip.sprites.front());
 
-			int id = render->getMaxSpriteId();
+			int id = spriteRender->getMaxSpriteId();
 			clip.spriteId = id;
-			render->getSpriteIdsRef().push_back(id++);
-			render->setMaxSpriteId(id);
+			spriteRender->getSpriteIdsRef().push_back(id++);
+			spriteRender->setMaxSpriteId(id);
 
 			clipDatas.emplace_back(std::move(clip));
 

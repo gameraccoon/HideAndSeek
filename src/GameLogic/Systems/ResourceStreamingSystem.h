@@ -6,7 +6,7 @@
 #include <raccoon-ecs/async_operations.h>
 
 #include "GameData/Components/SpriteCreatorComponent.generated.h"
-#include "GameData/Components/RenderComponent.generated.h"
+#include "GameData/Components/SpriteRenderComponent.generated.h"
 #include "GameData/Components/AnimationClipsComponent.generated.h"
 #include "GameData/Components/AnimationClipCreatorComponent.generated.h"
 #include "GameData/Components/AnimationGroupsComponent.generated.h"
@@ -27,7 +27,7 @@ public:
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>&& worldCachedDataAdder,
 		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>&& spriteCreatorRemover,
 		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>&& spriteCreatorFilter,
-		RaccoonEcs::ComponentAdder<RenderComponent>&& renderComponentAdder,
+		RaccoonEcs::ComponentAdder<SpriteRenderComponent>&& spriteRenderComponentAdder,
 		RaccoonEcs::ComponentAdder<AnimationClipsComponent>&& animationClipsAdder,
 		RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent>&& animationClipCreatorRemover,
 		RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent>&& animationClipCreatorFilter,
@@ -46,7 +46,7 @@ private:
 	RaccoonEcs::ComponentAdder<WorldCachedDataComponent> mWorldCachedDataAdder;
 	RaccoonEcs::ComponentRemover<SpriteCreatorComponent> mSpriteCreatorRemover;
 	RaccoonEcs::ComponentFilter<SpriteCreatorComponent> mSpriteCreatorFilter;
-	RaccoonEcs::ComponentAdder<RenderComponent> mRenderComponentAdder;
+	RaccoonEcs::ComponentAdder<SpriteRenderComponent> mSpriteRenderComponentAdder;
 	RaccoonEcs::ComponentAdder<AnimationClipsComponent> mAnimationClipsAdder;
 	RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent> mAnimationClipCreatorRemover;
 	RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent> mAnimationClipCreatorFilter;

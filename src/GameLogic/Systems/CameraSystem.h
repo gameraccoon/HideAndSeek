@@ -9,6 +9,7 @@
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 #include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/ImguiComponent.generated.h"
+#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/InputData.h"

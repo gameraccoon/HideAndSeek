@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <ranges>
 
+#include "Base/Types/TemplateAliases.h"
+
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
@@ -22,7 +24,7 @@ RenderSystem::RenderSystem(
 		RaccoonEcs::ComponentFilter<const RenderModeComponent>&& renderModeFilter,
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>&& backgroundTextureFilter,
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
-		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>&& renderFilter,
+		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>&& spriteRenderFilter,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>&& lightFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
@@ -34,7 +36,7 @@ RenderSystem::RenderSystem(
 	, mRenderModeFilter(std::move(renderModeFilter))
 	, mBackgroundTextureFilter(std::move(backgroundTextureFilter))
 	, mLightBlockingGeometryFilter(std::move(lightBlockingGeometryFilter))
-	, mRenderFilter(std::move(renderFilter))
+	, mSpriteRenderFilter(std::move(spriteRenderFilter))
 	, mLightFilter(std::move(lightFilter))
 	, mWorldHolder(worldHolder)
 	, mTime(timeData)
@@ -78,12 +80,12 @@ void RenderSystem::update()
 	if (!renderMode || renderMode->getIsDrawVisibleEntitiesEnabled())
 	{
 		spatialManager.forEachComponentSet(
-			mRenderFilter,
-			[&drawShift, &resourceManager = mResourceManager](const RenderComponent* render, const TransformComponent* transform)
+			mSpriteRenderFilter,
+			[&drawShift, &resourceManager = mResourceManager](const SpriteRenderComponent* spriteRender, const TransformComponent* transform)
 		{
 			Vector2D location = transform->getLocation() + drawShift;
 			float rotation = transform->getRotation().getValue();
-			for (const auto& data : render->getSpriteDatas())
+			for (const auto& data : spriteRender->getSpriteDatas())
 			{
 				const Graphics::Sprite& spriteData = resourceManager.getResource<Graphics::Sprite>(data.spriteHandle);
 				Graphics::Render::DrawQuad(*spriteData.getSurface(), location, data.params.size, data.params.anchor, rotation, spriteData.getUV(), 1.0f);

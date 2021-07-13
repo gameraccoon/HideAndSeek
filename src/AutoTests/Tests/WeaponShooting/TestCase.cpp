@@ -124,7 +124,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>,
 		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>,
 		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>,
-		RaccoonEcs::ComponentAdder<RenderComponent>,
+		RaccoonEcs::ComponentAdder<SpriteRenderComponent>,
 		RaccoonEcs::ComponentAdder<AnimationClipsComponent>,
 		RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent>,
 		RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent>,
@@ -142,7 +142,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<const RenderModeComponent>,
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>,
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>,
-		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>,
+		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>>(
 		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,

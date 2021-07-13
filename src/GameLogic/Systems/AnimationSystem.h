@@ -8,7 +8,7 @@
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 
-#include "GameData/Components/RenderComponent.generated.h"
+#include "GameData/Components/SpriteRenderComponent.generated.h"
 #include "GameData/Components/AnimationClipsComponent.generated.h"
 #include "GameData/Components/AnimationGroupsComponent.generated.h"
 #include "GameData/Components/StateMachineComponent.generated.h"
@@ -22,7 +22,7 @@ class AnimationSystem : public RaccoonEcs::System
 public:
 	AnimationSystem(
 		RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent>&& animUpdateFilter,
-		RaccoonEcs::ComponentFilter<AnimationClipsComponent, RenderComponent>&& animRenderFilter,
+		RaccoonEcs::ComponentFilter<AnimationClipsComponent, SpriteRenderComponent>&& animRenderFilter,
 		RaccoonEcs::ComponentFilter<const StateMachineComponent>&& stateMachineFilter,
 		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
 		WorldHolder& worldHolder,
@@ -34,7 +34,7 @@ public:
 
 private:
 	RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent> mAnimUpdateFilter;
-	RaccoonEcs::ComponentFilter<AnimationClipsComponent, RenderComponent> mAnimRenderFilter;
+	RaccoonEcs::ComponentFilter<AnimationClipsComponent, SpriteRenderComponent> mAnimRenderFilter;
 	RaccoonEcs::ComponentFilter<const StateMachineComponent> mStateMachineFilter;
 	RaccoonEcs::ComponentFilter<const WorldCachedDataComponent> mWorldCachedDataFilter;
 	WorldHolder& mWorldHolder;

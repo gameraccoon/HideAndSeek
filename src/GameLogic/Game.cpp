@@ -182,7 +182,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>,
 		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>,
 		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>,
-		RaccoonEcs::ComponentAdder<RenderComponent>,
+		RaccoonEcs::ComponentAdder<SpriteRenderComponent>,
 		RaccoonEcs::ComponentAdder<AnimationClipsComponent>,
 		RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent>,
 		RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent>,
@@ -197,7 +197,7 @@ void Game::initSystems()
 
 	mSystemsManager.registerSystem<AnimationSystem,
 		RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent>,
-		RaccoonEcs::ComponentFilter<AnimationClipsComponent, RenderComponent>,
+		RaccoonEcs::ComponentFilter<AnimationClipsComponent, SpriteRenderComponent>,
 		RaccoonEcs::ComponentFilter<const StateMachineComponent>,
 		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>>(
 		RaccoonEcs::SystemDependencies(),

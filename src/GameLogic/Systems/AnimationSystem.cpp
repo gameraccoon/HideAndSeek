@@ -9,7 +9,7 @@
 
 AnimationSystem::AnimationSystem(
 		RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent>&& animUpdateFilter,
-		RaccoonEcs::ComponentFilter<AnimationClipsComponent, RenderComponent>&& animRenderFilter,
+		RaccoonEcs::ComponentFilter<AnimationClipsComponent, SpriteRenderComponent>&& animRenderFilter,
 		RaccoonEcs::ComponentFilter<const StateMachineComponent>&& stateMachineFilter,
 		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
 		WorldHolder& worldHolder,
@@ -58,7 +58,7 @@ void AnimationSystem::update()
 	// update animation frame
 	spatialManager.forEachComponentSet(
 			mAnimRenderFilter,
-			[dt](AnimationClipsComponent* animationClips, RenderComponent* render)
+			[dt](AnimationClipsComponent* animationClips, SpriteRenderComponent* spriteRender)
 	{
 		std::vector<AnimationClip>& animationDatas = animationClips->getDatasRef();
 		for (auto& data : animationDatas)
@@ -71,8 +71,8 @@ void AnimationSystem::update()
 
 			size_t spriteIdx = 0;
 
-			const auto& ids = render->getSpriteIds();
-			for (size_t i = 0; i < render->getSpriteIds().size(); ++i)
+			const auto& ids = spriteRender->getSpriteIds();
+			for (size_t i = 0; i < spriteRender->getSpriteIds().size(); ++i)
 			{
 				if (ids[i] == data.spriteId)
 				{
@@ -80,7 +80,7 @@ void AnimationSystem::update()
 				}
 			}
 
-			render->getSpriteDatasRef()[spriteIdx].spriteHandle = data.sprites[std::min(static_cast<size_t>(data.sprites.size() * data.progress), data.sprites.size())];
+			spriteRender->getSpriteDatasRef()[spriteIdx].spriteHandle = data.sprites[std::min(static_cast<size_t>(data.sprites.size() * data.progress), data.sprites.size())];
 		}
 	});
 }
