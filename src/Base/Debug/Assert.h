@@ -63,11 +63,18 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 	#define AssertFatal(...) do { } while(0)
 #endif
 
+#define ReportErrorRelease(...) \
+	do \
+	{ \
+		LogAssertHelper("false", __FILE__, __LINE__, ##__VA_ARGS__); \
+		gGlobalAssertHandler(); \
+	} while(0)
+
 #define AssertRelease(cond, ...) \
 	do { \
 	if ALMOST_NEVER(static_cast<bool>(cond) == false) \
 	{ \
-		LogAssertHelper("false", __FILE__, __LINE__, ##__VA_ARGS__); \
+		LogAssertHelper(STR(cond), __FILE__, __LINE__, ##__VA_ARGS__); \
 		gGlobalAssertHandler(); \
 	} \
 } while(0)

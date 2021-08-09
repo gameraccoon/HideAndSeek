@@ -11,6 +11,7 @@
 #include "GameData/Components/ImguiComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/InputData.h"

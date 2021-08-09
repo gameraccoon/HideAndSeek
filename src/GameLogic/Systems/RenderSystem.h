@@ -13,14 +13,17 @@
 #include "GameData/Components/RenderModeComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 #include "GameData/Components/BackgroundTextureComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
+#include "GameData/Components/RenderConfigurationComponent.generated.h"
 
 #include "Utils/Jobs/WorkerManager.h"
 
 #include "HAL/Base/ResourceManager.h"
-#include "HAL/EngineFwd.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
+
+struct RenderData;
 
 /**
  * System that handles rendering of world objects
@@ -35,9 +38,10 @@ public:
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>&& spriteRenderFilter,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>&& lightFilter,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>&& renderAccessor,
+		RaccoonEcs::ComponentFilter<const RenderConfigurationComponent>&& renderConfiguration,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
-		HAL::Engine& engine,
 		HAL::ResourceManager& resourceManager,
 		Jobs::WorkerManager& jobsWorkerManager) noexcept;
 
@@ -47,9 +51,9 @@ public:
 	static std::string GetSystemId() { return "RenderSystem"; }
 
 private:
-	static void DrawVisibilityPolygon(const Graphics::Sprite& lightSprite, const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift);
-	void drawBackground(World& world, const Vector2D& drawShift);
-	void drawLights(class SpatialEntityManager& managerGroup, std::vector<class WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize);
+	static void DrawVisibilityPolygon(RenderData& renderData, ResourceHandle lightSpriteHandle, const std::vector<Vector2D>& polygon, const Vector2D& fovSize, const Vector2D& drawShift);
+	void drawBackground(RenderData& renderData, World& world, Vector2D drawShift, Vector2D windowSize);
+	void drawLights(RenderData& renderData, class SpatialEntityManager& managerGroup, std::vector<class WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize);
 
 private:
 	RaccoonEcs::ComponentFilter<const WorldCachedDataComponent> mWorldCachedDataFilter;
@@ -58,9 +62,10 @@ private:
 	RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent> mLightBlockingGeometryFilter;
 	RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent> mSpriteRenderFilter;
 	RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent> mLightFilter;
+	RaccoonEcs::ComponentFilter<RenderAccessorComponent> mRenderAccessorFilter;
+	RaccoonEcs::ComponentFilter<const RenderConfigurationComponent> mRenderConfigurationFilter;
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
-	HAL::Engine& mEngine;
 	HAL::ResourceManager& mResourceManager;
 	Jobs::WorkerManager& mJobsWorkerManager;
 	ResourceHandle mLightSpriteHandle;

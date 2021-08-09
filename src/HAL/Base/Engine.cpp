@@ -124,6 +124,16 @@ namespace HAL
 		return Vector2D(static_cast<float>(WindowWidth), static_cast<float>(WindowHeight));
 	}
 
+	void Engine::releaseRenderContext()
+	{
+		SDL_GL_MakeCurrent(nullptr, 0);
+	}
+
+	void Engine::acquireRenderContext()
+	{
+		SDL_GL_MakeCurrent(mPimpl->mWindow.getRawWindow(), mPimpl->mGlContext.getRawGLContext());
+	}
+
 	SDL_Window* Engine::getRawWindow()
 	{
 		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);

@@ -1,0 +1,13 @@
+{
+	"component": "renderConfiguration",
+	"description": "Component with information about render configuration",
+	"attributes": [
+		{
+			"name": "windowSize",
+			"type": "Vector2D",
+			"default": " = ZERO_VECTOR",
+			"includes": ["\"GameData/Core/Vector2D.h\""],
+			"flags": ["transient"]
+		}
+	]
+}

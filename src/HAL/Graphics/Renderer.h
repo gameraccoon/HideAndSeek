@@ -24,12 +24,6 @@ namespace Graphics
 	class Font;
 	class Texture;
 
-	struct DrawPoint
-	{
-		Vector2D spacePoint;
-		Vector2D texturePoint;
-	};
-
 	namespace Render
 	{
 		void DrawQuad(const Internal::Surface& surface, const glm::mat4& transform, Vector2D size, QuadUV uv, float alpha = 1.0f);
@@ -37,7 +31,7 @@ namespace Graphics
 		void DrawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size, Vector2D anchor, float rotation, QuadUV uv, float alpha = 1.0f);
 		void DrawFan(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
 		void DrawStrip(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
-		void DrawTiledQuad(const Internal::Surface& surface, Vector2D start, Vector2D size, Vector2D tiles, Vector2D uvShift);
+		void DrawTiledQuad(const Internal::Surface& surface, Vector2D start, Vector2D size, const QuadUV& uv);
 	}
 
 	class Renderer

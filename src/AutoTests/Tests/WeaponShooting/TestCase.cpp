@@ -143,71 +143,80 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>,
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>,
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>>(
+		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>,
+		RaccoonEcs::ComponentFilter<const RenderConfigurationComponent>>(
 		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime,
-		getEngine(),
 		getResourceManager(),
 		mWorkerManager
 	);
 
-	mSystemsManager.init([this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
-	{
-		Vector2D playerPos{ZERO_VECTOR};
-		AsyncEntityView playerEntity = mWorld.createTrackedSpatialEntity(
-			RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(dataAccessor),
-			RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(dataAccessor),
-			RaccoonEcs::EntityAdder(dataAccessor),
-			STR_TO_ID("ControlledEntity"),
-			SpatialWorldData::GetCellForPos(playerPos)
-		);
+	mSystemsManager.init(
+		1,
+		[this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
+		{
+			Vector2D playerPos{ZERO_VECTOR};
+			AsyncEntityView playerEntity = mWorld.createTrackedSpatialEntity(
+				RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(dataAccessor),
+				RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(dataAccessor),
+				RaccoonEcs::EntityAdder(dataAccessor),
+				STR_TO_ID("ControlledEntity"),
+				SpatialWorldData::GetCellForPos(playerPos)
+			);
 
-		{
-			TransformComponent* transform = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class TransformComponent>(dataAccessor));
-			transform->setLocation(playerPos);
-		}
-		{
-			SpriteCreatorComponent* sprite = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class SpriteCreatorComponent>(dataAccessor));
-			SpriteDescription spriteDesc;
-			spriteDesc.params.size = Vector2D(30.0f, 30.0f);
-			spriteDesc.path = "resources/textures/hero.png";
-			sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
-		}
-		{
-			CollisionComponent* collision = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class CollisionComponent>(dataAccessor));
-			Hull& hull = collision->getGeometryRef();
-			hull.type = HullType::Circular;
-			hull.setRadius(15.0f);
-		}
-		playerEntity.addComponent(RaccoonEcs::ComponentAdder<class MovementComponent>(dataAccessor));
-		{
-			WeaponComponent* weapon = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class WeaponComponent>(dataAccessor));
-			weapon->setShotDistance(1000.0f);
-			weapon->setDamageValue(70.0f);
-			weapon->setShotPeriod(0.0001f);
-		}
-		playerEntity.addComponent(RaccoonEcs::ComponentAdder<class CharacterStateComponent>(dataAccessor));
+			{
+				TransformComponent* transform = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class TransformComponent>(dataAccessor));
+				transform->setLocation(playerPos);
+			}
+			{
+				SpriteCreatorComponent* sprite = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class SpriteCreatorComponent>(dataAccessor));
+				SpriteDescription spriteDesc;
+				spriteDesc.params.size = Vector2D(30.0f, 30.0f);
+				spriteDesc.path = "resources/textures/hero.png";
+				sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
+			}
+			{
+				CollisionComponent* collision = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class CollisionComponent>(dataAccessor));
+				Hull& hull = collision->getGeometryRef();
+				hull.type = HullType::Circular;
+				hull.setRadius(15.0f);
+			}
+			playerEntity.addComponent(RaccoonEcs::ComponentAdder<class MovementComponent>(dataAccessor));
+			{
+				WeaponComponent* weapon = playerEntity.addComponent(RaccoonEcs::ComponentAdder<class WeaponComponent>(dataAccessor));
+				weapon->setShotDistance(1000.0f);
+				weapon->setDamageValue(70.0f);
+				weapon->setShotPeriod(0.0001f);
+			}
+			playerEntity.addComponent(RaccoonEcs::ComponentAdder<class CharacterStateComponent>(dataAccessor));
 
-		Vector2D cameraPos{ZERO_VECTOR};
-		AsyncEntityView camera = mWorld.createTrackedSpatialEntity(
-			RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(dataAccessor),
-			RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(dataAccessor),
-			RaccoonEcs::EntityAdder(dataAccessor),
-			STR_TO_ID("CameraEntity"), SpatialWorldData::GetCellForPos(cameraPos)
-		);
+			Vector2D cameraPos{ZERO_VECTOR};
+			AsyncEntityView camera = mWorld.createTrackedSpatialEntity(
+				RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(dataAccessor),
+				RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(dataAccessor),
+				RaccoonEcs::EntityAdder(dataAccessor),
+				STR_TO_ID("CameraEntity"), SpatialWorldData::GetCellForPos(cameraPos)
+			);
 
-		{
-			TransformComponent* transform = camera.addComponent(RaccoonEcs::ComponentAdder<class TransformComponent>(dataAccessor));
-			transform->setLocation(cameraPos);
-		}
-		camera.addComponent(RaccoonEcs::ComponentAdder<class MovementComponent>(dataAccessor));
+			{
+				TransformComponent* transform = camera.addComponent(RaccoonEcs::ComponentAdder<class TransformComponent>(dataAccessor));
+				transform->setLocation(cameraPos);
+			}
+			camera.addComponent(RaccoonEcs::ComponentAdder<class MovementComponent>(dataAccessor));
 
-		{
-			StateMachineComponent* stateMachine = mGameData.getGameComponents().addComponent<StateMachineComponent>();
-			StateMachines::RegisterStateMachines(stateMachine);
+			{
+				StateMachineComponent* stateMachine = mGameData.getGameComponents().addComponent<StateMachineComponent>();
+				StateMachines::RegisterStateMachines(stateMachine);
+			}
+
+			{
+				RenderConfigurationComponent* renderConfiguration = mGameData.getGameComponents().getOrAddComponent<RenderConfigurationComponent>();
+				renderConfiguration->setWindowSize(getEngine().getWindowSize());
+			}
 		}
-	});
+	);
 
 	mInputData.windowSize = getEngine().getWindowSize();
 	mInputData.mousePos = mInputData.windowSize * 0.5f;

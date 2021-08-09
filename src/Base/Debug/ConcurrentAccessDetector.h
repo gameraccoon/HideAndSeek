@@ -61,7 +61,11 @@ public:
 		if (acquiredCountBefore > 0)
 		{
 			std::thread::id ownedThreadID = mOwningThreadID.load(std::memory_order_relaxed);
-			AssertRelease(ownedThreadID == std::this_thread::get_id(), "A data race detected");
+			std::thread::id currentThreadID = std::this_thread::get_id();
+			if (ownedThreadID != currentThreadID)
+			{
+				ReportErrorRelease("A data race detected");
+			}
 		}
 		else
 		{

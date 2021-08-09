@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <ranges>
 #include <type_traits>
+#include <variant>
 
 namespace TemplateHelpers
 {
@@ -18,5 +19,11 @@ namespace TemplateHelpers
 	void CopyOrMoveContainer(typename std::remove_reference<SourceContainerType>::type&& sourceContainer, IteratorType&& outputIterator)
 	{
 		std::ranges::move(sourceContainer, std::forward<IteratorType>(outputIterator));
+	}
+
+	template<typename T, typename Container, typename... Args>
+	T& EmplaceVariant(Container& container, Args&&... args)
+	{
+		return std::get<T>(container.template emplace_back(std::in_place_type<T>, std::forward<Args>(args)...));
 	}
 }

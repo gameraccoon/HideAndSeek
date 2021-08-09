@@ -46,7 +46,15 @@ namespace HAL
 			DETECT_CONCURRENT_ACCESS(mConcurrencyDetector);
 			auto it = mResources.find(handle.resourceIndex);
 			AssertFatal(it != mResources.end(), "Trying to access non loaded resource");
-			return static_cast<T&>(*(it->second.get()));
+			return static_cast<T&>(*it->second);
+		}
+
+		template<typename T>
+		[[nodiscard]] const T* tryGetResource(ResourceHandle handle)
+		{
+			DETECT_CONCURRENT_ACCESS(mConcurrencyDetector);
+			auto it = mResources.find(handle.resourceIndex);
+			return it == mResources.end() ? nullptr : static_cast<T*>(it->second.get());
 		}
 
 		void unlockResource(ResourceHandle handle);

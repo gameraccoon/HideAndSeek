@@ -1,5 +1,7 @@
 #pragma once
 
+#include <thread>
+
 #include <raccoon-ecs/async_systems_manager.h>
 
 #include "GameData/World.h"
@@ -15,6 +17,7 @@
 #include "GameLogic/SharedManagers/TimeData.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/InputData.h"
+#include "GameLogic/Render/RenderThreadManager.h"
 
 #ifdef IMGUI_ENABLED
 #include "GameLogic/Imgui/ImguiDebugData.h"
@@ -48,6 +51,7 @@ private:
 	Json::ComponentSerializationHolder mComponentSerializers;
 	Jobs::WorkerManager mJobsWorkerManager{Jobs::GetAvailableThreadsCount()};
 	TimeData mTime;
+	RenderThreadManager mRenderThread;
 
 #ifdef PROFILE_SYSTEMS
 	bool mProfileSystems = false;

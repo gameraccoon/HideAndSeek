@@ -8,6 +8,7 @@
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 
 #include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "HAL/Base/Engine.h"
 
@@ -44,15 +45,27 @@ void Game::start(ArgumentsParser& arguments)
 
 	initSystems();
 
-	mSystemsManager.init([this, &arguments](const RaccoonEcs::InnerDataAccessor& dataAccessor)
-	{
-		GameDataLoader::LoadWorld(mWorld, dataAccessor, arguments.getArgumentValue("world", "test"), mComponentSerializers);
-		GameDataLoader::LoadGameData(mGameData, arguments.getArgumentValue("gameData", "gameData"), mComponentSerializers);
-	});
+	mSystemsManager.init(
+		3, // threads count available for systems manager
+		[this, &arguments](const RaccoonEcs::InnerDataAccessor& dataAccessor)
+		{
+			GameDataLoader::LoadWorld(mWorld, dataAccessor, arguments.getArgumentValue("world", "test"), mComponentSerializers);
+			GameDataLoader::LoadGameData(mGameData, arguments.getArgumentValue("gameData", "gameData"), mComponentSerializers);
 
-	// ToDo: make an editor not to hardcode SM data
-	auto [sm] = mGameData.getGameComponents().getComponents<StateMachineComponent>();
-	StateMachines::RegisterStateMachines(sm);
+			auto [sm] = mGameData.getGameComponents().getComponents<StateMachineComponent>();
+			// ToDo: make an editor not to hardcode SM data
+			StateMachines::RegisterStateMachines(sm);
+
+			RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
+			renderAccessor->setAccessor(&mRenderThread.getAccessor());
+
+			RenderConfigurationComponent* renderConfiguration = mGameData.getGameComponents().getOrAddComponent<RenderConfigurationComponent>();
+			renderConfiguration->setWindowSize(getEngine().getWindowSize());
+		}
+	);
+
+	getEngine().releaseRenderContext();
+	mRenderThread.startThread(getResourceManager(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
 
 #ifdef PROFILE_SYSTEMS
 	mProfileSystems = arguments.hasArgument("profile-systems");
@@ -103,7 +116,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<RenderModeComponent>,
 		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const TransformComponent>>(
-		RaccoonEcs::SystemDependencies().dependsOn<AiSystem>(),
+		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mInputData
 	);
@@ -127,7 +140,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<HealthComponent>,
 		RaccoonEcs::ComponentAdder<DeathComponent>,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().dependsOn<ControlSystem>().dependsOn<AiSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -135,7 +148,7 @@ void Game::initSystems()
 	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem,
 		RaccoonEcs::ComponentFilter<const DeathComponent>,
 		RaccoonEcs::EntityRemover>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().dependsOn<WeaponSystem>(),
 		mWorldHolder
 	);
 
@@ -143,7 +156,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().dependsOn<ControlSystem>().dependsOn<AiSystem>(),
 		mWorldHolder
 	);
 
@@ -153,7 +166,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<const TransformComponent>,
 		RaccoonEcs::ComponentFilter<const ImguiComponent>,
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().dependsOn<ControlSystem>(),
 		mWorldHolder,
 		mInputData
 	);
@@ -163,7 +176,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>,
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::EntityTransferer>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().dependsOn<CollisionSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -173,7 +186,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().dependsOn<ControlSystem>().dependsOn<AiSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -200,7 +213,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<AnimationClipsComponent, SpriteRenderComponent>,
 		RaccoonEcs::ComponentFilter<const StateMachineComponent>,
 		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().dependsOn<CharacterStateSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -210,12 +223,13 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<const RenderModeComponent>,
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>, // hey, why isn't it const?
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>,
-		RaccoonEcs::ComponentFilter<const RenderComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
+		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>,
+		RaccoonEcs::ComponentFilter<const RenderConfigurationComponent>>(
+		RaccoonEcs::SystemDependencies().dependsOn<AnimationSystem>(),
 		mWorldHolder,
 		mTime,
-		getEngine(),
 		getResourceManager(),
 		mJobsWorkerManager
 	);
