@@ -154,7 +154,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	);
 
 	mSystemsManager.init(
-		1,
+		//1,
 		[this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
 			Vector2D playerPos{ZERO_VECTOR};

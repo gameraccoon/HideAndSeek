@@ -20,9 +20,9 @@ RenderThreadManager::~RenderThreadManager()
 	mRenderThread->join();
 }
 
-void RenderThreadManager::startThread(HAL::ResourceManager& resourceManager, std::function<void()>&& threadInitializeFn)
+void RenderThreadManager::startThread(HAL::ResourceManager& /*resourceManager*/, std::function<void()>&& /*threadInitializeFn*/)
 {
-	mRenderThread = std::make_unique<std::thread>(
+/*	mRenderThread = std::make_unique<std::thread>(
 		[&renderAccessor = mRenderAccessor, &resourceManager, threadInitializeFn]
 		{
 			if (threadInitializeFn)
@@ -31,7 +31,7 @@ void RenderThreadManager::startThread(HAL::ResourceManager& resourceManager, std
 			}
 			RenderThreadManager::RenderThreadFunction(renderAccessor, resourceManager);
 		}
-	);
+	);*/
 }
 
 namespace RenderThreadManagerInternal
@@ -115,8 +115,6 @@ namespace RenderThreadManagerInternal
 
 void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager)
 {
-	using namespace RenderThreadManagerInternal;
-
 	std::vector<std::unique_ptr<RenderData>> dataToRender;
 	while(true)
 	{
@@ -131,22 +129,33 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 				return;
 			}
 
-			dataToRender.reserve(dataToRender.size() + renderAccessor.dataToTransfer.size());
-			std::move(
-				renderAccessor.dataToTransfer.begin(),
-				renderAccessor.dataToTransfer.end(),
-				std::back_inserter(dataToRender)
-			);
-			renderAccessor.dataToTransfer.clear();
+			TransferDataToQueue(dataToRender, renderAccessor.dataToTransfer);
 		}
 
-		for (std::unique_ptr<RenderData>& renderData : dataToRender)
-		{
-			for (RenderData::Layer& layer : renderData->layers)
-			{
-				std::visit(RenderVisitor{resourceManager}, layer);
-			}
-		}
+		RenderQueue(dataToRender, resourceManager);
+
 		dataToRender.clear();
+	}
+}
+
+void RenderThreadManager::TransferDataToQueue(RenderDataVector& inOutDataToRender, RenderDataVector& inOutDataToTransfer) {
+	inOutDataToRender.reserve(inOutDataToRender.size() + inOutDataToTransfer.size());
+	std::move(
+		inOutDataToTransfer.begin(),
+		inOutDataToTransfer.end(),
+		std::back_inserter(inOutDataToRender)
+	);
+	inOutDataToTransfer.clear();
+}
+
+void RenderThreadManager::RenderQueue(const RenderDataVector& dataToRender, HAL::ResourceManager& resourceManager)
+{
+	using namespace RenderThreadManagerInternal;
+	for (const std::unique_ptr<RenderData>& renderData : dataToRender)
+	{
+		for (const RenderData::Layer& layer : renderData->layers)
+		{
+			std::visit(RenderVisitor{resourceManager}, layer);
+		}
 	}
 }

@@ -122,7 +122,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 	);
 
 	mSystemsManager.init(
-		1,
+		//1,
 		[this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
 			Vector2D playerPos{ZERO_VECTOR};

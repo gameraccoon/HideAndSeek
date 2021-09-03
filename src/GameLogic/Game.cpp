@@ -46,7 +46,7 @@ void Game::start(ArgumentsParser& arguments)
 	initSystems();
 
 	mSystemsManager.init(
-		3, // threads count available for systems manager
+		//3, // threads count available for systems manager
 		[this, &arguments](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
 			GameDataLoader::LoadWorld(mWorld, dataAccessor, arguments.getArgumentValue("world", "test"), mComponentSerializers);
@@ -64,7 +64,7 @@ void Game::start(ArgumentsParser& arguments)
 		}
 	);
 
-	getEngine().releaseRenderContext();
+	//getEngine().releaseRenderContext();
 	mRenderThread.startThread(getResourceManager(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
 
 #ifdef PROFILE_SYSTEMS
@@ -100,6 +100,10 @@ void Game::update(float dt)
 
 	mTime.update(dt);
 	mSystemsManager.update();
+
+	// test code
+	mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager());
+
 	mInputData.clearAfterFrame();
 
 #ifdef PROFILE_SYSTEMS
