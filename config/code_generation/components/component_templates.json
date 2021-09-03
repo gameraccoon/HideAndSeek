@@ -20,7 +20,8 @@
 		"blacklist": ["transient"]
 	},
 	{
-		"name": "editor/component_edit_factory_includes"
+		"name": "editor/component_edit_factory_includes",
+		"blacklist": ["transient"]
 	},
 	{
 		"name": "editor/component_factory_register"

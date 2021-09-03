@@ -6,7 +6,8 @@
 #include <QWidget>
 
 #include <raccoon-ecs/delegates.h>
-#include <raccoon-ecs/entity.h>
+
+#include "GameData/EcsDefinitions.h"
 
 class MainWindow;
 
