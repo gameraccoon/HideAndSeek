@@ -58,9 +58,6 @@ void Game::start(ArgumentsParser& arguments)
 
 			RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
 			renderAccessor->setAccessor(&mRenderThread.getAccessor());
-
-			RenderConfigurationComponent* renderConfiguration = mGameData.getGameComponents().getOrAddComponent<RenderConfigurationComponent>();
-			renderConfiguration->setWindowSize(getEngine().getWindowSize());
 		}
 	);
 
@@ -229,8 +226,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>,
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>,
-		RaccoonEcs::ComponentFilter<const RenderConfigurationComponent>>(
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
 		RaccoonEcs::SystemDependencies().dependsOn<AnimationSystem>(),
 		mWorldHolder,
 		mTime,
@@ -245,11 +241,11 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<const NavMeshComponent>,
 		RaccoonEcs::ComponentFilter<const AiControllerComponent>,
 		RaccoonEcs::ComponentFilter<const DebugDrawComponent>,
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>>(
+		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
 		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime,
-		getEngine(),
 		getResourceManager()
 	);
 
@@ -257,7 +253,7 @@ void Game::initSystems()
 	mSystemsManager.registerSystem<ImguiSystem,
 		RaccoonEcs::ComponentAdder<ImguiComponent>,
 		RaccoonEcs::InnerDataAccessor>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().limitConcurrentlyRunSystemsTo(0),
 		mImguiDebugData,
 		getEngine()
 	);

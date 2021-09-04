@@ -14,6 +14,7 @@
 #include "GameData/Components/CharacterStateComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 #include "GameData/Components/DebugDrawComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "HAL/Base/ResourceManager.h"
 #include "HAL/EngineFwd.h"
@@ -38,9 +39,9 @@ public:
 		RaccoonEcs::ComponentFilter<const AiControllerComponent>&& aiControllerFilter,
 		RaccoonEcs::ComponentFilter<const DebugDrawComponent>&& debugDrawFilter,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>&& characterStateFilter,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>&& renderAccessorFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
-		HAL::Engine& engine,
 		HAL::ResourceManager& resourceManager) noexcept;
 	~DebugDrawSystem() override = default;
 
@@ -56,9 +57,9 @@ private:
 	RaccoonEcs::ComponentFilter<const AiControllerComponent> mAiControllerFilter;
 	RaccoonEcs::ComponentFilter<const DebugDrawComponent> mDebugDrawFilter;
 	RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent> mCharacterStateFilter;
+	RaccoonEcs::ComponentFilter<RenderAccessorComponent> mRenderAccessorFilter;
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
-	HAL::Engine& mEngine;
 	HAL::ResourceManager& mResourceManager;
 
 	ResourceHandle mCollisionSpriteHandle;

@@ -144,8 +144,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>,
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>,
-		RaccoonEcs::ComponentFilter<const RenderConfigurationComponent>>(
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
 		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime,
@@ -209,11 +208,6 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 			{
 				StateMachineComponent* stateMachine = mGameData.getGameComponents().addComponent<StateMachineComponent>();
 				StateMachines::RegisterStateMachines(stateMachine);
-			}
-
-			{
-				RenderConfigurationComponent* renderConfiguration = mGameData.getGameComponents().getOrAddComponent<RenderConfigurationComponent>();
-				renderConfiguration->setWindowSize(getEngine().getWindowSize());
 			}
 		}
 	);

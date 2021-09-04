@@ -25,8 +25,7 @@ RenderSystem::RenderSystem(
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>&& spriteRenderFilter,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>&& lightFilter,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>&& renderAccessor,
-		RaccoonEcs::ComponentFilter<const RenderConfigurationComponent>&& renderConfiguration,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>&& renderAccessorFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::ResourceManager& resourceManager,
@@ -38,8 +37,7 @@ RenderSystem::RenderSystem(
 	, mLightBlockingGeometryFilter(std::move(lightBlockingGeometryFilter))
 	, mSpriteRenderFilter(std::move(spriteRenderFilter))
 	, mLightFilter(std::move(lightFilter))
-	, mRenderAccessorFilter(std::move(renderAccessor))
-	, mRenderConfigurationFilter(std::move(renderConfiguration))
+	, mRenderAccessorFilter(std::move(renderAccessorFilter))
 	, mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mResourceManager(resourceManager)
@@ -60,12 +58,8 @@ void RenderSystem::update()
 	static const Vector2D maxFov(500.0f, 500.0f);
 
 	const auto [renderMode] = mRenderModeFilter.getComponents(gameData.getGameComponents());
-	const auto [renderConfiguration] = mRenderConfigurationFilter.getComponents(gameData.getGameComponents());
 
-	AssertFatal(renderConfiguration, "RenderConfigurationComponent should be created as a GameComponent");
-
-	Vector2D windowSize = renderConfiguration->getWindowSize();
-	Vector2D halfWindowSize = windowSize * 0.5f;
+	Vector2D halfWindowSize = workingRect * 0.5f;
 
 	Vector2D drawShift = halfWindowSize - cameraLocation;
 
@@ -87,7 +81,7 @@ void RenderSystem::update()
 
 	if (!renderMode || renderMode->getIsDrawBackgroundEnabled())
 	{
-		drawBackground(*renderData, world, drawShift, windowSize);
+		drawBackground(*renderData, world, drawShift, workingRect);
 	}
 
 	if (!renderMode || renderMode->getIsDrawLightsEnabled())
@@ -123,7 +117,7 @@ void RenderSystem::DrawVisibilityPolygon(RenderData& renderData, ResourceHandle 
 {
 	if (polygon.size() > 2)
 	{
-		LightPolygonRenderData& lightPolygon = TemplateHelpers::EmplaceVariant<LightPolygonRenderData>(renderData.layers);
+		FanRenderData& lightPolygon = TemplateHelpers::EmplaceVariant<FanRenderData>(renderData.layers);
 
 		lightPolygon.points.reserve(polygon.size() + 2);
 		lightPolygon.points.push_back(ZERO_VECTOR);
@@ -133,10 +127,10 @@ void RenderSystem::DrawVisibilityPolygon(RenderData& renderData, ResourceHandle 
 		}
 		lightPolygon.points.push_back(polygon[0]);
 
-		lightPolygon.lightSpriteHandle = lightSpriteHandle;
+		lightPolygon.spriteHandle = lightSpriteHandle;
 		lightPolygon.alpha = 0.5f;
-		lightPolygon.boundsStart = drawShift - fovSize;
-		lightPolygon.textureWorldSize = fovSize;
+		lightPolygon.start = drawShift - fovSize;
+		lightPolygon.size = fovSize;
 	}
 }
 
@@ -251,12 +245,6 @@ static size_t GetJobDivisor(size_t maxThreadsCount)
 void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, std::vector<WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize)
 {
 	const GameplayTimestamp timestampNow = mTime.currentTimestamp;
-
-	const Graphics::Sprite& lightSprite = mResourceManager.getResource<Graphics::Sprite>(mLightSpriteHandle);
-	if (!lightSprite.isValid())
-	{
-		return;
-	}
 
 	// get all the collidable components
 	std::vector<const LightBlockingGeometryComponent*> lightBlockingComponents;

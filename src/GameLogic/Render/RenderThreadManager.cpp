@@ -43,7 +43,7 @@ namespace RenderThreadManagerInternal
 			: mResourceManager(resourceManager)
 		{}
 
-		void operator()(const BackgroundRenderData& bgData)
+		void operator()(BackgroundRenderData&& bgData)
 		{
 			const Graphics::Sprite* bgSprite = mResourceManager.tryGetResource<Graphics::Sprite>(bgData.spriteHandle);
 
@@ -60,36 +60,37 @@ namespace RenderThreadManagerInternal
 			);
 		}
 
-		void operator()(const LightPolygonRenderData& lightPolygonData)
+		void operator()(FanRenderData&& fanData)
 		{
-			const Graphics::Sprite* lightSprite = mResourceManager.tryGetResource<Graphics::Sprite>(lightPolygonData.lightSpriteHandle);
+			const Graphics::Sprite* sprite = mResourceManager.tryGetResource<Graphics::Sprite>(fanData.spriteHandle);
 
-			if (lightSprite == nullptr)
+			if (sprite == nullptr)
 			{
 				return;
 			}
 
-			const Graphics::QuadUV quadUV = lightSprite->getUV();
+			const Graphics::QuadUV spriteUV = sprite->getUV();
 
 			std::vector<Graphics::DrawPoint> points;
-			points.reserve(lightPolygonData.points.size());
-			for (Vector2D point : lightPolygonData.points)
+			points.reserve(fanData.points.size());
+			const Vector2D backScale{1.0f/fanData.size.x, 1.0f/fanData.size.y};
+			for (Vector2D point : fanData.points)
 			{
-				points.emplace_back(point, Graphics::QuadLerp(quadUV, 0.5f+point.x/lightPolygonData.textureWorldSize.x, 0.5f+point.y/lightPolygonData.textureWorldSize.y));
+				points.emplace_back(point, Graphics::QuadLerp(spriteUV, 0.5f+point.x*backScale.x, 0.5f+point.y*backScale.y));
 			}
 
-			const Vector2D drawShift = lightPolygonData.boundsStart + lightPolygonData.textureWorldSize;
+			const Vector2D drawShift = fanData.start + fanData.size;
 			glm::mat4 transform(1.0f);
 			transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
 			Graphics::Render::DrawFan(
-				*lightSprite->getSurface(),
+				*sprite->getSurface(),
 				points,
 				transform,
-				lightPolygonData.alpha
+				fanData.alpha
 			);
 		}
 
-		void operator()(const QuadRenderData& quadData)
+		void operator()(QuadRenderData&& quadData)
 		{
 			const Graphics::Sprite* sprite = mResourceManager.tryGetResource<Graphics::Sprite>(quadData.spriteHandle);
 			if (sprite == nullptr)
@@ -106,6 +107,52 @@ namespace RenderThreadManagerInternal
 				sprite->getUV(),
 				quadData.alpha
 			);
+		}
+
+		void operator()(PolygonRenderData&& polygonData)
+		{
+			const Graphics::Sprite* sprite = mResourceManager.tryGetResource<Graphics::Sprite>(polygonData.spriteHandle);
+
+			if (sprite == nullptr)
+			{
+				return;
+			}
+
+			Graphics::QuadUV spriteUV = sprite->getUV();
+
+			for (Graphics::DrawPoint& point : polygonData.points)
+			{
+				point.texturePoint = Graphics::QuadLerp(spriteUV, point.texturePoint);
+			}
+
+			glm::mat4 transform(1.0f);
+			transform = glm::translate(transform, glm::vec3(polygonData.drawShift.x, polygonData.drawShift.y, 0.0f));
+			Graphics::Render::DrawFan(*sprite->getSurface(), polygonData.points, transform, 0.3f);
+		}
+
+		void operator()(StripRenderData&& stripData)
+		{
+			const Graphics::Sprite* sprite = mResourceManager.tryGetResource<Graphics::Sprite>(stripData.spriteHandle);
+			if (sprite == nullptr)
+			{
+				return;
+			}
+
+			Graphics::QuadUV spriteUV = sprite->getUV();
+
+			for (Graphics::DrawPoint& point : stripData.points)
+			{
+				point.texturePoint = Graphics::QuadLerp(spriteUV, point.texturePoint);
+			}
+
+			glm::mat4 transform(1.0f);
+			transform = glm::translate(transform, glm::vec3(stripData.drawShift.x, stripData.drawShift.y, 0.0f));
+			Graphics::Render::DrawStrip(*sprite->getSurface(), stripData.points, transform, stripData.alpha);
+		}
+
+		void operator()(const TextRenderData& /*textData*/)
+		{
+			// need an implimentation when text rendering is fixed
 		}
 
 	private:
@@ -132,30 +179,37 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 			TransferDataToQueue(dataToRender, renderAccessor.dataToTransfer);
 		}
 
-		RenderQueue(dataToRender, resourceManager);
-
-		dataToRender.clear();
+		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager);
 	}
 }
 
-void RenderThreadManager::TransferDataToQueue(RenderDataVector& inOutDataToRender, RenderDataVector& inOutDataToTransfer) {
-	inOutDataToRender.reserve(inOutDataToRender.size() + inOutDataToTransfer.size());
-	std::move(
-		inOutDataToTransfer.begin(),
-		inOutDataToTransfer.end(),
-		std::back_inserter(inOutDataToRender)
-	);
-	inOutDataToTransfer.clear();
+void RenderThreadManager::TransferDataToQueue(RenderDataVector& inOutDataToRender, RenderDataVector& inOutDataToTransfer)
+{
+	if (inOutDataToRender.empty())
+	{
+		inOutDataToRender = std::move(inOutDataToTransfer);
+	}
+	else
+	{
+		inOutDataToRender.reserve(inOutDataToRender.size() + inOutDataToTransfer.size());
+		std::move(
+			inOutDataToTransfer.begin(),
+			inOutDataToTransfer.end(),
+			std::back_inserter(inOutDataToRender)
+		);
+		inOutDataToTransfer.clear();
+	}
 }
 
-void RenderThreadManager::RenderQueue(const RenderDataVector& dataToRender, HAL::ResourceManager& resourceManager)
+void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager)
 {
 	using namespace RenderThreadManagerInternal;
-	for (const std::unique_ptr<RenderData>& renderData : dataToRender)
+	for (std::unique_ptr<RenderData>& renderData : dataToRender)
 	{
-		for (const RenderData::Layer& layer : renderData->layers)
+		for (RenderData::Layer& layer : renderData->layers)
 		{
-			std::visit(RenderVisitor{resourceManager}, layer);
+			std::visit(RenderVisitor{resourceManager}, std::move(layer));
 		}
 	}
+	dataToRender.clear();
 }

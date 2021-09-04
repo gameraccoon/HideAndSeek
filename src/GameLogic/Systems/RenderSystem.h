@@ -14,7 +14,6 @@
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 #include "GameData/Components/BackgroundTextureComponent.generated.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
-#include "GameData/Components/RenderConfigurationComponent.generated.h"
 
 #include "Utils/Jobs/WorkerManager.h"
 
@@ -38,8 +37,7 @@ public:
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>&& spriteRenderFilter,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>&& lightFilter,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>&& renderAccessor,
-		RaccoonEcs::ComponentFilter<const RenderConfigurationComponent>&& renderConfiguration,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>&& renderAccessorFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::ResourceManager& resourceManager,
@@ -63,7 +61,6 @@ private:
 	RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent> mSpriteRenderFilter;
 	RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent> mLightFilter;
 	RaccoonEcs::ComponentFilter<RenderAccessorComponent> mRenderAccessorFilter;
-	RaccoonEcs::ComponentFilter<const RenderConfigurationComponent> mRenderConfigurationFilter;
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
 	HAL::ResourceManager& mResourceManager;

@@ -112,8 +112,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>,
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>,
-		RaccoonEcs::ComponentFilter<const RenderConfigurationComponent>>(
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
 		RaccoonEcs::SystemDependencies(),
 		mWorldHolder,
 		mTime,
@@ -169,11 +168,6 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 			camera.addComponent(RaccoonEcs::ComponentAdder<MovementComponent>(dataAccessor));
 
 			RaccoonEcs::ComponentAdder<StateMachineComponent>(dataAccessor).addComponent(mGameData.getGameComponents());
-
-			{
-				RenderConfigurationComponent* renderConfiguration = mGameData.getGameComponents().getOrAddComponent<RenderConfigurationComponent>();
-				renderConfiguration->setWindowSize(getEngine().getWindowSize());
-			}
 		}
 	);
 

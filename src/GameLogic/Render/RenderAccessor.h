@@ -19,13 +19,13 @@ struct BackgroundRenderData
 	Graphics::QuadUV uv;
 };
 
-struct LightPolygonRenderData
+struct FanRenderData
 {
-	ResourceHandle lightSpriteHandle;
 	std::vector<Vector2D> points;
-	Vector2D boundsStart;
-	Vector2D textureWorldSize;
-	float alpha;
+	ResourceHandle spriteHandle;
+	Vector2D start;
+	Vector2D size;
+	float alpha = 1.0f;
 };
 
 struct QuadRenderData
@@ -33,14 +33,42 @@ struct QuadRenderData
 	ResourceHandle spriteHandle;
 	Vector2D position;
 	Vector2D size;
-	Vector2D anchor;
-	float rotation;
-	float alpha;
+	Vector2D anchor = {0.5f, 0.5f};
+	float rotation = 0.0f;
+	float alpha = 1.0f;
+};
+
+struct StripRenderData {
+	std::vector<Graphics::DrawPoint> points;
+	ResourceHandle spriteHandle;
+	Vector2D drawShift;
+	float alpha = 1.0f;
+};
+
+struct PolygonRenderData {
+	std::vector<Graphics::DrawPoint> points;
+	ResourceHandle spriteHandle;
+	Vector2D drawShift;
+	float alpha = 1.0f;
+};
+
+struct TextRenderData {
+	std::string text;
+	Vector2D pos;
+	ResourceHandle fontHandle;
+	Graphics::Color color;
 };
 
 struct RenderData
 {
-	using Layer = std::variant<BackgroundRenderData, LightPolygonRenderData, QuadRenderData>;
+	using Layer = std::variant<
+		BackgroundRenderData,
+		FanRenderData,
+		QuadRenderData,
+		StripRenderData,
+		PolygonRenderData,
+		TextRenderData
+	>;
 
 	std::vector<Layer> layers;
 };

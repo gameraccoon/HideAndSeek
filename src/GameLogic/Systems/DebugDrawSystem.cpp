@@ -2,22 +2,16 @@
 
 #include "GameLogic/Systems/DebugDrawSystem.h"
 
-#include "Base/Random/Random.h"
-
 #include <algorithm>
+
+#include "Base/Random/Random.h"
+#include "Base/Types/TemplateHelpers.h"
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
+#include "GameLogic/Render/RenderAccessor.h"
 
 #include "Utils/Geometry/VisibilityPolygon.h"
-
-#include "HAL/Base/Engine.h"
-#include "HAL/Base/Math.h"
-#include "HAL/Graphics/Renderer.h"
-#include "HAL/Graphics/Sprite.h"
-#include "HAL/Graphics/Font.h"
-
-#include <glm/gtc/matrix_transform.hpp>
 
 
 DebugDrawSystem::DebugDrawSystem(
@@ -28,9 +22,9 @@ DebugDrawSystem::DebugDrawSystem(
 		RaccoonEcs::ComponentFilter<const AiControllerComponent>&& aiControllerFilter,
 		RaccoonEcs::ComponentFilter<const DebugDrawComponent>&& debugDrawFilter,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>&& characterStateFilter,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>&& renderAccessorFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
-		HAL::Engine& engine,
 		HAL::ResourceManager& resourceManager) noexcept
 	: mWorldCachedDataFilter(std::move(worldCachedDataFilter))
 	, mRenderModeFilter(std::move(renderModeFilter))
@@ -39,9 +33,9 @@ DebugDrawSystem::DebugDrawSystem(
 	, mAiControllerFilter(std::move(aiControllerFilter))
 	, mDebugDrawFilter(std::move(debugDrawFilter))
 	, mCharacterStateFilter(std::move(characterStateFilter))
+	, mRenderAccessorFilter(std::move(renderAccessorFilter))
 	, mWorldHolder(worldHolder)
 	, mTime(timeData)
-	, mEngine(engine)
 	, mResourceManager(resourceManager)
 {
 }
@@ -55,23 +49,16 @@ void RemoveOldDrawElement(std::vector<T>& vector, GameplayTimestamp now)
 	);
 }
 
-/*static Vector2D GetNavmeshPolygonCenter(size_t triangleIdx, const NavMesh::Geometry& navMeshGeometry)
-{
-	Vector2D polygonCenter{ZERO_VECTOR};
-	for (size_t i = 0; i < navMeshGeometry.vertsPerPoly; ++i)
-	{
-		polygonCenter += navMeshGeometry.vertices[navMeshGeometry.indexes[triangleIdx * navMeshGeometry.vertsPerPoly + i]];
-	}
-	polygonCenter /= static_cast<float>(navMeshGeometry.vertsPerPoly);
-	return polygonCenter;
-}*/
-
-static void DrawPath(const std::vector<Vector2D>& path, const Graphics::Sprite& navMeshSprite, const Graphics::QuadUV& quadUV, Vector2D drawShift)
+static void DrawPath(RenderData& renderData, const std::vector<Vector2D>& path, const ResourceHandle& navMeshSprite, Vector2D drawShift)
 {
 	if (path.size() > 1)
 	{
-		std::vector<Graphics::DrawPoint> drawablePolygon;
-		drawablePolygon.reserve(path.size() * 2);
+		StripRenderData& stripData = TemplateHelpers::EmplaceVariant<StripRenderData>(renderData.layers);
+
+		stripData.points.reserve(path.size() * 2);
+		stripData.spriteHandle = navMeshSprite;
+		stripData.drawShift = drawShift;
+		stripData.alpha = 0.5f;
 
 		{
 			float u1 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
@@ -81,8 +68,8 @@ static void DrawPath(const std::vector<Vector2D>& path, const Graphics::Sprite& 
 
 			Vector2D normal = (path[1] - path[0]).normal() * 3;
 
-			drawablePolygon.push_back(Graphics::DrawPoint{path[0] + normal, Graphics::QuadLerp(quadUV, u1, v1)});
-			drawablePolygon.push_back(Graphics::DrawPoint{path[0] - normal, Graphics::QuadLerp(quadUV, u2, v2)});
+			stripData.points.push_back(Graphics::DrawPoint{path[0] + normal, {u1, v1}});
+			stripData.points.push_back(Graphics::DrawPoint{path[0] - normal, {u2, v2}});
 		}
 
 		for (size_t i = 1; i < path.size(); ++i)
@@ -94,13 +81,9 @@ static void DrawPath(const std::vector<Vector2D>& path, const Graphics::Sprite& 
 
 			Vector2D normal = (path[i] - path[i-1]).normal() * 3;
 
-			drawablePolygon.push_back(Graphics::DrawPoint{path[i] + normal, Graphics::QuadLerp(quadUV, u1, v1)});
-			drawablePolygon.push_back(Graphics::DrawPoint{path[i] - normal, Graphics::QuadLerp(quadUV, u2, v2)});
+			stripData.points.push_back(Graphics::DrawPoint{path[i] + normal, {u1, v1}});
+			stripData.points.push_back(Graphics::DrawPoint{path[i] - normal, {u2, v2}});
 		}
-
-		glm::mat4 transform(1.0f);
-		transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
-		Graphics::Render::DrawStrip(*navMeshSprite.getSurface(), drawablePolygon, transform, 0.5f);
 	}
 }
 
@@ -108,113 +91,102 @@ void DebugDrawSystem::update()
 {
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
-	Graphics::Renderer& renderer = mEngine.getRenderer();
 
 	auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
-	Vector2D workingRect = worldCachedData->getScreenSize();
-	Vector2D cameraLocation = worldCachedData->getCameraPos();
-	CellPos cameraCell = worldCachedData->getCameraCellPos();
-
-	Vector2D screenHalfSize = mEngine.getWindowSize() * 0.5f;
-
-	Vector2D drawShift = screenHalfSize - cameraLocation;
+	const Vector2D workingRect = worldCachedData->getScreenSize();
+	const Vector2D cameraLocation = worldCachedData->getCameraPos();
+	const CellPos cameraCell = worldCachedData->getCameraCellPos();
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(cameraLocation, workingRect);
 
 	auto [renderMode] = mRenderModeFilter.getComponents(gameData.getGameComponents());
 
+	const Vector2D screenHalfSize = workingRect * 0.5f;
+	const Vector2D drawShift = screenHalfSize - cameraLocation;
+
+	RenderAccessor* renderAccessor = nullptr;
+	if (auto [renderAccessorCmp] = gameData.getGameComponents().getComponents<RenderAccessorComponent>(); renderAccessorCmp != nullptr)
+	{
+		renderAccessor = renderAccessorCmp->getAccessor();
+	}
+
+	if (renderAccessor == nullptr)
+	{
+		return;
+	}
+
+	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
+
 	if (renderMode && renderMode->getIsDrawDebugCellInfoEnabled())
 	{
-		const Graphics::Font& font = mResourceManager.getResource<Graphics::Font>(mFontHandle);
-		const Graphics::Sprite& collisionSprite = mResourceManager.getResource<Graphics::Sprite>(mCollisionSpriteHandle);
-		Graphics::QuadUV quadUV = collisionSprite.getUV();
-
 		std::vector<WorldCell*> cellsAround = world.getSpatialData().getCellsAround(cameraLocation, screenHalfSize*2.0f);
 
 		for (WorldCell* cell : cellsAround)
 		{
 			CellPos cellPos = cell->getPos();
 			Vector2D location = SpatialWorldData::GetRelativeLocation(cameraCell, cellPos, drawShift);
-			Graphics::Render::DrawQuad(*collisionSprite.getSurface(),
-				location,
-				SpatialWorldData::CellSizeVector,
-				ZERO_VECTOR,
-				0.0f,
-				quadUV);
+			QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+			quadData.position = location;
+			quadData.size = SpatialWorldData::CellSizeVector;
+			quadData.spriteHandle = mCollisionSpriteHandle;
 
-			std::string text = FormatString("(%d, %d)", cellPos.x, cellPos.y);
-			std::array<int, 2> textSize = renderer.getTextSize(font, text.c_str());
-			Vector2D screenPos = SpatialWorldData::CellSizeVector*0.5 + SpatialWorldData::GetCellRealDistance(cellPos - cameraCell) - cameraLocation + screenHalfSize - Vector2D(static_cast<float>(textSize[0]) * 0.5f, static_cast<float>(textSize[1]) * 0.5f);
-			renderer.renderText(font, screenPos, {255, 255, 255, 255}, text.c_str());
+			TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
+			textData.color = {255, 255, 255, 255};
+			textData.fontHandle = mFontHandle;
+			textData.pos = SpatialWorldData::CellSizeVector*0.5 + SpatialWorldData::GetCellRealDistance(cellPos - cameraCell) - cameraLocation + screenHalfSize;
+			textData.text = FormatString("(%d, %d)", cellPos.x, cellPos.y);
 		}
 	}
 
 	if (renderMode && renderMode->getIsDrawDebugCollisionsEnabled())
 	{
-		const Graphics::Sprite& collisionSprite = mResourceManager.getResource<Graphics::Sprite>(mCollisionSpriteHandle);
-		Graphics::QuadUV quadUV = collisionSprite.getUV();
 		spatialManager.forEachComponentSet(
 			mCollisionDataFilter,
-			[&collisionSprite, &quadUV, drawShift](const CollisionComponent* collision, const TransformComponent* transform)
+			[&renderData, &collisionSpriteHandle = mCollisionSpriteHandle, drawShift](const CollisionComponent* collision, const TransformComponent* transform)
 		{
-			Vector2D location = transform->getLocation() + drawShift;
-			Graphics::Render::DrawQuad(*collisionSprite.getSurface(),
-				Vector2D(collision->getBoundingBox().minX + location.x, collision->getBoundingBox().minY + location.y),
-				Vector2D(collision->getBoundingBox().maxX-collision->getBoundingBox().minX,
-						 collision->getBoundingBox().maxY-collision->getBoundingBox().minY),
-				ZERO_VECTOR,
-				0.0f,
-				quadUV);
-			return true;
+			const Vector2D location = transform->getLocation() + drawShift;
+			QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+			quadData.position = Vector2D(collision->getBoundingBox().minX + location.x, collision->getBoundingBox().minY + location.y);
+			quadData.rotation = 0.0f;
+			quadData.size = Vector2D(collision->getBoundingBox().maxX-collision->getBoundingBox().minX,
+				collision->getBoundingBox().maxY-collision->getBoundingBox().minY);
+			quadData.spriteHandle = collisionSpriteHandle;
+			quadData.anchor = ZERO_VECTOR;
 		});
 	}
 
 	if (renderMode && renderMode->getIsDrawDebugAiDataEnabled())
 	{
-		const Graphics::Sprite& navMeshSprite = mResourceManager.getResource<Graphics::Sprite>(mNavmeshSpriteHandle);
-		Graphics::QuadUV quadUV = navMeshSprite.getUV();
 		auto [navMeshComponent] = mNavMeshFilter.getComponents(world.getWorldComponents());
 
 		if (navMeshComponent)
 		{
 			const NavMesh& navMesh = navMeshComponent->getNavMesh();
 			const NavMesh::Geometry& navMeshGeometry = navMesh.geometry;
-			std::vector<Graphics::DrawPoint> drawablePolygon;
-			drawablePolygon.reserve(navMeshGeometry.verticesPerPoly);
 			for (size_t k = 0; k < navMeshGeometry.polygonsCount; ++k)
 			{
-				drawablePolygon.clear();
+				PolygonRenderData& polygon = TemplateHelpers::EmplaceVariant<PolygonRenderData>(renderData->layers);
+				polygon.points.reserve(navMeshGeometry.verticesPerPoly);
 				for (size_t j = 0; j < navMeshGeometry.verticesPerPoly; ++j)
 				{
 					float u = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 					float v = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
 					Vector2D pos = navMeshGeometry.vertices[navMeshGeometry.indexes[k*navMeshGeometry.verticesPerPoly + j]];
-					drawablePolygon.push_back(Graphics::DrawPoint{pos, Graphics::QuadLerp(quadUV, u, v)});
+					polygon.points.push_back(Graphics::DrawPoint{pos, {u, v}});
 				}
-				glm::mat4 transform(1.0f);
-				transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
-				Graphics::Render::DrawFan(*navMeshSprite.getSurface(), drawablePolygon, transform, 0.3f);
-			}
 
-			/*const NavMesh::InnerLinks& navMeshLinks = navMesh.links;
-			for (size_t i = 0; i < navMeshLinks.links.size(); ++i)
-			{
-				Vector2D firstPolygonCenter = GetNavmeshPolygonCenter(i, navMeshGeometry);
-				for (NavMesh::InnerLinks::LinkData link : navMeshLinks.links[i])
-				{
-					Vector2D secondPolygonCenter = GetNavmeshPolygonCenter(link.neighbor, navMeshGeometry);
-					std::vector<Vector2D> line{firstPolygonCenter, secondPolygonCenter + (firstPolygonCenter - secondPolygonCenter)*0.52f};
-					DrawPath(line, navMeshSprite, quadUV, drawShift);
-				}
-			}*/
+				polygon.spriteHandle = mNavmeshSpriteHandle;
+				polygon.alpha = 0.3f;
+				polygon.drawShift = drawShift;
+			}
 		}
 
 		spatialManager.forEachComponentSet(
 			mAiControllerFilter,
-			[&navMeshSprite, &quadUV, drawShift](const AiControllerComponent* aiController)
+			[&navMeshSpriteHandle = mNavmeshSpriteHandle, &renderData, drawShift](const AiControllerComponent* aiController)
 		{
-			DrawPath(aiController->getPath().smoothPath, navMeshSprite, quadUV, drawShift);
+			DrawPath(*renderData, aiController->getPath().smoothPath, navMeshSpriteHandle, drawShift);
 		});
 	}
 
@@ -224,54 +196,66 @@ void DebugDrawSystem::update()
 		if (debugDraw != nullptr)
 		{
 			Vector2D pointSize(6, 6);
-			const Graphics::Sprite& pointSprite = mResourceManager.getResource<Graphics::Sprite>(mPointTextureHandle);
-			const Graphics::Sprite& lineSprite = mResourceManager.getResource<Graphics::Sprite>(mLineTextureHandle);
-			const Graphics::Font& font = mResourceManager.getResource<Graphics::Font>(mFontHandle);
 			for (const auto& screenPoint : debugDraw->getScreenPoints())
 			{
-				Graphics::Render::DrawQuad(*pointSprite.getSurface(), screenPoint.screenPos, pointSize);
+				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+				quadData.position = screenPoint.screenPos;
+				quadData.size = pointSize;
+				quadData.spriteHandle = mPointTextureHandle;
 				if (!screenPoint.name.empty())
 				{
-					renderer.renderText(font, screenPoint.screenPos, {255, 255, 255, 255}, screenPoint.name.c_str());
+					TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
+					textData.color = {255, 255, 255, 255};
+					textData.fontHandle = mFontHandle;
+					textData.pos = screenPoint.screenPos;
+					textData.text = screenPoint.name;
 				}
 			}
 
 			for (const auto& worldPoint : debugDraw->getWorldPoints())
 			{
 				Vector2D screenPos = worldPoint.pos - cameraLocation + screenHalfSize;
-				Graphics::Render::DrawQuad(*pointSprite.getSurface(), screenPos, pointSize);
+
+				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+				quadData.position = screenPos;
+				quadData.rotation = 0.0f;
+				quadData.size = pointSize;
+				quadData.spriteHandle = mPointTextureHandle;
 				if (!worldPoint.name.empty())
 				{
-					renderer.renderText(font, screenPos, {255, 255, 255, 255}, worldPoint.name.c_str());
+					TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
+					textData.color = {255, 255, 255, 255};
+					textData.fontHandle = mFontHandle;
+					textData.pos = screenPos;
+					textData.text = worldPoint.name;
 				}
 			}
 
 			for (const auto& worldLineSegment : debugDraw->getWorldLineSegments())
 			{
+				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
 				Vector2D screenPosStart = worldLineSegment.startPos - cameraLocation + screenHalfSize;
 				Vector2D screenPosEnd = worldLineSegment.endPos - cameraLocation + screenHalfSize;
 				Vector2D diff = screenPosEnd - screenPosStart;
-				Graphics::Render::DrawQuad(
-					*lineSprite.getSurface(),
-					(screenPosStart + screenPosEnd) * 0.5f,
-					Vector2D(diff.size(), pointSize.y),
-					Vector2D(0.5f, 0.5f),
-					diff.rotation().getValue(),
-					lineSprite.getUV()
-				);
+				quadData.position = (screenPosStart + screenPosEnd) * 0.5f;
+				quadData.rotation = diff.rotation().getValue();
+				quadData.size = {diff.size(), pointSize.y};
+				quadData.spriteHandle = mLineTextureHandle;
 			}
 		}
 	}
 
 	if (renderMode && renderMode->getIsDrawDebugCharacterInfoEnabled())
 	{
-		const Graphics::Font& font = mResourceManager.getResource<Graphics::Font>(mFontHandle);
 		spatialManager.forEachComponentSet(
 			mCharacterStateFilter,
-			[&renderer, &font, drawShift, cameraCell](const CharacterStateComponent* characterState, const TransformComponent* transform)
+			[&renderData, fontHandle = mFontHandle, drawShift](const CharacterStateComponent* characterState, const TransformComponent* transform)
 		{
-			Vector2D location = transform->getLocation() + drawShift;
-			renderer.renderText(font, location, {255, 255, 255, 255}, ID_TO_STR(enum_to_string(characterState->getState())).c_str());
+			TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
+			textData.color = {255, 255, 255, 255};
+			textData.fontHandle = fontHandle;
+			textData.pos = transform->getLocation() + drawShift;
+			textData.text = ID_TO_STR(enum_to_string(characterState->getState()));
 		});
 	}
 
@@ -282,6 +266,8 @@ void DebugDrawSystem::update()
 		RemoveOldDrawElement(debugDraw->getScreenPointsRef(), mTime.currentTimestamp);
 		RemoveOldDrawElement(debugDraw->getWorldLineSegmentsRef(), mTime.currentTimestamp);
 	}
+
+	renderAccessor->submitData(std::move(renderData));
 }
 
 void DebugDrawSystem::initResources()
