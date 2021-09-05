@@ -23,7 +23,7 @@ RenderThreadManager::~RenderThreadManager()
 void RenderThreadManager::startThread(HAL::ResourceManager& /*resourceManager*/, std::function<void()>&& /*threadInitializeFn*/)
 {
 /*	mRenderThread = std::make_unique<std::thread>(
-		[&renderAccessor = mRenderAccessor, &resourceManager, threadInitializeFn]
+		[&renderAccessor = mRenderAccessor, &resourceManager, &engine, threadInitializeFn]
 		{
 			if (threadInitializeFn)
 			{
@@ -153,6 +153,12 @@ namespace RenderThreadManagerInternal
 		void operator()(const TextRenderData& /*textData*/)
 		{
 			// need an implimentation when text rendering is fixed
+		}
+
+		void operator()(const SynchroneousRenderData& syncRenderData)
+		{
+			syncRenderData.renderThreadFn();
+			syncRenderData.sharedData->isFinised.store(true, std::memory_order_release);
 		}
 
 	private:

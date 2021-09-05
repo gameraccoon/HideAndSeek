@@ -9,6 +9,7 @@
 #include <raccoon-ecs/async_operations.h>
 
 #include "GameData/Components/ImguiComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "HAL/EngineFwd.h"
 
@@ -28,6 +29,7 @@ class ImguiSystem : public RaccoonEcs::System
 public:
 	ImguiSystem(
 		RaccoonEcs::ComponentAdder<ImguiComponent>&& imguiAdder,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent> renderAccessorFilter,
 		RaccoonEcs::InnerDataAccessor&& innerDataAccessor,
 		ImguiDebugData& debugData,
 		HAL::Engine& engine) noexcept;
@@ -40,6 +42,7 @@ public:
 
 private:
 	RaccoonEcs::ComponentAdder<ImguiComponent> mImguiAdder;
+	RaccoonEcs::ComponentFilter<RenderAccessorComponent> mRenderAccessorFilter;
 	RaccoonEcs::InnerDataAccessor mInnerDataAccessor;
 	HAL::Engine& mEngine;
 	ImguiDebugData& mDebugData;

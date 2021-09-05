@@ -10,16 +10,23 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include "Base/Types/TemplateHelpers.h"
+
 #include "GameData/GameData.h"
 
 #include "HAL/Base/Engine.h"
 
+#include "GameLogic/Render/RenderAccessor.h"
+
+
 ImguiSystem::ImguiSystem(
 		RaccoonEcs::ComponentAdder<ImguiComponent>&& imguiAdder,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent> renderAccessorFilter,
 		RaccoonEcs::InnerDataAccessor&& innerDataAccessor,
 		ImguiDebugData& debugData,
 		HAL::Engine& engine) noexcept
 	: mImguiAdder(std::move(imguiAdder))
+	, mRenderAccessorFilter(std::move(renderAccessorFilter))
 	, mInnerDataAccessor(std::move(innerDataAccessor))
 	, mEngine(engine)
 	, mDebugData(debugData)
@@ -38,21 +45,50 @@ void ImguiSystem::update()
 		return;
 	}
 
-	ImGui_ImplSDL2_ProcessEvent(&mEngine.getLastEventRef());
+	RenderAccessor* renderAccessor = nullptr;
+	if (auto [renderAccessorCmp] = gameData.getGameComponents().getComponents<RenderAccessorComponent>(); renderAccessorCmp != nullptr)
+	{
+		renderAccessor = renderAccessorCmp->getAccessor();
+	}
 
-	// start the imgui frame
-	ImGui_ImplOpenGL2_NewFrame();
-	ImGui_ImplSDL2_NewFrame(mEngine.getRawWindow());
-	ImGui::NewFrame();
+	if (renderAccessor == nullptr)
+	{
+		return;
+	}
 
-	// update the window hierarchy
-	mImguiMainMenu.update(mDebugData, mInnerDataAccessor);
+	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
+	SynchroneousRenderData& syncData = TemplateHelpers::EmplaceVariant<SynchroneousRenderData>(renderData->layers);
 
-	// rendering imgui to the viewport
-	ImGui::Render();
-	ImGuiIO& io = ImGui::GetIO();
-	glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
-	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+	syncData.renderThreadFn = [this] {
+		ImGui_ImplSDL2_ProcessEvent(&mEngine.getLastEventRef());
+
+		// start the imgui frame
+		ImGui_ImplOpenGL2_NewFrame();
+		ImGui_ImplSDL2_NewFrame(mEngine.getRawWindow());
+		ImGui::NewFrame();
+
+		// update the window hierarchy
+		mImguiMainMenu.update(mDebugData, mInnerDataAccessor);
+
+		// rendering imgui to the viewport
+		ImGui::Render();
+
+		ImGuiIO& io = ImGui::GetIO();
+		glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
+		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+	};
+	syncData.sharedData = std::make_shared<SyncRenderSharedData>();
+
+	// have a owning copy of the data before moving render data to the render thread
+	std::shared_ptr<SyncRenderSharedData> sharedData = syncData.sharedData;
+
+	renderAccessor->submitData(std::move(renderData));
+
+	/* this is temporary commented until we use real render thread
+	// wait until we finish rendering
+	std::unique_lock lock(sharedData->isFinishedMutex);
+	sharedData->onFinished.wait(lock, [&sharedData]{ return sharedData->isFinised; });
+	*/
 }
 
 void ImguiSystem::initResources()

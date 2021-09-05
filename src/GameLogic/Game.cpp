@@ -252,8 +252,9 @@ void Game::initSystems()
 #ifdef IMGUI_ENABLED
 	mSystemsManager.registerSystem<ImguiSystem,
 		RaccoonEcs::ComponentAdder<ImguiComponent>,
+		RaccoonEcs::ComponentFilter<RenderAccessorComponent>,
 		RaccoonEcs::InnerDataAccessor>(
-		RaccoonEcs::SystemDependencies().limitConcurrentlyRunSystemsTo(0),
+		RaccoonEcs::SystemDependencies(),
 		mImguiDebugData,
 		getEngine()
 	);

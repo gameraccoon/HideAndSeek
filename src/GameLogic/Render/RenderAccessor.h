@@ -59,6 +59,19 @@ struct TextRenderData {
 	Graphics::Color color;
 };
 
+struct SyncRenderSharedData {
+	std::condition_variable onFinished;
+	std::mutex isFinishedMutex;
+	bool isFinised = false;
+};
+struct SynchroneousRenderData {
+	std::shared_ptr<SyncRenderSharedData> sharedData;
+	std::function<void()> renderThreadFn;
+};
+
+struct SwapBuffersCommand {
+};
+
 struct RenderData
 {
 	using Layer = std::variant<
@@ -67,7 +80,8 @@ struct RenderData
 		QuadRenderData,
 		StripRenderData,
 		PolygonRenderData,
-		TextRenderData
+		TextRenderData,
+		SynchroneousRenderData
 	>;
 
 	std::vector<Layer> layers;
