@@ -156,9 +156,6 @@ namespace HAL
 	{
 		while (!mQuit)
 		{
-			SDL_GL_SwapWindow(mWindow.getRawWindow());
-			glClear(GL_COLOR_BUFFER_BIT);
-
 			parseEvents();
 
 			float currentTicks = static_cast<float>(SDL_GetTicks());

@@ -8,6 +8,7 @@
 namespace HAL
 {
 	class ResourceManager;
+	class Engine;
 }
 
 class RenderThreadManager
@@ -22,22 +23,23 @@ public:
 
 	RenderAccessor& getAccessor() { return mRenderAccessor; }
 
-	void startThread(HAL::ResourceManager& resourceManager, std::function<void()>&& threadInitializeFn);
+	void startThread(HAL::ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn);
 
 	// temp code
-	void testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager)
+	void testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
 	{
 		RenderDataVector dataToRender;
 		TransferDataToQueue(dataToRender, renderAccessor.dataToTransfer);
-		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager);
+		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
 	}
 
 private:
 	using RenderDataVector = std::vector<std::unique_ptr<RenderData>>;
+
 private:
-	static void RenderThreadFunction(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager);
+	static void RenderThreadFunction(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine);
 	static void TransferDataToQueue(RenderDataVector& inOutDataToRender, RenderDataVector& inOutDataToTransfer);
-	static void ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager);
+	static void ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine);
 
 private:
 	// contains everything needed to communicate with the render thread

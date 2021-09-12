@@ -2,13 +2,16 @@
 
 #include "GameLogic/Render/RenderThreadManager.h"
 
+#include <glew/glew.h>
 #include <glm/matrix.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <SDL_video.h>
 
 #include "HAL/Base/Math.h"
 #include "HAL/Base/ResourceManager.h"
 #include "HAL/Graphics/Renderer.h"
 #include "HAL/Graphics/Sprite.h"
+#include "HAL/Base/Engine.h"
 
 RenderThreadManager::~RenderThreadManager()
 {
@@ -20,7 +23,7 @@ RenderThreadManager::~RenderThreadManager()
 	mRenderThread->join();
 }
 
-void RenderThreadManager::startThread(HAL::ResourceManager& /*resourceManager*/, std::function<void()>&& /*threadInitializeFn*/)
+void RenderThreadManager::startThread(HAL::ResourceManager& /*resourceManager*/, HAL::Engine& /*engine*/, std::function<void()>&& /*threadInitializeFn*/)
 {
 /*	mRenderThread = std::make_unique<std::thread>(
 		[&renderAccessor = mRenderAccessor, &resourceManager, &engine, threadInitializeFn]
@@ -29,7 +32,7 @@ void RenderThreadManager::startThread(HAL::ResourceManager& /*resourceManager*/,
 			{
 				threadInitializeFn();
 			}
-			RenderThreadManager::RenderThreadFunction(renderAccessor, resourceManager);
+			RenderThreadManager::RenderThreadFunction(renderAccessor, resourceManager, engine);
 		}
 	);*/
 }
@@ -39,8 +42,9 @@ namespace RenderThreadManagerInternal
 	class RenderVisitor
 	{
 	public:
-		RenderVisitor(HAL::ResourceManager& resourceManager)
+		RenderVisitor(HAL::ResourceManager& resourceManager, HAL::Engine& engine)
 			: mResourceManager(resourceManager)
+			, mEngine(engine)
 		{}
 
 		void operator()(BackgroundRenderData&& bgData)
@@ -158,15 +162,26 @@ namespace RenderThreadManagerInternal
 		void operator()(const SynchroneousRenderData& syncRenderData)
 		{
 			syncRenderData.renderThreadFn();
-			syncRenderData.sharedData->isFinised.store(true, std::memory_order_release);
+
+			syncRenderData.sharedData->isFinishedMutex.lock();
+			syncRenderData.sharedData->isFinised = true;
+			syncRenderData.sharedData->isFinishedMutex.unlock();
+			syncRenderData.sharedData->onFinished.notify_one();
+		}
+
+		void operator()(const SwapBuffersCommand&)
+		{
+			SDL_GL_SwapWindow(mEngine.getRawWindow());
+			glClear(GL_COLOR_BUFFER_BIT);
 		}
 
 	private:
 		HAL::ResourceManager& mResourceManager;
+		HAL::Engine& mEngine;
 	};
 }
 
-void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager)
+void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
 {
 	std::vector<std::unique_ptr<RenderData>> dataToRender;
 	while(true)
@@ -185,7 +200,7 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 			TransferDataToQueue(dataToRender, renderAccessor.dataToTransfer);
 		}
 
-		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager);
+		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
 	}
 }
 
@@ -207,14 +222,14 @@ void RenderThreadManager::TransferDataToQueue(RenderDataVector& inOutDataToRende
 	}
 }
 
-void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager)
+void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
 {
 	using namespace RenderThreadManagerInternal;
 	for (std::unique_ptr<RenderData>& renderData : dataToRender)
 	{
 		for (RenderData::Layer& layer : renderData->layers)
 		{
-			std::visit(RenderVisitor{resourceManager}, std::move(layer));
+			std::visit(RenderVisitor{resourceManager, engine}, std::move(layer));
 		}
 	}
 	dataToRender.clear();

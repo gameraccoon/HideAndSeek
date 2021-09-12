@@ -81,8 +81,15 @@ struct RenderData
 		StripRenderData,
 		PolygonRenderData,
 		TextRenderData,
-		SynchroneousRenderData
+		SynchroneousRenderData,
+		SwapBuffersCommand
 	>;
+
+	RenderData() = default;
+
+	RenderData(std::vector<Layer>&& layers)
+		: layers(layers)
+	{}
 
 	std::vector<Layer> layers;
 };

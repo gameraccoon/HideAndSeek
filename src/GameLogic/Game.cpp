@@ -4,6 +4,8 @@
 
 #include <raccoon-ecs/async_operations.h>
 
+#include "Base/Types/TemplateHelpers.h"
+
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 
@@ -62,7 +64,7 @@ void Game::start(ArgumentsParser& arguments)
 	);
 
 	//getEngine().releaseRenderContext();
-	mRenderThread.startThread(getResourceManager(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
+	mRenderThread.startThread(getResourceManager(), getEngine(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
 
 #ifdef PROFILE_SYSTEMS
 	mProfileSystems = arguments.hasArgument("profile-systems");
@@ -92,6 +94,10 @@ void Game::setMouseKeyState(int key, bool isPressed)
 
 void Game::update(float dt)
 {
+	std::unique_ptr<RenderData> renderCommands = std::make_unique<RenderData>();
+	TemplateHelpers::EmplaceVariant<SwapBuffersCommand>(renderCommands->layers);
+	mRenderThread.getAccessor().submitData(std::move(renderCommands));
+
 	mInputData.windowSize = getEngine().getWindowSize();
 	mInputData.mousePos = getEngine().getMousePos();
 
@@ -99,7 +105,7 @@ void Game::update(float dt)
 	mSystemsManager.update();
 
 	// test code
-	mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager());
+	mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
 
 	mInputData.clearAfterFrame();
 
