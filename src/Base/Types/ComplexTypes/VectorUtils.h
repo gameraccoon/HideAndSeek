@@ -71,4 +71,32 @@ namespace VectorUtils
 		(TemplateHelpers::CopyOrMoveContainer<Others>(std::forward<Others>(otherVectors), std::back_inserter(result)), ...);
 		return result;
 	}
+
+	template<typename VectorBase, typename VectorAdded>
+	void AppendToVector(VectorBase& base, VectorAdded&& added)
+	{
+		if (base.empty())
+		{
+			base = std::forward<VectorAdded>(added);
+		}
+		else
+		{
+			if constexpr (std::is_rvalue_reference<VectorAdded&&>::value)
+			{
+				std::move(
+					added.begin(),
+					added.end(),
+					std::back_inserter(base)
+				);
+			}
+			else
+			{
+				std::copy(
+					added.begin(),
+					added.end(),
+					std::back_inserter(base)
+				);
+			}
+		}
+	}
 }

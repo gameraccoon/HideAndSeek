@@ -45,6 +45,6 @@ namespace Graphics
 		Renderer& operator=(Renderer&&) = delete;
 
 		void renderText(const Font& font, Vector2D pos, Color color, const char* text);
-		[[nodiscard]] std::array<int, 2> getTextSize(const Font& font, const char* text);
+		std::array<int, 2> getTextSize(const Font& font, const char* text);
 	};
 }

@@ -13,6 +13,7 @@
 
 #include "Utils/Geometry/VisibilityPolygon.h"
 
+#include "HAL/Graphics/Font.h"
 
 DebugDrawSystem::DebugDrawSystem(
 		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
@@ -276,5 +277,5 @@ void DebugDrawSystem::initResources()
 	mNavmeshSpriteHandle = mResourceManager.lockSprite("resources/textures/testTexture.png");
 	mPointTextureHandle = mResourceManager.lockSprite("resources/textures/collision.png");
 	mLineTextureHandle = mResourceManager.lockSprite("resources/textures/testTexture.png");
-	mFontHandle = mResourceManager.lockFont("resources/fonts/prstart.ttf", 16);
+	mFontHandle = mResourceManager.lockResource<Graphics::Font>("resources/fonts/prstart.ttf", 16);
 }

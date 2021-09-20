@@ -98,7 +98,7 @@ void ResourceStreamingSystem::update()
 		{
 			animations[i].animation = mResourceManager.lockSpriteAnimationClip(descriptions[i].path);
 			animations[i].params = descriptions[i].params;
-			animations[i].sprites = mResourceManager.getResource<Graphics::SpriteAnimationClip>(animations[i].animation).getSprites();
+			animations[i].sprites = mResourceManager.tryGetResource<Graphics::SpriteAnimationClip>(animations[i].animation)->getSprites();
 
 			AssertFatal(!animations[i].sprites.empty(), "Empty SpriteAnimation '%s'", descriptions[i].path.c_str());
 			spriteDatas.emplace_back(descriptions[i].spriteParams, animations[i].sprites.front());
@@ -142,11 +142,11 @@ void ResourceStreamingSystem::update()
 		for (const ResourcePath& groupPath : animationGroupCreator->getAnimationGroups())
 		{
 			ResourceHandle animGroupHandle = mResourceManager.lockAnimationGroup(groupPath);
-			const Graphics::AnimationGroup& group = mResourceManager.getResource<Graphics::AnimationGroup>(animGroupHandle);
+			const Graphics::AnimationGroup* group = mResourceManager.tryGetResource<Graphics::AnimationGroup>(animGroupHandle);
 			AnimationGroup<StringId> animationGroup;
-			animationGroup.currentState = group.getDefaultState();
-			animationGroup.animationClips = group.getAnimationClips();
-			animationGroup.stateMachineId = group.getStateMachineId();
+			animationGroup.currentState = group->getDefaultState();
+			animationGroup.animationClips = group->getAnimationClips();
+			animationGroup.stateMachineId = group->getStateMachineId();
 			animationGroup.animationClipIdx = clipDatas.size();
 
 			AnimationClip clip;

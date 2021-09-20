@@ -3,9 +3,9 @@
 #include <map>
 #include <unordered_map>
 #include <functional>
+#include <mutex>
 
 #include "Base/Types/String/Path.h"
-#include "Base/Debug/ConcurrentAccessDetector.h"
 
 #include "GameData/Core/ResourceHandle.h"
 
@@ -29,34 +29,38 @@ namespace HAL
 		ResourceManager(ResourceManager&&) = delete;
 		ResourceManager& operator=(ResourceManager&&) = delete;
 
-		ResourceHandle lockFont(const ResourcePath& path, int fontSize);
 		ResourceHandle lockSprite(const ResourcePath& path);
 		ResourceHandle lockSpriteAnimationClip(const ResourcePath& path);
 		ResourceHandle lockAnimationGroup(const ResourcePath& path);
-		ResourceHandle lockSound(const ResourcePath& path);
-		ResourceHandle lockMusic(const ResourcePath& path);
-	private:
 
-		ResourceHandle lockSurface(const ResourcePath& path);
-	public:
-
-		template<typename T>
-		[[nodiscard]] const T& getResource(ResourceHandle handle)
+		template<typename T, typename... Args>
+		[[nodiscard]] ResourceHandle lockResource(Args&&... args)
 		{
-			DETECT_CONCURRENT_ACCESS(mConcurrencyDetector);
-			auto it = mResources.find(handle.resourceIndex);
-			AssertFatal(it != mResources.end(), "Trying to access non loaded resource");
-			return static_cast<T&>(*it->second);
+			std::scoped_lock l(mDataMutex);
+			std::string id = T::getUniqueId(args...);
+			auto it = mPathsMap.find(static_cast<ResourcePath>(id));
+			if (it != mPathsMap.end())
+			{
+				++mResourceLocksCount[it->second];
+				return ResourceHandle(it->second);
+			}
+			else
+			{
+				int thisHandle = createResourceLock(static_cast<ResourcePath>(id));
+				mResources[thisHandle] = std::make_unique<T>(std::forward<Args>(args)...);
+				return ResourceHandle(thisHandle);
+			}
 		}
 
 		template<typename T>
 		[[nodiscard]] const T* tryGetResource(ResourceHandle handle)
 		{
-			DETECT_CONCURRENT_ACCESS(mConcurrencyDetector);
+			std::scoped_lock l(mDataMutex);
 			auto it = mResources.find(handle.resourceIndex);
 			return it == mResources.end() ? nullptr : static_cast<T*>(it->second.get());
 		}
 
+		void lockResource(ResourceHandle handle);
 		void unlockResource(ResourceHandle handle);
 
 		void loadAtlasesData(const ResourcePath& listPath);
@@ -78,7 +82,10 @@ namespace HAL
 		using ReleaseFn = std::function<void(Resource*)>;
 
 	private:
-		int createResourceLock(const ResourcePath& path);
+
+		ResourceHandle lockSurface(const ResourcePath& path);
+
+		ResourceHandle::IndexType createResourceLock(const ResourcePath& path);
 
 		void loadOneAtlasData(const ResourcePath& path);
 		std::vector<ResourcePath> loadSpriteAnimClipData(const ResourcePath& path);
@@ -93,8 +100,8 @@ namespace HAL
 
 		std::unordered_map<ResourcePath, AtlasFrameData> mAtlasFrames;
 
-		int mHandleIdx = 0;
+		ResourceHandle::IndexType mHandleIdx = 0;
 
-		ConcurrentAccessDetector mConcurrencyDetector;
+		std::recursive_mutex mDataMutex;
 	};
 }

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vector>
+
+#include <GameData/Core/ResourceHandle.h>
+
 namespace HAL
 {
 	/**
@@ -16,6 +20,15 @@ namespace HAL
 		Resource(Resource&&) = default;
 		Resource& operator=(Resource&&) = default;
 
-		[[nodiscard]] virtual bool isValid() const = 0;
+		virtual bool isValid() const = 0;
+
+		void addDependency(ResourceHandle handle);
+		void addDependencies(const std::vector<ResourceHandle>& handles);
+		void addDependencies(std::vector<ResourceHandle>&& handles);
+		const std::vector<ResourceHandle>& getResourceDependencies() const;
+		std::vector<ResourceHandle>&& getResourceDependencies();
+
+	private:
+		std::vector<ResourceHandle> mResourceDependencies;
 	};
 }

@@ -7,6 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <SDL_video.h>
 
+#include "Base/Types/ComplexTypes/VectorUtils.h"
+
 #include "HAL/Base/Math.h"
 #include "HAL/Base/ResourceManager.h"
 #include "HAL/Graphics/Renderer.h"
@@ -23,9 +25,9 @@ RenderThreadManager::~RenderThreadManager()
 	mRenderThread->join();
 }
 
-void RenderThreadManager::startThread(HAL::ResourceManager& /*resourceManager*/, HAL::Engine& /*engine*/, std::function<void()>&& /*threadInitializeFn*/)
+void RenderThreadManager::startThread(HAL::ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn)
 {
-/*	mRenderThread = std::make_unique<std::thread>(
+	mRenderThread = std::make_unique<std::thread>(
 		[&renderAccessor = mRenderAccessor, &resourceManager, &engine, threadInitializeFn]
 		{
 			if (threadInitializeFn)
@@ -34,7 +36,12 @@ void RenderThreadManager::startThread(HAL::ResourceManager& /*resourceManager*/,
 			}
 			RenderThreadManager::RenderThreadFunction(renderAccessor, resourceManager, engine);
 		}
-	);*/
+	);
+}
+
+void RenderThreadManager::testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
+{
+	ConsumeAndRenderQueue(std::move(renderAccessor.dataToTransfer), resourceManager, engine);
 }
 
 namespace RenderThreadManagerInternal
@@ -197,28 +204,11 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 				return;
 			}
 
-			TransferDataToQueue(dataToRender, renderAccessor.dataToTransfer);
+			VectorUtils::AppendToVector(dataToRender, std::move(renderAccessor.dataToTransfer));
+			renderAccessor.dataToTransfer.clear();
 		}
 
 		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
-	}
-}
-
-void RenderThreadManager::TransferDataToQueue(RenderDataVector& inOutDataToRender, RenderDataVector& inOutDataToTransfer)
-{
-	if (inOutDataToRender.empty())
-	{
-		inOutDataToRender = std::move(inOutDataToTransfer);
-	}
-	else
-	{
-		inOutDataToRender.reserve(inOutDataToRender.size() + inOutDataToTransfer.size());
-		std::move(
-			inOutDataToTransfer.begin(),
-			inOutDataToTransfer.end(),
-			std::back_inserter(inOutDataToRender)
-		);
-		inOutDataToTransfer.clear();
 	}
 }
 

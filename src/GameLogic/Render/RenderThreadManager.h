@@ -26,19 +26,13 @@ public:
 	void startThread(HAL::ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn);
 
 	// temp code
-	void testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
-	{
-		RenderDataVector dataToRender;
-		TransferDataToQueue(dataToRender, renderAccessor.dataToTransfer);
-		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
-	}
+	void testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine);
 
 private:
 	using RenderDataVector = std::vector<std::unique_ptr<RenderData>>;
 
 private:
 	static void RenderThreadFunction(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine);
-	static void TransferDataToQueue(RenderDataVector& inOutDataToRender, RenderDataVector& inOutDataToTransfer);
 	static void ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine);
 
 private:

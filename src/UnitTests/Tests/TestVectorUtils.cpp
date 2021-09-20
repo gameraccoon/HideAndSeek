@@ -155,3 +155,54 @@ TEST(VectorUtils, JoinVectors)
 		EXPECT_EQ(std::vector<int>({1, 2}), lvalueOriginalVector);
 	}
 }
+
+TEST(VectorUtils, AppendToVector)
+{
+	using namespace VectorUtils;
+
+	{
+		std::vector<int> base;
+		std::vector<int> appended{1, 2};
+		AppendToVector(base, appended);
+		EXPECT_EQ(static_cast<size_t>(2), base.size());
+		EXPECT_EQ(static_cast<size_t>(2), appended.size());
+		if (base.size() > 1) {
+			EXPECT_EQ(1, base[0]);
+			EXPECT_EQ(2, base[1]);
+		}
+	}
+
+	{
+		std::vector<int> base;
+		std::vector<int> appended{1, 2};
+		AppendToVector(base, std::move(appended));
+		EXPECT_EQ(static_cast<size_t>(2), base.size());
+		if (base.size() > 1) {
+			EXPECT_EQ(1, base[0]);
+			EXPECT_EQ(2, base[1]);
+		}
+	}
+
+	{
+		std::vector<int> base{1};
+		std::vector<int> appended{2};
+		AppendToVector(base, appended);
+		EXPECT_EQ(static_cast<size_t>(2), base.size());
+		EXPECT_EQ(static_cast<size_t>(1), appended.size());
+		if (base.size() > 1) {
+			EXPECT_EQ(1, base[0]);
+			EXPECT_EQ(2, base[1]);
+		}
+	}
+
+	{
+		std::vector<int> base{1};
+		std::vector<int> appended{2};
+		AppendToVector(base, std::move(appended));
+		EXPECT_EQ(static_cast<size_t>(2), base.size());
+		if (base.size() > 1) {
+			EXPECT_EQ(1, base[0]);
+			EXPECT_EQ(2, base[1]);
+		}
+	}
+}

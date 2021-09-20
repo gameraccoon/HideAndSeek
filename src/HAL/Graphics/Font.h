@@ -23,9 +23,11 @@ namespace Graphics
 
 		~Font() override;
 
-		[[nodiscard]] bool isValid() const override;
+		bool isValid() const override;
 
-		[[nodiscard]] FC_Font* getRawFont() const;
+		static std::string getUniqueId(const ResourcePath& path, int fontSize);
+
+		FC_Font* getRawFont() const;
 
 	private:
 		FC_Font* mFont = nullptr;

@@ -24,7 +24,7 @@ public:
 		explicit Guard(ConcurrentAccessDetector& detector)
 			: mDetector(detector)
 		{
-            mDetector.acquire();
+			mDetector.acquire();
 		}
 
 		~Guard()

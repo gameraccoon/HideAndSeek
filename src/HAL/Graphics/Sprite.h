@@ -17,13 +17,13 @@ namespace Graphics
 	public:
 		Sprite(const Internal::Surface* surface, QuadUV uv);
 
-		[[nodiscard]] int getHeight() const;
-		[[nodiscard]] int getWidth() const;
+		int getHeight() const;
+		int getWidth() const;
 
-		[[nodiscard]] const Internal::Surface* getSurface() const;
-		[[nodiscard]] QuadUV getUV() const { return mUV; }
+		const Internal::Surface* getSurface() const;
+		QuadUV getUV() const { return mUV; }
 
-		[[nodiscard]] bool isValid() const override;
+		bool isValid() const override;
 
 	private:
 		const Internal::Surface* mSurface = nullptr;

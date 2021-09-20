@@ -81,5 +81,10 @@ namespace Graphics
 		{
 			return mSurface != nullptr;
 		}
+
+		std::string Surface::getUniqueId(const std::string& filename)
+		{
+			return filename;
+		}
 	}
 }

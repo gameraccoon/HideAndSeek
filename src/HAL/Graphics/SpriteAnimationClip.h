@@ -21,10 +21,10 @@ namespace Graphics
 		SpriteAnimationClip() = default;
 		explicit SpriteAnimationClip(std::vector<ResourceHandle>&& sprites);
 
-		[[nodiscard]] bool isValid() const override;
+		bool isValid() const override;
 
-		[[nodiscard]] const ResourceHandle& getSprite(float progress) const;
-		[[nodiscard]] const std::vector<ResourceHandle>& getSprites() const;
+		const ResourceHandle& getSprite(float progress) const;
+		const std::vector<ResourceHandle>& getSprites() const;
 
 	private:
 		std::vector<ResourceHandle> mSprites;

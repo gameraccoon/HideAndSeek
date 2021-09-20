@@ -19,10 +19,10 @@ namespace Graphics
 		AnimationGroup() = default;
 		explicit AnimationGroup(std::map<StringId, std::vector<ResourceHandle>>&& animationClips, StringId stateMachineId, StringId defaultState);
 
-		[[nodiscard]] bool isValid() const override;
-		[[nodiscard]] StringId getStateMachineId() const { return mStateMachineId; }
-		[[nodiscard]] std::map<StringId, std::vector<ResourceHandle>> getAnimationClips() const { return mAnimationClips; }
-		[[nodiscard]] StringId getDefaultState() const { return mDefaultState; }
+		bool isValid() const override;
+		StringId getStateMachineId() const { return mStateMachineId; }
+		std::map<StringId, std::vector<ResourceHandle>> getAnimationClips() const { return mAnimationClips; }
+		StringId getDefaultState() const { return mDefaultState; }
 
 	private:
 		std::map<StringId, std::vector<ResourceHandle>> mAnimationClips;

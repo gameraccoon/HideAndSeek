@@ -23,12 +23,14 @@ namespace Graphics
 
 			~Surface() override;
 
-			[[nodiscard]] int getWidth() const;
-			[[nodiscard]] int getHeight() const;
+			int getWidth() const;
+			int getHeight() const;
 
 			void bind() const;
 
-			[[nodiscard]] bool isValid() const override;
+			bool isValid() const override;
+
+			static std::string getUniqueId(const std::string& filename);
 
 		private:
 			SDL_Surface* mSurface;

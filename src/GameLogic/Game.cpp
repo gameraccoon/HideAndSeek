@@ -64,7 +64,7 @@ void Game::start(ArgumentsParser& arguments)
 	);
 
 	//getEngine().releaseRenderContext();
-	mRenderThread.startThread(getResourceManager(), getEngine(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
+	//mRenderThread.startThread(getResourceManager(), getEngine(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
 
 #ifdef PROFILE_SYSTEMS
 	mProfileSystems = arguments.hasArgument("profile-systems");
