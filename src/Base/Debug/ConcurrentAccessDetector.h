@@ -21,10 +21,11 @@ public:
 	class Guard
 	{
 	public:
-		explicit Guard(ConcurrentAccessDetector& detector)
+		template<typename Func = std::nullptr_t>
+		explicit Guard(ConcurrentAccessDetector& detector, Func errorHandler = nullptr)
 			: mDetector(detector)
 		{
-			mDetector.acquire();
+			mDetector.acquire(errorHandler);
 		}
 
 		~Guard()
@@ -53,7 +54,8 @@ public:
 	ConcurrentAccessDetector(ConcurrentAccessDetector&&) = delete;
 	ConcurrentAccessDetector& operator=(ConcurrentAccessDetector&&) = delete;
 
-	void acquire()
+	template<typename Func = std::nullptr_t>
+	void acquire(Func errorHandler = nullptr)
 	{
 		// Note that this code doesn't have to be 100% thread-safe
 		// covering 90% cases is enough to detect data races
@@ -64,7 +66,15 @@ public:
 			std::thread::id currentThreadID = std::this_thread::get_id();
 			if (ownedThreadID != currentThreadID)
 			{
-				ReportErrorRelease("A data race detected");
+				if constexpr (!std::is_same<Func, std::nullptr_t>::value)
+				{
+					errorHandler();
+				}
+				else
+				{
+					ReportErrorRelease("A data race detected");
+					(void)errorHandler;
+				}
 			}
 		}
 		else
@@ -111,7 +121,7 @@ public:
 
 #ifdef CONCURRENT_ACCESS_DETECTION
 #define DETECT_CONCURRENT_ACCESS_NAME(A,B) A##B
-#define DETECT_CONCURRENT_ACCESS_IMPL(dataRaceDetector, namePostfix) ConcurrentAccessDetector::Guard DETECT_CONCURRENT_ACCESS_NAME(cadg_inst_, namePostfix)(dataRaceDetector)
+#define DETECT_CONCURRENT_ACCESS_IMPL(dataRaceDetector, namePostfix) ConcurrentAccessDetector::Guard DETECT_CONCURRENT_ACCESS_NAME(cadg_inst_, namePostfix)(dataRaceDetector, []{ReportErrorRelease("A data race detected");})
 // macro generates a unique instance name of the guard for us
 #define DETECT_CONCURRENT_ACCESS(dataRaceDetector) DETECT_CONCURRENT_ACCESS_IMPL(dataRaceDetector, __COUNTER__)
 #else
