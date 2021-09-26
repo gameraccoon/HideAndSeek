@@ -215,8 +215,41 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
 {
 	using namespace RenderThreadManagerInternal;
-	for (std::unique_ptr<RenderData>& renderData : dataToRender)
+
+	size_t firstSwap = 0;
+	size_t lastSwap = 0;
+	bool hasMetSwap = false;
+	for (size_t i = 0; i < dataToRender.size(); ++i)
 	{
+		RenderData* renderData = dataToRender[i].get();
+		for (RenderData::Layer& layer : renderData->layers)
+		{
+			if (std::holds_alternative<SwapBuffersCommand>(layer))
+			{
+				if (!hasMetSwap)
+				{
+					hasMetSwap = true;
+					firstSwap = i;
+				}
+				else
+				{
+					// skipped a render frame
+					// probably need to log it somewhere for analysis
+					ReportError("render frame skipped");
+				}
+				lastSwap = i;
+			}
+		}
+	}
+
+	for (size_t i = 0; i < dataToRender.size(); ++i)
+	{
+		if (firstSwap <= i && i < lastSwap)
+		{
+			continue;
+		}
+
+		RenderData* renderData = dataToRender[i].get();
 		for (RenderData::Layer& layer : renderData->layers)
 		{
 			std::visit(RenderVisitor{resourceManager, engine}, std::move(layer));
