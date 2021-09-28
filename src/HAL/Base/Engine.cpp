@@ -95,7 +95,6 @@ namespace HAL
 
 	Vector2D Engine::getMousePos() const
 	{
-		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
 		return Vector2D(mPimpl->mMouseX, mPimpl->mMouseY);
 	}
 
@@ -120,7 +119,6 @@ namespace HAL
 
 	Vector2D Engine::getWindowSize() const
 	{
-		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
 		return Vector2D(static_cast<float>(WindowWidth), static_cast<float>(WindowHeight));
 	}
 
@@ -179,7 +177,6 @@ namespace HAL
 
 	void Engine::Impl::parseEvents()
 	{
-		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{

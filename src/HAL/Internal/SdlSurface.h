@@ -23,18 +23,25 @@ namespace Graphics
 
 			~Surface() override;
 
+			bool isValid() const override;
+
+			const SpecialThreadInit* getSpecialThreadInitialization() const override;
+
+			void setTextureId(unsigned int textureId) { mTextureID = textureId; }
+			unsigned int getTextureId() { return mTextureID; }
+
 			int getWidth() const;
 			int getHeight() const;
 
 			void bind() const;
+			const SDL_Surface* getRawSurface() const { return mSurface; }
 
-			bool isValid() const override;
-
-			static std::string getUniqueId(const std::string& filename);
+			static std::string GetUniqueId(const std::string& filename);
 
 		private:
 			SDL_Surface* mSurface;
 			unsigned int mTextureID;
+			static SpecialThreadInit RenderThreadInit;
 		};
 	}
 }

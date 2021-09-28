@@ -25,7 +25,7 @@ namespace Graphics
 
 		bool isValid() const override;
 
-		static std::string getUniqueId(const ResourcePath& path, int fontSize);
+		static std::string GetUniqueId(const ResourcePath& path, int fontSize);
 
 		FC_Font* getRawFont() const;
 

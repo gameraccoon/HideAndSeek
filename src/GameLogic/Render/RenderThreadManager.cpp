@@ -208,6 +208,7 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 			renderAccessor.dataToTransfer.clear();
 		}
 
+		resourceManager.RunRenderThreadTasks();
 		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
 	}
 }

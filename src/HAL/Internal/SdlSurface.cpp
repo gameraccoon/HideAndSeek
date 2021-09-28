@@ -22,18 +22,19 @@ namespace Graphics
 {
 	namespace Internal
 	{
-		Surface::Surface(const std::string& filename)
-			: mSurface(IMG_Load(filename.c_str()))
-			, mTextureID(0)
+		static bool InitSurfaceRenderThread(HAL::Resource* resource)
 		{
-			DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
-			AssertFatal(mSurface, "Unable to load texture %s", filename);
+			Surface* surface = static_cast<Surface*>(resource);
 
-			glGenTextures(1, &mTextureID);
-			glBindTexture(GL_TEXTURE_2D, mTextureID);
+			unsigned int textureId;
+			glGenTextures(1, &textureId);
+			glBindTexture(GL_TEXTURE_2D, textureId);
+			surface->setTextureId(textureId);
+
+			const SDL_Surface* sdlSurface = surface->getRawSurface();
 
 			int mode;
-			switch (mSurface->format->BytesPerPixel)
+			switch (sdlSurface->format->BytesPerPixel)
 			{
 			case 4:
 				mode = GL_RGBA;
@@ -45,18 +46,52 @@ namespace Graphics
 				mode = GL_LUMINANCE_ALPHA;
 				break;
 			default:
-				throw std::runtime_error("Image with unknown channel profile");
+				ReportError("Image with unknown channel profile");
+				return false;
 			}
 
-			glTexImage2D(GL_TEXTURE_2D, 0, mode, mSurface->w, mSurface->h, 0, static_cast<GLenum>(mode), GL_UNSIGNED_BYTE, mSurface->pixels);
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				mode,
+				sdlSurface->w,
+				sdlSurface->h,
+				0,
+				static_cast<GLenum>(mode),
+				GL_UNSIGNED_BYTE,
+				sdlSurface->pixels
+			);
+
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			return true;
+		}
+
+		static void DeinitSurfaceRenderThread(HAL::Resource* resource)
+		{
+			Surface* surface = static_cast<Surface*>(resource);
+			unsigned int textureId = surface->getTextureId();
+			glDeleteTextures(1, &textureId);
+		}
+
+		Surface::SpecialThreadInit Surface::RenderThreadInit{
+			Surface::SpecialThreadInit::Step{
+				.thread = SpecialThreadInit::Thread::Render,
+				.init = &InitSurfaceRenderThread,
+				.deinit = &DeinitSurfaceRenderThread,
+			}
+		};
+
+		Surface::Surface(const std::string& filename)
+			: mSurface(IMG_Load(filename.c_str()))
+			, mTextureID(0)
+		{
+			AssertFatal(mSurface, "Unable to load texture %s", filename);
 		}
 
 		Surface::~Surface()
 		{
 			SDL_FreeSurface(mSurface);
-			glDeleteTextures(1, &mTextureID);
 		}
 
 		int Surface::getWidth() const
@@ -82,9 +117,14 @@ namespace Graphics
 			return mSurface != nullptr;
 		}
 
-		std::string Surface::getUniqueId(const std::string& filename)
+		std::string Surface::GetUniqueId(const std::string& filename)
 		{
 			return filename;
+		}
+
+		const HAL::Resource::SpecialThreadInit* Surface::getSpecialThreadInitialization() const
+		{
+			return &RenderThreadInit;
 		}
 	}
 }

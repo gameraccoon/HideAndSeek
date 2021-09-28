@@ -9,64 +9,130 @@
 
 #include <nlohmann/json.hpp>
 
-#include "HAL/Internal/SdlSurface.h"
-
 #include "HAL/Audio/Music.h"
 #include "HAL/Audio/Sound.h"
 #include "HAL/Graphics/Font.h"
 #include "HAL/Graphics/Sprite.h"
 #include "HAL/Graphics/SpriteAnimationClip.h"
 #include "HAL/Graphics/AnimationGroup.h"
+#include "HAL/Internal/SdlSurface.h"
 
 namespace HAL
 {
+	void ResourceDependencies::setFirstDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency)
+	{
+		dependencies[dependentResource].push_back(dependency);
+		dependentResources[dependency].push_back(dependentResource);
+	}
+
+	void ResourceDependencies::setFirstDependOnSecond(ResourceHandle dependentResource, std::vector<ResourceHandle>&& dependencies)
+	{
+		for (ResourceHandle dependency : dependencies)
+		{
+			setFirstDependOnSecond(dependentResource, dependency);
+		}
+	}
+
+	const std::vector<ResourceHandle>& ResourceDependencies::getDependencies(ResourceHandle resource) const
+	{
+		static const std::vector<ResourceHandle> emptyVector;
+		if (auto it = dependencies.find(resource); it != dependencies.end())
+		{
+			return it->second;
+		}
+		else
+		{
+			return emptyVector;
+		}
+	}
+
+	const std::vector<ResourceHandle>& ResourceDependencies::getDependentResources(ResourceHandle resource) const
+	{
+		static const std::vector<ResourceHandle> emptyVector;
+		if (auto it = dependentResources.find(resource); it != dependentResources.end())
+		{
+			return it->second;
+		}
+		else
+		{
+			return emptyVector;
+		}
+	}
+
+	std::vector<ResourceHandle> ResourceDependencies::removeResource(ResourceHandle resource)
+	{
+		std::vector<ResourceHandle> result;
+		if (auto it = dependencies.find(resource); it != dependencies.end())
+		{
+			result = std::move(it->second);
+			dependencies.erase(it);
+		}
+
+		if (auto it = dependentResources.find(resource); it != dependentResources.end())
+		{
+			Assert(it->second.empty(), "We removing a resource that have dependent resources: %d", resource);
+			dependentResources.erase(it);
+		}
+		return result;
+	}
+
+	ResourceHandle ResourceStorage::createResourceLock(const ResourcePath& path)
+	{
+		ResourceHandle currentHandle(handleIdx);
+		pathsMap[path] = currentHandle;
+		pathFindMap[currentHandle] = path;
+		resourceLocksCount[currentHandle] = 1;
+		++handleIdx;
+		return currentHandle;
+	}
+
 	ResourceManager::ResourceManager() noexcept = default;
 
 	ResourceHandle ResourceManager::lockSprite(const ResourcePath& path)
 	{
 		std::scoped_lock l(mDataMutex);
 		std::string spritePathId = "spr-" + path;
-		auto spritePathIt = mPathsMap.find(static_cast<ResourcePath>(spritePathId));
-		if (spritePathIt != mPathsMap.end())
+		auto spritePathIt = mStorage.pathsMap.find(static_cast<ResourcePath>(spritePathId));
+		if (spritePathIt != mStorage.pathsMap.end())
 		{
-			++mResourceLocksCount[spritePathIt->second];
+			++mStorage.resourceLocksCount[spritePathIt->second];
 			return ResourceHandle(spritePathIt->second);
 		}
 		else
 		{
-			int thisHandle = createResourceLock(static_cast<ResourcePath>(spritePathId));
+			ResourceHandle thisHandle = mStorage.createResourceLock(static_cast<ResourcePath>(spritePathId));
 			ResourceHandle originalSurfaceHandle;
-			auto it = mAtlasFrames.find(path);
-			if (it != mAtlasFrames.end())
+			auto it = mStorage.atlasFrames.find(path);
+			if (it != mStorage.atlasFrames.end())
 			{
 				originalSurfaceHandle = lockResource<Graphics::Internal::Surface>(it->second.atlasPath);
 				const Graphics::Internal::Surface* texture = tryGetResource<Graphics::Internal::Surface>(originalSurfaceHandle);
-				mResources[thisHandle] = std::make_unique<Graphics::Sprite>(texture, it->second.quadUV);
-				mResources[thisHandle]->addDependency(originalSurfaceHandle);
+				mStorage.resources[thisHandle] = std::make_unique<Graphics::Sprite>(texture, it->second.quadUV);
+				mDependencies.setFirstDependOnSecond(thisHandle, originalSurfaceHandle);
 			}
 			else
 			{
 				originalSurfaceHandle = lockResource<Graphics::Internal::Surface>(path);
 				const Graphics::Internal::Surface* surface = tryGetResource<Graphics::Internal::Surface>(originalSurfaceHandle);
-				mResources[thisHandle] = std::make_unique<Graphics::Sprite>(surface, Graphics::QuadUV());
-				mResources[thisHandle]->addDependency(originalSurfaceHandle);
+				mStorage.resources[thisHandle] = std::make_unique<Graphics::Sprite>(surface, Graphics::QuadUV());
+				mDependencies.setFirstDependOnSecond(thisHandle, originalSurfaceHandle);
 			}
-			return ResourceHandle(thisHandle);
+			return thisHandle;
 		}
 	}
 
 	ResourceHandle ResourceManager::lockSpriteAnimationClip(const ResourcePath& path)
 	{
 		std::scoped_lock l(mDataMutex);
-		auto it = mPathsMap.find(path);
-		if (it != mPathsMap.end())
+		auto it = mStorage.pathsMap.find(path);
+		if (it != mStorage.pathsMap.end())
 		{
-			++mResourceLocksCount[it->second];
+			++mStorage.resourceLocksCount[it->second];
 			return ResourceHandle(it->second);
 		}
 		else
 		{
-			int thisHandle = createResourceLock(path);
+			ResourceHandle thisHandle = mStorage.createResourceLock(path);
 			std::vector<ResourcePath> framePaths = loadSpriteAnimClipData(path);
 
 			std::vector<ResourceHandle> frames;
@@ -75,47 +141,47 @@ namespace HAL
 				auto spriteHandle = lockSprite(animFramePath);
 				frames.push_back(spriteHandle);
 			}
-			mResources[thisHandle] = std::make_unique<Graphics::SpriteAnimationClip>(std::move(frames));
+			mStorage.resources[thisHandle] = std::make_unique<Graphics::SpriteAnimationClip>(std::move(frames));
 
-			return ResourceHandle(thisHandle);
+			return thisHandle;
 		}
 	}
 
 	ResourceHandle ResourceManager::lockAnimationGroup(const ResourcePath& path)
 	{
 		std::scoped_lock l(mDataMutex);
-		auto it = mPathsMap.find(path);
-		if (it != mPathsMap.end())
+		auto it = mStorage.pathsMap.find(path);
+		if (it != mStorage.pathsMap.end())
 		{
-			++mResourceLocksCount[it->second];
+			++mStorage.resourceLocksCount[it->second];
 			return ResourceHandle(it->second);
 		}
 		else
 		{
-			int thisHandle = createResourceLock(path);
+			ResourceHandle thisHandle = mStorage.createResourceLock(path);
 			AnimGroupData animGroupData = loadAnimGroupData(path);
 
 			std::map<StringId, std::vector<ResourceHandle>> animClips;
-			std::vector<ResourceHandle> clipsToRelease;
-			clipsToRelease.reserve(animGroupData.clips.size());
+			std::vector<ResourceHandle> dependencies;
+			dependencies.reserve(animGroupData.clips.size());
 			for (const auto& animClipPath : animGroupData.clips)
 			{
 				auto clipHandle = lockSpriteAnimationClip(animClipPath.second);
 				animClips.emplace(animClipPath.first, tryGetResource<Graphics::SpriteAnimationClip>(clipHandle)->getSprites());
-				clipsToRelease.push_back(clipHandle);
+				dependencies.push_back(clipHandle);
 			}
-			mResources[thisHandle] = std::make_unique<Graphics::AnimationGroup>(std::move(animClips), animGroupData.stateMachineID, animGroupData.defaultState);
-			mResources[thisHandle]->addDependencies(std::move(clipsToRelease));
+			mStorage.resources[thisHandle] = std::make_unique<Graphics::AnimationGroup>(std::move(animClips), animGroupData.stateMachineID, animGroupData.defaultState);
+			mDependencies.setFirstDependOnSecond(thisHandle, std::move(dependencies));
 
-			return ResourceHandle(thisHandle);
+			return thisHandle;
 		}
 	}
 
 	void ResourceManager::unlockResource(ResourceHandle handle)
 	{
 		std::scoped_lock l(mDataMutex);
-		auto locksCntIt = mResourceLocksCount.find(handle.resourceIndex);
-		if ALMOST_NEVER(locksCntIt == mResourceLocksCount.end())
+		auto locksCntIt = mStorage.resourceLocksCount.find(handle);
+		if ALMOST_NEVER(locksCntIt == mStorage.resourceLocksCount.end())
 		{
 			ReportError("Unlocking non-locked resource");
 			return;
@@ -129,26 +195,27 @@ namespace HAL
 		else
 		{
 			// release the resource
-			auto resourceIt = mResources.find(handle.resourceIndex);
-			if (resourceIt != mResources.end())
+			auto resourceIt = mStorage.resources.find(handle);
+			if (resourceIt != mStorage.resources.end())
 			{
-				std::vector<ResourceHandle> resourcesToUnlock = resourceIt->second->getResourceDependencies();
-
 				// unload and delete
-				auto releaseFnIt = mResourceReleaseFns.find(handle.resourceIndex);
-				if (releaseFnIt != mResourceReleaseFns.end())
+				if (const HAL::Resource::SpecialThreadInit* specInit = resourceIt->second->getSpecialThreadInitialization())
 				{
-					releaseFnIt->second(resourceIt->second.get());
-					mResourceReleaseFns.erase(releaseFnIt);
+					if (specInit->steps[0].deinit != nullptr)
+					{
+						mLoading.resourcesWaitingDeinit.emplace_back(handle, std::move(resourceIt->second));
+					}
 				}
-				mResources.erase(resourceIt);
+
+				mStorage.resources.erase(resourceIt);
 
 				// unlock all dependencies (do after unloading to resolve any cyclic depenencies)
+				std::vector<ResourceHandle> resourcesToUnlock = mDependencies.removeResource(handle);
 				for (ResourceHandle resourceHandle : resourcesToUnlock) {
-					unlockResource(resourceHandle);
+					unlockResource(ResourceHandle(resourceHandle));
 				}
 			}
-			mResourceLocksCount.erase(handle.resourceIndex);
+			mStorage.resourceLocksCount.erase(handle);
 		}
 	}
 
@@ -180,12 +247,78 @@ namespace HAL
 		}
 	}
 
-	ResourceHandle::IndexType ResourceManager::createResourceLock(const ResourcePath& path)
+	void ResourceManager::RunRenderThreadTasks()
 	{
-		mPathsMap[path] = mHandleIdx;
-		mPathFindMap[mHandleIdx] = path;
-		mResourceLocksCount[mHandleIdx] = 1;
-		return mHandleIdx++;
+		std::unique_lock l(mDataMutex);
+		for (int i = 0; i < static_cast<int>(mLoading.resourcesWaitingInit.size()); ++i)
+		{
+			auto&& [handle, resource] = mLoading.resourcesWaitingInit[static_cast<size_t>(i)];
+			if (const HAL::Resource::SpecialThreadInit* specInit = resource->getSpecialThreadInitialization())
+			{
+				if (specInit->steps[0].thread == HAL::Resource::SpecialThreadInit::Thread::Render)
+				{
+					specInit->steps[0].init(resource.get());
+					mStorage.resources[handle] = std::move(resource);
+					mLoading.resourcesWaitingInit.erase(mLoading.resourcesWaitingInit.begin() + i);
+					--i;
+				}
+			}
+		}
+
+		for (int i = 0; i < static_cast<int>(mLoading.resourcesWaitingDeinit.size()); ++i)
+		{
+			auto&& [handle, resource] = mLoading.resourcesWaitingDeinit[static_cast<size_t>(i)];
+			if (const HAL::Resource::SpecialThreadInit* specInit = resource->getSpecialThreadInitialization())
+			{
+				if (specInit->steps[0].thread == HAL::Resource::SpecialThreadInit::Thread::Render)
+				{
+					specInit->steps[0].init(resource.get());
+					// resource unloading happens here
+					mLoading.resourcesWaitingDeinit.erase(mLoading.resourcesWaitingDeinit.begin() + i);
+					--i;
+				}
+			}
+		}
+	}
+
+	void ResourceManager::startResourceLoading(ResourceHandle handle, ResourceLoadFn&& resourceLoadFn)
+	{
+		auto deletionIt = std::find_if(
+			mLoading.resourcesWaitingDeinit.begin(),
+			mLoading.resourcesWaitingDeinit.end(),
+			[handle](const ResourceLoading::ResourceLoadingData& resourceLoadData)
+			{
+				return resourceLoadData.handle == handle;
+			}
+		);
+
+		// revive a resource that we were about to delete
+		if (deletionIt != mLoading.resourcesWaitingDeinit.end())
+		{
+			mStorage.resources[handle] = std::move(deletionIt->resource);
+			mLoading.resourcesWaitingDeinit.erase(deletionIt);
+			return;
+		}
+
+		std::unique_ptr<Resource> resource = resourceLoadFn();
+		if (const Resource::SpecialThreadInit* specInit = resource->getSpecialThreadInitialization())
+		{
+			if (specInit->steps[0].init != nullptr)
+			{
+				switch (specInit->steps[0].thread)
+				{
+				case Resource::SpecialThreadInit::Thread::Render:
+					mLoading.resourcesWaitingInit.emplace_back(handle, std::move(resource));
+					break;
+				default:
+					ReportError("Unknown resource init thread");
+				}
+			}
+		}
+		else
+		{
+			mStorage.resources[handle] = std::move(resource);
+		}
 	}
 
 	void ResourceManager::loadOneAtlasData(const ResourcePath& path)
@@ -209,7 +342,7 @@ namespace HAL
 			const auto& frames = atlasJson.at("frames");
 			for (const auto& frameDataJson : frames)
 			{
-				AtlasFrameData frameData;
+				ResourceStorage::AtlasFrameData frameData;
 				ResourcePath fileName = frameDataJson.at("filename");
 				auto frame = frameDataJson.at("frame");
 				frameData.atlasPath = atlasPath;
@@ -223,7 +356,7 @@ namespace HAL
 				frameData.quadUV.v1 = y / atlasSize.y;
 				frameData.quadUV.u2 = (x + w) / atlasSize.x;
 				frameData.quadUV.v2 = (y + h) / atlasSize.y;
-				mAtlasFrames.emplace(fileName, std::move(frameData));
+				mStorage.atlasFrames.emplace(fileName, std::move(frameData));
 			}
 		}
 		catch(const nlohmann::detail::exception& e)

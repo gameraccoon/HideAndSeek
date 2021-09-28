@@ -12,7 +12,6 @@ namespace Graphics
 	SpriteAnimationClip::SpriteAnimationClip(std::vector<ResourceHandle>&& sprites)
 		: mSprites(std::move(sprites))
 	{
-		addDependencies(sprites);
 	}
 
 	bool SpriteAnimationClip::isValid() const

@@ -24,7 +24,7 @@ namespace Graphics
 		return mFont != nullptr;
 	}
 
-	std::string Font::getUniqueId(const ResourcePath& path, int fontSize)
+	std::string Font::GetUniqueId(const ResourcePath& path, int fontSize)
 	{
 		return FormatString("%s:%d", path.c_str(), fontSize);
 	}

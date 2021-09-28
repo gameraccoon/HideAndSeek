@@ -14,6 +14,71 @@
 
 namespace HAL
 {
+	class ResourceDependencies
+	{
+	public:
+		// this should be followed with resource lock
+		void setFirstDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency);
+		void setFirstDependOnSecond(ResourceHandle dependentResource, std::vector<ResourceHandle>&& dependencies);
+
+		const std::vector<ResourceHandle>& getDependencies(ResourceHandle resource) const;
+		const std::vector<ResourceHandle>& getDependentResources(ResourceHandle resource) const;
+
+		// returns all dependencies of the resource (need to unlock them)
+		[[nodiscard]]
+		std::vector<ResourceHandle> removeResource(ResourceHandle resource);
+
+	private:
+		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> dependencies;
+		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> dependentResources;
+	};
+
+	// storage for loaded and ready resources
+	class ResourceStorage
+	{
+	public:
+		struct AtlasFrameData
+		{
+			ResourcePath atlasPath;
+			Graphics::QuadUV quadUV;
+		};
+
+	public:
+		ResourceHandle createResourceLock(const ResourcePath& path);
+
+	public:
+		std::unordered_map<ResourceHandle, std::unique_ptr<Resource>> resources;
+		std::unordered_map<ResourceHandle, int> resourceLocksCount;
+		std::unordered_map<ResourcePath, ResourceHandle> pathsMap;
+		std::map<ResourceHandle, ResourcePath> pathFindMap;
+		std::unordered_map<ResourcePath, AtlasFrameData> atlasFrames;
+		ResourceHandle::IndexType handleIdx = 0;
+	};
+
+	// data for loading and resolving dependencies
+	class ResourceLoading
+	{
+	public:
+		struct ResourceLoadingData
+		{
+			ResourceLoadingData(
+				ResourceHandle handle,
+				std::unique_ptr<Resource>&& resource
+			)
+				: handle(handle)
+				, resource(std::move(resource))
+			{}
+
+			ResourceHandle handle;
+			std::unique_ptr<Resource> resource;
+		};
+
+	public:
+
+		std::vector<ResourceLoadingData> resourcesWaitingInit;
+		std::vector<ResourceLoadingData> resourcesWaitingDeinit;
+	};
+
 	/**
 	 * Class that manages resources such as textures
 	 */
@@ -37,18 +102,19 @@ namespace HAL
 		[[nodiscard]] ResourceHandle lockResource(Args&&... args)
 		{
 			std::scoped_lock l(mDataMutex);
-			std::string id = T::getUniqueId(args...);
-			auto it = mPathsMap.find(static_cast<ResourcePath>(id));
-			if (it != mPathsMap.end())
+			std::string id = T::GetUniqueId(args...);
+			auto it = mStorage.pathsMap.find(static_cast<ResourcePath>(id));
+			if (it != mStorage.pathsMap.end())
 			{
-				++mResourceLocksCount[it->second];
+				++mStorage.resourceLocksCount[it->second];
 				return ResourceHandle(it->second);
 			}
 			else
 			{
-				int thisHandle = createResourceLock(static_cast<ResourcePath>(id));
-				mResources[thisHandle] = std::make_unique<T>(std::forward<Args>(args)...);
-				return ResourceHandle(thisHandle);
+				ResourceHandle thisHandle = mStorage.createResourceLock(static_cast<ResourcePath>(id));
+				startResourceLoading(thisHandle, [args...]{ return std::make_unique<T>(std::move(args)...); });
+
+				return thisHandle;
 			}
 		}
 
@@ -56,8 +122,8 @@ namespace HAL
 		[[nodiscard]] const T* tryGetResource(ResourceHandle handle)
 		{
 			std::scoped_lock l(mDataMutex);
-			auto it = mResources.find(handle.resourceIndex);
-			return it == mResources.end() ? nullptr : static_cast<T*>(it->second.get());
+			auto it = mStorage.resources.find(handle);
+			return it == mStorage.resources.end() ? nullptr : static_cast<T*>(it->second.get());
 		}
 
 		void lockResource(ResourceHandle handle);
@@ -65,13 +131,9 @@ namespace HAL
 
 		void loadAtlasesData(const ResourcePath& listPath);
 
-	private:
-		struct AtlasFrameData
-		{
-			ResourcePath atlasPath;
-			Graphics::QuadUV quadUV;
-		};
+		void RunRenderThreadTasks();
 
+	private:
 		struct AnimGroupData
 		{
 			std::map<StringId, ResourcePath> clips;
@@ -80,27 +142,20 @@ namespace HAL
 		};
 
 		using ReleaseFn = std::function<void(Resource*)>;
+		using ResourceLoadFn = std::function<std::unique_ptr<Resource>()>;
 
 	private:
-
 		ResourceHandle lockSurface(const ResourcePath& path);
 
-		ResourceHandle::IndexType createResourceLock(const ResourcePath& path);
-
+		void startResourceLoading(ResourceHandle handle, ResourceLoadFn&& resourceLoadFn);
 		void loadOneAtlasData(const ResourcePath& path);
 		std::vector<ResourcePath> loadSpriteAnimClipData(const ResourcePath& path);
 		AnimGroupData loadAnimGroupData(const ResourcePath& path);
 
 	private:
-		std::unordered_map<ResourceHandle::IndexType, std::unique_ptr<Resource>> mResources;
-		std::unordered_map<ResourceHandle::IndexType, int> mResourceLocksCount;
-		std::unordered_map<ResourceHandle::IndexType, ReleaseFn> mResourceReleaseFns;
-		std::unordered_map<ResourcePath, ResourceHandle::IndexType> mPathsMap;
-		std::map<ResourceHandle::IndexType, ResourcePath> mPathFindMap;
-
-		std::unordered_map<ResourcePath, AtlasFrameData> mAtlasFrames;
-
-		ResourceHandle::IndexType mHandleIdx = 0;
+		ResourceStorage mStorage;
+		ResourceLoading mLoading;
+		ResourceDependencies mDependencies;
 
 		std::recursive_mutex mDataMutex;
 	};
