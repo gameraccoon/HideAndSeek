@@ -24,13 +24,24 @@ namespace HAL
 		const std::vector<ResourceHandle>& getDependencies(ResourceHandle resource) const;
 		const std::vector<ResourceHandle>& getDependentResources(ResourceHandle resource) const;
 
+	protected:
+		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> dependencies;
+		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> dependentResources;
+	};
+
+	class RuntimeDependencies : public ResourceDependencies
+	{
+	public:
 		// returns all dependencies of the resource (need to unlock them)
 		[[nodiscard]]
 		std::vector<ResourceHandle> removeResource(ResourceHandle resource);
+	};
 
-	private:
-		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> dependencies;
-		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> dependentResources;
+	class LoadDependencies : public ResourceDependencies
+	{
+	public:
+		// returns all dependent resources that don't have dependencies anymore
+		std::vector<ResourceHandle> resolveDependency(ResourceHandle dependency);
 	};
 
 	// storage for loaded and ready resources
@@ -47,7 +58,7 @@ namespace HAL
 		ResourceHandle createResourceLock(const ResourcePath& path);
 
 	public:
-		std::unordered_map<ResourceHandle, std::unique_ptr<Resource>> resources;
+		std::unordered_map<ResourceHandle, Resource::Ptr> resources;
 		std::unordered_map<ResourceHandle, int> resourceLocksCount;
 		std::unordered_map<ResourcePath, ResourceHandle> pathsMap;
 		std::map<ResourceHandle, ResourcePath> pathFindMap;
@@ -55,28 +66,58 @@ namespace HAL
 		ResourceHandle::IndexType handleIdx = 0;
 	};
 
-	// data for loading and resolving dependencies
+	// data for loading and resolving dependencies on load
 	class ResourceLoading
 	{
 	public:
-		struct ResourceLoadingData
+		struct LoadingData
 		{
-			ResourceLoadingData(
+			using ResourceFactoryFn = std::function<Resource::Ptr()>;
+
+			LoadingData(
 				ResourceHandle handle,
-				std::unique_ptr<Resource>&& resource
+				Resource::InitSteps&& loadingSteps,
+				ResourceFactoryFn&& factoryFn,
+				Resource::Thread factoryThread
 			)
 				: handle(handle)
-				, resource(std::move(resource))
+				, stepsLeft(std::move(loadingSteps))
+				, factoryFn(std::move(factoryFn))
+				, factoryThread(factoryThread)
 			{}
 
 			ResourceHandle handle;
-			std::unique_ptr<Resource> resource;
+			Resource::Ptr resource;
+			Resource::InitSteps stepsLeft;
+			ResourceFactoryFn factoryFn;
+			Resource::Thread factoryThread;
 		};
 
-	public:
+		struct UnloadingData
+		{
+			UnloadingData(
+				ResourceHandle handle,
+				Resource::Ptr&& resource,
+				Resource::DeinitSteps&& unloadingSteps
+			)
+				: handle(handle)
+				, resource(std::move(resource))
+				, stepsLeft(std::move(unloadingSteps))
+			{}
 
-		std::vector<ResourceLoadingData> resourcesWaitingInit;
-		std::vector<ResourceLoadingData> resourcesWaitingDeinit;
+			ResourceHandle handle;
+			Resource::Ptr resource;
+			Resource::DeinitSteps stepsLeft;
+		};
+
+		using LoadingDataPtr = std::unique_ptr<LoadingData>;
+		using UnloadingDataPtr = std::unique_ptr<UnloadingData>;
+
+	public:
+		std::vector<LoadingDataPtr> resourcesWaitingInit;
+		std::unordered_map<ResourceHandle, LoadingDataPtr> resourcesWaitingDependencies;
+		std::vector<UnloadingDataPtr> resourcesWaitingDeinit;
+		LoadDependencies loadDependencies;
 	};
 
 	/**
@@ -94,28 +135,35 @@ namespace HAL
 		ResourceManager(ResourceManager&&) = delete;
 		ResourceManager& operator=(ResourceManager&&) = delete;
 
-		ResourceHandle lockSprite(const ResourcePath& path);
-		ResourceHandle lockSpriteAnimationClip(const ResourcePath& path);
-		ResourceHandle lockAnimationGroup(const ResourcePath& path);
+		ResourceHandle lockSprite(const ResourcePath& path, Resource::Thread currentThread = Resource::Thread::Any);
+		ResourceHandle lockSpriteAnimationClip(const ResourcePath& path, Resource::Thread currentThread = Resource::Thread::Any);
+		ResourceHandle lockAnimationGroup(const ResourcePath& path, Resource::Thread currentThread = Resource::Thread::Any);
 
 		template<typename T, typename... Args>
 		[[nodiscard]] ResourceHandle lockResource(Args&&... args)
 		{
+			return lockResourceFromThread<T>(Resource::Thread::Any, std::forward<Args>(args)...);
+		}
+
+		template<typename T, typename... Args>
+		[[nodiscard]] ResourceHandle lockResourceFromThread(Resource::Thread currentThread, Args&&... args)
+		{
 			std::scoped_lock l(mDataMutex);
 			std::string id = T::GetUniqueId(args...);
-			auto it = mStorage.pathsMap.find(static_cast<ResourcePath>(id));
-			if (it != mStorage.pathsMap.end())
-			{
-				++mStorage.resourceLocksCount[it->second];
-				return ResourceHandle(it->second);
-			}
-			else
-			{
-				ResourceHandle thisHandle = mStorage.createResourceLock(static_cast<ResourcePath>(id));
-				startResourceLoading(thisHandle, [args...]{ return std::make_unique<T>(std::move(args)...); });
-
-				return thisHandle;
-			}
+			return lockCustomResource<T>(
+				id,
+				[](ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, Args&&... args){
+					resourceManager.startResourceLoading(std::make_unique<ResourceLoading::LoadingData>(
+						handle,
+						T::GetInitSteps(),
+						[args...]{ return std::make_unique<T>(std::move(args)...); },
+						T::GetCreateThread()
+					),
+					currentThread);
+				},
+				currentThread,
+				std::forward<Args>(args)...
+			);
 		}
 
 		template<typename T>
@@ -131,7 +179,7 @@ namespace HAL
 
 		void loadAtlasesData(const ResourcePath& listPath);
 
-		void RunRenderThreadTasks();
+		void runThreadTasks(Resource::Thread currentThread);
 
 	private:
 		struct AnimGroupData
@@ -142,20 +190,39 @@ namespace HAL
 		};
 
 		using ReleaseFn = std::function<void(Resource*)>;
-		using ResourceLoadFn = std::function<std::unique_ptr<Resource>()>;
 
 	private:
 		ResourceHandle lockSurface(const ResourcePath& path);
 
-		void startResourceLoading(ResourceHandle handle, ResourceLoadFn&& resourceLoadFn);
+		void startResourceLoading(ResourceLoading::LoadingDataPtr&& loadingGata, Resource::Thread currentThread);
 		void loadOneAtlasData(const ResourcePath& path);
 		std::vector<ResourcePath> loadSpriteAnimClipData(const ResourcePath& path);
 		AnimGroupData loadAnimGroupData(const ResourcePath& path);
+		void createLoadDependency(ResourceHandle dependency, ResourceLoading::LoadingDataPtr&& loadingData);
+		void finalizeResourceLoading(ResourceHandle handle, Resource::Ptr&& resource, Resource::Thread currentThread);
+		static void StartSpriteLoading(ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const std::string& path);
+
+		template<typename T, typename Func, typename... Args>
+		[[nodiscard]] ResourceHandle lockCustomResource(const std::string& id, Func loadFn, Resource::Thread currentThread, Args&&... args)
+		{
+			auto it = mStorage.pathsMap.find(static_cast<ResourcePath>(id));
+			if (it != mStorage.pathsMap.end())
+			{
+				++mStorage.resourceLocksCount[it->second];
+				return ResourceHandle(it->second);
+			}
+			else
+			{
+				ResourceHandle handle = mStorage.createResourceLock(static_cast<ResourcePath>(id));
+				loadFn(*this, handle, currentThread, std::forward<Args>(args)...);
+				return handle;
+			}
+		}
 
 	private:
 		ResourceStorage mStorage;
 		ResourceLoading mLoading;
-		ResourceDependencies mDependencies;
+		RuntimeDependencies mDependencies;
 
 		std::recursive_mutex mDataMutex;
 	};

@@ -22,9 +22,14 @@ namespace Graphics
 {
 	namespace Internal
 	{
-		static bool InitSurfaceRenderThread(HAL::Resource* resource)
+		static void InitSurfaceRenderThread(std::unique_ptr<HAL::Resource>& resource)
 		{
-			Surface* surface = static_cast<Surface*>(resource);
+			if (!resource->isValid())
+			{
+				return;
+			}
+
+			Surface* surface = static_cast<Surface*>(resource.get());
 
 			unsigned int textureId;
 			glGenTextures(1, &textureId);
@@ -47,7 +52,7 @@ namespace Graphics
 				break;
 			default:
 				ReportError("Image with unknown channel profile");
-				return false;
+				return;
 			}
 
 			glTexImage2D(
@@ -64,23 +69,15 @@ namespace Graphics
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			return true;
+			return;
 		}
 
-		static void DeinitSurfaceRenderThread(HAL::Resource* resource)
+		static void DeinitSurfaceRenderThread(std::unique_ptr<HAL::Resource>& resource)
 		{
-			Surface* surface = static_cast<Surface*>(resource);
+			Surface* surface = static_cast<Surface*>(resource.get());
 			unsigned int textureId = surface->getTextureId();
 			glDeleteTextures(1, &textureId);
 		}
-
-		Surface::SpecialThreadInit Surface::RenderThreadInit{
-			Surface::SpecialThreadInit::Step{
-				.thread = SpecialThreadInit::Thread::Render,
-				.init = &InitSurfaceRenderThread,
-				.deinit = &DeinitSurfaceRenderThread,
-			}
-		};
 
 		Surface::Surface(const std::string& filename)
 			: mSurface(IMG_Load(filename.c_str()))
@@ -122,9 +119,24 @@ namespace Graphics
 			return filename;
 		}
 
-		const HAL::Resource::SpecialThreadInit* Surface::getSpecialThreadInitialization() const
+		Surface::InitSteps Surface::GetInitSteps()
 		{
-			return &RenderThreadInit;
+			return {
+				InitStep{
+					.thread = Thread::Render,
+					.init = &InitSurfaceRenderThread,
+				}
+			};
+		}
+
+		Surface::DeinitSteps Surface::getDeinitSteps() const
+		{
+			return {
+				DeinitStep{
+					.thread = Thread::Render,
+					.deinit = &DeinitSurfaceRenderThread,
+				}
+			};
 		}
 	}
 }

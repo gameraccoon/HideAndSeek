@@ -25,8 +25,6 @@ namespace Graphics
 
 			bool isValid() const override;
 
-			const SpecialThreadInit* getSpecialThreadInitialization() const override;
-
 			void setTextureId(unsigned int textureId) { mTextureID = textureId; }
 			unsigned int getTextureId() { return mTextureID; }
 
@@ -37,11 +35,12 @@ namespace Graphics
 			const SDL_Surface* getRawSurface() const { return mSurface; }
 
 			static std::string GetUniqueId(const std::string& filename);
+			static InitSteps GetInitSteps();
+			DeinitSteps getDeinitSteps() const override;
 
 		private:
 			SDL_Surface* mSurface;
 			unsigned int mTextureID;
-			static SpecialThreadInit RenderThreadInit;
 		};
 	}
 }

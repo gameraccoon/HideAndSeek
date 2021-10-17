@@ -41,6 +41,7 @@ void RenderThreadManager::startThread(HAL::ResourceManager& resourceManager, HAL
 
 void RenderThreadManager::testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
 {
+	resourceManager.runThreadTasks(HAL::Resource::Thread::Render);
 	ConsumeAndRenderQueue(std::move(renderAccessor.dataToTransfer), resourceManager, engine);
 }
 
@@ -208,7 +209,7 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 			renderAccessor.dataToTransfer.clear();
 		}
 
-		resourceManager.RunRenderThreadTasks();
+		resourceManager.runThreadTasks(HAL::Resource::Thread::Render);
 		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
 	}
 }
