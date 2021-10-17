@@ -22,7 +22,10 @@ RenderThreadManager::~RenderThreadManager()
 		mRenderAccessor.shutdownRequested = true;
 	}
 	mRenderAccessor.notifyRenderThread.notify_all();
-	mRenderThread->join();
+	if (mRenderThread)
+	{
+		mRenderThread->join();
+	}
 }
 
 void RenderThreadManager::startThread(HAL::ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn)
