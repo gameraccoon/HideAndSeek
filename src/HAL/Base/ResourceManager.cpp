@@ -26,7 +26,7 @@ namespace HAL
 		dependentResources[dependency].push_back(dependentResource);
 	}
 
-	void ResourceDependencies::setFirstDependOnSecond(ResourceHandle dependentResource, std::vector<ResourceHandle>&& dependencies)
+	void ResourceDependencies::setFirstDependOnSecond(ResourceHandle dependentResource, const std::vector<ResourceHandle>& dependencies)
 	{
 		for (ResourceHandle dependency : dependencies)
 		{
@@ -80,22 +80,47 @@ namespace HAL
 	std::vector<ResourceHandle> LoadDependencies::resolveDependency(ResourceHandle dependency)
 	{
 		std::vector<ResourceHandle> result;
+
+		// move the dependent resources to "result" and remove the record
 		if (auto it = dependentResources.find(dependency); it != dependentResources.end())
 		{
 			result = std::move(it->second);
 			dependentResources.erase(it);
 		}
 
+		// check that our dependencies are empty and remove the record
 		if (auto it = dependencies.find(dependency); it != dependencies.end())
 		{
 			Assert(it->second.empty(), "We resolving dependency that have unresolved dependencies itself: %d", dependency);
 			dependencies.erase(it);
 		}
 
-		std::ranges::remove_if(result, [this](ResourceHandle handle){
-			auto it = dependencies.find(handle);
-			return it == dependencies.end() || it->second.empty();
-		});
+		// resolve dependencies for the dependent resources
+		// and filter "result" to keep only fully resolved ones
+		for (int i = 0; i < static_cast<int>(result.size()); ++i)
+		{
+			auto it = dependencies.find(result[i]);
+			if (it != dependencies.end())
+			{
+				auto removedRange = std::ranges::remove_if(it->second, [dependency](ResourceHandle handle){
+					return handle == dependency;
+				});
+				Assert(!removedRange.empty(), "We've got a dependent resource missing info about its dependency");
+
+				it->second.erase(removedRange.begin(), removedRange.end());
+
+				// not fully resolved yet, remove from "result"
+				if (!it->second.empty())
+				{
+					result.erase(result.begin() + i);
+					--i;
+				}
+			}
+			else
+			{
+				ReportError("We tried to resolve a dependency, but it's already resolved");
+			}
+		}
 
 		return result;
 	}
@@ -117,71 +142,66 @@ namespace HAL
 		std::scoped_lock l(mDataMutex);
 		std::string spritePathId = "spr-" + path;
 		return lockCustomResource<Graphics::Sprite>(
-			spritePathId,
+			static_cast<ResourcePath>(spritePathId),
 			&ResourceManager::StartSpriteLoading,
 			currentThread,
-			path
+			static_cast<ResourcePath>(path)
 		);
 	}
 
 	ResourceHandle ResourceManager::lockSpriteAnimationClip(const ResourcePath& path, Resource::Thread currentThread)
 	{
 		std::scoped_lock l(mDataMutex);
-		auto it = mStorage.pathsMap.find(path);
-		if (it != mStorage.pathsMap.end())
-		{
-			++mStorage.resourceLocksCount[it->second];
-			return ResourceHandle(it->second);
-		}
-		else
-		{
-			ResourceHandle thisHandle = mStorage.createResourceLock(path);
-			std::vector<ResourcePath> framePaths = loadSpriteAnimClipData(path);
 
-			std::vector<ResourceHandle> frames;
-			for (const auto& animFramePath : framePaths)
-			{
-				auto spriteHandle = lockSprite(animFramePath);
-				frames.push_back(spriteHandle);
-			}
-			finalizeResourceLoading(thisHandle, std::make_unique<Graphics::SpriteAnimationClip>(std::move(frames)), currentThread);
+		return lockCustomResource<Graphics::SpriteAnimationClip>(
+			path,
+			[](ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const ResourcePath& path){
+				std::vector<ResourcePath> framePaths = resourceManager.loadSpriteAnimClipData(path);
+				std::vector<ResourceHandle> frames;
+				for (const auto& animFramePath : framePaths)
+				{
+					ResourceHandle spriteHandle = resourceManager.lockSprite(animFramePath);
+					resourceManager.mDependencies.setFirstDependOnSecond(handle, spriteHandle);
+					frames.push_back(spriteHandle);
+				}
 
-			return thisHandle;
-		}
+				resourceManager.finalizeResourceLoading(
+					handle,
+					std::make_unique<Graphics::SpriteAnimationClip>(std::move(frames)),
+					currentThread
+				);
+			},
+			currentThread,
+			path
+		);
 	}
 
 	ResourceHandle ResourceManager::lockAnimationGroup(const ResourcePath& path, Resource::Thread currentThread)
 	{
 		std::scoped_lock l(mDataMutex);
-		auto it = mStorage.pathsMap.find(path);
-		if (it != mStorage.pathsMap.end())
-		{
-			++mStorage.resourceLocksCount[it->second];
-			return ResourceHandle(it->second);
-		}
-		else
-		{
-			ResourceHandle thisHandle = mStorage.createResourceLock(path);
-			AnimGroupData animGroupData = loadAnimGroupData(path);
 
-			std::map<StringId, std::vector<ResourceHandle>> animClips;
-			std::vector<ResourceHandle> dependencies;
-			dependencies.reserve(animGroupData.clips.size());
-			for (const auto& animClipPath : animGroupData.clips)
-			{
-				auto clipHandle = lockSpriteAnimationClip(animClipPath.second);
-				animClips.emplace(animClipPath.first, tryGetResource<Graphics::SpriteAnimationClip>(clipHandle)->getSprites());
-				dependencies.push_back(clipHandle);
-			}
-			finalizeResourceLoading(
-				thisHandle,
-				std::make_unique<Graphics::AnimationGroup>(std::move(animClips), animGroupData.stateMachineID, animGroupData.defaultState),
-				currentThread
-			);
-			mDependencies.setFirstDependOnSecond(thisHandle, std::move(dependencies));
+		return lockCustomResource<Graphics::AnimationGroup>(
+			path,
+			[](ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const ResourcePath& path){
+				AnimGroupData animGroupData = resourceManager.loadAnimGroupData(path);
 
-			return thisHandle;
-		}
+				std::map<StringId, std::vector<ResourceHandle>> animClips;
+				for (const auto& animClipPath : animGroupData.clips)
+				{
+					ResourceHandle clipHandle = resourceManager.lockSpriteAnimationClip(animClipPath.second);
+					resourceManager.mDependencies.setFirstDependOnSecond(handle, clipHandle);
+					animClips.emplace(animClipPath.first, resourceManager.tryGetResource<Graphics::SpriteAnimationClip>(clipHandle)->getSprites());
+				}
+
+				resourceManager.finalizeResourceLoading(
+					handle,
+					std::make_unique<Graphics::AnimationGroup>(std::move(animClips), animGroupData.stateMachineID, animGroupData.defaultState),
+					currentThread
+				);
+			},
+			currentThread,
+			path
+		);
 	}
 
 	void ResourceManager::unlockResource(ResourceHandle handle)
@@ -497,10 +517,10 @@ namespace HAL
 		}
 	}
 
-	void ResourceManager::StartSpriteLoading(ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const std::string& path)
+	void ResourceManager::StartSpriteLoading(ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const ResourcePath& path)
 	{
 		ResourceHandle originalSurfaceHandle;
-		auto it = resourceManager.mStorage.atlasFrames.find(static_cast<ResourcePath>(path));
+		auto it = resourceManager.mStorage.atlasFrames.find(path);
 		std::string surfacePath;
 		Graphics::QuadUV spriteUV;
 

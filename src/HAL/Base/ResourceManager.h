@@ -19,7 +19,7 @@ namespace HAL
 	public:
 		// this should be followed with resource lock
 		void setFirstDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency);
-		void setFirstDependOnSecond(ResourceHandle dependentResource, std::vector<ResourceHandle>&& dependencies);
+		void setFirstDependOnSecond(ResourceHandle dependentResource, const std::vector<ResourceHandle>& dependencies);
 
 		const std::vector<ResourceHandle>& getDependencies(ResourceHandle resource) const;
 		const std::vector<ResourceHandle>& getDependentResources(ResourceHandle resource) const;
@@ -151,7 +151,7 @@ namespace HAL
 			std::scoped_lock l(mDataMutex);
 			std::string id = T::GetUniqueId(args...);
 			return lockCustomResource<T>(
-				id,
+				static_cast<ResourcePath>(id),
 				[](ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, Args&&... args){
 					resourceManager.startResourceLoading(std::make_unique<ResourceLoading::LoadingData>(
 						handle,
@@ -200,12 +200,12 @@ namespace HAL
 		AnimGroupData loadAnimGroupData(const ResourcePath& path);
 		void createLoadDependency(ResourceHandle dependency, ResourceLoading::LoadingDataPtr&& loadingData);
 		void finalizeResourceLoading(ResourceHandle handle, Resource::Ptr&& resource, Resource::Thread currentThread);
-		static void StartSpriteLoading(ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const std::string& path);
+		static void StartSpriteLoading(ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const ResourcePath& path);
 
 		template<typename T, typename Func, typename... Args>
-		[[nodiscard]] ResourceHandle lockCustomResource(const std::string& id, Func loadFn, Resource::Thread currentThread, Args&&... args)
+		[[nodiscard]] ResourceHandle lockCustomResource(const ResourcePath& path, Func loadFn, Resource::Thread currentThread, Args&&... args)
 		{
-			auto it = mStorage.pathsMap.find(static_cast<ResourcePath>(id));
+			auto it = mStorage.pathsMap.find(path);
 			if (it != mStorage.pathsMap.end())
 			{
 				++mStorage.resourceLocksCount[it->second];
@@ -213,7 +213,7 @@ namespace HAL
 			}
 			else
 			{
-				ResourceHandle handle = mStorage.createResourceLock(static_cast<ResourcePath>(id));
+				ResourceHandle handle = mStorage.createResourceLock(path);
 				loadFn(*this, handle, currentThread, std::forward<Args>(args)...);
 				return handle;
 			}
