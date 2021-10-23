@@ -6,8 +6,8 @@
 class Log
 {
 public:
-    Log(const Log&) = delete;
-    void operator=(const Log&) = delete;
+	Log(const Log&) = delete;
+	void operator=(const Log&) = delete;
 
 	/**
 	 * Return single instance of class Log

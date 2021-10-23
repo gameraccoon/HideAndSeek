@@ -53,14 +53,14 @@ private:
 	TimeData mTime;
 	RenderThreadManager mRenderThread;
 
-#ifdef PROFILE_SYSTEMS
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	bool mProfileSystems = false;
 	std::string mSystemProfileOutputPath = "systemProfile.csv";
-#endif // PROFILE_SYSTEMS
+#endif // RACCOON_ECS_PROFILE_SYSTEMS
 
-#if defined(IMGUI_ENABLED) || defined(PROFILE_SYSTEMS)
+#if defined(IMGUI_ENABLED) || defined(RACCOON_ECS_PROFILE_SYSTEMS)
 	SystemFrameRecords mSystemFrameRecords;
-#endif // IMGUI_ENABLED || PROFILE_SYSTEMS
+#endif // IMGUI_ENABLED || RACCOON_ECS_PROFILE_SYSTEMS
 
 #ifdef IMGUI_ENABLED
 	ImguiDebugData mImguiDebugData{mWorldHolder, mTime, mSystemFrameRecords, mComponentFactory, {}};

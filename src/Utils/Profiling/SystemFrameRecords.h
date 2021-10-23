@@ -2,15 +2,15 @@
 
 #include <string>
 
-#include <raccoon-ecs/systems_manager.h>
+#include <raccoon-ecs/async_systems_manager.h>
 
 class SystemFrameRecords
 {
 public:
 	void setRecordsLimit(unsigned int newLimit);
 
-	void addFrame(RaccoonEcs::SystemsFrameTime&& frameTime);
-	std::vector<RaccoonEcs::SystemsFrameTime>& getFramesRef();
+	void addFrame(RaccoonEcs::AsyncSystemsFrameTime&& frameTime);
+	std::vector<RaccoonEcs::AsyncSystemsFrameTime>& getFramesRef();
 
 	void pauseRecording();
 	void resumeRecording();
@@ -20,7 +20,7 @@ public:
 	void print(const std::vector<std::string>& systemNames, std::ostream& stream) const;
 
 private:
-	std::vector<RaccoonEcs::SystemsFrameTime> mSystemFrameRecords;
+	std::vector<RaccoonEcs::AsyncSystemsFrameTime> mSystemFrameRecords;
 	unsigned int mRecordsLimit = 0;
 	bool mIsRecordingActive = true;
 };

@@ -48,7 +48,7 @@ void Game::start(ArgumentsParser& arguments)
 	initSystems();
 
 	mSystemsManager.init(
-		//3, // threads count available for systems manager
+		3, // threads count available for systems manager
 		[this, &arguments](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
 			GameDataLoader::LoadWorld(mWorld, dataAccessor, arguments.getArgumentValue("world", "test"), mComponentSerializers);
@@ -63,17 +63,17 @@ void Game::start(ArgumentsParser& arguments)
 		}
 	);
 
-	//getEngine().releaseRenderContext();
-	//mRenderThread.startThread(getResourceManager(), getEngine(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
+	getEngine().releaseRenderContext();
+	mRenderThread.startThread(getResourceManager(), getEngine(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
 
-#ifdef PROFILE_SYSTEMS
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	mProfileSystems = arguments.hasArgument("profile-systems");
 	mSystemProfileOutputPath = arguments.getArgumentValue("profile-systems", mSystemProfileOutputPath);
 	mSystemFrameRecords.setRecordsLimit(mProfileSystems ? 0u : 100u);
-#endif // PROFILE_SYSTEMS
+#endif // RACCOON_ECS_PROFILE_SYSTEMS
 
 #ifdef IMGUI_ENABLED
-	//mImguiDebugData.systemNames = mSystemsManager.getSystemNames();
+	mImguiDebugData.systemNames = mSystemsManager.getSystemNames();
 #endif // IMGUI_ENABLED
 
 	// start the main loop
@@ -105,13 +105,13 @@ void Game::update(float dt)
 	mSystemsManager.update();
 
 	// test code
-	mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
+	//mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
 
 	mInputData.clearAfterFrame();
 
-#ifdef PROFILE_SYSTEMS
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	mSystemFrameRecords.addFrame(mSystemsManager.getPreviousFrameTimeData());
-#endif
+#endif // RACCOON_ECS_PROFILE_SYSTEMS
 }
 
 void Game::initSystems()
@@ -147,7 +147,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<HealthComponent>,
 		RaccoonEcs::ComponentAdder<DeathComponent>,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>>(
-		RaccoonEcs::SystemDependencies().dependsOn<ControlSystem>().dependsOn<AiSystem>(),
+		RaccoonEcs::SystemDependencies().goesAfter<ControlSystem, AiSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -155,7 +155,7 @@ void Game::initSystems()
 	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem,
 		RaccoonEcs::ComponentFilter<const DeathComponent>,
 		RaccoonEcs::EntityRemover>(
-		RaccoonEcs::SystemDependencies().dependsOn<WeaponSystem>(),
+		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
 		mWorldHolder
 	);
 
@@ -163,7 +163,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>>(
-		RaccoonEcs::SystemDependencies().dependsOn<ControlSystem>().dependsOn<AiSystem>(),
+		RaccoonEcs::SystemDependencies().goesAfter<ControlSystem, AiSystem>(),
 		mWorldHolder
 	);
 
@@ -173,7 +173,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<const TransformComponent>,
 		RaccoonEcs::ComponentFilter<const ImguiComponent>,
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>>(
-		RaccoonEcs::SystemDependencies().dependsOn<ControlSystem>(),
+		RaccoonEcs::SystemDependencies().goesAfter<ControlSystem>(),
 		mWorldHolder,
 		mInputData
 	);
@@ -183,7 +183,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>,
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::EntityTransferer>(
-		RaccoonEcs::SystemDependencies().dependsOn<CollisionSystem>(),
+		RaccoonEcs::SystemDependencies().goesAfter<CollisionSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -193,7 +193,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>>(
-		RaccoonEcs::SystemDependencies().dependsOn<ControlSystem>().dependsOn<AiSystem>(),
+		RaccoonEcs::SystemDependencies().goesAfter<ControlSystem, AiSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -210,7 +210,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>,
 		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>,
 		RaccoonEcs::ScheduledActionsExecutor>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesBefore<RenderSystem>(),
 		mWorldHolder,
 		getResourceManager()
 	);
@@ -220,7 +220,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<AnimationClipsComponent, SpriteRenderComponent>,
 		RaccoonEcs::ComponentFilter<const StateMachineComponent>,
 		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>>(
-		RaccoonEcs::SystemDependencies().dependsOn<CharacterStateSystem>(),
+		RaccoonEcs::SystemDependencies().goesAfter<CharacterStateSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -233,7 +233,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
-		RaccoonEcs::SystemDependencies().dependsOn<AnimationSystem>(),
+		RaccoonEcs::SystemDependencies().goesAfter<AnimationSystem>(),
 		mWorldHolder,
 		mTime,
 		getResourceManager(),
@@ -249,7 +249,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentFilter<const DebugDrawComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>,
 		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<RenderSystem>(),
 		mWorldHolder,
 		mTime,
 		getResourceManager()
@@ -260,7 +260,7 @@ void Game::initSystems()
 		RaccoonEcs::ComponentAdder<ImguiComponent>,
 		RaccoonEcs::ComponentFilter<RenderAccessorComponent>,
 		RaccoonEcs::InnerDataAccessor>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<DebugDrawSystem>(),
 		mImguiDebugData,
 		getEngine()
 	);
@@ -275,11 +275,11 @@ void Game::initResources()
 
 void Game::onGameShutdown()
 {
-#ifdef PROFILE_SYSTEMS
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	if (mProfileSystems)
 	{
 		mSystemFrameRecords.printToFile(mSystemsManager.getSystemNames(), mSystemProfileOutputPath);
 	}
-#endif // PROFILE_SYSTEMS
+#endif // RACCOON_ECS_PROFILE_SYSTEMS
 	mSystemsManager.shutdown();
 }

@@ -15,6 +15,7 @@
 #include "GameLogic/SharedManagers/TimeData.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/InputData.h"
+#include "GameLogic/Render/RenderThreadManager.h"
 
 #include "AutoTests/TestChecklist.h"
 
@@ -43,6 +44,7 @@ protected:
 	Jobs::WorkerManager mWorkerManager{1};
 	TimeData mTime;
 	InputData mInputData;
+	RenderThreadManager mRenderThread;
 
 	TestChecklist mTestChecklist;
 

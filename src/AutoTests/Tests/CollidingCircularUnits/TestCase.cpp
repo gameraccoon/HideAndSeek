@@ -44,7 +44,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::ComponentFilter<const TransformComponent>,
 		RaccoonEcs::ComponentFilter<const AiControllerComponent, const TransformComponent, MovementComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<TestUnitsCountControlSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -53,7 +53,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<TestCircularUnitsSystem>(),
 		mWorldHolder
 	);
 
@@ -63,7 +63,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<const TransformComponent>,
 		RaccoonEcs::ComponentFilter<const ImguiComponent>,
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<CollisionSystem>(),
 		mWorldHolder,
 		mInputData
 	);
@@ -73,7 +73,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>,
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::EntityTransferer>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<CollisionSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -83,7 +83,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<MovementSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -100,7 +100,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>,
 		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>,
 		RaccoonEcs::ScheduledActionsExecutor>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesBefore<RenderSystem>(),
 		mWorldHolder,
 		getResourceManager()
 	);
@@ -113,7 +113,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<MovementSystem>(),
 		mWorldHolder,
 		mTime,
 		getResourceManager(),
@@ -121,7 +121,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 	);
 
 	mSystemsManager.init(
-		//1,
+		1,
 		[this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
 			Vector2D playerPos{ZERO_VECTOR};
@@ -168,6 +168,9 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 			camera.addComponent(RaccoonEcs::ComponentAdder<MovementComponent>(dataAccessor));
 
 			RaccoonEcs::ComponentAdder<StateMachineComponent>(dataAccessor).addComponent(mGameData.getGameComponents());
+
+			RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
+			renderAccessor->setAccessor(&mRenderThread.getAccessor());
 		}
 	);
 

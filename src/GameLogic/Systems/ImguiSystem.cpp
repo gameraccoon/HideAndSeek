@@ -84,11 +84,9 @@ void ImguiSystem::update()
 
 	renderAccessor->submitData(std::move(renderData));
 
-	/* this is temporary commented until we use real render thread
 	// wait until we finish rendering
 	std::unique_lock lock(sharedData->isFinishedMutex);
 	sharedData->onFinished.wait(lock, [&sharedData]{ return sharedData->isFinised; });
-	*/
 }
 
 void ImguiSystem::initResources()

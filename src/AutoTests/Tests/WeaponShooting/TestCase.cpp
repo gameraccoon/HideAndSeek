@@ -52,7 +52,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::ComponentFilter<const TransformComponent, const WeaponComponent, CharacterStateComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const HealthComponent, const TransformComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<TestSpawnShootableUnitsSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -63,14 +63,14 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<HealthComponent>,
 		RaccoonEcs::ComponentAdder<DeathComponent>,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<TestShootingControlSystem>(),
 		mWorldHolder,
 		mTime
 	);
 
 	mSystemsManager.registerSystem<TestDestroyedEntitiesRegistrationSystem,
 		RaccoonEcs::ComponentFilter<const DeathComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
 		mWorldHolder,
 		destroyedEntitiesTestCheck
 	);
@@ -78,7 +78,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem,
 		RaccoonEcs::ComponentFilter<const DeathComponent>,
 		RaccoonEcs::EntityRemover>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
 		mWorldHolder
 	);
 
@@ -86,7 +86,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
 		mWorldHolder
 	);
 
@@ -105,7 +105,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>,
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::EntityTransferer>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<CollisionSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -115,7 +115,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
 		mWorldHolder,
 		mTime
 	);
@@ -132,7 +132,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>,
 		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>,
 		RaccoonEcs::ScheduledActionsExecutor>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesBefore<RenderSystem>(),
 		mWorldHolder,
 		getResourceManager()
 	);
@@ -145,7 +145,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
-		RaccoonEcs::SystemDependencies(),
+		RaccoonEcs::SystemDependencies().goesAfter<MovementSystem>(),
 		mWorldHolder,
 		mTime,
 		getResourceManager(),
@@ -153,7 +153,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	);
 
 	mSystemsManager.init(
-		//1,
+		1,
 		[this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
 			Vector2D playerPos{ZERO_VECTOR};
@@ -209,6 +209,9 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 				StateMachineComponent* stateMachine = mGameData.getGameComponents().addComponent<StateMachineComponent>();
 				StateMachines::RegisterStateMachines(stateMachine);
 			}
+
+			RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
+			renderAccessor->setAccessor(&mRenderThread.getAccessor());
 		}
 	);
 
