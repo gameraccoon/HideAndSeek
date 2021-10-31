@@ -106,11 +106,11 @@ namespace std
 			return static_cast<size_t>(stringId.mHash);
 		}
 	};
+}
 
-	inline std::string to_string(StringId stringId)
-	{
-		return ID_TO_STR(stringId);
-	}
+inline std::string to_string(StringId stringId)
+{
+	return ID_TO_STR(stringId);
 }
 
 void to_json(nlohmann::json& outJson, const StringId& stringId);
