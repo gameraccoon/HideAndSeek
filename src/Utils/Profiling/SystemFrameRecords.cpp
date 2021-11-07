@@ -3,6 +3,8 @@
 #include "Utils/Profiling/SystemFrameRecords.h"
 
 #include <fstream>
+#include <iomanip>
+#include <nlohmann/json.hpp>
 
 void SystemFrameRecords::setRecordsLimit(unsigned int newLimit)
 {
@@ -52,21 +54,28 @@ void SystemFrameRecords::printToFile(const std::vector<std::string>& systemNames
 
 void SystemFrameRecords::print(const std::vector<std::string>& systemNames, std::ostream& outStream) const
 {
-	// printing in CSV format
-	outStream << "\"Total\"";
-	for (const auto& systemName : systemNames)
-	{
-		outStream << ",\"" << systemName << "\"";
-	}
-	outStream << "\n";
+	using RaccoonEcs::AsyncSystemsFrameTime;
 
-	for (const auto& frameRecord : mSystemFrameRecords)
+	nlohmann::json result;
+
+	result["taskNames"] = systemNames;
+
+	nlohmann::json& frames = result["frames"];
+
+	for (const AsyncSystemsFrameTime& frameRecord : mSystemFrameRecords)
 	{
-		outStream << frameRecord.frameTime.count();
-		for (const auto& systemTime : frameRecord.systemsTime)
+		nlohmann::json frame;
+		nlohmann::json& tasks = frame["tasks"];
+		for (const AsyncSystemsFrameTime::OneSystemTime& systemTime : frameRecord.systemsTime)
 		{
-			outStream << "," << (systemTime.end - systemTime.start).count();
+			nlohmann::json task;
+			task["threadId"] = systemTime.workerThreadId;
+			task["timeStart"] = systemTime.start.time_since_epoch().count();
+			task["timeFinish"] = systemTime.end.time_since_epoch().count();
+			task["taskNameIdx"] = systemTime.systemIdx;
+			tasks.push_back(task);
 		}
-		outStream << "\n";
+		frames.push_back(frame);
 	}
+	outStream << std::setw(4) <<  result;
 }

@@ -52,10 +52,11 @@ private:
 	Jobs::WorkerManager mJobsWorkerManager{Jobs::GetAvailableThreadsCount()};
 	TimeData mTime;
 	RenderThreadManager mRenderThread;
+	static inline const int WorkerThreadsCount = 3;
 
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	bool mProfileSystems = false;
-	std::string mSystemProfileOutputPath = "systemProfile.csv";
+	std::string mSystemProfileOutputPath = "systemProfile.json";
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 
 #if defined(IMGUI_ENABLED) || defined(RACCOON_ECS_PROFILE_SYSTEMS)

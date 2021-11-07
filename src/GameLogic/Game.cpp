@@ -48,7 +48,7 @@ void Game::start(ArgumentsParser& arguments)
 	initSystems();
 
 	mSystemsManager.init(
-		3, // threads count available for systems manager
+		WorkerThreadsCount, // threads count available for systems manager
 		[this, &arguments](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
 			GameDataLoader::LoadWorld(mWorld, dataAccessor, arguments.getArgumentValue("world", "test"), mComponentSerializers);
