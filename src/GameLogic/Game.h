@@ -10,7 +10,6 @@
 
 #include "Utils/Application/ArgumentsParser.h"
 #include "Utils/Profiling/SystemFrameRecords.h"
-#include "Utils/Jobs/WorkerManager.h"
 
 #include "HAL/GameBase.h"
 
@@ -47,9 +46,9 @@ private:
 
 	InputData mInputData;
 
-	RaccoonEcs::AsyncSystemsManager<StringId> mSystemsManager;
+	RaccoonEcs::ThreadPool mThreadPool;
+	RaccoonEcs::AsyncSystemsManager<StringId> mSystemsManager{mThreadPool};
 	Json::ComponentSerializationHolder mComponentSerializers;
-	Jobs::WorkerManager mJobsWorkerManager{Jobs::GetAvailableThreadsCount()};
 	TimeData mTime;
 	RenderThreadManager mRenderThread;
 	static inline const int WorkerThreadsCount = 3;

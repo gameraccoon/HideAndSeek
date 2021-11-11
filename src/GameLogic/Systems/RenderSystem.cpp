@@ -29,7 +29,7 @@ RenderSystem::RenderSystem(
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::ResourceManager& resourceManager,
-		Jobs::WorkerManager& jobsWorkerManager
+		RaccoonEcs::ThreadPool& threadPool
 	) noexcept
 	: mWorldCachedDataFilter(std::move(worldCachedDataFilter))
 	, mRenderModeFilter(std::move(renderModeFilter))
@@ -41,7 +41,7 @@ RenderSystem::RenderSystem(
 	, mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mResourceManager(resourceManager)
-	, mJobsWorkerManager(jobsWorkerManager)
+	, mThreadPool(threadPool)
 {
 	mLightSpriteHandle = resourceManager.lockSprite("resources/textures/light.png");
 }
@@ -158,80 +158,39 @@ void RenderSystem::drawBackground(RenderData& renderData, World& world, Vector2D
 	}
 }
 
-class VisibilityPolygonCalculationJob : public Jobs::BaseJob
+struct VisibilityPolygonCalculationResult
 {
-public:
-	struct Result
-	{
-		Result() = default;
-		Result(const std::vector<Vector2D>& polygon, Vector2D location)
-			: polygon(polygon)
-			, location(location)
-		{
-		}
-
-		std::vector<Vector2D> polygon;
-		Vector2D location;
-		Vector2D size;
-	};
-
-	using FinalizeFn = std::function<void(std::vector<Result>&&)>;
-	using LightBlockingComponents = std::vector<const LightBlockingGeometryComponent*>;
-
-public:
-	VisibilityPolygonCalculationJob(Vector2D maxFov, const LightBlockingComponents& lightBlockingComponents, GameplayTimestamp timestamp, FinalizeFn finalizeFn) noexcept
-		: mMaxFov(maxFov)
-		, mLightBlockingComponents(lightBlockingComponents)
-		, mTimestamp(timestamp)
-		, mFinalizeFn(std::move(finalizeFn))
-	{
-		Assert(mFinalizeFn, "finalizeFn should be set");
-	}
-
-	~VisibilityPolygonCalculationJob() override;
-
-	void process() override
-	{
-		VisibilityPolygonCalculator visibilityPolygonCalculator;
-		mCalculationResults.resize(componentsToProcess.size());
-		for (size_t i = 0; i < componentsToProcess.size(); ++i)
-		{
-			auto [light, transform] = componentsToProcess[i];
-
-			visibilityPolygonCalculator.calculateVisibilityPolygon(light->getCachedVisibilityPolygonRef(), mLightBlockingComponents, transform->getLocation(), mMaxFov * light->getBrightness());
-			light->setUpdateTimestamp(mTimestamp);
-
-			const std::vector<Vector2D>& visibilityPolygon = light->getCachedVisibilityPolygon();
-
-			mCalculationResults[i].polygon.resize(visibilityPolygon.size());
-			std::ranges::copy(visibilityPolygon, std::begin(mCalculationResults[i].polygon));
-			mCalculationResults[i].location = transform->getLocation();
-			mCalculationResults[i].size = mMaxFov * light->getBrightness();
-		}
-	}
-
-	void finalize() override
-	{
-		if (mFinalizeFn)
-		{
-			mFinalizeFn(std::move(mCalculationResults));
-		}
-	}
-
-public:
-	TupleVector<LightComponent*, const TransformComponent*> componentsToProcess;
-
-private:
-	Vector2D mMaxFov;
-	const LightBlockingComponents& mLightBlockingComponents;
-	const GameplayTimestamp mTimestamp;
-	FinalizeFn mFinalizeFn;
-
-	std::vector<Result> mCalculationResults;
+	std::vector<Vector2D> polygon;
+	Vector2D location;
+	Vector2D size;
 };
 
-// just to suppress weak vtables warning
-VisibilityPolygonCalculationJob::~VisibilityPolygonCalculationJob() = default;
+using LightBlockingComponents = std::vector<const LightBlockingGeometryComponent*>;
+
+static std::vector<VisibilityPolygonCalculationResult> processVisibilityPolygonsGroup(
+	const TupleVector<LightComponent*, const TransformComponent*>& componentsToProcess,
+	Vector2D maxFov,
+	const LightBlockingComponents& lightBlockingComponents,
+	const GameplayTimestamp& timestamp)
+{
+	std::vector<VisibilityPolygonCalculationResult> calculationResults(componentsToProcess.size());
+	VisibilityPolygonCalculator visibilityPolygonCalculator;
+	for (size_t i = 0; i < componentsToProcess.size(); ++i)
+	{
+		auto [light, transform] = componentsToProcess[i];
+
+		visibilityPolygonCalculator.calculateVisibilityPolygon(light->getCachedVisibilityPolygonRef(), lightBlockingComponents, transform->getLocation(), maxFov * light->getBrightness());
+		light->setUpdateTimestamp(timestamp);
+
+		const std::vector<Vector2D>& visibilityPolygon = light->getCachedVisibilityPolygon();
+
+		calculationResults[i].polygon.resize(visibilityPolygon.size());
+		std::ranges::copy(visibilityPolygon, std::begin(calculationResults[i].polygon));
+		calculationResults[i].location = transform->getLocation();
+		calculationResults[i].size = maxFov * light->getBrightness();
+	}
+	return calculationResults;
+}
 
 static size_t GetJobDivisor(size_t maxThreadsCount)
 {
@@ -278,46 +237,53 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 	if (!lightComponentSets.empty())
 	{
 		// collect the results from all the threads to one vector
-		std::vector<VisibilityPolygonCalculationJob::Result> allResults;
+		std::vector<VisibilityPolygonCalculationResult> allResults;
 		allResults.reserve(lightComponentSets.size());
 
 		// prepare function that will collect the calculated data
-		auto finalizeFn = [&allResults](std::vector<VisibilityPolygonCalculationJob::Result>&& results)
+		auto finalizeFn = [&allResults](std::any&& result)
 		{
-			std::ranges::move(results, std::back_inserter(allResults));
+			std::ranges::move(
+				std::any_cast<std::vector<VisibilityPolygonCalculationResult>&>(result),
+				std::back_inserter(allResults)
+			);
 		};
 
 		// calculate how many threads we need
-		size_t threadsCount = mJobsWorkerManager.getThreadsCount();
+		const size_t threadsCount = mThreadPool.getThreadsCount();
 		AssertFatal(threadsCount != 0, "Jobs Worker Manager threads count can't be zero");
-		size_t chunksCount = GetJobDivisor(threadsCount + 1);
-		size_t componentsToRecalculate = lightComponentSets.size();
-		size_t chunkSize = std::max((componentsToRecalculate / chunksCount) + (componentsToRecalculate % chunksCount > 1 ? 1 : 0), static_cast<size_t>(1));
+		const size_t minimumComponentsForThread = 3;
+		const size_t componentsToRecalculate = lightComponentSets.size();
+		const size_t chunksCount = std::min(GetJobDivisor(threadsCount + 1), componentsToRecalculate / minimumComponentsForThread);
+		const size_t chunkSize = componentsToRecalculate / chunksCount;
 
-		std::vector<Jobs::BaseJob::UniquePtr> jobs;
-		size_t chunkItemIndex = 0;
+		std::vector<std::pair<std::function<std::any()>, std::function<void(std::any&&)>>> jobs;
+		jobs.reserve(chunksCount);
 
 		// fill the jobs
-		for (const auto& lightData : lightComponentSets)
+		TupleVector<LightComponent*, const TransformComponent*> oneTaskComponents;
+		oneTaskComponents.reserve(chunkSize);
+		for (size_t i = 0; i < chunksCount; ++i)
 		{
-			if (chunkItemIndex == 0)
-			{
-				jobs.emplace_back(std::make_unique<VisibilityPolygonCalculationJob>(maxFov, lightBlockingComponents, timestampNow, finalizeFn));
-			}
+			std::move(
+				lightComponentSets.begin() + (i * chunkSize),
+				lightComponentSets.begin() + (std::min(lightComponentSets.size(), (i + 1) * chunkSize)),
+				std::back_inserter(oneTaskComponents)
+			);
 
-			VisibilityPolygonCalculationJob* jobData = static_cast<VisibilityPolygonCalculationJob*>(jobs.rbegin()->get());
-
-			jobData->componentsToProcess.emplace_back(lightData);
-
-			++chunkItemIndex;
-			if (chunkItemIndex >= chunkSize)
-			{
-				chunkItemIndex = 0;
-			}
+			jobs.emplace_back(
+				[components = std::move(oneTaskComponents), maxFov, &lightBlockingComponents, timestampNow]()
+				{
+					return processVisibilityPolygonsGroup(components, maxFov, lightBlockingComponents, timestampNow);
+				},
+				finalizeFn
+			);
+			oneTaskComponents.clear();
 		}
 
 		// start heavy calculations
-		mJobsWorkerManager.runJobs(std::move(jobs));
+		mThreadPool.executeTasks(std::move(jobs), 1u);
+		mThreadPool.finalizeTasks(1u);
 
 		// sort lights in some deterministic order
 		std::ranges::sort(allResults, [](auto& a, auto& b)

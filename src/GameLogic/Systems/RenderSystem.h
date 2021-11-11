@@ -5,6 +5,7 @@
 
 #include <raccoon-ecs/system.h>
 #include <raccoon-ecs/async_operations.h>
+#include <raccoon-ecs/thread_pool.h>
 
 #include "GameData/Components/SpriteRenderComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
@@ -14,8 +15,6 @@
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 #include "GameData/Components/BackgroundTextureComponent.generated.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
-
-#include "Utils/Jobs/WorkerManager.h"
 
 #include "HAL/Base/ResourceManager.h"
 
@@ -41,7 +40,7 @@ public:
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::ResourceManager& resourceManager,
-		Jobs::WorkerManager& jobsWorkerManager) noexcept;
+		RaccoonEcs::ThreadPool& threadPool) noexcept;
 
 	~RenderSystem() override = default;
 
@@ -64,6 +63,6 @@ private:
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
 	HAL::ResourceManager& mResourceManager;
-	Jobs::WorkerManager& mJobsWorkerManager;
+	RaccoonEcs::ThreadPool& mThreadPool;
 	ResourceHandle mLightSpriteHandle;
 };
