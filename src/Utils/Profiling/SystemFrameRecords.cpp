@@ -46,13 +46,13 @@ bool SystemFrameRecords::isRecordingActive() const
 	return mIsRecordingActive;
 }
 
-void SystemFrameRecords::printToFile(const std::vector<std::string>& systemNames, const std::string& fileName) const
+void SystemFrameRecords::printToFile(const std::vector<std::string>& systemNames, const std::string& fileName, const std::vector<NonFrameTasks>& nonFrameTasks) const
 {
 	std::ofstream outStream(fileName);
-	print(systemNames, outStream);
+	print(systemNames, outStream, std::move(nonFrameTasks));
 }
 
-void SystemFrameRecords::print(const std::vector<std::string>& systemNames, std::ostream& outStream) const
+void SystemFrameRecords::print(const std::vector<std::string>& systemNames, std::ostream& outStream, const std::vector<NonFrameTasks>& nonFrameTasks) const
 {
 	using RaccoonEcs::AsyncSystemsFrameTime;
 
@@ -77,5 +77,22 @@ void SystemFrameRecords::print(const std::vector<std::string>& systemNames, std:
 		}
 		frames.push_back(frame);
 	}
+
+	nlohmann::json& nonFrameTasksJson = result["nonFrameTasks"];
+	for (const NonFrameTasks& taskList : nonFrameTasks)
+	{
+		result["taskNames"].push_back(taskList.name);
+		const size_t taskNameId = result["taskNames"].size() - 1;
+		for (const auto& task : taskList.tasks)
+		{
+			nlohmann::json taskJson;
+			taskJson["threadId"] = taskList.threadId;
+			taskJson["timeStart"] = task.first.time_since_epoch().count();
+			taskJson["timeFinish"] = task.second.time_since_epoch().count();
+			taskJson["taskNameIdx"] = taskNameId;
+			nonFrameTasksJson.push_back(taskJson);
+		}
+	}
+
 	outStream << std::setw(4) <<  result;
 }

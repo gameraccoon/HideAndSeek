@@ -7,6 +7,15 @@
 class SystemFrameRecords
 {
 public:
+	using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
+
+	struct NonFrameTasks
+	{
+		size_t threadId;
+		std::string name;
+		std::vector<std::pair<TimePoint, TimePoint>> tasks;
+	};
+
 	void setRecordsLimit(unsigned int newLimit);
 
 	void addFrame(RaccoonEcs::AsyncSystemsFrameTime&& frameTime);
@@ -16,8 +25,8 @@ public:
 	void resumeRecording();
 	[[nodiscard]] bool isRecordingActive() const;
 
-	void printToFile(const std::vector<std::string>& systemNames, const std::string& fileName) const;
-	void print(const std::vector<std::string>& systemNames, std::ostream& stream) const;
+	void printToFile(const std::vector<std::string>& systemNames, const std::string& fileName, const std::vector<NonFrameTasks>& nonFrameTasks) const;
+	void print(const std::vector<std::string>& systemNames, std::ostream& stream, const std::vector<NonFrameTasks>& nonFrameTasks) const;
 
 private:
 	std::vector<RaccoonEcs::AsyncSystemsFrameTime> mSystemFrameRecords;

@@ -53,6 +53,7 @@ private:
 	TimeData mTime;
 	RenderThreadManager mRenderThread;
 	static inline const int WorkerThreadsCount = 3;
+	static inline const int RenderThreadId = WorkerThreadsCount + 1;
 
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	bool mProfileSystems = false;

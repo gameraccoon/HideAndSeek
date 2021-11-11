@@ -17,15 +17,7 @@
 
 RenderThreadManager::~RenderThreadManager()
 {
-	{
-		std::lock_guard l(mRenderAccessor.dataMutex);
-		mRenderAccessor.shutdownRequested = true;
-	}
-	mRenderAccessor.notifyRenderThread.notify_all();
-	if (mRenderThread)
-	{
-		mRenderThread->join();
-	}
+	shutdownThread();
 }
 
 void RenderThreadManager::startThread(HAL::ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn)
@@ -40,6 +32,20 @@ void RenderThreadManager::startThread(HAL::ResourceManager& resourceManager, HAL
 			RenderThreadManager::RenderThreadFunction(renderAccessor, resourceManager, engine);
 		}
 	);
+}
+
+void RenderThreadManager::shutdownThread()
+{
+	{
+		std::lock_guard l(mRenderAccessor.dataMutex);
+		mRenderAccessor.shutdownRequested = true;
+	}
+	mRenderAccessor.notifyRenderThread.notify_all();
+	if (mRenderThread)
+	{
+		mRenderThread->join();
+		mRenderThread = nullptr;
+	}
 }
 
 void RenderThreadManager::testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
@@ -212,8 +218,17 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 			renderAccessor.dataToTransfer.clear();
 		}
 
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+		const auto startTime = std::chrono::system_clock::now();
+#endif
+
 		resourceManager.runThreadTasks(HAL::Resource::Thread::Render);
 		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
+
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+		const auto endTime = std::chrono::system_clock::now();
+		renderAccessor.renderWorkTime.emplace_back(startTime, endTime);
+#endif
 	}
 }
 

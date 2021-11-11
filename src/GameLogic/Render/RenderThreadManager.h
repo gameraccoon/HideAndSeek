@@ -24,6 +24,7 @@ public:
 	RenderAccessor& getAccessor() { return mRenderAccessor; }
 
 	void startThread(HAL::ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn);
+	void shutdownThread();
 
 	// temp code
 	void testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine);

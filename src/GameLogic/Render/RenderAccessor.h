@@ -6,6 +6,11 @@
 #include <variant>
 #include <vector>
 
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#include <array>
+#include <chrono>
+#endif // RACCOON_ECS_PROFILE_SYSTEMS
+
 #include "GameData/Core/Vector2D.h"
 
 #include "HAL/Base/ResourceManager.h"
@@ -108,9 +113,21 @@ public:
 
 	void submitData(std::unique_ptr<RenderData>&& newData);
 
+
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+	using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
+	using WorkTimeRecords = std::vector<std::pair<TimePoint, TimePoint>>;
+	// can be safely called only when render thread is stopped
+	WorkTimeRecords consumeRenderWorkTimeUnsafe();
+#endif
+
 private:
 	std::mutex dataMutex;
 	bool shutdownRequested = false;
 	std::vector<std::unique_ptr<RenderData>> dataToTransfer;
 	std::condition_variable notifyRenderThread;
+
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+	WorkTimeRecords renderWorkTime;
+#endif
 };

@@ -275,10 +275,18 @@ void Game::initResources()
 
 void Game::onGameShutdown()
 {
+	// run this before dumping profile information to avoid data races
+	mRenderThread.shutdownThread();
+
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	if (mProfileSystems)
 	{
-		mSystemFrameRecords.printToFile(mSystemsManager.getSystemNames(), mSystemProfileOutputPath);
+		std::vector<SystemFrameRecords::NonFrameTasks> nonFrameTasks(1);
+		SystemFrameRecords::NonFrameTasks& renderTasks = nonFrameTasks[0];
+		renderTasks.tasks = mRenderThread.getAccessor().consumeRenderWorkTimeUnsafe();
+		renderTasks.name = "Render Thread";
+		renderTasks.threadId = RenderThreadId;
+		mSystemFrameRecords.printToFile(mSystemsManager.getSystemNames(), mSystemProfileOutputPath, nonFrameTasks);
 	}
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 	mSystemsManager.shutdown();
