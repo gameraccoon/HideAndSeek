@@ -46,13 +46,13 @@ bool SystemFrameRecords::isRecordingActive() const
 	return mIsRecordingActive;
 }
 
-void SystemFrameRecords::printToFile(const std::vector<std::string>& systemNames, const std::string& fileName, const std::vector<NonFrameTasks>& nonFrameTasks) const
+void SystemFrameRecords::printToFile(const std::vector<std::string>& systemNames, const std::string& fileName, const NonFrameTasks& nonFrameTasks, const ScopedProfilerDatas& scopedProfilerDatas) const
 {
 	std::ofstream outStream(fileName);
-	print(systemNames, outStream, std::move(nonFrameTasks));
+	print(systemNames, outStream, nonFrameTasks, scopedProfilerDatas);
 }
 
-void SystemFrameRecords::print(const std::vector<std::string>& systemNames, std::ostream& outStream, const std::vector<NonFrameTasks>& nonFrameTasks) const
+void SystemFrameRecords::print(const std::vector<std::string>& systemNames, std::ostream& outStream, const NonFrameTasks& nonFrameTasks, const ScopedProfilerDatas& scopedProfilerDatas) const
 {
 	using RaccoonEcs::AsyncSystemsFrameTime;
 
@@ -79,11 +79,11 @@ void SystemFrameRecords::print(const std::vector<std::string>& systemNames, std:
 	}
 
 	nlohmann::json& nonFrameTasksJson = result["nonFrameTasks"];
-	for (const NonFrameTasks& taskList : nonFrameTasks)
+	for (const NonFrameTask& taskList : nonFrameTasks)
 	{
-		result["taskNames"].push_back(taskList.name);
+		result["taskNames"].push_back(taskList.taskName);
 		const size_t taskNameId = result["taskNames"].size() - 1;
-		for (const auto& task : taskList.tasks)
+		for (const auto& task : taskList.taskInstances)
 		{
 			nlohmann::json taskJson;
 			taskJson["threadId"] = taskList.threadId;
@@ -92,6 +92,24 @@ void SystemFrameRecords::print(const std::vector<std::string>& systemNames, std:
 			taskJson["taskNameIdx"] = taskNameId;
 			nonFrameTasksJson.push_back(taskJson);
 		}
+	}
+
+	nlohmann::json& scopeRecords = result["scopeRecords"];
+	for (const ScopedProfilerData& scopeData : scopedProfilerDatas)
+	{
+		nlohmann::json threadJson;
+		threadJson["threadId"] = scopeData.threadId;
+		nlohmann::json& recordsJson = threadJson["records"];
+		for (const ScopedProfilerThreadData::ScopeRecord& record : scopeData.records)
+		{
+			nlohmann::json recordJson;
+			recordJson["stackDepth"] = record.stackDepth;
+			recordJson["timeStart"] = record.start.time_since_epoch().count();
+			recordJson["timeFinish"] = record.end.time_since_epoch().count();
+			recordJson["scopeName"] = record.scopeName;
+			recordsJson.push_back(recordJson);
+		}
+		scopeRecords.push_back(threadJson);
 	}
 
 	outStream << std::setw(4) <<  result;

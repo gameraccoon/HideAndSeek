@@ -283,12 +283,18 @@ void Game::onGameShutdown()
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	if (mProfileSystems)
 	{
-		std::vector<SystemFrameRecords::NonFrameTasks> nonFrameTasks(1);
-		SystemFrameRecords::NonFrameTasks& renderTasks = nonFrameTasks[0];
-		renderTasks.tasks = mRenderThread.getAccessor().consumeRenderWorkTimeUnsafe();
-		renderTasks.name = "Render Thread";
+		SystemFrameRecords::NonFrameTasks nonFrameTasks(1);
+		SystemFrameRecords::NonFrameTask& renderTasks = nonFrameTasks[0];
+		renderTasks.taskInstances = mRenderThread.getAccessor().consumeRenderWorkTimeUnsafe();
+		renderTasks.taskName = "Render Thread";
 		renderTasks.threadId = RenderThreadId;
-		mSystemFrameRecords.printToFile(mSystemsManager.getSystemNames(), mSystemProfileOutputPath, nonFrameTasks);
+
+		SystemFrameRecords::ScopedProfilerDatas scopedProfilerDatas(1);
+		SystemFrameRecords::ScopedProfilerData& renderScopedProfilerData = scopedProfilerDatas[0];
+		renderScopedProfilerData.records = mRenderThread.getAccessor().consumeScopedProfilerRecordsUnsafe();
+		renderScopedProfilerData.threadId = RenderThreadId;
+
+		mSystemFrameRecords.printToFile(mSystemsManager.getSystemNames(), mSystemProfileOutputPath, nonFrameTasks, scopedProfilerDatas);
 	}
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 	mSystemsManager.shutdown();

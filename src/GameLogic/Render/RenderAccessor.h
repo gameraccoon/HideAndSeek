@@ -9,6 +9,7 @@
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 #include <array>
 #include <chrono>
+#include "Base/Profile/ScopedProfiler.h"
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 
 #include "GameData/Core/Vector2D.h"
@@ -119,6 +120,7 @@ public:
 	using WorkTimeRecords = std::vector<std::pair<TimePoint, TimePoint>>;
 	// can be safely called only when render thread is stopped
 	WorkTimeRecords consumeRenderWorkTimeUnsafe();
+	ScopedProfilerThreadData::Records consumeScopedProfilerRecordsUnsafe();
 #endif
 
 private:
@@ -129,5 +131,6 @@ private:
 
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	WorkTimeRecords renderWorkTime;
+	ScopedProfilerThreadData::Records scopedProfilerRecords;
 #endif
 };

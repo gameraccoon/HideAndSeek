@@ -17,3 +17,8 @@ RenderAccessor::WorkTimeRecords RenderAccessor::consumeRenderWorkTimeUnsafe()
 {
 	return std::move(renderWorkTime);
 }
+
+ScopedProfilerThreadData::Records RenderAccessor::consumeScopedProfilerRecordsUnsafe()
+{
+	return std::move(scopedProfilerRecords);
+}

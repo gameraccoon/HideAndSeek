@@ -8,6 +8,7 @@
 #include <SDL_video.h>
 
 #include "Base/Types/ComplexTypes/VectorUtils.h"
+#include "Base/Profile/ScopedProfiler.h"
 
 #include "HAL/Base/Math.h"
 #include "HAL/Base/ResourceManager.h"
@@ -66,6 +67,8 @@ namespace RenderThreadManagerInternal
 
 		void operator()(BackgroundRenderData&& bgData)
 		{
+			SCOPED_PROFILER("RenderVisitor->BackgroundRenderData");
+
 			const Graphics::Sprite* bgSprite = mResourceManager.tryGetResource<Graphics::Sprite>(bgData.spriteHandle);
 
 			if (bgSprite == nullptr)
@@ -83,6 +86,8 @@ namespace RenderThreadManagerInternal
 
 		void operator()(FanRenderData&& fanData)
 		{
+			SCOPED_PROFILER("RenderVisitor->FanRenderData");
+
 			const Graphics::Sprite* sprite = mResourceManager.tryGetResource<Graphics::Sprite>(fanData.spriteHandle);
 
 			if (sprite == nullptr)
@@ -113,6 +118,8 @@ namespace RenderThreadManagerInternal
 
 		void operator()(QuadRenderData&& quadData)
 		{
+			SCOPED_PROFILER("RenderVisitor->QuadRenderData");
+
 			const Graphics::Sprite* sprite = mResourceManager.tryGetResource<Graphics::Sprite>(quadData.spriteHandle);
 			if (sprite == nullptr)
 			{
@@ -132,6 +139,8 @@ namespace RenderThreadManagerInternal
 
 		void operator()(PolygonRenderData&& polygonData)
 		{
+			SCOPED_PROFILER("RenderVisitor->PolygonRenderData");
+
 			const Graphics::Sprite* sprite = mResourceManager.tryGetResource<Graphics::Sprite>(polygonData.spriteHandle);
 
 			if (sprite == nullptr)
@@ -153,6 +162,8 @@ namespace RenderThreadManagerInternal
 
 		void operator()(StripRenderData&& stripData)
 		{
+			SCOPED_PROFILER("RenderVisitor->StripRenderData");
+
 			const Graphics::Sprite* sprite = mResourceManager.tryGetResource<Graphics::Sprite>(stripData.spriteHandle);
 			if (sprite == nullptr)
 			{
@@ -173,11 +184,15 @@ namespace RenderThreadManagerInternal
 
 		void operator()(const TextRenderData& /*textData*/)
 		{
+			SCOPED_PROFILER("RenderVisitor->TextRenderData");
+
 			// need an implimentation when text rendering is fixed
 		}
 
 		void operator()(const SynchroneousRenderData& syncRenderData)
 		{
+			SCOPED_PROFILER("RenderVisitor->SynchroneousRenderData");
+
 			syncRenderData.renderThreadFn();
 
 			syncRenderData.sharedData->isFinishedMutex.lock();
@@ -188,6 +203,8 @@ namespace RenderThreadManagerInternal
 
 		void operator()(const SwapBuffersCommand&)
 		{
+			SCOPED_PROFILER("RenderVisitor->SwapBuffersCommand");
+
 			SDL_GL_SwapWindow(mEngine.getRawWindow());
 			glClear(GL_COLOR_BUFFER_BIT);
 		}
@@ -211,7 +228,7 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 
 			if (renderAccessor.shutdownRequested)
 			{
-				return;
+				break;
 			}
 
 			VectorUtils::AppendToVector(dataToRender, std::move(renderAccessor.dataToTransfer));
@@ -230,6 +247,8 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 		renderAccessor.renderWorkTime.emplace_back(startTime, endTime);
 #endif
 	}
+
+	renderAccessor.scopedProfilerRecords = gtlScopedProfilerData.consumeAllRecords();
 }
 
 void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine)

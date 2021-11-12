@@ -106,6 +106,7 @@ public:
 		Guard(Guard&&) = delete;
 		Guard& operator=(Guard&&) = delete;
 	};
+
 public:
 	ConcurrentAccessDetector() = default;
 	~ConcurrentAccessDetector() = default;
@@ -121,9 +122,9 @@ public:
 
 #ifdef CONCURRENT_ACCESS_DETECTION
 #define DETECT_CONCURRENT_ACCESS_NAME(A,B) A##B
-#define DETECT_CONCURRENT_ACCESS_IMPL(dataRaceDetector, namePostfix) ConcurrentAccessDetector::Guard DETECT_CONCURRENT_ACCESS_NAME(cadg_inst_, namePostfix)(dataRaceDetector, []{ReportErrorRelease("A data race detected");})
+#define DETECT_CONCURRENT_ACCESS_IMPL(dataRaceDetector, namePostfix) ConcurrentAccessDetector::Guard DETECT_CONCURRENT_ACCESS_NAME(cadg_inst_, namePostfix)((dataRaceDetector), []{ReportErrorRelease("A data race detected");})
 // macro generates a unique instance name of the guard for us
-#define DETECT_CONCURRENT_ACCESS(dataRaceDetector) DETECT_CONCURRENT_ACCESS_IMPL(dataRaceDetector, __COUNTER__)
+#define DETECT_CONCURRENT_ACCESS(dataRaceDetector) DETECT_CONCURRENT_ACCESS_IMPL((dataRaceDetector), __COUNTER__)
 #else
 #define DETECT_CONCURRENT_ACCESS(dataRaceDetector)
 #endif // CONCURRENT_ACCESS_DETECTION
