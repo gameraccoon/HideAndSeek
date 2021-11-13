@@ -8,7 +8,6 @@
 #include <SDL_video.h>
 
 #include "Base/Types/ComplexTypes/VectorUtils.h"
-#include "Base/Profile/ScopedProfiler.h"
 
 #include "HAL/Base/Math.h"
 #include "HAL/Base/ResourceManager.h"

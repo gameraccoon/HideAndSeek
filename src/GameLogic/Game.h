@@ -22,6 +22,10 @@
 #include "GameLogic/Imgui/ImguiDebugData.h"
 #endif
 
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#include <mutex>
+#endif
+
 class Game : public HAL::GameBase
 {
 public:
@@ -36,6 +40,7 @@ public:
 private:
 	void initSystems();
 	void onGameShutdown();
+	void workingThreadSaveProfileData();
 
 private:
 	ComponentFactory mComponentFactory;
@@ -51,12 +56,15 @@ private:
 	Json::ComponentSerializationHolder mComponentSerializers;
 	TimeData mTime;
 	RenderThreadManager mRenderThread;
+	static inline const int MainThreadId = 0;
 	static inline const int WorkerThreadsCount = 3;
 	static inline const int RenderThreadId = WorkerThreadsCount + 1;
 
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	bool mProfileSystems = false;
 	std::string mSystemProfileOutputPath = "systemProfile.json";
+	std::vector<std::pair<size_t, ScopedProfilerThreadData::Records>> mScopedProfileRecords;
+	std::mutex mScopedProfileRecordsMutex;
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 
 #if defined(IMGUI_ENABLED) || defined(RACCOON_ECS_PROFILE_SYSTEMS)

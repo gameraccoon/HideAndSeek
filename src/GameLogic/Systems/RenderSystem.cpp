@@ -173,6 +173,8 @@ static std::vector<VisibilityPolygonCalculationResult> processVisibilityPolygons
 	const LightBlockingComponents& lightBlockingComponents,
 	const GameplayTimestamp& timestamp)
 {
+	SCOPED_PROFILER("processVisibilityPolygonsGroup()");
+
 	std::vector<VisibilityPolygonCalculationResult> calculationResults(componentsToProcess.size());
 	VisibilityPolygonCalculator visibilityPolygonCalculator;
 	for (size_t i = 0; i < componentsToProcess.size(); ++i)

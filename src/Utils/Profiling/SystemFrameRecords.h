@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include "Base/Profile/ScopedProfiler.h"
-
 #include <raccoon-ecs/async_systems_manager.h>
 
 class SystemFrameRecords

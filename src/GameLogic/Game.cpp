@@ -37,6 +37,7 @@
 
 Game::Game(int width, int height)
 	: HAL::GameBase(width, height)
+	, mThreadPool([this]{ workingThreadSaveProfileData(); })
 {
 }
 
@@ -279,23 +280,46 @@ void Game::onGameShutdown()
 {
 	// run this before dumping profile information to avoid data races
 	mRenderThread.shutdownThread();
+	mThreadPool.shutdown();
 
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	if (mProfileSystems)
 	{
 		SystemFrameRecords::NonFrameTasks nonFrameTasks(1);
-		SystemFrameRecords::NonFrameTask& renderTasks = nonFrameTasks[0];
-		renderTasks.taskInstances = mRenderThread.getAccessor().consumeRenderWorkTimeUnsafe();
-		renderTasks.taskName = "Render Thread";
-		renderTasks.threadId = RenderThreadId;
+		{
+			SystemFrameRecords::NonFrameTask& renderTasks = nonFrameTasks[0];
+			renderTasks.taskInstances = mRenderThread.getAccessor().consumeRenderWorkTimeUnsafe();
+			renderTasks.taskName = "Render Thread";
+			renderTasks.threadId = RenderThreadId;
+		}
 
-		SystemFrameRecords::ScopedProfilerDatas scopedProfilerDatas(1);
-		SystemFrameRecords::ScopedProfilerData& renderScopedProfilerData = scopedProfilerDatas[0];
-		renderScopedProfilerData.records = mRenderThread.getAccessor().consumeScopedProfilerRecordsUnsafe();
-		renderScopedProfilerData.threadId = RenderThreadId;
+		SystemFrameRecords::ScopedProfilerDatas scopedProfilerDatas(2);
+		{
+			SystemFrameRecords::ScopedProfilerData& renderScopedProfilerData = scopedProfilerDatas[0];
+			renderScopedProfilerData.records = mRenderThread.getAccessor().consumeScopedProfilerRecordsUnsafe();
+			renderScopedProfilerData.threadId = RenderThreadId;
+		}
+		{
+			SystemFrameRecords::ScopedProfilerData& mainScopedProfilerData = scopedProfilerDatas[1];
+			mainScopedProfilerData.records = gtlScopedProfilerData.consumeAllRecords();
+			mainScopedProfilerData.threadId = MainThreadId;
+		}
+
+		for (auto&& [threadId, records] : mScopedProfileRecords)
+		{
+			scopedProfilerDatas.emplace_back(threadId, std::move(records));
+		}
 
 		mSystemFrameRecords.printToFile(mSystemsManager.getSystemNames(), mSystemProfileOutputPath, nonFrameTasks, scopedProfilerDatas);
 	}
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 	mSystemsManager.shutdown();
+}
+
+void Game::workingThreadSaveProfileData()
+{
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+	std::lock_guard l(mScopedProfileRecordsMutex);
+	mScopedProfileRecords.emplace_back(RaccoonEcs::ThreadPool::GetThisThreadId(), gtlScopedProfilerData.consumeAllRecords());
+#endif // RACCOON_ECS_PROFILE_SYSTEMS
 }

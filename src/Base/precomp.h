@@ -14,3 +14,4 @@
 #include "Base/Types/String/StringHelpers.h"
 #include "Base/Debug/Log.h"
 #include "Base/Debug/Assert.h"
+#include "Base/Profile/ScopedProfiler.h"
