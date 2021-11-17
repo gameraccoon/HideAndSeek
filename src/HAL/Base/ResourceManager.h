@@ -148,6 +148,7 @@ namespace HAL
 		template<typename T, typename... Args>
 		[[nodiscard]] ResourceHandle lockResourceFromThread(Resource::Thread currentThread, Args&&... args)
 		{
+			SCOPED_PROFILER("ResourceManager::lockResourceFromThread");
 			std::scoped_lock l(mDataMutex);
 			std::string id = T::GetUniqueId(args...);
 			return lockCustomResource<T>(
@@ -205,6 +206,7 @@ namespace HAL
 		template<typename T, typename Func, typename... Args>
 		[[nodiscard]] ResourceHandle lockCustomResource(const ResourcePath& path, Func loadFn, Resource::Thread currentThread, Args&&... args)
 		{
+			SCOPED_PROFILER("ResourceManager::lockCustomResource");
 			auto it = mStorage.pathsMap.find(path);
 			if (it != mStorage.pathsMap.end())
 			{

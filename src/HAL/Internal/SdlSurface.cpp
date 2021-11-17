@@ -24,6 +24,7 @@ namespace Graphics
 	{
 		static void InitSurfaceRenderThread(std::unique_ptr<HAL::Resource>& resource)
 		{
+			SCOPED_PROFILER("InitSurfaceRenderThread");
 			if (!resource->isValid())
 			{
 				return;

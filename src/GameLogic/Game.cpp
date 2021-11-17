@@ -43,6 +43,7 @@ Game::Game(int width, int height)
 
 void Game::start(ArgumentsParser& arguments)
 {
+	SCOPED_PROFILER("Game::start");
 	ComponentsRegistration::RegisterComponents(mComponentFactory);
 	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializers);
 
@@ -72,7 +73,7 @@ void Game::start(ArgumentsParser& arguments)
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	mProfileSystems = arguments.hasArgument("profile-systems");
 	mSystemProfileOutputPath = arguments.getArgumentValue("profile-systems", mSystemProfileOutputPath);
-	mSystemFrameRecords.setRecordsLimit(mProfileSystems ? 0u : 100u);
+	mSystemFrameRecords.setRecordsLimit(100u);
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 
 #ifdef IMGUI_ENABLED
@@ -119,6 +120,7 @@ void Game::update(float dt)
 
 void Game::initSystems()
 {
+	SCOPED_PROFILER("Game::initSystems");
 	mSystemsManager.registerSystem<ControlSystem,
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
@@ -272,6 +274,7 @@ void Game::initSystems()
 
 void Game::initResources()
 {
+	SCOPED_PROFILER("Game::initResources");
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 	mSystemsManager.initResources();
 }
@@ -285,32 +288,45 @@ void Game::onGameShutdown()
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	if (mProfileSystems)
 	{
-		SystemFrameRecords::NonFrameTasks nonFrameTasks(1);
+		SystemFrameRecords::ProfileData data;
 		{
-			SystemFrameRecords::NonFrameTask& renderTasks = nonFrameTasks[0];
+			data.nonFrameTasks.emplace_back();
+			SystemFrameRecords::NonFrameTask& renderTasks = data.nonFrameTasks.back();
 			renderTasks.taskInstances = mRenderThread.getAccessor().consumeRenderWorkTimeUnsafe();
 			renderTasks.taskName = "Render Thread";
 			renderTasks.threadId = RenderThreadId;
 		}
 
-		SystemFrameRecords::ScopedProfilerDatas scopedProfilerDatas(2);
 		{
-			SystemFrameRecords::ScopedProfilerData& renderScopedProfilerData = scopedProfilerDatas[0];
+			data.scopedProfilerDatas.emplace_back();
+			SystemFrameRecords::ScopedProfilerData& renderScopedProfilerData = data.scopedProfilerDatas.back();
 			renderScopedProfilerData.records = mRenderThread.getAccessor().consumeScopedProfilerRecordsUnsafe();
 			renderScopedProfilerData.threadId = RenderThreadId;
 		}
 		{
-			SystemFrameRecords::ScopedProfilerData& mainScopedProfilerData = scopedProfilerDatas[1];
-			mainScopedProfilerData.records = gtlScopedProfilerData.consumeAllRecords();
+			data.scopedProfilerDatas.emplace_back();
+			SystemFrameRecords::ScopedProfilerData& mainScopedProfilerData = data.scopedProfilerDatas.back();
+			mainScopedProfilerData.records = gtlScopedProfilerData.getAllRecords();
 			mainScopedProfilerData.threadId = MainThreadId;
 		}
 
 		for (auto&& [threadId, records] : mScopedProfileRecords)
 		{
-			scopedProfilerDatas.emplace_back(threadId, std::move(records));
+			data.scopedProfilerDatas.emplace_back(threadId, std::move(records));
 		}
 
-		mSystemFrameRecords.printToFile(mSystemsManager.getSystemNames(), mSystemProfileOutputPath, nonFrameTasks, scopedProfilerDatas);
+		data.systemNames = mSystemsManager.getSystemNames();
+
+		data.threadNames.resize(RenderThreadId + 1);
+		data.threadNames[MainThreadId] = "Main Thread";
+		data.threadNames[RenderThreadId] = "Render Thread";
+		for (int i = 0; i < WorkerThreadsCount; ++i)
+		{
+			// zero is reserved for main thread
+			data.threadNames[1 + i] = std::string("Working Thread #") + std::to_string(i+1);
+		}
+
+		mSystemFrameRecords.printToFile(mSystemProfileOutputPath, data);
 	}
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 	mSystemsManager.shutdown();
@@ -320,6 +336,6 @@ void Game::workingThreadSaveProfileData()
 {
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 	std::lock_guard l(mScopedProfileRecordsMutex);
-	mScopedProfileRecords.emplace_back(RaccoonEcs::ThreadPool::GetThisThreadId(), gtlScopedProfilerData.consumeAllRecords());
+	mScopedProfileRecords.emplace_back(RaccoonEcs::ThreadPool::GetThisThreadId(), gtlScopedProfilerData.getAllRecords());
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 }

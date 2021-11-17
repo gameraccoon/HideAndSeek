@@ -6,6 +6,11 @@
 #include <iomanip>
 #include <nlohmann/json.hpp>
 
+SystemFrameRecords::SystemFrameRecords()
+	: mCreationTimeNs(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count())
+{
+}
+
 void SystemFrameRecords::setRecordsLimit(unsigned int newLimit)
 {
 	mRecordsLimit = newLimit;
@@ -46,70 +51,125 @@ bool SystemFrameRecords::isRecordingActive() const
 	return mIsRecordingActive;
 }
 
-void SystemFrameRecords::printToFile(const std::vector<std::string>& systemNames, const std::string& fileName, const NonFrameTasks& nonFrameTasks, const ScopedProfilerDatas& scopedProfilerDatas) const
+void SystemFrameRecords::printToFile(const std::string& fileName, const ProfileData& profileData) const
 {
 	std::ofstream outStream(fileName);
-	print(systemNames, outStream, nonFrameTasks, scopedProfilerDatas);
+	print(outStream, profileData);
 }
 
-void SystemFrameRecords::print(const std::vector<std::string>& systemNames, std::ostream& outStream, const NonFrameTasks& nonFrameTasks, const ScopedProfilerDatas& scopedProfilerDatas) const
+double SystemFrameRecords::getTimeMicrosecondsFromPoint(const std::chrono::time_point<std::chrono::system_clock>& timePoint) const
+{
+	// try to reduce floating point error by making the time relative to the app start befor converting to fp value
+	return (std::chrono::duration_cast<std::chrono::nanoseconds>(timePoint.time_since_epoch()).count() - mCreationTimeNs) * 0.001;
+}
+
+void SystemFrameRecords::print(std::ostream& outStream, const ProfileData& profileData) const
 {
 	using RaccoonEcs::AsyncSystemsFrameTime;
 
 	nlohmann::json result;
 
-	result["taskNames"] = systemNames;
-
-	nlohmann::json& frames = result["frames"];
+	nlohmann::json& events = result["traceEvents"];
 
 	for (const AsyncSystemsFrameTime& frameRecord : mSystemFrameRecords)
 	{
-		nlohmann::json frame;
-		nlohmann::json& tasks = frame["tasks"];
 		for (const AsyncSystemsFrameTime::OneSystemTime& systemTime : frameRecord.systemsTime)
 		{
-			nlohmann::json task;
-			task["threadId"] = systemTime.workerThreadId;
-			task["timeStart"] = systemTime.start.time_since_epoch().count();
-			task["timeFinish"] = systemTime.end.time_since_epoch().count();
-			task["taskNameIdx"] = systemTime.systemIdx;
-			tasks.push_back(task);
+			nlohmann::json taskBegin;
+			taskBegin["name"] = profileData.systemNames[systemTime.systemIdx];
+			taskBegin["ph"] = "B";
+			taskBegin["pid"] = 1;
+			taskBegin["tid"] = systemTime.workerThreadId;
+			taskBegin["ts"] = getTimeMicrosecondsFromPoint(systemTime.begin);
+			events.push_back(taskBegin);
+
+			nlohmann::json taskEnd;
+			taskEnd["name"] = profileData.systemNames[systemTime.systemIdx];
+			taskEnd["ph"] = "E";
+			taskEnd["pid"] = "1";
+			taskEnd["tid"] = systemTime.workerThreadId;
+			taskEnd["ts"] = getTimeMicrosecondsFromPoint(systemTime.end);
+			events.push_back(taskEnd);
 		}
-		frames.push_back(frame);
 	}
 
-	nlohmann::json& nonFrameTasksJson = result["nonFrameTasks"];
-	for (const NonFrameTask& taskList : nonFrameTasks)
+	for (const NonFrameTask& taskList : profileData.nonFrameTasks)
 	{
-		result["taskNames"].push_back(taskList.taskName);
-		const size_t taskNameId = result["taskNames"].size() - 1;
 		for (const auto& task : taskList.taskInstances)
 		{
-			nlohmann::json taskJson;
-			taskJson["threadId"] = taskList.threadId;
-			taskJson["timeStart"] = task.first.time_since_epoch().count();
-			taskJson["timeFinish"] = task.second.time_since_epoch().count();
-			taskJson["taskNameIdx"] = taskNameId;
-			nonFrameTasksJson.push_back(taskJson);
+			nlohmann::json taskBegin;
+			taskBegin["name"] = taskList.taskName;
+			taskBegin["ph"] = "B";
+			taskBegin["pid"] = 1;
+			taskBegin["tid"] = taskList.threadId;
+			taskBegin["ts"] = getTimeMicrosecondsFromPoint(task.first);
+			events.push_back(taskBegin);
+
+			nlohmann::json taskEnd;
+			taskEnd["name"] = taskList.taskName;
+			taskEnd["ph"] = "E";
+			taskEnd["pid"] = 1;
+			taskEnd["tid"] = taskList.threadId;
+			taskEnd["ts"] = getTimeMicrosecondsFromPoint(task.second);
+			events.push_back(taskEnd);
 		}
 	}
 
-	nlohmann::json& scopeRecords = result["scopeRecords"];
-	for (const ScopedProfilerData& scopeData : scopedProfilerDatas)
+	for (const ScopedProfilerData& scopeData : profileData.scopedProfilerDatas)
 	{
-		nlohmann::json threadJson;
-		threadJson["threadId"] = scopeData.threadId;
-		nlohmann::json& recordsJson = threadJson["records"];
 		for (const ScopedProfilerThreadData::ScopeRecord& record : scopeData.records)
 		{
-			nlohmann::json recordJson;
-			recordJson["stackDepth"] = record.stackDepth;
-			recordJson["timeStart"] = record.start.time_since_epoch().count();
-			recordJson["timeFinish"] = record.end.time_since_epoch().count();
-			recordJson["scopeName"] = record.scopeName;
-			recordsJson.push_back(recordJson);
+			if (record.stackDepth != ScopedProfilerThreadData::InvalidStackDepth)
+			{
+				nlohmann::json taskBegin;
+				taskBegin["name"] = record.scopeName;
+				taskBegin["ph"] = "B";
+				taskBegin["pid"] = 1;
+				taskBegin["tid"] = scopeData.threadId;
+				taskBegin["ts"] = getTimeMicrosecondsFromPoint(record.begin);
+				taskBegin["sf"] = std::to_string(scopeData.threadId) + "#" + std::to_string(record.stackDepth) + "#" + record.scopeName;
+				events.push_back(taskBegin);
+
+				nlohmann::json taskEnd;
+				taskEnd["name"] = record.scopeName;
+				taskEnd["ph"] = "E";
+				taskEnd["pid"] = 1;
+				taskEnd["tid"] = scopeData.threadId;
+				taskEnd["ts"] = getTimeMicrosecondsFromPoint(record.end);
+				events.push_back(taskEnd);
+			}
 		}
-		scopeRecords.push_back(threadJson);
+	}
+
+	std::sort(
+		events.begin(),
+		events.end(),
+		[](const nlohmann::json& eventJsonL, const nlohmann::json& eventJsonR)
+		{
+			return eventJsonL.at("ts").get<double>() < eventJsonR.at("ts").get<double>();
+		}
+	);
+
+	const double minTime = events.begin()->at("ts").get<double>();
+
+	std::for_each(
+		events.begin(),
+		events.end(),
+		[minTime](nlohmann::json& eventJson){
+			eventJson["ts"] = eventJson["ts"].get<double>() - minTime;
+		}
+	);
+
+	for (size_t i = 0; i < profileData.threadNames.size(); ++i)
+	{
+		const std::string& threadName = profileData.threadNames[i];
+		events.insert(events.begin(), nlohmann::json{
+			{ "name", "thread_name" },
+			{ "ph", "M" },
+			{ "pid", 1 },
+			{ "tid", i },
+			{ "args", nlohmann::json{ {"name", threadName} }}
+		});
 	}
 
 	outStream << std::setw(4) <<  result;

@@ -7,6 +7,8 @@
 class SystemFrameRecords
 {
 public:
+	SystemFrameRecords();
+
 	using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
 
 	struct NonFrameTask
@@ -24,6 +26,14 @@ public:
 	};
 	using ScopedProfilerDatas = std::vector<ScopedProfilerData>;
 
+	struct ProfileData
+	{
+		std::vector<std::string> systemNames;
+		std::vector<std::string> threadNames;
+		NonFrameTasks nonFrameTasks;
+		ScopedProfilerDatas scopedProfilerDatas;
+	};
+
 	void setRecordsLimit(unsigned int newLimit);
 
 	void addFrame(RaccoonEcs::AsyncSystemsFrameTime&& frameTime);
@@ -33,11 +43,15 @@ public:
 	void resumeRecording();
 	[[nodiscard]] bool isRecordingActive() const;
 
-	void printToFile(const std::vector<std::string>& systemNames, const std::string& fileName, const NonFrameTasks& nonFrameTasks, const ScopedProfilerDatas& scopedProfilerDatas) const;
-	void print(const std::vector<std::string>& systemNames, std::ostream& stream, const NonFrameTasks& nonFrameTasks, const ScopedProfilerDatas& scopedProfilerDatas) const;
+	void printToFile(const std::string& fileName, const ProfileData& profileData) const;
+	void print(std::ostream& stream, const ProfileData& profilerData) const;
+
+private:
+	double getTimeMicrosecondsFromPoint(const std::chrono::time_point<std::chrono::system_clock>& timePoint) const;
 
 private:
 	std::vector<RaccoonEcs::AsyncSystemsFrameTime> mSystemFrameRecords;
 	unsigned int mRecordsLimit = 0;
 	bool mIsRecordingActive = true;
+	const long mCreationTimeNs;
 };

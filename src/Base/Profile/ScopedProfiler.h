@@ -3,32 +3,43 @@
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
 
 #include <chrono>
-#include <vector>
+#include <list>
 
 class ScopedProfilerThreadData
 {
 public:
+	static const int InvalidStackDepth = -9999;
+
+	ScopedProfilerThreadData(size_t eventsCount = 10000)
+		: mRecords(eventsCount)
+	{
+	}
+
 	struct ScopeRecord
 	{
-		std::chrono::time_point<std::chrono::system_clock> start;
+		std::chrono::time_point<std::chrono::system_clock> begin;
 		std::chrono::time_point<std::chrono::system_clock> end;
-		const char* scopeName;
-		int stackDepth;
+		const char* scopeName = nullptr;
+		int stackDepth = InvalidStackDepth;
 	};
 
-	using Records = std::vector<ScopeRecord>;
+	using Records = std::list<ScopeRecord>;
 
 	void addRecord(
-		std::chrono::time_point<std::chrono::system_clock>&& start
+		std::chrono::time_point<std::chrono::system_clock>&& begin
 		, std::chrono::time_point<std::chrono::system_clock>&& end
 		, const char* scopeName
 		, int stackDepth)
 	{
-		mRecords.emplace_back(std::move(start), std::move(end), scopeName, stackDepth);
+		mRecords.splice(mRecords.end(), mRecords, mRecords.begin());
+		ScopeRecord& newRecord = mRecords.back();
+		newRecord.begin = std::move(begin);
+		newRecord.end = std::move(end);
+		newRecord.scopeName = scopeName;
+		newRecord.stackDepth = std::move(stackDepth);
 	}
 
 	const Records& getAllRecords() const { return mRecords; }
-	Records consumeAllRecords() { return std::move(mRecords); }
 
 private:
 	Records mRecords;

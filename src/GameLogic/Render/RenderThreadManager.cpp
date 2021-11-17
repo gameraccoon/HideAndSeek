@@ -247,7 +247,7 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 #endif
 	}
 
-	renderAccessor.scopedProfilerRecords = gtlScopedProfilerData.consumeAllRecords();
+	renderAccessor.scopedProfilerRecords = gtlScopedProfilerData.getAllRecords();
 }
 
 void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine)

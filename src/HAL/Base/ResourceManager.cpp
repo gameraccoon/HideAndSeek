@@ -252,6 +252,7 @@ namespace HAL
 
 	void ResourceManager::loadAtlasesData(const ResourcePath& listPath)
 	{
+		SCOPED_PROFILER("ResourceManager::loadAtlasesData");
 		std::scoped_lock l(mDataMutex);
 		namespace fs = std::filesystem;
 		fs::path listFsPath(static_cast<std::string>(listPath));
@@ -280,6 +281,7 @@ namespace HAL
 
 	void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 	{
+		SCOPED_PROFILER("ResourceManager::runThreadTasks");
 		std::unique_lock l(mDataMutex);
 		for (int i = 0; i < static_cast<int>(mLoading.resourcesWaitingInit.size()); ++i)
 		{
@@ -332,6 +334,7 @@ namespace HAL
 
 	void ResourceManager::startResourceLoading(ResourceLoading::LoadingDataPtr&& loadingData, Resource::Thread currentThread)
 	{
+		SCOPED_PROFILER("ResourceManager::startResourceLoading");
 		auto deletionIt = std::ranges::find_if(
 			mLoading.resourcesWaitingDeinit,
 			[handle = loadingData->handle](const ResourceLoading::UnloadingDataPtr& resourceUnloadData)
@@ -387,6 +390,7 @@ namespace HAL
 
 	void ResourceManager::loadOneAtlasData(const ResourcePath& path)
 	{
+		SCOPED_PROFILER("ResourceManager::loadOneAtlasData");
 		namespace fs = std::filesystem;
 		fs::path atlasDescPath(static_cast<std::string>(path));
 
@@ -435,6 +439,7 @@ namespace HAL
 
 	std::vector<ResourcePath> ResourceManager::loadSpriteAnimClipData(const ResourcePath& path)
 	{
+		SCOPED_PROFILER("ResourceManager::loadSpriteAnimClipData");
 		namespace fs = std::filesystem;
 		fs::path atlasDescPath(static_cast<std::string>(path));
 
@@ -466,6 +471,7 @@ namespace HAL
 
 	ResourceManager::AnimGroupData ResourceManager::loadAnimGroupData(const ResourcePath& path)
 	{
+		SCOPED_PROFILER("ResourceManager::loadAnimGroupData");
 		namespace fs = std::filesystem;
 		fs::path atlasDescPath(static_cast<std::string>(path));
 
@@ -499,6 +505,7 @@ namespace HAL
 
 	void ResourceManager::finalizeResourceLoading(ResourceHandle handle, Resource::Ptr&& resource, Resource::Thread currentThread)
 	{
+		SCOPED_PROFILER("ResourceManager::finalizeResourceLoading");
 		mStorage.resources[handle] = std::move(resource);
 
 		const std::vector<ResourceHandle> readyToLoadResources = mLoading.loadDependencies.resolveDependency(handle);
@@ -519,6 +526,7 @@ namespace HAL
 
 	void ResourceManager::StartSpriteLoading(ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const ResourcePath& path)
 	{
+		SCOPED_PROFILER("ResourceManager::StartSpriteLoading");
 		ResourceHandle originalSurfaceHandle;
 		auto it = resourceManager.mStorage.atlasFrames.find(path);
 		std::string surfacePath;
