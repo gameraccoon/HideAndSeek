@@ -13,11 +13,6 @@ void RenderAccessor::submitData(std::unique_ptr<RenderData>&& newData)
 	notifyRenderThread.notify_all();
 }
 
-RenderAccessor::WorkTimeRecords RenderAccessor::consumeRenderWorkTimeUnsafe()
-{
-	return std::move(renderWorkTime);
-}
-
 ScopedProfilerThreadData::Records RenderAccessor::consumeScopedProfilerRecordsUnsafe()
 {
 	return std::move(scopedProfilerRecords);

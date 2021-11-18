@@ -33,6 +33,7 @@ AiSystem::AiSystem(
 
 void AiSystem::update()
 {
+	SCOPED_PROFILER("AiSystem::update");
 	World& world = mWorldHolder.getWorld();
 	const GameplayTimestamp timestampNow = mTime.currentTimestamp;
 

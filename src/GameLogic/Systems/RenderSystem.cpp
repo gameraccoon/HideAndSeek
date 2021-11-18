@@ -48,6 +48,7 @@ RenderSystem::RenderSystem(
 
 void RenderSystem::update()
 {
+	SCOPED_PROFILER("RenderSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
 
@@ -91,6 +92,7 @@ void RenderSystem::update()
 
 	if (!renderMode || renderMode->getIsDrawVisibleEntitiesEnabled())
 	{
+		SCOPED_PROFILER("draw visible entities");
 		spatialManager.forEachComponentSet(
 			mSpriteRenderFilter,
 			[&drawShift, &renderData](const SpriteRenderComponent* spriteRender, const TransformComponent* transform)
@@ -136,6 +138,7 @@ void RenderSystem::DrawVisibilityPolygon(RenderData& renderData, ResourceHandle 
 
 void RenderSystem::drawBackground(RenderData& renderData, World& world, Vector2D drawShift, Vector2D windowSize)
 {
+	SCOPED_PROFILER("RenderSystem::drawBackground");
 	auto [backgroundTexture] = mBackgroundTextureFilter.getComponents(world.getWorldComponents());
 	if (backgroundTexture != nullptr)
 	{
@@ -205,6 +208,7 @@ static size_t GetJobDivisor(size_t maxThreadsCount)
 
 void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, std::vector<WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize)
 {
+	SCOPED_PROFILER("RenderSystem::drawLights");
 	const GameplayTimestamp timestampNow = mTime.currentTimestamp;
 
 	// get all the collidable components

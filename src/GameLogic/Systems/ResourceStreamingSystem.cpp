@@ -41,6 +41,7 @@ ResourceStreamingSystem::ResourceStreamingSystem(
 
 void ResourceStreamingSystem::update()
 {
+	SCOPED_PROFILER("ResourceStreamingSystem::update");
 	World& world = mWorldHolder.getWorld();
 
 	WorldCachedDataComponent* worldCachedData = mWorldCachedDataAdder.getOrAddComponent(world.getWorldComponents());

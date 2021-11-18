@@ -234,17 +234,8 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 			renderAccessor.dataToTransfer.clear();
 		}
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
-		const auto startTime = std::chrono::system_clock::now();
-#endif
-
 		resourceManager.runThreadTasks(HAL::Resource::Thread::Render);
 		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
-
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
-		const auto endTime = std::chrono::system_clock::now();
-		renderAccessor.renderWorkTime.emplace_back(startTime, endTime);
-#endif
 	}
 
 	renderAccessor.scopedProfilerRecords = gtlScopedProfilerData.getAllRecords();
@@ -252,6 +243,7 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 
 void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
 {
+	SCOPED_PROFILER("RenderThreadManager::ConsumeAndRenderQueue");
 	using namespace RenderThreadManagerInternal;
 
 	size_t firstSwap = 0;

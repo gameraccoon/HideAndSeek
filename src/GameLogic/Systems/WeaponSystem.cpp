@@ -50,6 +50,7 @@ struct HitInfo
 
 void WeaponSystem::update()
 {
+	SCOPED_PROFILER("WeaponSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameplayTimestamp currentTime = mTime.currentTimestamp;
 

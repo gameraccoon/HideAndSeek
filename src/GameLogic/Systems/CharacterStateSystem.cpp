@@ -38,6 +38,7 @@ static bool IsRunning(CharacterState state)
 
 void CharacterStateSystem::update()
 {
+	SCOPED_PROFILER("CharacterStateSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
 	float dt = mTime.dt;

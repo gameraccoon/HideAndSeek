@@ -25,6 +25,7 @@ MovementSystem::MovementSystem(
 
 void MovementSystem::update()
 {
+	SCOPED_PROFILER("MovementSystem::update");
 	World& world = mWorldHolder.getWorld();
 	const GameplayTimestamp timestampNow = mTime.currentTimestamp;
 

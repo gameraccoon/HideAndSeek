@@ -9,9 +9,8 @@
 #include "GameData/GameData.h"
 
 #include "GameLogic/Imgui/ImguiDebugData.h"
-#include "Utils/Profiling/SystemFrameRecords.h"
 
-static float TotalTimePlotValueGetter(void* data, int idx)
+/*static float TotalTimePlotValueGetter(void* data, int idx)
 {
 	return static_cast<float>(static_cast<RaccoonEcs::AsyncSystemsFrameTime*>(data)[idx].frameTime.count()) * 0.001f;
 }
@@ -19,13 +18,13 @@ static float TotalTimePlotValueGetter(void* data, int idx)
 static float SystemTimePlotValueGetter(void* data, int idx)
 {
 	return static_cast<float>(static_cast<std::chrono::microseconds*>(data)[idx].count()) * 0.001f;
-}
+}*/
 
-void ImguiSystemsTimeReportWindow::update(ImguiDebugData& debugData)
+void ImguiSystemsTimeReportWindow::update(ImguiDebugData& /*debugData*/)
 {
 	if (isVisible)
 	{
-		std::vector<RaccoonEcs::AsyncSystemsFrameTime>& records = debugData.systemRecords.getFramesRef();
+/*		std::vector<RaccoonEcs::AsyncSystemsFrameTime>& records = debugData.systemRecords.getFramesRef();
 
 		if (records.empty())
 		{
@@ -95,6 +94,6 @@ void ImguiSystemsTimeReportWindow::update(ImguiDebugData& debugData)
 			ImGui::Text("%u %s", i, debugData.systemNames[i].c_str());
 		}
 
-		ImGui::End();
+		ImGui::End();*/
 	}
 }

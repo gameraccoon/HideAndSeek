@@ -19,6 +19,7 @@ DeadEntitiesDestructionSystem::DeadEntitiesDestructionSystem(
 
 void DeadEntitiesDestructionSystem::update()
 {
+	SCOPED_PROFILER("DeadEntitiesDestructionSystem::update");
 	World& world = mWorldHolder.getWorld();
 
 	TupleVector<WorldCell*, Entity, const DeathComponent*> components;

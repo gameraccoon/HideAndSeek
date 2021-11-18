@@ -9,7 +9,6 @@
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 #include "Utils/Application/ArgumentsParser.h"
-#include "Utils/Profiling/SystemFrameRecords.h"
 
 #include "HAL/GameBase.h"
 
@@ -61,17 +60,12 @@ private:
 	static inline const int RenderThreadId = WorkerThreadsCount + 1;
 
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
-	bool mProfileSystems = false;
-	std::string mSystemProfileOutputPath = "systemProfile.json";
+	std::string mScopedProfileOutputPath = "scoped_profile.json";
 	std::vector<std::pair<size_t, ScopedProfilerThreadData::Records>> mScopedProfileRecords;
 	std::mutex mScopedProfileRecordsMutex;
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 
-#if defined(IMGUI_ENABLED) || defined(RACCOON_ECS_PROFILE_SYSTEMS)
-	SystemFrameRecords mSystemFrameRecords;
-#endif // IMGUI_ENABLED || RACCOON_ECS_PROFILE_SYSTEMS
-
 #ifdef IMGUI_ENABLED
-	ImguiDebugData mImguiDebugData{mWorldHolder, mTime, mSystemFrameRecords, mComponentFactory, {}};
+	ImguiDebugData mImguiDebugData{mWorldHolder, mTime, mComponentFactory, {}};
 #endif // IMGUI_ENABLED
 };

@@ -26,6 +26,7 @@ CameraSystem::CameraSystem(
 
 void CameraSystem::update()
 {
+	SCOPED_PROFILER("CameraSystem::update");
 	GameData& gameData = mWorldHolder.getGameData();
 
 	auto [imgui] = mImguiFilter.getComponents(gameData.getGameComponents());

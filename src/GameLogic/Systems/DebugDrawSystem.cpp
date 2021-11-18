@@ -90,6 +90,7 @@ static void DrawPath(RenderData& renderData, const std::vector<Vector2D>& path, 
 
 void DebugDrawSystem::update()
 {
+	SCOPED_PROFILER("DebugDrawSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
 
@@ -273,6 +274,7 @@ void DebugDrawSystem::update()
 
 void DebugDrawSystem::initResources()
 {
+	SCOPED_PROFILER("DebugDrawSystem::initResources");
 	mCollisionSpriteHandle = mResourceManager.lockSprite("resources/textures/collision.png");
 	mNavmeshSpriteHandle = mResourceManager.lockSprite("resources/textures/testTexture.png");
 	mPointTextureHandle = mResourceManager.lockSprite("resources/textures/collision.png");

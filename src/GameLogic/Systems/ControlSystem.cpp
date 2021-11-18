@@ -40,6 +40,7 @@ void UpdateRenderStateOnPressed(const HAL::KeyStatesMap& keys, int key, bool& va
 
 void ControlSystem::update()
 {
+	SCOPED_PROFILER("ControlSystem::update");
 	GameData& gameData = mWorldHolder.getGameData();
 
 	const HAL::KeyStatesMap& keyStates = mInputData.keyboardKeyStates;

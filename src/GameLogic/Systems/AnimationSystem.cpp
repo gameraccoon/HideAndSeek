@@ -25,6 +25,7 @@ AnimationSystem::AnimationSystem(
 
 void AnimationSystem::update()
 {
+	SCOPED_PROFILER("AnimationSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
 	float dt = mTime.dt;

@@ -35,6 +35,7 @@ ImguiSystem::ImguiSystem(
 
 void ImguiSystem::update()
 {
+	SCOPED_PROFILER("ImguiSystem::update");
 	GameData& gameData = mDebugData.worldHolder.getGameData();
 
 	// check if we need to render imgui
@@ -91,6 +92,8 @@ void ImguiSystem::update()
 
 void ImguiSystem::initResources()
 {
+	SCOPED_PROFILER("ImguiSystem::initResources");
+
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -109,6 +112,7 @@ void ImguiSystem::initResources()
 
 void ImguiSystem::shutdown()
 {
+	SCOPED_PROFILER("ImguiSystem::shutdown");
 	ImGui_ImplOpenGL2_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();

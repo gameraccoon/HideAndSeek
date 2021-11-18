@@ -33,6 +33,10 @@
 #include "GameLogic/Systems/ImguiSystem.h"
 #endif // IMGUI_ENABLED
 
+#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#include "Utils/Profiling/ProfileDataWriter.h"
+#endif // RACCOON_ECS_PROFILE_SYSTEMS
+
 #include "GameLogic/Initialization/StateMachines.h"
 
 Game::Game(int width, int height)
@@ -71,9 +75,7 @@ void Game::start(ArgumentsParser& arguments)
 	mRenderThread.startThread(getResourceManager(), getEngine(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
 
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
-	mProfileSystems = arguments.hasArgument("profile-systems");
-	mSystemProfileOutputPath = arguments.getArgumentValue("profile-systems", mSystemProfileOutputPath);
-	mSystemFrameRecords.setRecordsLimit(100u);
+	mScopedProfileOutputPath = arguments.getArgumentValue("profile-systems", mScopedProfileOutputPath);
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 
 #ifdef IMGUI_ENABLED
@@ -98,6 +100,7 @@ void Game::setMouseKeyState(int key, bool isPressed)
 
 void Game::update(float dt)
 {
+	SCOPED_PROFILER("Game::update");
 	std::unique_ptr<RenderData> renderCommands = std::make_unique<RenderData>();
 	TemplateHelpers::EmplaceVariant<SwapBuffersCommand>(renderCommands->layers);
 	mRenderThread.getAccessor().submitData(std::move(renderCommands));
@@ -112,10 +115,6 @@ void Game::update(float dt)
 	//mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
 
 	mInputData.clearAfterFrame();
-
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
-	mSystemFrameRecords.addFrame(mSystemsManager.getPreviousFrameTimeData());
-#endif // RACCOON_ECS_PROFILE_SYSTEMS
 }
 
 void Game::initSystems()
@@ -286,26 +285,17 @@ void Game::onGameShutdown()
 	mThreadPool.shutdown();
 
 #ifdef RACCOON_ECS_PROFILE_SYSTEMS
-	if (mProfileSystems)
 	{
-		SystemFrameRecords::ProfileData data;
-		{
-			data.nonFrameTasks.emplace_back();
-			SystemFrameRecords::NonFrameTask& renderTasks = data.nonFrameTasks.back();
-			renderTasks.taskInstances = mRenderThread.getAccessor().consumeRenderWorkTimeUnsafe();
-			renderTasks.taskName = "Render Thread";
-			renderTasks.threadId = RenderThreadId;
-		}
-
+		ProfileDataWriter::ProfileData data;
 		{
 			data.scopedProfilerDatas.emplace_back();
-			SystemFrameRecords::ScopedProfilerData& renderScopedProfilerData = data.scopedProfilerDatas.back();
+			ProfileDataWriter::ScopedProfilerData& renderScopedProfilerData = data.scopedProfilerDatas.back();
 			renderScopedProfilerData.records = mRenderThread.getAccessor().consumeScopedProfilerRecordsUnsafe();
 			renderScopedProfilerData.threadId = RenderThreadId;
 		}
 		{
 			data.scopedProfilerDatas.emplace_back();
-			SystemFrameRecords::ScopedProfilerData& mainScopedProfilerData = data.scopedProfilerDatas.back();
+			ProfileDataWriter::ScopedProfilerData& mainScopedProfilerData = data.scopedProfilerDatas.back();
 			mainScopedProfilerData.records = gtlScopedProfilerData.getAllRecords();
 			mainScopedProfilerData.threadId = MainThreadId;
 		}
@@ -315,18 +305,16 @@ void Game::onGameShutdown()
 			data.scopedProfilerDatas.emplace_back(threadId, std::move(records));
 		}
 
-		data.systemNames = mSystemsManager.getSystemNames();
-
 		data.threadNames.resize(RenderThreadId + 1);
 		data.threadNames[MainThreadId] = "Main Thread";
 		data.threadNames[RenderThreadId] = "Render Thread";
 		for (int i = 0; i < WorkerThreadsCount; ++i)
 		{
 			// zero is reserved for main thread
-			data.threadNames[1 + i] = std::string("Working Thread #") + std::to_string(i+1);
+			data.threadNames[1 + i] = std::string("Worker Thread #") + std::to_string(i+1);
 		}
 
-		mSystemFrameRecords.printToFile(mSystemProfileOutputPath, data);
+		ProfileDataWriter::PrintToFile(mScopedProfileOutputPath, data);
 	}
 #endif // RACCOON_ECS_PROFILE_SYSTEMS
 	mSystemsManager.shutdown();

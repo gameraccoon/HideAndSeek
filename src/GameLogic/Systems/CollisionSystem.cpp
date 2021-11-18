@@ -23,6 +23,7 @@ CollisionSystem::CollisionSystem(
 
 void CollisionSystem::update()
 {
+	SCOPED_PROFILER("CollisionSystem::update");
 	struct SpatialComponents
 	{
 		WorldCell* cell;
@@ -33,22 +34,28 @@ void CollisionSystem::update()
 
 	auto& allCellsMap = world.getSpatialData().getAllCells();
 	std::vector<SpatialComponents> collidableComponentGroups(allCellsMap.size());
-	size_t i = 0;
-	for (auto& pair : allCellsMap)
 	{
-		mCollidingFilter.getComponentsWithEntities(pair.second.getEntityManager(), collidableComponentGroups[i].components);
-		collidableComponentGroups[i].cell = &pair.second;
-		++i;
-	}
-
-	for (auto& pair : collidableComponentGroups)
-	{
-		for (auto [entity, collision, transform] : pair.components)
+		SCOPED_PROFILER("get components");
+		size_t i = 0;
+		for (auto& pair : allCellsMap)
 		{
-			Collide::UpdateBoundingBox(collision);
+			mCollidingFilter.getComponentsWithEntities(pair.second.getEntityManager(), collidableComponentGroups[i].components);
+			collidableComponentGroups[i].cell = &pair.second;
+			++i;
+		}
+	}
+	{
+		SCOPED_PROFILER("update bounding boxes");
+		for (auto& pair : collidableComponentGroups)
+		{
+			for (auto [entity, collision, transform] : pair.components)
+			{
+				Collide::UpdateBoundingBox(collision);
+			}
 		}
 	}
 
+	SCOPED_PROFILER("resolve collisions");
 	world.getSpatialData().getAllCellManagers().forEachComponentSet(
 			mMovingCollisionsFilter,
 			[&collidableComponentGroups, this](const CollisionComponent* collisionComponent, const TransformComponent* transformComponent, MovementComponent* movementComponent)
