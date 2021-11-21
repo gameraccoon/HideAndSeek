@@ -289,7 +289,7 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 
 		// start heavy calculations
 		mThreadPool.executeTasks(std::move(jobs), 1u);
-		mThreadPool.finalizeTasks(1u);
+		mThreadPool.processAndFinalizeTasks(1u);
 
 		// sort lights in some deterministic order
 		std::ranges::sort(allResults, [](auto& a, auto& b)
