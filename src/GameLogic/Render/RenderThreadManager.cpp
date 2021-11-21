@@ -238,7 +238,9 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
 	}
 
+#ifdef ENABLE_SCOPED_PROFILER
 	renderAccessor.scopedProfilerRecords = gtlScopedProfilerData.getAllRecords();
+#endif // ENABLE_SCOPED_PROFILER
 }
 
 void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine)

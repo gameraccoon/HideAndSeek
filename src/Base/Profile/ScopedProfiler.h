@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#ifdef ENABLE_SCOPED_PROFILER
 
 #include <chrono>
 #include <list>
@@ -81,5 +81,5 @@ private:
 // macro generates a unique instance name for us
 #define SCOPED_PROFILER(scopeName) SCOPED_PROFILER_IMPL((scopeName), __COUNTER__)
 #else
-#define SCOPED_PROFILER
+#define SCOPED_PROFILER(scopeName)
 #endif

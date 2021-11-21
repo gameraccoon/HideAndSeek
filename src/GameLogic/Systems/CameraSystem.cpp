@@ -11,14 +11,14 @@ CameraSystem::CameraSystem(
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
 		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
 		RaccoonEcs::ComponentFilter<const ImguiComponent>&& imguiFilter,
-		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>&& worldDataAdder,
+		RaccoonEcs::ComponentFilter<WorldCachedDataComponent>&& worldCachedDataFilter,
 		WorldHolder& worldHolder,
 		const InputData& inputData) noexcept
 	: mCameraMoveFilter(std::move(cameraMoveFilter))
 	, mTrackedFilter(std::move(trackedFilter))
 	, mTransformFilter(std::move(transformFilter))
 	, mImguiFilter(std::move(imguiFilter))
-	, mWorldDataAdder(std::move(worldDataAdder))
+	, mWorldCachedDataFilter(std::move(worldCachedDataFilter))
 	, mWorldHolder(worldHolder)
 	, mInputData(inputData)
 {
@@ -64,7 +64,7 @@ void CameraSystem::update()
 
 			cameraMovement->setNextStep(cameraMove);
 
-			WorldCachedDataComponent* worldCachedData = mWorldDataAdder.getOrAddComponent(world.getWorldComponents());
+			auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
 			worldCachedData->setCameraPos(cameraNewPos);
 			worldCachedData->setScreenSize(screenSize);
 		}

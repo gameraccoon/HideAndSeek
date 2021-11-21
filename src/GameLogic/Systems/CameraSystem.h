@@ -25,7 +25,7 @@ public:
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
 		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
 		RaccoonEcs::ComponentFilter<const ImguiComponent>&& imguiFilter,
-		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>&& worldDataAdder,
+		RaccoonEcs::ComponentFilter<WorldCachedDataComponent>&& worldCachedDataFilter,
 		WorldHolder& worldHolder,
 		const InputData& inputData) noexcept;
 	~CameraSystem() override = default;
@@ -38,7 +38,7 @@ private:
 	RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent> mTrackedFilter;
 	RaccoonEcs::ComponentFilter<const TransformComponent> mTransformFilter;
 	RaccoonEcs::ComponentFilter<const ImguiComponent> mImguiFilter;
-	RaccoonEcs::ComponentAdder<WorldCachedDataComponent> mWorldDataAdder;
+	RaccoonEcs::ComponentFilter<WorldCachedDataComponent> mWorldCachedDataFilter;
 	WorldHolder& mWorldHolder;
 	const InputData& mInputData;
 };

@@ -13,9 +13,9 @@ inline void EnableFailOnAssert() noexcept
 	gGlobalAllowAssertLogs = true;
 #endif // DEBUG_CHECKS
 
-#ifdef ECS_DEBUG_CHECKS_ENABLED
+#ifdef RACCOON_ECS_DEBUG_CHECKS_ENABLED
 	RaccoonEcs::gErrorHandler = [](const std::string& error) { ReportFatalError(error); };
-#endif // ECS_DEBUG_CHECKS_ENABLED
+#endif // RACCOON_ECS_DEBUG_CHECKS_ENABLED
 }
 
 inline void DisableFailOnAssert() noexcept

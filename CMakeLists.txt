@@ -10,7 +10,7 @@ set(EXECUTABLE_NAME Game)
 
 # parameters
 option(DEBUG_CHECKS "Enable debug checks and assertions" ON)
-option(PROFILE_SYSTEMS "Enable systems time gathering for systems time reports" ON)
+option(ENABLE_SCOPED_PROFILER "Enable pfofiler that records time of execution of scopes across threads" OFF)
 option(MEMLEAK_DETECTION "Enable memory leaks detection code (slow)" OFF)
 option(MEMLEAK_REDEFINE_NEW "Redefine default new (provide more detailed info but can conflict with some libs)" OFF)
 option(CONCURRENT_ACCESS_DETECTION "Enable concurrent access detection" ON)
@@ -38,9 +38,9 @@ if(DEBUG_CHECKS)
 	add_definitions(-DDEBUG_CHECKS -DRACCOON_ECS_DEBUG_CHECKS_ENABLED)
 endif(DEBUG_CHECKS)
 
-if(PROFILE_SYSTEMS)
-	add_definitions(-DRACCOON_ECS_PROFILE_SYSTEMS)
-endif(PROFILE_SYSTEMS)
+if(ENABLE_SCOPED_PROFILER)
+	add_definitions(-DENABLE_SCOPED_PROFILER)
+endif(ENABLE_SCOPED_PROFILER)
 
 if(MEMLEAK_DETECTION)
 	add_definitions(-DDETECT_MEMORY_LEAKS)

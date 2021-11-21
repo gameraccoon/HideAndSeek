@@ -12,7 +12,7 @@ TestShootingControlSystem::TestShootingControlSystem(
 		RaccoonEcs::ComponentFilter<const TransformComponent, const WeaponComponent, CharacterStateComponent, MovementComponent>&& shooterFilter,
 		RaccoonEcs::ComponentFilter<const HealthComponent, const TransformComponent>&& targetsFilter,
 		WorldHolder& worldHolder,
-		TimeData& time) noexcept
+		const TimeData& time) noexcept
 	: mTrackedFilter(std::move(trackedFilter))
 	, mShooterFilters(std::move(shooterFilter))
 	, mTargetsFilter(std::move(targetsFilter))
@@ -41,13 +41,12 @@ void TestShootingControlSystem::update()
 	Vector2D closestTarget;
 	float closestQDist = std::numeric_limits<float>::max();
 
-	SpatialEntityManager spatialManager = world.getSpatialData().getAllCellManagers();
-	spatialManager.forEachComponentSet(
+	world.getSpatialData().getAllCellManagers().forEachComponentSet(
 			mTargetsFilter,
-			[playerLocation, &closestTarget, &closestQDist](const HealthComponent* /*health*/, const TransformComponent* transform)
+			[playerLocation, &closestTarget, &closestQDist](const HealthComponent* health, const TransformComponent* transform)
 	{
 		float qDist = (transform->getLocation() - playerLocation).qSize();
-		if (qDist < closestQDist)
+		if (health->getHealthValue() > 0.0f && qDist < closestQDist)
 		{
 			closestQDist = qDist;
 			closestTarget = transform->getLocation();

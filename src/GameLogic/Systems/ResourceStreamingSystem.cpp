@@ -10,7 +10,7 @@
 #include "HAL/Graphics/AnimationGroup.h"
 
 ResourceStreamingSystem::ResourceStreamingSystem(
-		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>&& worldCachedDataAddeer,
+		RaccoonEcs::ComponentFilter<WorldCachedDataComponent>&& worldCachedDataFilter,
 		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>&& spriteCreatorRemover,
 		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>&& spriteCreatorFilter,
 		RaccoonEcs::ComponentAdder<SpriteRenderComponent>&& spriteRenderComponentAdder,
@@ -23,7 +23,7 @@ ResourceStreamingSystem::ResourceStreamingSystem(
 		RaccoonEcs::ScheduledActionsExecutor&& scheduledActionsExecutor,
 		WorldHolder& worldHolder,
 		HAL::ResourceManager& resourceManager) noexcept
-	: mWorldCachedDataAdder(std::move(worldCachedDataAddeer))
+	: mWorldCachedDataFilter(std::move(worldCachedDataFilter))
 	, mSpriteCreatorRemover(std::move(spriteCreatorRemover))
 	, mSpriteCreatorFilter(std::move(spriteCreatorFilter))
 	, mSpriteRenderComponentAdder(std::move(spriteRenderComponentAdder))
@@ -44,7 +44,7 @@ void ResourceStreamingSystem::update()
 	SCOPED_PROFILER("ResourceStreamingSystem::update");
 	World& world = mWorldHolder.getWorld();
 
-	WorldCachedDataComponent* worldCachedData = mWorldCachedDataAdder.getOrAddComponent(world.getWorldComponents());
+	auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
 	Vector2D workingRect = worldCachedData->getScreenSize();
 
 	// load sprites

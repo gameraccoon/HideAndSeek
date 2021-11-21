@@ -21,7 +21,7 @@ public:
 		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
 		RaccoonEcs::ComponentFilter<const AiControllerComponent, const TransformComponent, MovementComponent>&& aiMovementFilter,
 		WorldHolder& worldHolder,
-		TimeData& time
+		const TimeData& time
 	) noexcept;
 	~TestCircularUnitsSystem() override = default;
 
@@ -33,5 +33,5 @@ private:
 	RaccoonEcs::ComponentFilter<const TransformComponent> mTransformFilter;
 	RaccoonEcs::ComponentFilter<const AiControllerComponent, const TransformComponent, MovementComponent> mAiMovementFilter;
 	WorldHolder& mWorldHolder;
-	TimeData& mTime;
+	const TimeData& mTime;
 };

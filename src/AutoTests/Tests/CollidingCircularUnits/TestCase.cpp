@@ -24,11 +24,11 @@
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestCircularUnitsSystem.h"
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestUnitsCountControlSystem.h"
 
-void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
+void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& arguments)
 {
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 
-	mSystemsManager.registerSystem<TestUnitsCountControlSystem,
+	getSystemsManager().registerSystem<TestUnitsCountControlSystem,
 		RaccoonEcs::EntityAdder,
 		RaccoonEcs::ComponentAdder<TransformComponent>,
 		RaccoonEcs::ComponentAdder<MovementComponent>,
@@ -37,58 +37,58 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentAdder<AiControllerComponent>,
 		RaccoonEcs::ComponentAdder<CharacterStateComponent>>(
 		RaccoonEcs::SystemDependencies(),
-		mWorldHolder
+		getWorldHolder()
 	);
 
-	mSystemsManager.registerSystem<TestCircularUnitsSystem,
+	getSystemsManager().registerSystem<TestCircularUnitsSystem,
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::ComponentFilter<const TransformComponent>,
 		RaccoonEcs::ComponentFilter<const AiControllerComponent, const TransformComponent, MovementComponent>>(
 		RaccoonEcs::SystemDependencies().goesAfter<TestUnitsCountControlSystem>(),
-		mWorldHolder,
-		mTime
+		getWorldHolder(),
+		getTime()
 	);
 
-	mSystemsManager.registerSystem<CollisionSystem,
+	getSystemsManager().registerSystem<CollisionSystem,
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>>(
 		RaccoonEcs::SystemDependencies().goesAfter<TestCircularUnitsSystem>(),
-		mWorldHolder
+		getWorldHolder()
 	);
 
-	mSystemsManager.registerSystem<CameraSystem,
+	getSystemsManager().registerSystem<CameraSystem,
 		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::ComponentFilter<const TransformComponent>,
 		RaccoonEcs::ComponentFilter<const ImguiComponent>,
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>>(
 		RaccoonEcs::SystemDependencies().goesAfter<CollisionSystem>(),
-		mWorldHolder,
-		mInputData
+		getWorldHolder(),
+		getInputData()
 	);
 
-	mSystemsManager.registerSystem<MovementSystem,
+	getSystemsManager().registerSystem<MovementSystem,
 		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>,
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>,
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::EntityTransferer>(
 		RaccoonEcs::SystemDependencies().goesAfter<CollisionSystem>(),
-		mWorldHolder,
-		mTime
+		getWorldHolder(),
+		getTime()
 	);
 
-	mSystemsManager.registerSystem<CharacterStateSystem,
+	getSystemsManager().registerSystem<CharacterStateSystem,
 		RaccoonEcs::ComponentFilter<const StateMachineComponent>,
 		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>>(
 		RaccoonEcs::SystemDependencies().goesAfter<MovementSystem>(),
-		mWorldHolder,
-		mTime
+		getWorldHolder(),
+		getTime()
 	);
 
-	mSystemsManager.registerSystem<ResourceStreamingSystem,
+	getSystemsManager().registerSystem<ResourceStreamingSystem,
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>,
 		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>,
 		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>,
@@ -101,11 +101,11 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>,
 		RaccoonEcs::ScheduledActionsExecutor>(
 		RaccoonEcs::SystemDependencies().goesBefore<RenderSystem>(),
-		mWorldHolder,
+		getWorldHolder(),
 		getResourceManager()
 	);
 
-	mSystemsManager.registerSystem<RenderSystem,
+	getSystemsManager().registerSystem<RenderSystem,
 		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>,
 		RaccoonEcs::ComponentFilter<const RenderModeComponent>,
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>,
@@ -114,19 +114,19 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
 		RaccoonEcs::SystemDependencies().goesAfter<MovementSystem>(),
-		mWorldHolder,
-		mTime,
+		getWorldHolder(),
+		getTime(),
 		getResourceManager(),
-		mWorkerManager
+		getThreadPool()
 	);
 
-	mSystemsManager.init(
-		1,
+	startGame(
+		arguments,
 		[this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
 			Vector2D playerPos{ZERO_VECTOR};
 
-			AsyncEntityView playerEntity = mWorld.createTrackedSpatialEntity(
+			AsyncEntityView playerEntity = getWorldHolder().getWorld().createTrackedSpatialEntity(
 				RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(dataAccessor),
 				RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(dataAccessor),
 				RaccoonEcs::EntityAdder(dataAccessor),
@@ -154,7 +154,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 			playerEntity.addComponent(RaccoonEcs::ComponentAdder<MovementComponent>(dataAccessor));
 
 			Vector2D cameraPos{ZERO_VECTOR};
-			AsyncEntityView camera = mWorld.createTrackedSpatialEntity(
+			AsyncEntityView camera = getWorldHolder().getWorld().createTrackedSpatialEntity(
 				RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(dataAccessor),
 				RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(dataAccessor),
 				RaccoonEcs::EntityAdder(dataAccessor),
@@ -166,14 +166,6 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 				transform->setLocation(cameraPos);
 			}
 			camera.addComponent(RaccoonEcs::ComponentAdder<MovementComponent>(dataAccessor));
-
-			RaccoonEcs::ComponentAdder<StateMachineComponent>(dataAccessor).addComponent(mGameData.getGameComponents());
-
-			RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
-			renderAccessor->setAccessor(&mRenderThread.getAccessor());
 		}
 	);
-
-	mInputData.windowSize = getEngine().getWindowSize();
-	mInputData.mousePos = mInputData.windowSize * 0.5f;
 }

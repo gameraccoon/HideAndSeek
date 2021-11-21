@@ -33,38 +33,43 @@
 #include "GameLogic/Systems/ImguiSystem.h"
 #endif // IMGUI_ENABLED
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#ifdef ENABLE_SCOPED_PROFILER
 #include "Utils/Profiling/ProfileDataWriter.h"
-#endif // RACCOON_ECS_PROFILE_SYSTEMS
+#endif // ENABLE_SCOPED_PROFILER
 
 #include "GameLogic/Initialization/StateMachines.h"
 
 Game::Game(int width, int height)
 	: HAL::GameBase(width, height)
-	, mThreadPool([this]{ workingThreadSaveProfileData(); })
+	, mThreadPool(0, [this]{ workingThreadSaveProfileData(); })
 {
 }
 
-void Game::start(ArgumentsParser& arguments)
+void Game::start([[maybe_unused]] const ArgumentsParser& arguments, int workerThreadsCount, SystemsInitFunction&& initFn)
 {
 	SCOPED_PROFILER("Game::start");
 	ComponentsRegistration::RegisterComponents(mComponentFactory);
 	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializers);
 
-	initSystems();
+	mThreadPool.spawnThreads(workerThreadsCount);
 
-	mThreadPool.spawnThreads(3);
+	mWorkerThreadsCount = workerThreadsCount;
+	mRenderThreadId = mWorkerThreadsCount + 1;
 
 	mSystemsManager.init(
 		0, // don't spawn additional threads since we already preallocated some
-		[this, &arguments](const RaccoonEcs::InnerDataAccessor& dataAccessor)
+		[this, initFn](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
-			GameDataLoader::LoadWorld(mWorld, dataAccessor, arguments.getArgumentValue("world", "test"), mComponentSerializers);
-			GameDataLoader::LoadGameData(mGameData, arguments.getArgumentValue("gameData", "gameData"), mComponentSerializers);
+			if (initFn)
+			{
+				initFn(dataAccessor);
+			}
 
-			auto [sm] = mGameData.getGameComponents().getComponents<StateMachineComponent>();
+			auto* sm = mGameData.getGameComponents().getOrAddComponent<StateMachineComponent>();
 			// ToDo: make an editor not to hardcode SM data
 			StateMachines::RegisterStateMachines(sm);
+
+			mWorld.getWorldComponents().addComponent<WorldCachedDataComponent>();
 
 			RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
 			renderAccessor->setAccessor(&mRenderThread.getAccessor());
@@ -74,13 +79,9 @@ void Game::start(ArgumentsParser& arguments)
 	getEngine().releaseRenderContext();
 	mRenderThread.startThread(getResourceManager(), getEngine(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#ifdef ENABLE_SCOPED_PROFILER
 	mScopedProfileOutputPath = arguments.getArgumentValue("profile-systems", mScopedProfileOutputPath);
-#endif // RACCOON_ECS_PROFILE_SYSTEMS
-
-#ifdef IMGUI_ENABLED
-	mImguiDebugData.systemNames = mSystemsManager.getSystemNames();
-#endif // IMGUI_ENABLED
+#endif // ENABLE_SCOPED_PROFILER
 
 	// start the main loop
 	getEngine().start(this);
@@ -101,174 +102,38 @@ void Game::setMouseKeyState(int key, bool isPressed)
 void Game::update(float dt)
 {
 	SCOPED_PROFILER("Game::update");
+	preInnderUpdate();
+
+	innerUpdate(dt);
+
+	postInnerUpdate();
+}
+
+void Game::preInnderUpdate()
+{
+	SCOPED_PROFILER("Game::preInnderUpdate");
 	std::unique_ptr<RenderData> renderCommands = std::make_unique<RenderData>();
 	TemplateHelpers::EmplaceVariant<SwapBuffersCommand>(renderCommands->layers);
 	mRenderThread.getAccessor().submitData(std::move(renderCommands));
 
 	mInputData.windowSize = getEngine().getWindowSize();
 	mInputData.mousePos = getEngine().getMousePos();
+}
 
+void Game::innerUpdate(float dt)
+{
+	SCOPED_PROFILER("Game::innerUpdate");
 	mTime.update(dt);
 	mSystemsManager.update();
+}
 
+void Game::postInnerUpdate()
+{
+	SCOPED_PROFILER("Game::postInnerUpdate");
 	// test code
 	//mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
 
 	mInputData.clearAfterFrame();
-}
-
-void Game::initSystems()
-{
-	SCOPED_PROFILER("Game::initSystems");
-	mSystemsManager.registerSystem<ControlSystem,
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
-		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
-		RaccoonEcs::ComponentFilter<ImguiComponent>,
-		RaccoonEcs::ComponentFilter<RenderModeComponent>,
-		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>,
-		RaccoonEcs::ComponentFilter<const TransformComponent>>(
-		RaccoonEcs::SystemDependencies(),
-		mWorldHolder,
-		mInputData
-	);
-
-	mSystemsManager.registerSystem<AiSystem,
-		RaccoonEcs::ComponentAdder<NavMeshComponent>,
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<const TransformComponent>,
-		RaccoonEcs::ComponentFilter<AiControllerComponent, const TransformComponent, MovementComponent, CharacterStateComponent>,
-		RaccoonEcs::ComponentFilter<DebugDrawComponent>,
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
-		RaccoonEcs::ComponentFilter<const PathBlockingGeometryComponent>>(
-		RaccoonEcs::SystemDependencies(),
-		mWorldHolder,
-		mTime
-	);
-
-	mSystemsManager.registerSystem<WeaponSystem,
-		RaccoonEcs::ComponentFilter<WeaponComponent, CharacterStateComponent>,
-		RaccoonEcs::ComponentFilter<const TransformComponent>,
-		RaccoonEcs::ComponentFilter<HealthComponent>,
-		RaccoonEcs::ComponentAdder<DeathComponent>,
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<ControlSystem, AiSystem>(),
-		mWorldHolder,
-		mTime
-	);
-
-	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem,
-		RaccoonEcs::ComponentFilter<const DeathComponent>,
-		RaccoonEcs::EntityRemover>(
-		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
-		mWorldHolder
-	);
-
-	mSystemsManager.registerSystem<CollisionSystem,
-		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<MovementComponent>,
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<ControlSystem, AiSystem>(),
-		mWorldHolder
-	);
-
-	mSystemsManager.registerSystem<CameraSystem,
-		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>,
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
-		RaccoonEcs::ComponentFilter<const TransformComponent>,
-		RaccoonEcs::ComponentFilter<const ImguiComponent>,
-		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<ControlSystem>(),
-		mWorldHolder,
-		mInputData
-	);
-
-	mSystemsManager.registerSystem<MovementSystem,
-		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>,
-		RaccoonEcs::ComponentFilter<SpatialTrackComponent>,
-		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>,
-		RaccoonEcs::EntityTransferer>(
-		RaccoonEcs::SystemDependencies().goesAfter<CollisionSystem>(),
-		mWorldHolder,
-		mTime
-	);
-
-	mSystemsManager.registerSystem<CharacterStateSystem,
-		RaccoonEcs::ComponentFilter<const StateMachineComponent>,
-		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>,
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<ControlSystem, AiSystem>(),
-		mWorldHolder,
-		mTime
-	);
-
-	mSystemsManager.registerSystem<ResourceStreamingSystem,
-		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>,
-		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>,
-		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>,
-		RaccoonEcs::ComponentAdder<SpriteRenderComponent>,
-		RaccoonEcs::ComponentAdder<AnimationClipsComponent>,
-		RaccoonEcs::ComponentRemover<AnimationClipCreatorComponent>,
-		RaccoonEcs::ComponentFilter<AnimationClipCreatorComponent>,
-		RaccoonEcs::ComponentAdder<AnimationGroupsComponent>,
-		RaccoonEcs::ComponentRemover<AnimationGroupCreatorComponent>,
-		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>,
-		RaccoonEcs::ScheduledActionsExecutor>(
-		RaccoonEcs::SystemDependencies().goesBefore<RenderSystem>(),
-		mWorldHolder,
-		getResourceManager()
-	);
-
-	mSystemsManager.registerSystem<AnimationSystem,
-		RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent>,
-		RaccoonEcs::ComponentFilter<AnimationClipsComponent, SpriteRenderComponent>,
-		RaccoonEcs::ComponentFilter<const StateMachineComponent>,
-		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<CharacterStateSystem>(),
-		mWorldHolder,
-		mTime
-	);
-
-	mSystemsManager.registerSystem<RenderSystem,
-		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>,
-		RaccoonEcs::ComponentFilter<const RenderModeComponent>,
-		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>, // hey, why isn't it const?
-		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>,
-		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<AnimationSystem>(),
-		mWorldHolder,
-		mTime,
-		getResourceManager(),
-		mThreadPool
-	);
-
-	mSystemsManager.registerSystem<DebugDrawSystem,
-		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>,
-		RaccoonEcs::ComponentFilter<const RenderModeComponent>,
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>,
-		RaccoonEcs::ComponentFilter<const NavMeshComponent>,
-		RaccoonEcs::ComponentFilter<const AiControllerComponent>,
-		RaccoonEcs::ComponentFilter<const DebugDrawComponent>,
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<RenderSystem>(),
-		mWorldHolder,
-		mTime,
-		getResourceManager()
-	);
-
-#ifdef IMGUI_ENABLED
-	mSystemsManager.registerSystem<ImguiSystem,
-		RaccoonEcs::ComponentAdder<ImguiComponent>,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>,
-		RaccoonEcs::InnerDataAccessor>(
-		RaccoonEcs::SystemDependencies().goesAfter<DebugDrawSystem>(),
-		mImguiDebugData,
-		getEngine()
-	);
-#endif // IMGUI_ENABLED
 }
 
 void Game::initResources()
@@ -284,14 +149,14 @@ void Game::onGameShutdown()
 	mRenderThread.shutdownThread();
 	mThreadPool.shutdown();
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#ifdef ENABLE_SCOPED_PROFILER
 	{
 		ProfileDataWriter::ProfileData data;
 		{
 			data.scopedProfilerDatas.emplace_back();
 			ProfileDataWriter::ScopedProfilerData& renderScopedProfilerData = data.scopedProfilerDatas.back();
 			renderScopedProfilerData.records = mRenderThread.getAccessor().consumeScopedProfilerRecordsUnsafe();
-			renderScopedProfilerData.threadId = RenderThreadId;
+			renderScopedProfilerData.threadId = mRenderThreadId;
 		}
 		{
 			data.scopedProfilerDatas.emplace_back();
@@ -305,10 +170,10 @@ void Game::onGameShutdown()
 			data.scopedProfilerDatas.emplace_back(threadId, std::move(records));
 		}
 
-		data.threadNames.resize(RenderThreadId + 1);
+		data.threadNames.resize(mRenderThreadId + 1);
 		data.threadNames[MainThreadId] = "Main Thread";
-		data.threadNames[RenderThreadId] = "Render Thread";
-		for (int i = 0; i < WorkerThreadsCount; ++i)
+		data.threadNames[mRenderThreadId] = "Render Thread";
+		for (int i = 0; i < mWorkerThreadsCount; ++i)
 		{
 			// zero is reserved for main thread
 			data.threadNames[1 + i] = std::string("Worker Thread #") + std::to_string(i+1);
@@ -316,14 +181,14 @@ void Game::onGameShutdown()
 
 		ProfileDataWriter::PrintToFile(mScopedProfileOutputPath, data);
 	}
-#endif // RACCOON_ECS_PROFILE_SYSTEMS
+#endif // ENABLE_SCOPED_PROFILER
 	mSystemsManager.shutdown();
 }
 
 void Game::workingThreadSaveProfileData()
 {
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#ifdef ENABLE_SCOPED_PROFILER
 	std::lock_guard l(mScopedProfileRecordsMutex);
 	mScopedProfileRecords.emplace_back(RaccoonEcs::ThreadPool::GetThisThreadId(), gtlScopedProfilerData.getAllRecords());
-#endif // RACCOON_ECS_PROFILE_SYSTEMS
+#endif // ENABLE_SCOPED_PROFILER
 }

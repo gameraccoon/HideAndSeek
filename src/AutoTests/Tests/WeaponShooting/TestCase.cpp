@@ -31,96 +31,97 @@
 #include "AutoTests/Tests/WeaponShooting/Systems/TestSpawnShootableUnitsSystem.h"
 #include "AutoTests/Tests/WeaponShooting/Systems/TestDestroyedEntitiesRegistrationSystem.h"
 
-void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
+void WeaponShootingTestCase::initTestCase(const ArgumentsParser& arguments)
 {
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 
 	mTestChecklist.checks.emplace("destroyedEntities", std::make_unique<DestroyedEntitiesTestCheck>(100));
 	DestroyedEntitiesTestCheck& destroyedEntitiesTestCheck = *static_cast<DestroyedEntitiesTestCheck*>(mTestChecklist.checks["destroyedEntities"].get());
 
-	mSystemsManager.registerSystem<TestSpawnShootableUnitsSystem,
+	getSystemsManager().registerSystem<TestSpawnShootableUnitsSystem,
 		RaccoonEcs::ComponentAdder<TransformComponent>,
 		RaccoonEcs::ComponentAdder<CollisionComponent>,
 		RaccoonEcs::ComponentAdder<HealthComponent>,
 		RaccoonEcs::ComponentAdder<SpriteCreatorComponent>,
 		RaccoonEcs::EntityAdder>(
 		RaccoonEcs::SystemDependencies(),
-		mWorldHolder
+		getWorldHolder()
 	);
 
-	mSystemsManager.registerSystem<TestShootingControlSystem,
+	getSystemsManager().registerSystem<TestShootingControlSystem,
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::ComponentFilter<const TransformComponent, const WeaponComponent, CharacterStateComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const HealthComponent, const TransformComponent>>(
 		RaccoonEcs::SystemDependencies().goesAfter<TestSpawnShootableUnitsSystem>(),
-		mWorldHolder,
-		mTime
+		getWorldHolder(),
+		getTime()
 	);
 
-	mSystemsManager.registerSystem<WeaponSystem,
-		RaccoonEcs::ComponentFilter<WeaponComponent, CharacterStateComponent>,
-		RaccoonEcs::ComponentFilter<const TransformComponent>,
-		RaccoonEcs::ComponentFilter<HealthComponent>,
-		RaccoonEcs::ComponentAdder<DeathComponent>,
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<TestShootingControlSystem>(),
-		mWorldHolder,
-		mTime
-	);
-
-	mSystemsManager.registerSystem<TestDestroyedEntitiesRegistrationSystem,
-		RaccoonEcs::ComponentFilter<const DeathComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
-		mWorldHolder,
-		destroyedEntitiesTestCheck
-	);
-
-	mSystemsManager.registerSystem<DeadEntitiesDestructionSystem,
-		RaccoonEcs::ComponentFilter<const DeathComponent>,
-		RaccoonEcs::EntityRemover>(
-		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
-		mWorldHolder
-	);
-
-	mSystemsManager.registerSystem<CollisionSystem,
+	getSystemsManager().registerSystem<CollisionSystem,
 		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>>(
 		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
-		mWorldHolder
+		getWorldHolder()
 	);
 
-	mSystemsManager.registerSystem<CameraSystem,
+	getSystemsManager().registerSystem<CameraSystem,
 		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::ComponentFilter<const TransformComponent>,
 		RaccoonEcs::ComponentFilter<const ImguiComponent>,
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>>(
 		RaccoonEcs::SystemDependencies(),
-		mWorldHolder,
-		mInputData);
+		getWorldHolder(),
+		getInputData()
+	);
 
-	mSystemsManager.registerSystem<MovementSystem,
+	getSystemsManager().registerSystem<MovementSystem,
 		RaccoonEcs::ComponentFilter<MovementComponent, TransformComponent>,
 		RaccoonEcs::ComponentFilter<SpatialTrackComponent>,
 		RaccoonEcs::ComponentFilter<TrackedSpatialEntitiesComponent>,
 		RaccoonEcs::EntityTransferer>(
 		RaccoonEcs::SystemDependencies().goesAfter<CollisionSystem>(),
-		mWorldHolder,
-		mTime
+		getWorldHolder(),
+		getTime()
 	);
 
-	mSystemsManager.registerSystem<CharacterStateSystem,
+	getSystemsManager().registerSystem<CharacterStateSystem,
 		RaccoonEcs::ComponentFilter<const StateMachineComponent>,
 		RaccoonEcs::ComponentFilter<CharacterStateComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>,
 		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>>(
-		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
-		mWorldHolder,
-		mTime
+		RaccoonEcs::SystemDependencies().goesAfter<TestShootingControlSystem>(),
+		getWorldHolder(),
+		getTime()
 	);
 
-	mSystemsManager.registerSystem<ResourceStreamingSystem,
+	getSystemsManager().registerSystem<WeaponSystem,
+		RaccoonEcs::ComponentFilter<WeaponComponent, CharacterStateComponent>,
+		RaccoonEcs::ComponentFilter<const TransformComponent>,
+		RaccoonEcs::ComponentFilter<HealthComponent>,
+		RaccoonEcs::ComponentAdder<DeathComponent>,
+		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>>(
+		RaccoonEcs::SystemDependencies().goesAfter<CharacterStateSystem>(),
+		getWorldHolder(),
+		getTime()
+	);
+
+	getSystemsManager().registerSystem<TestDestroyedEntitiesRegistrationSystem,
+		RaccoonEcs::ComponentFilter<const DeathComponent>>(
+		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>().goesBefore<DeadEntitiesDestructionSystem>(),
+		getWorldHolder(),
+		destroyedEntitiesTestCheck
+	);
+
+	getSystemsManager().registerSystem<DeadEntitiesDestructionSystem,
+		RaccoonEcs::ComponentFilter<const DeathComponent>,
+		RaccoonEcs::EntityRemover>(
+		RaccoonEcs::SystemDependencies().goesAfter<WeaponSystem>(),
+		getWorldHolder()
+	);
+
+	getSystemsManager().registerSystem<ResourceStreamingSystem,
 		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>,
 		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>,
 		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>,
@@ -133,11 +134,11 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<AnimationGroupCreatorComponent>,
 		RaccoonEcs::ScheduledActionsExecutor>(
 		RaccoonEcs::SystemDependencies().goesBefore<RenderSystem>(),
-		mWorldHolder,
+		getWorldHolder(),
 		getResourceManager()
 	);
 
-	mSystemsManager.registerSystem<RenderSystem,
+	getSystemsManager().registerSystem<RenderSystem,
 		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>,
 		RaccoonEcs::ComponentFilter<const RenderModeComponent>,
 		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>,
@@ -146,18 +147,20 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>,
 		RaccoonEcs::ComponentFilter<RenderAccessorComponent>>(
 		RaccoonEcs::SystemDependencies().goesAfter<MovementSystem>(),
-		mWorldHolder,
-		mTime,
+		getWorldHolder(),
+		getTime(),
 		getResourceManager(),
-		mWorkerManager
+		getThreadPool()
 	);
 
-	mSystemsManager.init(
-		1,
+	startGame(
+		arguments,
 		[this](const RaccoonEcs::InnerDataAccessor& dataAccessor)
 		{
+			World& world = getWorldHolder().getWorld();
+
 			Vector2D playerPos{ZERO_VECTOR};
-			AsyncEntityView playerEntity = mWorld.createTrackedSpatialEntity(
+			AsyncEntityView playerEntity = world.createTrackedSpatialEntity(
 				RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(dataAccessor),
 				RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(dataAccessor),
 				RaccoonEcs::EntityAdder(dataAccessor),
@@ -192,7 +195,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 			playerEntity.addComponent(RaccoonEcs::ComponentAdder<class CharacterStateComponent>(dataAccessor));
 
 			Vector2D cameraPos{ZERO_VECTOR};
-			AsyncEntityView camera = mWorld.createTrackedSpatialEntity(
+			AsyncEntityView camera = world.createTrackedSpatialEntity(
 				RaccoonEcs::ComponentAdder<class TrackedSpatialEntitiesComponent>(dataAccessor),
 				RaccoonEcs::ComponentAdder<class SpatialTrackComponent>(dataAccessor),
 				RaccoonEcs::EntityAdder(dataAccessor),
@@ -205,18 +208,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 			}
 			camera.addComponent(RaccoonEcs::ComponentAdder<class MovementComponent>(dataAccessor));
 
-			{
-				StateMachineComponent* stateMachine = mGameData.getGameComponents().addComponent<StateMachineComponent>();
-				StateMachines::RegisterStateMachines(stateMachine);
-			}
-
-			RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
-			renderAccessor->setAccessor(&mRenderThread.getAccessor());
+			mTicksToFinish = 300;
 		}
 	);
-
-	mInputData.windowSize = getEngine().getWindowSize();
-	mInputData.mousePos = mInputData.windowSize * 0.5f;
-
-	mTicksToFinish = 300;
 }

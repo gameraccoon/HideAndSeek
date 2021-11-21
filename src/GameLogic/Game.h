@@ -21,23 +21,38 @@
 #include "GameLogic/Imgui/ImguiDebugData.h"
 #endif
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#ifdef ENABLE_SCOPED_PROFILER
 #include <mutex>
 #endif
 
 class Game : public HAL::GameBase
 {
 public:
+	using SystemsInitFunction = std::function<void(const RaccoonEcs::InnerDataAccessor& dataAccessor)>;
+
+public:
 	Game(int width, int height);
 
-	void start(ArgumentsParser& arguments);
-	void update(float dt) override;
+	void start(const ArgumentsParser& arguments, int workerThreadsCount, SystemsInitFunction&& initFn);
+	void update(float dt) final;
+	void preInnderUpdate();
+	virtual void innerUpdate(float dt);
+	void postInnerUpdate();
 	void setKeyboardKeyState(int key, bool isPressed) override;
 	void setMouseKeyState(int key, bool isPressed) override;
 	void initResources() override;
 
+protected:
+	ComponentFactory& getComponentFactory() { return mComponentFactory; }
+	WorldHolder& getWorldHolder() { return mWorldHolder; }
+	RaccoonEcs::AsyncSystemsManager<StringId>& getSystemsManager() { return mSystemsManager; }
+	InputData& getInputData() { return mInputData; }
+	const TimeData& getTime() const { return mTime; }
+	RaccoonEcs::ThreadPool& getThreadPool() { return mThreadPool; }
+	GameData& getGameData() { return mGameData; }
+	const Json::ComponentSerializationHolder& getComponentSerializers() const { return mComponentSerializers; }
+
 private:
-	void initSystems();
 	void onGameShutdown();
 	void workingThreadSaveProfileData();
 
@@ -55,15 +70,15 @@ private:
 	Json::ComponentSerializationHolder mComponentSerializers;
 	TimeData mTime;
 	RenderThreadManager mRenderThread;
-	static inline const int MainThreadId = 0;
-	static inline const int WorkerThreadsCount = 3;
-	static inline const int RenderThreadId = WorkerThreadsCount + 1;
+	const int MainThreadId = 0;
+	int mWorkerThreadsCount = 3;
+	int mRenderThreadId = mWorkerThreadsCount + 1;
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#ifdef ENABLE_SCOPED_PROFILER
 	std::string mScopedProfileOutputPath = "scoped_profile.json";
 	std::vector<std::pair<size_t, ScopedProfilerThreadData::Records>> mScopedProfileRecords;
 	std::mutex mScopedProfileRecordsMutex;
-#endif // RACCOON_ECS_PROFILE_SYSTEMS
+#endif // ENABLE_SCOPED_PROFILER
 
 #ifdef IMGUI_ENABLED
 	ImguiDebugData mImguiDebugData{mWorldHolder, mTime, mComponentFactory, {}};

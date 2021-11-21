@@ -1,5 +1,6 @@
 #include "Base/precomp.h"
 
+#ifdef ENABLE_SCOPED_PROFILER
 #include "Utils/Profiling/ProfileDataWriter.h"
 
 #include <fstream>
@@ -105,3 +106,4 @@ void ProfileDataWriter::Print(std::ostream& outStream, const ProfileData& profil
 
 	outStream << std::setw(4) <<  result;
 }
+#endif // ENABLE_SCOPED_PROFILER

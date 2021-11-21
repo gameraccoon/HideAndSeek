@@ -24,7 +24,7 @@ class ResourceStreamingSystem : public RaccoonEcs::System
 {
 public:
 	ResourceStreamingSystem(
-		RaccoonEcs::ComponentAdder<WorldCachedDataComponent>&& worldCachedDataAdder,
+		RaccoonEcs::ComponentFilter<WorldCachedDataComponent>&& worldCachedDataFilter,
 		RaccoonEcs::ComponentRemover<SpriteCreatorComponent>&& spriteCreatorRemover,
 		RaccoonEcs::ComponentFilter<SpriteCreatorComponent>&& spriteCreatorFilter,
 		RaccoonEcs::ComponentAdder<SpriteRenderComponent>&& spriteRenderComponentAdder,
@@ -43,7 +43,7 @@ public:
 	static std::string GetSystemId() { return "ResourceStreamingSystem"; }
 
 private:
-	RaccoonEcs::ComponentAdder<WorldCachedDataComponent> mWorldCachedDataAdder;
+	RaccoonEcs::ComponentFilter<WorldCachedDataComponent> mWorldCachedDataFilter;
 	RaccoonEcs::ComponentRemover<SpriteCreatorComponent> mSpriteCreatorRemover;
 	RaccoonEcs::ComponentFilter<SpriteCreatorComponent> mSpriteCreatorFilter;
 	RaccoonEcs::ComponentAdder<SpriteRenderComponent> mSpriteRenderComponentAdder;

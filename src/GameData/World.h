@@ -19,6 +19,12 @@ public:
 public:
 	World(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator);
 
+	World(const World&) = delete;
+	World(World&&) = delete;
+	World operator=(const World&) = delete;
+	World operator=(World&&) = delete;
+	~World() = default;
+
 	[[nodiscard]] AsyncEntityManager& getEntityManager() { return mAsyncEntityManager; }
 	[[nodiscard]] const AsyncEntityManager& getEntityManager() const { return mAsyncEntityManager; }
 

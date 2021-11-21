@@ -21,7 +21,7 @@ public:
 		DestroyedEntitiesTestCheck& testCheck) noexcept;
 
 	void update() override;
-	static std::string GetSystemId() { return "TestSpawnShootableUnitsSystem"; }
+	static std::string GetSystemId() { return "TestDestroyedEntitiesRegistrationSystem"; }
 
 private:
 	RaccoonEcs::ComponentFilter<const DeathComponent> mDeathFilter;

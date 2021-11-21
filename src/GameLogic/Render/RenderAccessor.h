@@ -6,10 +6,10 @@
 #include <variant>
 #include <vector>
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
+#ifdef ENABLE_SCOPED_PROFILER
 #include <array>
 #include <chrono>
-#endif // RACCOON_ECS_PROFILE_SYSTEMS
+#endif // ENABLE_SCOPED_PROFILER
 
 #include "GameData/Core/Vector2D.h"
 
@@ -114,11 +114,7 @@ public:
 	void submitData(std::unique_ptr<RenderData>&& newData);
 
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
-	using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
-	using WorkTimeRecords = std::vector<std::pair<TimePoint, TimePoint>>;
-	// can be safely called only when render thread is stopped
-	WorkTimeRecords consumeRenderWorkTimeUnsafe();
+#ifdef ENABLE_SCOPED_PROFILER
 	ScopedProfilerThreadData::Records consumeScopedProfilerRecordsUnsafe();
 #endif
 
@@ -128,8 +124,7 @@ private:
 	std::vector<std::unique_ptr<RenderData>> dataToTransfer;
 	std::condition_variable notifyRenderThread;
 
-#ifdef RACCOON_ECS_PROFILE_SYSTEMS
-	WorkTimeRecords renderWorkTime;
+#ifdef ENABLE_SCOPED_PROFILER
 	ScopedProfilerThreadData::Records scopedProfilerRecords;
 #endif
 };

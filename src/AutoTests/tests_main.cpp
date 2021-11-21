@@ -61,9 +61,9 @@ int main(int argc, char** argv)
 
 	Random::gGlobalGenerator = std::mt19937(seed);
 
-#ifdef ECS_DEBUG_CHECKS_ENABLED
+#ifdef RACCOON_ECS_DEBUG_CHECKS_ENABLED
 	RaccoonEcs::gErrorHandler = [](const std::string& error) { ReportFatalError(error); };
-#endif // ECS_DEBUG_CHECKS_ENABLED
+#endif // RACCOON_ECS_DEBUG_CHECKS_ENABLED
 
 	auto cases = GetCases();
 

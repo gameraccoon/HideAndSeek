@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_SCOPED_PROFILER
+
 #include <string>
 #include <vector>
 #include <chrono>
@@ -25,3 +27,5 @@ public:
 	static void PrintToFile(const std::string& fileName, const ProfileData& profileData);
 	static void Print(std::ostream& stream, const ProfileData& profilerData);
 };
+
+#endif // ENABLE_SCOPED_PROFILER

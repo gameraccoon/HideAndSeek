@@ -22,7 +22,7 @@ public:
 		RaccoonEcs::ComponentFilter<const TransformComponent, const WeaponComponent, CharacterStateComponent, MovementComponent>&& shooterFilter,
 		RaccoonEcs::ComponentFilter<const HealthComponent, const TransformComponent>&& targetsFilter,
 		WorldHolder& worldHolder,
-		TimeData& time
+		const TimeData& time
 	) noexcept;
 
 	~TestShootingControlSystem() override = default;
@@ -35,5 +35,5 @@ private:
 	RaccoonEcs::ComponentFilter<const TransformComponent, const WeaponComponent, CharacterStateComponent, MovementComponent> mShooterFilters;
 	RaccoonEcs::ComponentFilter<const HealthComponent, const TransformComponent> mTargetsFilter;
 	WorldHolder& mWorldHolder;
-	TimeData& mTime;
+	const TimeData& mTime;
 };

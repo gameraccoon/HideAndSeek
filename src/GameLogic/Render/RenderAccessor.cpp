@@ -13,7 +13,9 @@ void RenderAccessor::submitData(std::unique_ptr<RenderData>&& newData)
 	notifyRenderThread.notify_all();
 }
 
+#ifdef ENABLE_SCOPED_PROFILER
 ScopedProfilerThreadData::Records RenderAccessor::consumeScopedProfilerRecordsUnsafe()
 {
 	return std::move(scopedProfilerRecords);
 }
+#endif // ENABLE_SCOPED_PROFILER
