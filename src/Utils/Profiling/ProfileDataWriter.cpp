@@ -1,24 +1,26 @@
 #include "Base/precomp.h"
 
 #ifdef ENABLE_SCOPED_PROFILER
+
 #include "Utils/Profiling/ProfileDataWriter.h"
 
 #include <fstream>
 #include <iomanip>
 #include <nlohmann/json.hpp>
 
-void ProfileDataWriter::PrintToFile(const std::string& fileName, const ProfileData& profileData)
+void ProfileDataWriter::PrintScopedProfileToFile(const std::string& fileName, const ProfileData& profileData)
 {
 	std::ofstream outStream(fileName);
-	Print(outStream, profileData);
+	PrintScopedProfile(outStream, profileData);
 }
 
-static long getTimeNsFromPoint(const std::chrono::time_point<std::chrono::system_clock>& timePoint) {
+static long getTimeNsFromPoint(const std::chrono::time_point<std::chrono::system_clock>& timePoint)
+{
 	// try to reduce floating point error by making the time relative to the app start befor converting to fp value
 	return std::chrono::duration_cast<std::chrono::nanoseconds>(timePoint.time_since_epoch()).count();
 }
 
-void ProfileDataWriter::Print(std::ostream& outStream, const ProfileData& profileData)
+void ProfileDataWriter::PrintScopedProfile(std::ostream& outStream, const ProfileData& profileData)
 {
 	// time of latest first record, we cut any earlier events to keep the records consistent
 	long startTimeNs = 0;
@@ -106,4 +108,29 @@ void ProfileDataWriter::Print(std::ostream& outStream, const ProfileData& profil
 
 	outStream << std::setw(4) <<  result;
 }
+
+void ProfileDataWriter::PrintFrameDurationStatsToFile(const std::string& fileName, const FrameDurations& frameTimes)
+{
+	std::ofstream outStream(fileName);
+	PrintFrameDurationStats(outStream, frameTimes);
+}
+
+void ProfileDataWriter::PrintFrameDurationStats(std::ostream& outStream, const FrameDurations& frameTimes)
+{
+	bool isFirst = true;
+	for (const size_t frameTime : frameTimes)
+	{
+		if (!isFirst)
+		{
+			outStream << '\n';
+		}
+		else
+		{
+			isFirst = false;
+		}
+		outStream << frameTime;
+	}
+	outStream << '\n';
+}
+
 #endif // ENABLE_SCOPED_PROFILER

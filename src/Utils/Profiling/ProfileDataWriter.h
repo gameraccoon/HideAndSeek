@@ -17,6 +17,7 @@ public:
 		ScopedProfilerThreadData::Records records;
 	};
 	using ScopedProfilerDatas = std::vector<ScopedProfilerData>;
+	using FrameDurations = std::vector<long>;
 
 	struct ProfileData
 	{
@@ -24,8 +25,11 @@ public:
 		ScopedProfilerDatas scopedProfilerDatas;
 	};
 
-	static void PrintToFile(const std::string& fileName, const ProfileData& profileData);
-	static void Print(std::ostream& stream, const ProfileData& profilerData);
+	static void PrintScopedProfileToFile(const std::string& fileName, const ProfileData& profileData);
+	static void PrintScopedProfile(std::ostream& outStream, const ProfileData& profilerData);
+
+	static void PrintFrameDurationStatsToFile(const std::string& fileName, const FrameDurations& frameTimes);
+	static void PrintFrameDurationStats(std::ostream& outStream, const FrameDurations& frameTimes);
 };
 
 #endif // ENABLE_SCOPED_PROFILER

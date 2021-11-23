@@ -102,11 +102,18 @@ void Game::setMouseKeyState(int key, bool isPressed)
 void Game::update(float dt)
 {
 	SCOPED_PROFILER("Game::update");
+#ifdef SCOPED_PROFILER
+	std::chrono::time_point<std::chrono::system_clock> frameBeginTime = std::chrono::system_clock::now();
+#endif
+
 	preInnderUpdate();
-
 	innerUpdate(dt);
-
 	postInnerUpdate();
+
+#ifdef SCOPED_PROFILER
+	std::chrono::time_point<std::chrono::system_clock> frameEndTime = std::chrono::system_clock::now();
+	mFrameDurations.push_back((frameEndTime - frameBeginTime).count());
+#endif
 }
 
 void Game::preInnderUpdate()
@@ -179,7 +186,9 @@ void Game::onGameShutdown()
 			data.threadNames[1 + i] = std::string("Worker Thread #") + std::to_string(i+1);
 		}
 
-		ProfileDataWriter::PrintToFile(mScopedProfileOutputPath, data);
+		ProfileDataWriter::PrintScopedProfileToFile(mScopedProfileOutputPath, data);
+
+		ProfileDataWriter::PrintFrameDurationStatsToFile(mFrameDurationsOutputPath, mFrameDurations);
 	}
 #endif // ENABLE_SCOPED_PROFILER
 	mSystemsManager.shutdown();
