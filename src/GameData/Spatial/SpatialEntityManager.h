@@ -18,7 +18,7 @@ public:
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.template getComponents(cell->getEntityManager(), inOutComponents);
+			operation.TEMPLATE_MSVC_FIX getComponents(cell->getEntityManager(), inOutComponents);
 		}
 	}
 
@@ -27,7 +27,7 @@ public:
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.template getComponents(cell->getEntityManager(), inOutComponents, cell);
+			operation.TEMPLATE_MSVC_FIX getComponents(cell->getEntityManager(), inOutComponents, cell);
 		}
 	}
 
@@ -36,7 +36,7 @@ public:
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.template getComponentsWithEntities(cell->getEntityManager(), inOutComponents, cell);
+			operation.TEMPLATE_MSVC_FIX getComponentsWithEntities(cell->getEntityManager(), inOutComponents, cell);
 		}
 	}
 
@@ -45,7 +45,7 @@ public:
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.template forEachComponentSet(cell->getEntityManager(), processor);
+			operation.TEMPLATE_MSVC_FIX forEachComponentSet(cell->getEntityManager(), processor);
 		}
 	}
 
@@ -63,7 +63,7 @@ public:
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.template forEachComponentSetWithEntity(cell->getEntityManager(), processor, cell);
+			operation.TEMPLATE_MSVC_FIX forEachComponentSetWithEntity(cell->getEntityManager(), processor, cell);
 		}
 	}
 
@@ -72,7 +72,7 @@ public:
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.template executeScheduledActions(cell->getEntityManager());
+			operation.TEMPLATE_MSVC_FIX executeScheduledActions(cell->getEntityManager());
 		}
 	}
 

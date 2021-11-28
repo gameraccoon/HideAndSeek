@@ -5,6 +5,8 @@
 #include <type_traits>
 #include <variant>
 
+#include <raccoon-ecs/msvc_fix.h>
+
 namespace TemplateHelpers
 {
 	// copy or move depending on the container type category
@@ -24,6 +26,6 @@ namespace TemplateHelpers
 	template<typename T, typename Container, typename... Args>
 	T& EmplaceVariant(Container& container, Args&&... args)
 	{
-		return std::get<T>(container.template emplace_back(std::in_place_type<T>, std::forward<Args>(args)...));
+		return std::get<T>(container.TEMPLATE_MSVC_FIX emplace_back(std::in_place_type<T>, std::forward<Args>(args)...));
 	}
 }
