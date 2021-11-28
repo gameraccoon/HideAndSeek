@@ -76,8 +76,8 @@ private:
 	int mRenderThreadId = mWorkerThreadsCount + 1;
 
 #ifdef ENABLE_SCOPED_PROFILER
-	std::string mScopedProfileOutputPath = "scoped_profile.json";
-	std::string mFrameDurationsOutputPath = "frame_times.csv";
+	std::string mScopedProfileOutputPath = "./scoped_profile.json";
+	std::string mFrameDurationsOutputPath = "./frame_times.csv";
 	std::vector<long> mFrameDurations;
 	std::vector<std::pair<size_t, ScopedProfilerThreadData::Records>> mScopedProfileRecords;
 	std::mutex mScopedProfileRecordsMutex;
