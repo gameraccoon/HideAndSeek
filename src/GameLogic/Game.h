@@ -12,6 +12,7 @@
 
 #include "HAL/GameBase.h"
 
+#include "GameLogic/Debug/DebugGameBehavior.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/InputData.h"
@@ -85,4 +86,7 @@ private:
 #ifdef IMGUI_ENABLED
 	ImguiDebugData mImguiDebugData{mWorldHolder, mTime, mComponentFactory, {}};
 #endif // IMGUI_ENABLED
+
+	DebugGameBehavior mDebugBehavior;
+	friend DebugGameBehavior;
 };

@@ -51,6 +51,8 @@ void Game::start([[maybe_unused]] const ArgumentsParser& arguments, int workerTh
 	ComponentsRegistration::RegisterComponents(mComponentFactory);
 	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializers);
 
+	mDebugBehavior.processArguments(arguments);
+
 	mThreadPool.spawnThreads(workerThreadsCount);
 
 	mWorkerThreadsCount = workerThreadsCount;
@@ -125,6 +127,8 @@ void Game::preInnderUpdate()
 
 	mInputData.windowSize = getEngine().getWindowSize();
 	mInputData.mousePos = getEngine().getMousePos();
+
+	mDebugBehavior.preInnerUpdate(*this);
 }
 
 void Game::innerUpdate(float dt)
@@ -141,6 +145,8 @@ void Game::postInnerUpdate()
 	//mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
 
 	mInputData.clearAfterFrame();
+
+	mDebugBehavior.postInnerUpdate(*this);
 }
 
 void Game::initResources()

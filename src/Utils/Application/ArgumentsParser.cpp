@@ -17,10 +17,10 @@ std::string ArgumentsParser::getArgumentValue(const std::string& argument, const
 {
 	std::vector<std::string>::const_iterator itr = std::find(this->mTokens.begin(), this->mTokens.end(), mArgumentSwitch + argument);
 
-	if (itr != this->mTokens.end())
+	if (itr != mTokens.end())
 	{
 		++itr;
-		if (itr != this->mTokens.end())
+		if (itr != mTokens.end())
 		{
 			return *itr;
 		}
@@ -31,5 +31,5 @@ std::string ArgumentsParser::getArgumentValue(const std::string& argument, const
 
 bool ArgumentsParser::hasArgument(const std::string& argument) const
 {
-	return std::find(this->mTokens.begin(), this->mTokens.end(), mArgumentSwitch + argument) != this->mTokens.end();
+	return std::find(mTokens.begin(), mTokens.end(), mArgumentSwitch + argument) != mTokens.end();
 }

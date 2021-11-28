@@ -249,6 +249,7 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 		// prepare function that will collect the calculated data
 		auto finalizeFn = [&allResults](std::any&& result)
 		{
+			SCOPED_PROFILER("finalizeFn()");
 			std::ranges::move(
 				std::any_cast<std::vector<VisibilityPolygonCalculationResult>&>(result),
 				std::back_inserter(allResults)

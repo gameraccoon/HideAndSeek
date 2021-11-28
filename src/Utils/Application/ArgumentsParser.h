@@ -12,6 +12,6 @@ public:
 	[[nodiscard]] std::string getArgumentValue(const std::string& argument, const std::string& defaultValue = "") const;
 
 private:
-	std::vector <std::string> mTokens;
+	std::vector<std::string> mTokens;
 	const std::string mArgumentSwitch;
 };
