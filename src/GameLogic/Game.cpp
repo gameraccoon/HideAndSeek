@@ -104,18 +104,18 @@ void Game::setMouseKeyState(int key, bool isPressed)
 void Game::update(float dt)
 {
 	SCOPED_PROFILER("Game::update");
-#ifdef SCOPED_PROFILER
+#ifdef ENABLE_SCOPED_PROFILER
 	std::chrono::time_point<std::chrono::system_clock> frameBeginTime = std::chrono::system_clock::now();
-#endif
+#endif // ENABLE_SCOPED_PROFILER
 
 	preInnderUpdate();
 	innerUpdate(dt);
 	postInnerUpdate();
 
-#ifdef SCOPED_PROFILER
+#ifdef ENABLE_SCOPED_PROFILER
 	std::chrono::time_point<std::chrono::system_clock> frameEndTime = std::chrono::system_clock::now();
 	mFrameDurations.push_back((frameEndTime - frameBeginTime).count());
-#endif
+#endif // ENABLE_SCOPED_PROFILER
 }
 
 void Game::preInnderUpdate()
