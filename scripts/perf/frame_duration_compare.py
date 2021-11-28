@@ -17,9 +17,11 @@ min_count = min(count, count_base) - extra_start_frames_to_cut
 df = df.loc[extra_start_frames_to_cut:min_count - 1]
 df_base = df_base.loc[extra_start_frames_to_cut:min_count - 1]
 
-# convert to milliseconds rounded by 0.1
+# convert to milliseconds rounded by some value
+time_to_ms = 1000000
+rounding = 0.1
 def round_ms(x):
-    return round(x / 100000) / 10.0
+    return round(x / time_to_ms / rounding) * rounding
 
 # calculate frequencies
 buckets = df.apply(lambda x: round_ms(x)).groupby("value").size()
