@@ -114,7 +114,7 @@ void Game::update(float dt)
 
 #ifdef ENABLE_SCOPED_PROFILER
 	std::chrono::time_point<std::chrono::system_clock> frameEndTime = std::chrono::system_clock::now();
-	mFrameDurations.push_back((frameEndTime - frameBeginTime).count());
+	mFrameDurations.push_back(std::chrono::duration<double, std::micro>(frameEndTime - frameBeginTime).count());
 #endif // ENABLE_SCOPED_PROFILER
 }
 

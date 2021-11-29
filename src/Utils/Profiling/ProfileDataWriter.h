@@ -17,7 +17,7 @@ public:
 		ScopedProfilerThreadData::Records records;
 	};
 	using ScopedProfilerDatas = std::vector<ScopedProfilerData>;
-	using FrameDurations = std::vector<long>;
+	using FrameDurations = std::vector<double>;
 
 	struct ProfileData
 	{

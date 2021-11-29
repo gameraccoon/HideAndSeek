@@ -3,7 +3,7 @@ import plotly.express as px
 import sys
 
 # a value that we need our time to be multiplied on to get values in milleseconds
-time_to_ms = 1000000
+time_to_ms = 1000
 # what precision we want to the values on the graph (the more the precision the noisier the graph)
 rounding = 0.1
 # how many decimal signs we want to show for time in the logs

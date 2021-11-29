@@ -14,28 +14,23 @@ void ProfileDataWriter::PrintScopedProfileToFile(const std::string& fileName, co
 	PrintScopedProfile(outStream, profileData);
 }
 
-static long getTimeNsFromPoint(const std::chrono::time_point<std::chrono::system_clock>& timePoint)
-{
-	// try to reduce floating point error by making the time relative to the app start befor converting to fp value
-	return std::chrono::duration_cast<std::chrono::nanoseconds>(timePoint.time_since_epoch()).count();
-}
-
 void ProfileDataWriter::PrintScopedProfile(std::ostream& outStream, const ProfileData& profileData)
 {
 	// time of latest first record, we cut any earlier events to keep the records consistent
-	long startTimeNs = 0;
+	auto startTimeNs = std::chrono::time_point<std::chrono::system_clock>::min();
 
 	for (const ScopedProfilerData& scopeData : profileData.scopedProfilerDatas)
 	{
-		long threadFirstTime = std::numeric_limits<long>::max();
+		auto threadFirstTime = std::chrono::time_point<std::chrono::system_clock>::max();
 		for (const ScopedProfilerThreadData::ScopeRecord& record : scopeData.records)
 		{
-			if (record.stackDepth != ScopedProfilerThreadData::InvalidStackDepth)
+			if (record.scopeName != nullptr)
 			{
-				threadFirstTime = std::min(threadFirstTime, getTimeNsFromPoint(record.begin));
+				threadFirstTime = std::min(threadFirstTime, record.begin);
 			}
 		}
-		if (threadFirstTime != std::numeric_limits<long>::max())
+
+		if (threadFirstTime != std::chrono::time_point<std::chrono::system_clock>::max())
 		{
 			startTimeNs = std::max(startTimeNs, threadFirstTime);
 		}
@@ -48,19 +43,17 @@ void ProfileDataWriter::PrintScopedProfile(std::ostream& outStream, const Profil
 	{
 		for (const ScopedProfilerThreadData::ScopeRecord& record : scopeData.records)
 		{
-			if (record.stackDepth != ScopedProfilerThreadData::InvalidStackDepth)
+			if (record.scopeName != nullptr)
 			{
-				long recordTimeBeginNs = getTimeNsFromPoint(record.begin);
-				const long recordTimeEndNs = getTimeNsFromPoint(record.end);
-				if (recordTimeEndNs > startTimeNs)
+				if (record.end > startTimeNs)
 				{
 					nlohmann::json taskBegin;
 					taskBegin["name"] = record.scopeName;
 					taskBegin["ph"] = "B";
 					taskBegin["pid"] = 1;
 					taskBegin["tid"] = scopeData.threadId;
-					taskBegin["ts"] = (recordTimeBeginNs  - startTimeNs) * 0.001;
-					taskBegin["sf"] = std::to_string(scopeData.threadId) + "#" + std::to_string(record.stackDepth) + "#" + record.scopeName;
+					taskBegin["ts"] = std::chrono::duration<double, std::micro>(record.begin - startTimeNs).count();
+					taskBegin["sf"] = std::to_string(scopeData.threadId) + "#" + record.scopeName;
 					events.push_back(taskBegin);
 
 					nlohmann::json taskEnd;
@@ -68,7 +61,7 @@ void ProfileDataWriter::PrintScopedProfile(std::ostream& outStream, const Profil
 					taskEnd["ph"] = "E";
 					taskEnd["pid"] = 1;
 					taskEnd["tid"] = scopeData.threadId;
-					taskEnd["ts"] = (recordTimeEndNs  - startTimeNs) * 0.001;
+					taskEnd["ts"] = std::chrono::duration<double, std::micro>(record.end - startTimeNs).count();
 					events.push_back(taskEnd);
 				}
 			}
@@ -118,7 +111,7 @@ void ProfileDataWriter::PrintFrameDurationStatsToFile(const std::string& fileNam
 void ProfileDataWriter::PrintFrameDurationStats(std::ostream& outStream, const FrameDurations& frameTimes)
 {
 	bool isFirst = true;
-	for (const size_t frameTime : frameTimes)
+	for (const double frameTime : frameTimes)
 	{
 		if (!isFirst)
 		{
