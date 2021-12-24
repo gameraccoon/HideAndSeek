@@ -47,6 +47,14 @@ median = df.median().value / time_to_ms
 median_base = df_base.median().value / time_to_ms
 print(f"Base median: {median_base:.{digits_in_logs}f} ms New median: {median:.{digits_in_logs}f} ms")
 
+min_t = df.min().value / time_to_ms
+mim_base = df_base.min().value / time_to_ms
+print(f"Base min: {mim_base:.{digits_in_logs}f} ms New min: {min_t:.{digits_in_logs}f} ms")
+
+max_t = df.max().value / time_to_ms
+max_base = df_base.max().value / time_to_ms
+print(f"Base max: {max_base:.{digits_in_logs}f} ms New max: {max_t:.{digits_in_logs}f} ms")
+
 # if any command line arguments are provided, use them as the graph title
 custom_title = " ".join(sys.argv[1:]).strip()
 title = custom_title if len(custom_title) > 0 else 'Frame duration frequency (ms)'
