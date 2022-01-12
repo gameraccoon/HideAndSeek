@@ -116,7 +116,7 @@ namespace std
 	{
 		std::size_t operator()(Vector2D k) const
 		{
-			return hash<float>()(k.x) ^ (hash<float>()(k.y) << 1);
+			return hash<float>()(k.x) ^ std::rotl(hash<float>()(k.y), 7);
 		}
 	};
 
@@ -125,7 +125,7 @@ namespace std
 	{
 		std::size_t operator()(const Vector2DKey<Precision>& k) const
 		{
-			return hash<float>()(k.keyX) ^ (hash<float>()(k.keyY) << 1);
+			return hash<float>()(k.keyX) ^ std::rotl(hash<float>()(k.keyY), 7);
 		}
 	};
 }

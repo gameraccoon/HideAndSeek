@@ -262,7 +262,7 @@ void MainWindow::on_actionCreate_triggered()
 	if (mCurrentWorld)
 	{
 		EntityManager& worldEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(mCurrentWorld->getEntityManager());
-		mCommandStack.executeNewCommand<AddEntityCommand>(mCurrentWorld.get(), worldEntityManager.getNonExistentEntity());
+		mCommandStack.executeNewCommand<AddEntityCommand>(mCurrentWorld.get(), worldEntityManager.generateNewEntityUnsafe());
 	}
 }
 
@@ -298,7 +298,7 @@ void MainWindow::on_actionCreate_Spatial_triggered()
 	if (mCurrentWorld)
 	{
 		EntityManager& worldEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(mCurrentWorld->getEntityManager());
-		SpatialEntity entity{worldEntityManager.getNonExistentEntity(), CellPos(0, 0)};
+		SpatialEntity entity{worldEntityManager.generateNewEntityUnsafe(), CellPos(0, 0)};
 		Vector2D location{ZERO_VECTOR};
 		if (mTransformEditorToolbox->isShown())
 		{

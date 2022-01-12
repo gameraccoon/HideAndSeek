@@ -98,7 +98,7 @@ private:
 	Ui::mainwindow* ui;
 	std::unique_ptr<ads::CDockManager> mDockManager;
 	ComponentFactory mComponentFactory;
-	RaccoonEcs::EntityGenerator mEntityGenerator;
+	RaccoonEcs::IncrementalEntityGenerator mEntityGenerator;
 	std::unique_ptr<class World> mCurrentWorld;
 	Json::ComponentSerializationHolder mComponentSerializationHolder;
 	ComponentContentFactory mComponentContentFactory;

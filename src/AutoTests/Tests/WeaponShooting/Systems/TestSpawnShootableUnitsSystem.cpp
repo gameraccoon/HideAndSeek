@@ -8,45 +8,39 @@
 
 #include "GameData/World.h"
 #include "GameData/Spatial/SpatialWorldData.h"
+#include "GameData/Components/SpriteCreatorComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/HealthComponent.generated.h"
 
-TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(
-		RaccoonEcs::ComponentAdder<TransformComponent>&& transformAdder,
-		RaccoonEcs::ComponentAdder<CollisionComponent>&& collisionAdder,
-		RaccoonEcs::ComponentAdder<HealthComponent>&& healthAdder,
-		RaccoonEcs::ComponentAdder<SpriteCreatorComponent>&& spriteCreatorAdder,
-		RaccoonEcs::EntityAdder&& entityAdder,
-		WorldHolder& worldHolder) noexcept
-	: mTransformAdder(std::move(transformAdder))
-	, mCollisionAdder(std::move(collisionAdder))
-	, mHealthAdder(std::move(healthAdder))
-	, mSpriteCreatorAdder(std::move(spriteCreatorAdder))
-	, mEntityAdder(std::move(entityAdder))
-	, mWorldHolder(worldHolder)
+
+TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept
+	: mWorldHolder(worldHolder)
 {
 }
 
-void TestSpawnShootableUnitsSystem::spawnUnit(AsyncEntityManager& entityManager, Vector2D pos)
+void TestSpawnShootableUnitsSystem::spawnUnit(EntityManager& entityManager, Vector2D pos)
 {
-	Entity entity = mEntityAdder.addEntity(entityManager);
+	Entity entity = entityManager.addEntity();
 	{
-		TransformComponent* transform = mTransformAdder.addComponent(entityManager, entity);
+		TransformComponent* transform = entityManager.addComponent<TransformComponent>(entity);
 		transform->setLocation(pos);
 	}
 	{
-		SpriteCreatorComponent* sprite = mSpriteCreatorAdder.addComponent(entityManager, entity);
+		SpriteCreatorComponent* sprite = entityManager.addComponent<SpriteCreatorComponent>(entity);
 		SpriteDescription spriteDesc;
 		spriteDesc.params.size = Vector2D(20.0f, 20.0f);
 		spriteDesc.path = "resources/textures/hero.png";
 		sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
 	}
 	{
-		CollisionComponent* collision = mCollisionAdder.addComponent(entityManager, entity);
+		CollisionComponent* collision = entityManager.addComponent<CollisionComponent>(entity);
 		Hull& hull = collision->getGeometryRef();
 		hull.type = HullType::Circular;
 		hull.setRadius(10.0f);
 	}
 	{
-		HealthComponent* health = mHealthAdder.addComponent(entityManager, entity);
+		HealthComponent* health = entityManager.addComponent<HealthComponent>(entity);
 		health->setHealthValue(100.0f);
 	}
 }

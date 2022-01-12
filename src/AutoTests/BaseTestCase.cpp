@@ -9,6 +9,7 @@
 #include "HAL/Base/Engine.h"
 
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
+#include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 
 BaseTestCase::BaseTestCase(int width, int height)
 	: Game(width, height)
@@ -42,9 +43,12 @@ void BaseTestCase::innerUpdate(float)
 	}
 }
 
-void BaseTestCase::startGame(const ArgumentsParser& arguments, Game::SystemsInitFunction&& initFn)
+void BaseTestCase::startGame(const ArgumentsParser& arguments)
 {
-	Game::start(arguments, 3, std::move(initFn));
+	ComponentsRegistration::RegisterComponents(getComponentFactory());
+	ComponentsRegistration::RegisterJsonSerializers(getComponentSerializers());
+
+	Game::start(arguments, 3);
 }
 
 void BaseTestCase::finalizeTestCase()

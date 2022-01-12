@@ -48,7 +48,7 @@ void RemoveEntitiesCommand::undoCommand(World* world)
 	{
 		WorldCell& cell = world->getSpatialData().getOrCreateCell(mEntities[i].cell);
 		EntityManager& cellEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(cell.getEntityManager());
-		cellEntityManager.reinsertPrevioslyExistingEntity(mEntities[i].entity.getEntity());
+		cellEntityManager.addExistingEntityUnsafe(mEntities[i].entity.getEntity());
 		Json::ApplyPrefabToExistentEntity(cellEntityManager, mSerializedComponents[i], mEntities[i].entity.getEntity(), mComponentSerializerHolder);
 	}
 }

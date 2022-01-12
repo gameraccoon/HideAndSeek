@@ -3,7 +3,6 @@
 #include <unordered_map>
 
 #include <raccoon-ecs/system.h>
-#include <raccoon-ecs/async_operations.h>
 
 #include "GameData/Components/DeathComponent.generated.h"
 
@@ -16,7 +15,6 @@ class TestDestroyedEntitiesRegistrationSystem : public RaccoonEcs::System
 {
 public:
 	TestDestroyedEntitiesRegistrationSystem(
-		RaccoonEcs::ComponentFilter<const DeathComponent>&& deathFilter,
 		WorldHolder& worldHolder,
 		DestroyedEntitiesTestCheck& testCheck) noexcept;
 
@@ -24,7 +22,6 @@ public:
 	static std::string GetSystemId() { return "TestDestroyedEntitiesRegistrationSystem"; }
 
 private:
-	RaccoonEcs::ComponentFilter<const DeathComponent> mDeathFilter;
 	WorldHolder& mWorldHolder;
 	DestroyedEntitiesTestCheck& mTestCheck;
 };

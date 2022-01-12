@@ -2,13 +2,14 @@
 
 #include <thread>
 
-#include <raccoon-ecs/async_systems_manager.h>
+#include <raccoon-ecs/systems_manager.h>
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 #include "Utils/Application/ArgumentsParser.h"
+#include "Utils/Multithreading/ThreadPool.h"
 
 #include "HAL/GameBase.h"
 
@@ -29,12 +30,9 @@
 class Game : public HAL::GameBase
 {
 public:
-	using SystemsInitFunction = std::function<void(const RaccoonEcs::InnerDataAccessor& dataAccessor)>;
-
-public:
 	Game(int width, int height);
 
-	void start(const ArgumentsParser& arguments, int workerThreadsCount, SystemsInitFunction&& initFn);
+	void start(const ArgumentsParser& arguments, int workerThreadsCount);
 	void update(float dt) final;
 	void preInnderUpdate();
 	virtual void innerUpdate(float dt);
@@ -46,12 +44,12 @@ public:
 protected:
 	ComponentFactory& getComponentFactory() { return mComponentFactory; }
 	WorldHolder& getWorldHolder() { return mWorldHolder; }
-	RaccoonEcs::AsyncSystemsManager<StringId>& getSystemsManager() { return mSystemsManager; }
+	RaccoonEcs::SystemsManager& getSystemsManager() { return mSystemsManager; }
 	InputData& getInputData() { return mInputData; }
 	const TimeData& getTime() const { return mTime; }
 	RaccoonEcs::ThreadPool& getThreadPool() { return mThreadPool; }
 	GameData& getGameData() { return mGameData; }
-	const Json::ComponentSerializationHolder& getComponentSerializers() const { return mComponentSerializers; }
+	Json::ComponentSerializationHolder& getComponentSerializers() { return mComponentSerializers; }
 
 private:
 	void onGameShutdown();
@@ -59,7 +57,7 @@ private:
 
 private:
 	ComponentFactory mComponentFactory;
-	RaccoonEcs::EntityGenerator mEntityGenerator;
+	RaccoonEcs::IncrementalEntityGenerator mEntityGenerator;
 	World mWorld{mComponentFactory, mEntityGenerator};
 	GameData mGameData{mComponentFactory};
 	WorldHolder mWorldHolder{&mWorld, mGameData};
@@ -67,7 +65,7 @@ private:
 	InputData mInputData;
 
 	RaccoonEcs::ThreadPool mThreadPool;
-	RaccoonEcs::AsyncSystemsManager<StringId> mSystemsManager{mThreadPool};
+	RaccoonEcs::SystemsManager mSystemsManager;
 	Json::ComponentSerializationHolder mComponentSerializers;
 	TimeData mTime;
 	RenderThreadManager mRenderThread;

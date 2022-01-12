@@ -11,7 +11,7 @@
 TEST(Components, EntityCreationAndRemovement)
 {
 	ComponentFactory componentFactory;
-	RaccoonEcs::EntityGenerator entityGenerator;
+	RaccoonEcs::IncrementalEntityGenerator entityGenerator;
 	ComponentsRegistration::RegisterComponents(componentFactory);
 
 	EntityManager entityManager(componentFactory, entityGenerator);
@@ -32,7 +32,7 @@ TEST(Components, EntityCreationAndRemovement)
 TEST(Components, ComponentsAttachment)
 {
 	ComponentFactory componentFactory;
-	RaccoonEcs::EntityGenerator entityGenerator;
+	RaccoonEcs::IncrementalEntityGenerator entityGenerator;
 	ComponentsRegistration::RegisterComponents(componentFactory);
 
 	Vector2D location(Vector2D(1.0f, 0.0f));
@@ -51,7 +51,7 @@ TEST(Components, ComponentsAttachment)
 TEST(Components, RemoveEntityWithComponents)
 {
 	ComponentFactory componentFactory;
-	RaccoonEcs::EntityGenerator entityGenerator;
+	RaccoonEcs::IncrementalEntityGenerator entityGenerator;
 	ComponentsRegistration::RegisterComponents(componentFactory);
 
 	Vector2D location1(Vector2D(1.0f, 0.0f));

@@ -4,8 +4,6 @@
 
 #include "GameData/World.h"
 
-#include "src/EditorDataAccessor.h"
-
 namespace Utils
 {
 	void* GetComponent(const ComponentReference& reference, World* world)
@@ -94,7 +92,7 @@ namespace Utils
 				{
 					if (WorldCell* cell = world->getSpatialData().getCell(*source.cellPos))
 					{
-						return &gEditorDataAccessor.getSingleThreadedEntityManager(cell->getEntityManager());
+						return &cell->getEntityManager();
 					}
 					else
 					{
@@ -115,7 +113,7 @@ namespace Utils
 			}
 			else if (source.entity.has_value()) // world entity
 			{
-				return &gEditorDataAccessor.getSingleThreadedEntityManager(world->getEntityManager());
+				return &world->getEntityManager();
 			}
 			else // world component
 			{

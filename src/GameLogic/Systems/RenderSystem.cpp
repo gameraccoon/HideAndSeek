@@ -10,6 +10,14 @@
 
 #include "GameData/GameData.h"
 #include "GameData/World.h"
+#include "GameData/Components/SpriteRenderComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/LightComponent.generated.h"
+#include "GameData/Components/LightBlockingGeometryComponent.generated.h"
+#include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/BackgroundTextureComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "Utils/Geometry/VisibilityPolygon.h"
 
@@ -19,26 +27,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 RenderSystem::RenderSystem(
-		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
-		RaccoonEcs::ComponentFilter<const RenderModeComponent>&& renderModeFilter,
-		RaccoonEcs::ComponentFilter<BackgroundTextureComponent>&& backgroundTextureFilter,
-		RaccoonEcs::ComponentFilter<const LightBlockingGeometryComponent>&& lightBlockingGeometryFilter,
-		RaccoonEcs::ComponentFilter<const SpriteRenderComponent, const TransformComponent>&& spriteRenderFilter,
-		RaccoonEcs::ComponentFilter<LightComponent, const TransformComponent>&& lightFilter,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>&& renderAccessorFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::ResourceManager& resourceManager,
 		RaccoonEcs::ThreadPool& threadPool
 	) noexcept
-	: mWorldCachedDataFilter(std::move(worldCachedDataFilter))
-	, mRenderModeFilter(std::move(renderModeFilter))
-	, mBackgroundTextureFilter(std::move(backgroundTextureFilter))
-	, mLightBlockingGeometryFilter(std::move(lightBlockingGeometryFilter))
-	, mSpriteRenderFilter(std::move(spriteRenderFilter))
-	, mLightFilter(std::move(lightFilter))
-	, mRenderAccessorFilter(std::move(renderAccessorFilter))
-	, mWorldHolder(worldHolder)
+	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mResourceManager(resourceManager)
 	, mThreadPool(threadPool)
@@ -52,13 +46,13 @@ void RenderSystem::update()
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
 
-	const auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
+	const auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
 	Vector2D workingRect = worldCachedData->getScreenSize();
 	Vector2D cameraLocation = worldCachedData->getCameraPos();
 
 	static const Vector2D maxFov(500.0f, 500.0f);
 
-	const auto [renderMode] = mRenderModeFilter.getComponents(gameData.getGameComponents());
+	const auto [renderMode] = gameData.getGameComponents().getComponents<RenderModeComponent>();
 
 	Vector2D halfWindowSize = workingRect * 0.5f;
 
@@ -93,8 +87,7 @@ void RenderSystem::update()
 	if (!renderMode || renderMode->getIsDrawVisibleEntitiesEnabled())
 	{
 		SCOPED_PROFILER("draw visible entities");
-		spatialManager.forEachComponentSet(
-			mSpriteRenderFilter,
+		spatialManager.forEachComponentSet<const SpriteRenderComponent, const TransformComponent>(
 			[&drawShift, &renderData](const SpriteRenderComponent* spriteRender, const TransformComponent* transform)
 		{
 			Vector2D location = transform->getLocation() + drawShift;
@@ -139,7 +132,7 @@ void RenderSystem::DrawVisibilityPolygon(RenderData& renderData, ResourceHandle 
 void RenderSystem::drawBackground(RenderData& renderData, World& world, Vector2D drawShift, Vector2D windowSize)
 {
 	SCOPED_PROFILER("RenderSystem::drawBackground");
-	auto [backgroundTexture] = mBackgroundTextureFilter.getComponents(world.getWorldComponents());
+	auto [backgroundTexture] = world.getWorldComponents().getComponents<BackgroundTextureComponent>();
 	if (backgroundTexture != nullptr)
 	{
 		if (!backgroundTexture->getSprite().spriteHandle.isValid())
@@ -216,7 +209,7 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 	lightBlockingComponents.reserve(cells.size());
 	for (WorldCell* cell : cells)
 	{
-		auto [lightBlockingGeometry] = mLightBlockingGeometryFilter.getComponents(cell->getCellComponents());
+		auto [lightBlockingGeometry] = cell->getCellComponents().getComponents<const LightBlockingGeometryComponent>();
 		if ALMOST_ALWAYS(lightBlockingGeometry)
 		{
 			lightBlockingComponents.push_back(lightBlockingGeometry);
@@ -225,7 +218,7 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 
 	// get lights
 	TupleVector<LightComponent*, const TransformComponent*> lightComponentSets;
-	managerGroup.getComponents(mLightFilter, lightComponentSets);
+	managerGroup.getComponents<LightComponent, const TransformComponent>(lightComponentSets);
 
 	// determine the borders of the location we're interested in
 	Vector2D emitterPositionBordersLT = playerSightPosition - screenHalfSize - maxFov;

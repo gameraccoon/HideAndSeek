@@ -13,7 +13,7 @@ AddEntityCommand::AddEntityCommand(Entity entity)
 void AddEntityCommand::doCommand(World* world)
 {
 	EntityManager& worldEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(world->getEntityManager());
-	worldEntityManager.reinsertPrevioslyExistingEntity(mEntity);
+	worldEntityManager.addExistingEntityUnsafe(mEntity);
 }
 
 void AddEntityCommand::undoCommand(World* world)

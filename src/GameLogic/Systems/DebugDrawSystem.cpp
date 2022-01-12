@@ -9,33 +9,27 @@
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
-#include "GameLogic/Render/RenderAccessor.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/NavMeshComponent.generated.h"
+#include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/Components/AiControllerComponent.generated.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/DebugDrawComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "Utils/Geometry/VisibilityPolygon.h"
 
 #include "HAL/Graphics/Font.h"
 
+#include "GameLogic/Render/RenderAccessor.h"
+
 DebugDrawSystem::DebugDrawSystem(
-		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
-		RaccoonEcs::ComponentFilter<const RenderModeComponent>&& renderModeFilter,
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>&& collisionDataFilter,
-		RaccoonEcs::ComponentFilter<const NavMeshComponent>&& navMeshFilter,
-		RaccoonEcs::ComponentFilter<const AiControllerComponent>&& aiControllerFilter,
-		RaccoonEcs::ComponentFilter<const DebugDrawComponent>&& debugDrawFilter,
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, class TransformComponent>&& characterStateFilter,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent>&& renderAccessorFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		HAL::ResourceManager& resourceManager) noexcept
-	: mWorldCachedDataFilter(std::move(worldCachedDataFilter))
-	, mRenderModeFilter(std::move(renderModeFilter))
-	, mCollisionDataFilter(std::move(collisionDataFilter))
-	, mNavMeshFilter(std::move(navMeshFilter))
-	, mAiControllerFilter(std::move(aiControllerFilter))
-	, mDebugDrawFilter(std::move(debugDrawFilter))
-	, mCharacterStateFilter(std::move(characterStateFilter))
-	, mRenderAccessorFilter(std::move(renderAccessorFilter))
-	, mWorldHolder(worldHolder)
+	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mResourceManager(resourceManager)
 {
@@ -94,14 +88,14 @@ void DebugDrawSystem::update()
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
 
-	auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
+	auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
 	const Vector2D workingRect = worldCachedData->getScreenSize();
 	const Vector2D cameraLocation = worldCachedData->getCameraPos();
 	const CellPos cameraCell = worldCachedData->getCameraCellPos();
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(cameraLocation, workingRect);
 
-	auto [renderMode] = mRenderModeFilter.getComponents(gameData.getGameComponents());
+	auto [renderMode] = gameData.getGameComponents().getComponents<const RenderModeComponent>();
 
 	const Vector2D screenHalfSize = workingRect * 0.5f;
 	const Vector2D drawShift = screenHalfSize - cameraLocation;
@@ -142,8 +136,7 @@ void DebugDrawSystem::update()
 
 	if (renderMode && renderMode->getIsDrawDebugCollisionsEnabled())
 	{
-		spatialManager.forEachComponentSet(
-			mCollisionDataFilter,
+		spatialManager.forEachComponentSet<const CollisionComponent, const TransformComponent>(
 			[&renderData, &collisionSpriteHandle = mCollisionSpriteHandle, drawShift](const CollisionComponent* collision, const TransformComponent* transform)
 		{
 			const Vector2D location = transform->getLocation() + drawShift;
@@ -159,7 +152,7 @@ void DebugDrawSystem::update()
 
 	if (renderMode && renderMode->getIsDrawDebugAiDataEnabled())
 	{
-		auto [navMeshComponent] = mNavMeshFilter.getComponents(world.getWorldComponents());
+		auto [navMeshComponent] = world.getWorldComponents().getComponents<NavMeshComponent>();
 
 		if (navMeshComponent)
 		{
@@ -184,8 +177,7 @@ void DebugDrawSystem::update()
 			}
 		}
 
-		spatialManager.forEachComponentSet(
-			mAiControllerFilter,
+		spatialManager.forEachComponentSet<const AiControllerComponent>(
 			[&navMeshSpriteHandle = mNavmeshSpriteHandle, &renderData, drawShift](const AiControllerComponent* aiController)
 		{
 			DrawPath(*renderData, aiController->getPath().smoothPath, navMeshSpriteHandle, drawShift);
@@ -194,7 +186,7 @@ void DebugDrawSystem::update()
 
 	if (renderMode && renderMode->getIsDrawDebugPrimitivesEnabled())
 	{
-		auto [debugDraw] = mDebugDrawFilter.getComponents(gameData.getGameComponents());
+		auto [debugDraw] = gameData.getGameComponents().getComponents<const DebugDrawComponent>();
 		if (debugDraw != nullptr)
 		{
 			Vector2D pointSize(6, 6);
@@ -249,8 +241,7 @@ void DebugDrawSystem::update()
 
 	if (renderMode && renderMode->getIsDrawDebugCharacterInfoEnabled())
 	{
-		spatialManager.forEachComponentSet(
-			mCharacterStateFilter,
+		spatialManager.forEachComponentSet<const CharacterStateComponent, const TransformComponent>(
 			[&renderData, fontHandle = mFontHandle, drawShift](const CharacterStateComponent* characterState, const TransformComponent* transform)
 		{
 			TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
@@ -272,7 +263,7 @@ void DebugDrawSystem::update()
 	renderAccessor->submitData(std::move(renderData));
 }
 
-void DebugDrawSystem::initResources()
+void DebugDrawSystem::init()
 {
 	SCOPED_PROFILER("DebugDrawSystem::initResources");
 	mCollisionSpriteHandle = mResourceManager.lockSprite("resources/textures/collision.png");

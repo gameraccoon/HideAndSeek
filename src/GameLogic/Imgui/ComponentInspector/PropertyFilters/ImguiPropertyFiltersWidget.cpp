@@ -43,11 +43,11 @@ namespace ImguiPropertyFiltration
 
 	ImguiPropertyFiltersWidget::~ImguiPropertyFiltersWidget() = default;
 
-	static WorldCell* findEntityCell(const RaccoonEcs::InnerDataAccessor& dataAccessor, std::unordered_map<CellPos, WorldCell>& cells, Entity entity)
+	static WorldCell* findEntityCell(std::unordered_map<CellPos, WorldCell>& cells, Entity entity)
 	{
 		for (auto& [pos, cell] : cells)
 		{
-			if (dataAccessor.getSingleThreadedEntityManager(cell.getEntityManager()).hasEntity(entity))
+			if (cell.getEntityManager().hasEntity(entity))
 			{
 				return &cell;
 			}
@@ -55,7 +55,7 @@ namespace ImguiPropertyFiltration
 		return nullptr;
 	}
 
-	void ImguiPropertyFiltersWidget::update(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor)
+	void ImguiPropertyFiltersWidget::update(ImguiDebugData& debugData)
 	{
 		if (!mIsInited)
 		{
@@ -92,7 +92,7 @@ namespace ImguiPropertyFiltration
 				Entity entity(id);
 
 				std::unordered_map<CellPos, WorldCell>& allCells = debugData.worldHolder.getWorld().getSpatialData().getAllCells();
-				WorldCell* cell = findEntityCell(dataAccessor, allCells, entity);
+				WorldCell* cell = findEntityCell(allCells, entity);
 				if (cell != nullptr)
 				{
 					mExplicitlySetEntity = std::make_tuple(cell, entity);
@@ -178,13 +178,13 @@ namespace ImguiPropertyFiltration
 		return filteredComponents;
 	}
 
-	static void getSpatialEntitiesHavingComponents(const RaccoonEcs::InnerDataAccessor& dataAccessor, std::unordered_map<CellPos, WorldCell>& cells, const std::vector<StringId>& componentTypes, TupleVector<WorldCell*, Entity>& inOutEntities)
+	static void getSpatialEntitiesHavingComponents(std::unordered_map<CellPos, WorldCell>& cells, const std::vector<StringId>& componentTypes, TupleVector<WorldCell*, Entity>& inOutEntities)
 	{
 		std::vector<Entity> entities;
 
 		for (auto& [pos, cell] : cells)
 		{
-			EntityManager& singleThreadedManager = dataAccessor.getSingleThreadedEntityManager(cell.getEntityManager());
+			EntityManager& singleThreadedManager = cell.getEntityManager();
 			entities.clear();
 			singleThreadedManager.getEntitiesHavingComponents(componentTypes, entities);
 			std::transform(
@@ -199,7 +199,7 @@ namespace ImguiPropertyFiltration
 		}
 	}
 
-	void ImguiPropertyFiltersWidget::getFilteredEntities(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor, TupleVector<WorldCell*, Entity>& inOutEntities)
+	void ImguiPropertyFiltersWidget::getFilteredEntities(ImguiDebugData& debugData, TupleVector<WorldCell*, Entity>& inOutEntities)
 	{
 		inOutEntities.clear();
 
@@ -208,11 +208,11 @@ namespace ImguiPropertyFiltration
 		if (!filteredComponentTypes.empty())
 		{
 			std::unordered_map<CellPos, WorldCell>& allCells = debugData.worldHolder.getWorld().getSpatialData().getAllCells();
-			getSpatialEntitiesHavingComponents(dataAccessor, allCells, filteredComponentTypes, inOutEntities);
+			getSpatialEntitiesHavingComponents(allCells, filteredComponentTypes, inOutEntities);
 
 			for (const auto& filter : mAppliedFilters)
 			{
-				filter->filterEntities(inOutEntities, dataAccessor);
+				filter->filterEntities(inOutEntities);
 			}
 		}
 		else if (mExplicitlySetEntity.has_value())

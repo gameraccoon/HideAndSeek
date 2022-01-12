@@ -7,11 +7,9 @@
 #include "GameData/World.h"
 
 TestDestroyedEntitiesRegistrationSystem::TestDestroyedEntitiesRegistrationSystem(
-		RaccoonEcs::ComponentFilter<const DeathComponent>&& deathFilter,
 		WorldHolder& worldHolder,
 		DestroyedEntitiesTestCheck& testCheck) noexcept
-	: mDeathFilter(std::move(deathFilter))
-	, mWorldHolder(worldHolder)
+	: mWorldHolder(worldHolder)
 	, mTestCheck(testCheck)
 {
 }
@@ -21,7 +19,7 @@ void TestDestroyedEntitiesRegistrationSystem::update()
 	World& world = mWorldHolder.getWorld();
 
 	int count = 0;
-	world.getSpatialData().getAllCellManagers().forEachComponentSet(mDeathFilter, [&count](const DeathComponent*)
+	world.getSpatialData().getAllCellManagers().forEachComponentSet<const DeathComponent>([&count](const DeathComponent*)
 	{
 		++count;
 	});

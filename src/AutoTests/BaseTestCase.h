@@ -1,6 +1,6 @@
 #pragma once
 
-#include <raccoon-ecs/async_systems_manager.h>
+#include <raccoon-ecs/systems_manager.h>
 
 #include "GameData/EcsDefinitions.h"
 #include "GameData/World.h"
@@ -29,7 +29,7 @@ public:
 	void setMouseKeyState(int, bool) override {}
 
 protected:
-	void startGame(const ArgumentsParser& arguments, SystemsInitFunction&& initFn);
+	void startGame(const ArgumentsParser& arguments);
 	virtual void initTestCase(const ArgumentsParser& arguments) = 0;
 	virtual void finalizeTestCase();
 

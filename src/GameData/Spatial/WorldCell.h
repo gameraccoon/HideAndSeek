@@ -13,22 +13,21 @@ class WorldCell
 public:
 	WorldCell(const CellPos& pos, const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator);
 
-	AsyncEntityManager& getEntityManager() { return mAsycnEntityManager; }
-	[[nodiscard]] const AsyncEntityManager& getEntityManager() const { return mAsycnEntityManager; }
+	EntityManager& getEntityManager() { return mEntityManager; }
+	const EntityManager& getEntityManager() const { return mEntityManager; }
 	ComponentSetHolder& getCellComponents() { return mCellComponents; }
-	[[nodiscard]] const ComponentSetHolder& getCellComponents() const { return mCellComponents; }
+	const ComponentSetHolder& getCellComponents() const { return mCellComponents; }
 
-	[[nodiscard]] CellPos getPos() const { return mPos; }
+	CellPos getPos() const { return mPos; }
 
 	[[nodiscard]] nlohmann::json toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder);
 	void fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
 	void clearCaches();
-	[[nodiscard]] bool hasAnyData() const;
+	bool hasAnyData() const;
 
 private:
 	EntityManager mEntityManager;
-	AsyncEntityManager mAsycnEntityManager{mEntityManager};
 	ComponentSetHolder mCellComponents;
 	CellPos mPos;
 };

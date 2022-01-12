@@ -2,15 +2,11 @@
 
 #include "GameLogic/Game.h"
 
-#include <raccoon-ecs/async_operations.h>
-
 #include "Base/Types/TemplateHelpers.h"
-
-#include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
-#include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 
 #include "GameData/Components/StateMachineComponent.generated.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
 
 #include "HAL/Base/Engine.h"
 
@@ -45,12 +41,9 @@ Game::Game(int width, int height)
 {
 }
 
-void Game::start([[maybe_unused]] const ArgumentsParser& arguments, int workerThreadsCount, SystemsInitFunction&& initFn)
+void Game::start([[maybe_unused]] const ArgumentsParser& arguments, int workerThreadsCount)
 {
 	SCOPED_PROFILER("Game::start");
-	ComponentsRegistration::RegisterComponents(mComponentFactory);
-	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializers);
-
 	mDebugBehavior.processArguments(arguments);
 
 	mThreadPool.spawnThreads(workerThreadsCount);
@@ -58,25 +51,14 @@ void Game::start([[maybe_unused]] const ArgumentsParser& arguments, int workerTh
 	mWorkerThreadsCount = workerThreadsCount;
 	mRenderThreadId = mWorkerThreadsCount + 1;
 
-	mSystemsManager.init(
-		0, // don't spawn additional threads since we already preallocated some
-		[this, initFn](const RaccoonEcs::InnerDataAccessor& dataAccessor)
-		{
-			if (initFn)
-			{
-				initFn(dataAccessor);
-			}
+	auto* sm = mGameData.getGameComponents().getOrAddComponent<StateMachineComponent>();
+	// ToDo: make an editor not to hardcode SM data
+	StateMachines::RegisterStateMachines(sm);
 
-			auto* sm = mGameData.getGameComponents().getOrAddComponent<StateMachineComponent>();
-			// ToDo: make an editor not to hardcode SM data
-			StateMachines::RegisterStateMachines(sm);
+	mWorld.getWorldComponents().addComponent<WorldCachedDataComponent>();
 
-			mWorld.getWorldComponents().addComponent<WorldCachedDataComponent>();
-
-			RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
-			renderAccessor->setAccessor(&mRenderThread.getAccessor());
-		}
-	);
+	RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
+	renderAccessor->setAccessor(&mRenderThread.getAccessor());
 
 	getEngine().releaseRenderContext();
 	mRenderThread.startThread(getResourceManager(), getEngine(), [&engine = getEngine()]{ engine.acquireRenderContext(); });

@@ -3,21 +3,17 @@
 #include "Base/Types/TemplateAliases.h"
 
 #include "GameData/World.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
 
 #include "Utils/Geometry/Collide.h"
 
 #include "GameLogic/Systems/CollisionSystem.h"
 
 
-CollisionSystem::CollisionSystem(
-		RaccoonEcs::ComponentFilter<CollisionComponent, const TransformComponent>&& collidingFilter,
-		RaccoonEcs::ComponentFilter<MovementComponent>&& movementFilter,
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent, MovementComponent>&& movingCollisionsFilter,
-		WorldHolder& worldHolder) noexcept
-	: mCollidingFilter(std::move(collidingFilter))
-	, mMovementFilter(std::move(movementFilter))
-	, mMovingCollisionsFilter(std::move(movingCollisionsFilter))
-	, mWorldHolder(worldHolder)
+CollisionSystem::CollisionSystem(WorldHolder& worldHolder) noexcept
+	: mWorldHolder(worldHolder)
 {
 }
 
@@ -39,7 +35,7 @@ void CollisionSystem::update()
 		size_t i = 0;
 		for (auto& pair : allCellsMap)
 		{
-			mCollidingFilter.getComponentsWithEntities(pair.second.getEntityManager(), collidableComponentGroups[i].components);
+			pair.second.getEntityManager().getComponentsWithEntities<CollisionComponent, const TransformComponent>(collidableComponentGroups[i].components);
 			collidableComponentGroups[i].cell = &pair.second;
 			++i;
 		}
@@ -56,9 +52,8 @@ void CollisionSystem::update()
 	}
 
 	SCOPED_PROFILER("resolve collisions");
-	world.getSpatialData().getAllCellManagers().forEachComponentSet(
-			mMovingCollisionsFilter,
-			[&collidableComponentGroups, this](const CollisionComponent* collisionComponent, const TransformComponent* transformComponent, MovementComponent* movementComponent)
+	world.getSpatialData().getAllCellManagers().forEachComponentSet<const CollisionComponent, const TransformComponent, MovementComponent>(
+			[&collidableComponentGroups](const CollisionComponent* collisionComponent, const TransformComponent* transformComponent, MovementComponent* movementComponent)
 	{
 		Vector2D resist = ZERO_VECTOR;
 		for (auto& pair : collidableComponentGroups)
@@ -71,7 +66,7 @@ void CollisionSystem::update()
 
 					if (doCollide)
 					{
-						auto [movement] = mMovementFilter.getEntityComponents(pair.cell->getEntityManager(), entity);
+						auto [movement] = pair.cell->getEntityManager().getEntityComponents<MovementComponent>(entity);
 						if (movement)
 						{
 							movementComponent->setNextStep(movementComponent->getNextStep() + resist/2);

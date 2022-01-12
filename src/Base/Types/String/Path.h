@@ -19,9 +19,9 @@ namespace std
 {
 	template<> struct hash<ResourcePath>
 	{
-		std::size_t operator()(ResourcePath const& path) const noexcept
+		size_t operator()(ResourcePath const& path) const noexcept
 		{
-			return std::hash<std::string>{}(static_cast<std::string>(path));
+			return hash<string>{}(static_cast<string>(path));
 		}
 	};
 }

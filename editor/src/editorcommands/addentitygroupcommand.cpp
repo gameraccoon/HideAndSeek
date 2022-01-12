@@ -47,10 +47,9 @@ void AddEntityGroupCommand::doCommand(World* world)
 
 void AddEntityGroupCommand::undoCommand(World* world)
 {
-	RaccoonEcs::EntityRemover entityRemover(gEditorDataAccessor);
 	for (auto [entity, cellPos] : mCreatedEntities)
 	{
 		WorldCell& cell = world->getSpatialData().getOrCreateCell(cellPos);
-		entityRemover.removeEntity(cell.getEntityManager(), entity.getEntity());
+		gEditorDataAccessor.getSingleThreadedEntityManager(cell.getEntityManager()).removeEntity(entity.getEntity());
 	}
 }

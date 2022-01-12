@@ -38,9 +38,9 @@ static void HelpMarker(const char* desc)
 	}
 }
 
-void ImguiComponentInspectorWindow::applyFilters(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor)
+void ImguiComponentInspectorWindow::applyFilters(ImguiDebugData& debugData)
 {
-	 mPropertyFiltersWidget.getFilteredEntities(debugData, dataAccessor, mFilteredEntities);
+	 mPropertyFiltersWidget.getFilteredEntities(debugData, mFilteredEntities);
 }
 
 void ImguiComponentInspectorWindow::showEntityId()
@@ -87,7 +87,7 @@ void ImguiComponentInspectorWindow::showFilteredEntities()
 	}
 }
 
-void ImguiComponentInspectorWindow::showComponentsInspector(const RaccoonEcs::InnerDataAccessor& dataAccessor)
+void ImguiComponentInspectorWindow::showComponentsInspector()
 {
 	bool hasFoundAnything = false;
 	if (mSelectedEntity.has_value())
@@ -95,7 +95,7 @@ void ImguiComponentInspectorWindow::showComponentsInspector(const RaccoonEcs::In
 		auto [cell, entity] = *mSelectedEntity;
 
 		std::vector<TypedComponent> components;
-		dataAccessor.getSingleThreadedEntityManager(cell->getEntityManager()).getAllEntityComponents(entity, components);
+		cell->getEntityManager().getAllEntityComponents(entity, components);
 		std::ranges::sort(components, [](const auto& a, const auto& b)
 		{
 			return a.typeId < b.typeId;
@@ -126,15 +126,15 @@ void ImguiComponentInspectorWindow::showComponentsInspector(const RaccoonEcs::In
 	}
 }
 
-void ImguiComponentInspectorWindow::update(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor)
+void ImguiComponentInspectorWindow::update(ImguiDebugData& debugData)
 {
 	if (isVisible)
 	{
 		ImGui::Begin("Component Inspector", &isVisible);
 
-		mPropertyFiltersWidget.update(debugData, dataAccessor);
+		mPropertyFiltersWidget.update(debugData);
 
-		applyFilters(debugData, dataAccessor);
+		applyFilters(debugData);
 
 		ImGui::Text("Entities matching the filter: %lu", mFilteredEntities.size());
 
@@ -142,7 +142,7 @@ void ImguiComponentInspectorWindow::update(ImguiDebugData& debugData, const Racc
 
 		showEntityId();
 
-		showComponentsInspector(dataAccessor);
+		showComponentsInspector();
 
 		ImGui::End();
 	}

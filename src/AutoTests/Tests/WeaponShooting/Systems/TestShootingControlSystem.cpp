@@ -2,21 +2,21 @@
 
 #include "AutoTests/Tests/WeaponShooting/Systems/TestShootingControlSystem.h"
 
+#include "GameData/Components/HealthComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/WeaponComponent.generated.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+
 #include <limits>
 
 #include "GameData/World.h"
 
 
 TestShootingControlSystem::TestShootingControlSystem(
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
-		RaccoonEcs::ComponentFilter<const TransformComponent, const WeaponComponent, CharacterStateComponent, MovementComponent>&& shooterFilter,
-		RaccoonEcs::ComponentFilter<const HealthComponent, const TransformComponent>&& targetsFilter,
 		WorldHolder& worldHolder,
 		const TimeData& time) noexcept
-	: mTrackedFilter(std::move(trackedFilter))
-	, mShooterFilters(std::move(shooterFilter))
-	, mTargetsFilter(std::move(targetsFilter))
-	, mWorldHolder(worldHolder)
+	: mWorldHolder(worldHolder)
 	, mTime(time)
 {
 }
@@ -25,14 +25,14 @@ void TestShootingControlSystem::update()
 {
 	World& world = mWorldHolder.getWorld();
 
-	std::optional<std::pair<AsyncEntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
 	if (!playerEntity.has_value())
 	{
 		return;
 	}
 
-	auto [playerTransform, playerWeapon, characterState, movement] = playerEntity->first.getComponents(mShooterFilters);
-	if (playerTransform == nullptr || playerWeapon == nullptr || characterState == nullptr)
+	auto [playerTransform, playerWeapon, characterState, movement] = playerEntity->first.getComponents<const TransformComponent, const WeaponComponent, CharacterStateComponent, MovementComponent>();
+	if (playerTransform == nullptr || playerWeapon == nullptr || characterState == nullptr || movement == nullptr)
 	{
 		return;
 	}
@@ -41,8 +41,7 @@ void TestShootingControlSystem::update()
 	Vector2D closestTarget;
 	float closestQDist = std::numeric_limits<float>::max();
 
-	world.getSpatialData().getAllCellManagers().forEachComponentSet(
-			mTargetsFilter,
+	world.getSpatialData().getAllCellManagers().forEachComponentSet<const HealthComponent, const TransformComponent>(
 			[playerLocation, &closestTarget, &closestQDist](const HealthComponent* health, const TransformComponent* transform)
 	{
 		float qDist = (transform->getLocation() - playerLocation).qSize();
@@ -53,9 +52,9 @@ void TestShootingControlSystem::update()
 		}
 	});
 
-	float weaponShootDistance = playerWeapon->getShotDistance();
+	const float weaponShootDistance = playerWeapon->getShotDistance();
 
-	bool canShoot = closestQDist < weaponShootDistance * weaponShootDistance;
+	const bool canShoot = closestQDist < weaponShootDistance * weaponShootDistance;
 	characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::TryingToShoot, canShoot);
 	movement->setSightDirection(closestTarget - playerLocation);
 }

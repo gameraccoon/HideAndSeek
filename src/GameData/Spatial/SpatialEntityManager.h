@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include "raccoon-ecs/async_operations.h"
-
 #include "GameData/EcsDefinitions.h"
 
 #include "GameData/Spatial/WorldCell.h"
@@ -13,75 +11,73 @@ class SpatialEntityManager
 public:
 	explicit SpatialEntityManager(const std::vector<WorldCell*>& cells);
 
-	template<typename Operation, typename DataVector>
-	void getComponents(const Operation& operation, DataVector& inOutComponents)
+	template<typename... Components, typename DataVector>
+	void getComponents(DataVector& inOutComponents)
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.TEMPLATE_MSVC_FIX getComponents(cell->getEntityManager(), inOutComponents);
+			cell->getEntityManager().getComponents<Components...>(inOutComponents);
 		}
 	}
 
-	template<typename Operation, typename DataVector>
-	void getSpatialComponents(const Operation& operation, DataVector& inOutComponents)
+	template<typename... Components, typename DataVector>
+	void getSpatialComponents(DataVector& inOutComponents)
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.TEMPLATE_MSVC_FIX getComponents(cell->getEntityManager(), inOutComponents, cell);
+			cell->getEntityManager().getComponents<Components...>(inOutComponents, cell);
 		}
 	}
 
-	template<typename Operation, typename DataVector>
-	void getSpatialComponentsWithEntities(Operation& operation, DataVector& inOutComponents)
+	template<typename... Components, typename DataVector>
+	void getSpatialComponentsWithEntities(DataVector& inOutComponents)
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.TEMPLATE_MSVC_FIX getComponentsWithEntities(cell->getEntityManager(), inOutComponents, cell);
+			cell->getEntityManager().getComponentsWithEntities<Components...>(inOutComponents, cell);
 		}
 	}
 
-	template<typename Operation, typename FunctionType>
-	void forEachComponentSet(const Operation& operation, FunctionType processor)
+	template<typename... Components, typename FunctionType>
+	void forEachComponentSet(FunctionType processor)
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.TEMPLATE_MSVC_FIX forEachComponentSet(cell->getEntityManager(), processor);
+			cell->getEntityManager().forEachComponentSet<Components...>(processor);
 		}
 	}
 
-	template<typename Operation, typename FunctionType>
-	void forEachSpatialComponentSet(const Operation& operation, FunctionType processor)
+	template<typename... Components, typename FunctionType>
+	void forEachSpatialComponentSet(FunctionType processor)
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.template forEachComponentSet(cell->getEntityManager(), processor, cell);
+			cell->getEntityManager().forEachComponentSet<Components...>(processor, cell);
 		}
 	}
 
-	template<typename Operation, typename FunctionType>
-	void forEachSpatialComponentSetWithEntity(const Operation& operation, FunctionType processor)
+	template<typename... Components, typename FunctionType>
+	void forEachSpatialComponentSetWithEntity(FunctionType processor)
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.TEMPLATE_MSVC_FIX forEachComponentSetWithEntity(cell->getEntityManager(), processor, cell);
+			cell->getEntityManager().forEachComponentSetWithEntity<Components...>(processor, cell);
 		}
 	}
 
-	template<typename Operation>
-	void executeScheduledActions(const Operation& operation)
+	void executeScheduledActions()
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.TEMPLATE_MSVC_FIX executeScheduledActions(cell->getEntityManager());
+			cell->getEntityManager().executeScheduledActions();
 		}
 	}
 
-	template<typename Operation>
-	void getAllEntityComponents(const Operation& operation, Entity entity, std::vector<TypedComponent>& outComponents)
+	void getAllEntityComponents(Entity entity, std::vector<TypedComponent>& outComponents)
 	{
 		for (WorldCell* cell : mCells)
 		{
-			operation.template getAllEntityComponents(cell->getEntityManager(), entity, outComponents);
+			cell->getEntityManager().getAllEntityComponents(entity, outComponents);
 
 			if (!outComponents.empty())
 			{
@@ -99,57 +95,70 @@ class ConstSpatialEntityManager
 public:
 	explicit ConstSpatialEntityManager(const std::vector<const WorldCell*>& cells);
 
-	template<typename Operation, typename DataVector>
-	void getComponents(const Operation& operation, DataVector& inOutComponents) const
+	template<typename... Components, typename DataVector>
+	void getComponents(DataVector& inOutComponents)
 	{
 		for (const WorldCell* cell : mCells)
 		{
-			operation.template getComponents(cell->getEntityManager(), inOutComponents);
+			cell->getEntityManager().getComponents<Components...>(inOutComponents);
 		}
 	}
 
-	template<typename Operation, typename DataVector>
-	void getSpatialComponents(const Operation& operation, DataVector& inOutComponents) const
+	template<typename... Components, typename DataVector>
+	void getSpatialComponents(DataVector& inOutComponents)
 	{
 		for (const WorldCell* cell : mCells)
 		{
-			operation.template getComponents(cell->getEntityManager(), inOutComponents, cell);
+			cell->getEntityManager().getComponents<Components...>(inOutComponents, cell);
 		}
 	}
 
-	template<typename Operation, typename DataVector>
-	void getSpatialComponentsWithEntities(Operation& operation, DataVector& inOutComponents) const
+	template<typename... Components, typename DataVector>
+	void getSpatialComponentsWithEntities(DataVector& inOutComponents)
 	{
 		for (const WorldCell* cell : mCells)
 		{
-			operation.template getComponentsWithEntities(cell->getEntityManager(), inOutComponents, cell);
+			cell->getEntityManager().getComponentsWithEntities<Components...>(inOutComponents, cell);
 		}
 	}
 
-	template<typename Operation, typename FunctionType>
-	void forEachComponentSet(const Operation& operation, FunctionType processor) const
+	template<typename... Components, typename FunctionType>
+	void forEachComponentSet(FunctionType processor)
 	{
 		for (const WorldCell* cell : mCells)
 		{
-			operation.template forEachComponentSet(cell->getEntityManager(), processor);
+			cell->getEntityManager().forEachComponentSet<Components...>(processor);
 		}
 	}
 
-	template<typename Operation, typename FunctionType>
-	void forEachSpatialComponentSet(const Operation& operation, FunctionType processor) const
+	template<typename... Components, typename FunctionType>
+	void forEachSpatialComponentSet(FunctionType processor)
 	{
 		for (const WorldCell* cell : mCells)
 		{
-			operation.template forEachComponentSet(cell->getEntityManager(), processor, cell);
+			cell->getEntityManager().forEachComponentSet<Components...>(processor, cell);
 		}
 	}
 
-	template<typename Operation, typename FunctionType>
-	void forEachSpatialComponentSetWithEntity(const Operation& operation, FunctionType processor) const
+	template<typename... Components, typename FunctionType>
+	void forEachSpatialComponentSetWithEntity(FunctionType processor)
 	{
 		for (const WorldCell* cell : mCells)
 		{
-			operation.template forEachComponentSetWithEntity(cell->getEntityManager(), processor, cell);
+			cell->getEntityManager().forEachComponentSetWithEntity<Components...>(processor, cell);
+		}
+	}
+
+	void getAllEntityComponents(Entity entity, std::vector<ConstTypedComponent>& outComponents)
+	{
+		for (const WorldCell* cell : mCells)
+		{
+			cell->getEntityManager().getAllEntityComponents(entity, outComponents);
+
+			if (!outComponents.empty())
+			{
+				break;
+			}
 		}
 	}
 

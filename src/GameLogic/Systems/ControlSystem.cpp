@@ -7,25 +7,16 @@
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/Components/ImguiComponent.generated.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 
 
-ControlSystem::ControlSystem(
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
-		RaccoonEcs::ComponentFilter<CharacterStateComponent>&& characterStateFilter,
-		RaccoonEcs::ComponentFilter<ImguiComponent>&& imguiFilter,
-		RaccoonEcs::ComponentFilter<RenderModeComponent>&& renderModeFilter,
-		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>&& moveFilter,
-		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
-		WorldHolder& worldHolder,
-		const InputData& inputData
-	) noexcept
-	: mTrackedFilter(std::move(trackedFilter))
-	, mCharacterStateFilter(std::move(characterStateFilter))
-	, mImguiFilter(std::move(imguiFilter))
-	, mRenderModeFilter(std::move(renderModeFilter))
-	, mMoveFilter(std::move(moveFilter))
-	, mTransformFilter(std::move(transformFilter))
-	, mWorldHolder(worldHolder)
+ControlSystem::ControlSystem(WorldHolder& worldHolder, const InputData& inputData) noexcept
+	: mWorldHolder(worldHolder)
 	, mInputData(inputData)
 {
 }
@@ -46,7 +37,7 @@ void ControlSystem::update()
 	const HAL::KeyStatesMap& keyStates = mInputData.keyboardKeyStates;
 
 #ifdef IMGUI_ENABLED
-	if (auto [imgui] = mImguiFilter.getComponents(gameData.getGameComponents()); imgui)
+	if (auto [imgui] = gameData.getGameComponents().getComponents<ImguiComponent>(); imgui)
 	{
 		UpdateRenderStateOnPressed(keyStates, SDLK_F1, imgui->getIsImguiVisibleRef());
 		if (imgui->getIsImguiVisible())
@@ -59,7 +50,7 @@ void ControlSystem::update()
 
 	processPlayerInput();
 
-	if (auto [renderMode] = mRenderModeFilter.getComponents(gameData.getGameComponents()); renderMode)
+	if (auto [renderMode] = gameData.getGameComponents().getComponents<RenderModeComponent>(); renderMode)
 	{
 		UpdateRenderStateOnPressed(keyStates, SDLK_F2, renderMode->getIsDrawDebugCollisionsEnabledRef());
 		UpdateRenderStateOnPressed(keyStates, SDLK_F3, renderMode->getIsDrawBackgroundEnabledRef());
@@ -78,7 +69,7 @@ void ControlSystem::processPlayerInput()
 	const HAL::KeyStatesMap& mouseKeyStates = mInputData.mouseKeyStates;
 	World& world = mWorldHolder.getWorld();
 
-	std::optional<std::pair<AsyncEntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<EntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
 
 	if (!controlledEntity.has_value())
 	{
@@ -110,21 +101,21 @@ void ControlSystem::processPlayerInput()
 		movementDirection += DOWN_DIRECTION;
 	}
 
-	if (auto [characterState] = controlledEntity->first.getComponents(mCharacterStateFilter); characterState != nullptr)
+	if (auto [characterState] = controlledEntity->first.getComponents<CharacterStateComponent>(); characterState != nullptr)
 	{
 		characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::TryingToMove, !movementDirection.isZeroLength());
 		characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::ReadyToRun, isRunPressed);
 		characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::TryingToShoot, isShootPressed);
 	}
 
-	auto [transform, movement] = controlledEntity->first.getComponents(mMoveFilter);
+	auto [transform, movement] = controlledEntity->first.getComponents<const TransformComponent, MovementComponent>();
 	movement->setMoveDirection(movementDirection);
 
-	std::optional<std::pair<AsyncEntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("CameraEntity"));
+	std::optional<std::pair<EntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(STR_TO_ID("CameraEntity"));
 
 	if (mainCamera.has_value())
 	{
-		auto [cameraTransform] = mainCamera->first.getComponents(mTransformFilter);
+		auto [cameraTransform] = mainCamera->first.getComponents<TransformComponent>();
 		if (cameraTransform == nullptr)
 		{
 			return;

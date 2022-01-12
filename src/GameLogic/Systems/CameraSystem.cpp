@@ -4,22 +4,17 @@
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/ImguiComponent.generated.h"
+#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 
 
 CameraSystem::CameraSystem(
-		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>&& cameraMoveFilter,
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
-		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
-		RaccoonEcs::ComponentFilter<const ImguiComponent>&& imguiFilter,
-		RaccoonEcs::ComponentFilter<WorldCachedDataComponent>&& worldCachedDataFilter,
 		WorldHolder& worldHolder,
 		const InputData& inputData) noexcept
-	: mCameraMoveFilter(std::move(cameraMoveFilter))
-	, mTrackedFilter(std::move(trackedFilter))
-	, mTransformFilter(std::move(transformFilter))
-	, mImguiFilter(std::move(imguiFilter))
-	, mWorldCachedDataFilter(std::move(worldCachedDataFilter))
-	, mWorldHolder(worldHolder)
+	: mWorldHolder(worldHolder)
 	, mInputData(inputData)
 {
 }
@@ -29,7 +24,7 @@ void CameraSystem::update()
 	SCOPED_PROFILER("CameraSystem::update");
 	GameData& gameData = mWorldHolder.getGameData();
 
-	auto [imgui] = mImguiFilter.getComponents(gameData.getGameComponents());
+	auto [imgui] = gameData.getGameComponents().getComponents<ImguiComponent>();
 	if (imgui && imgui->getIsImguiVisible())
 	{
 		return;
@@ -37,15 +32,15 @@ void CameraSystem::update()
 
 	World& world = mWorldHolder.getWorld();
 
-	std::optional<std::pair<AsyncEntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<EntityView, CellPos>> controlledEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
 
 	if (controlledEntity.has_value())
 	{
-		std::optional<std::pair<AsyncEntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("CameraEntity"));
+		std::optional<std::pair<EntityView, CellPos>> mainCamera = world.getTrackedSpatialEntity(STR_TO_ID("CameraEntity"));
 
 		if (mainCamera.has_value())
 		{
-			auto [cameraTransform, cameraMovement] = mainCamera->first.getComponents(mCameraMoveFilter);
+			auto [cameraTransform, cameraMovement] = mainCamera->first.getComponents<TransformComponent, MovementComponent>();
 			if (cameraTransform == nullptr)
 			{
 				return;
@@ -57,14 +52,14 @@ void CameraSystem::update()
 
 			const float cameraMobilityRate = 0.7f;
 
-			auto [controledEntityTransform] = controlledEntity->first.getComponents(mTransformFilter);
+			auto [controledEntityTransform] = controlledEntity->first.getComponents<TransformComponent>();
 
 			Vector2D cameraNewPos = controledEntityTransform->getLocation() + (mouseScreenPos - screenHalfSize) * cameraMobilityRate;
 			Vector2D cameraMove = cameraNewPos - cameraTransform->getLocation();
 
 			cameraMovement->setNextStep(cameraMove);
 
-			auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
+			auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
 			worldCachedData->setCameraPos(cameraNewPos);
 			worldCachedData->setScreenSize(screenSize);
 		}

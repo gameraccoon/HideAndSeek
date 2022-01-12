@@ -16,11 +16,11 @@
 
 namespace RayTrace
 {
-	bool FastTrace(World& world, CollisionsFilter& collisionsFilter, const Vector2D& startPoint, const Vector2D& endPoint)
+	bool FastTrace(World& world, const Vector2D& startPoint, const Vector2D& endPoint)
 	{
 		TupleVector<const CollisionComponent*, const TransformComponent*> components;
 		// ToDo: choose only potentially intersected cells
-		world.getSpatialData().getAllCellManagers().getComponents(collisionsFilter, components);
+		world.getSpatialData().getAllCellManagers().getComponents<const CollisionComponent, const TransformComponent>(components);
 
 		for (auto [collision, transform] : components)
 		{
@@ -38,7 +38,7 @@ namespace RayTrace
 					for (auto& border : hull.borders)
 					{
 						// if ray have opposite direction with normal
-						if (abs((border.getNormal().rotation() - (transformedEndPoint - transformedStartPoint).rotation()).getValue()) <= PI/2)
+						if (std::abs((border.getNormal().rotation() - (transformedEndPoint - transformedStartPoint).rotation()).getValue()) <= PI/2)
 						{
 							continue;
 						}
@@ -78,15 +78,14 @@ namespace RayTrace
 		return false;
 	}
 
-	TraceResult Trace(World& world, CollisionsFilter& collisionsFilter, Vector2D startPoint, Vector2D endPoint)
+	TraceResult Trace(World& world, Vector2D startPoint, Vector2D endPoint)
 	{
 		TraceResult result;
 
 		float minRayQLength = (startPoint - endPoint).qSize() + 20.0f;
 
-		// ToDo: choose only potentially intersected cells
-		world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity(
-			collisionsFilter,
+		// ToDo: choose only potentially intersecting cells
+		world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<const CollisionComponent, const TransformComponent>(
 			[&result, &minRayQLength, startPoint, endPoint](WorldCell* cell, Entity entity, const CollisionComponent* collision, const TransformComponent* transform)
 		{
 			Vector2D transformedStartPoint = startPoint - transform->getLocation();
@@ -103,7 +102,7 @@ namespace RayTrace
 					for (auto& border : hull.borders)
 					{
 						// if ray have opposite direction with normal
-						if (abs((border.getNormal().rotation() - (transformedEndPoint - transformedStartPoint).rotation()).getValue()) <= PI/2)
+						if (std::abs((border.getNormal().rotation() - (transformedEndPoint - transformedStartPoint).rotation()).getValue()) <= PI/2)
 						{
 							continue;
 						}

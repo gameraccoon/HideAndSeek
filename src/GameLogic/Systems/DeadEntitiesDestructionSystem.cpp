@@ -6,14 +6,10 @@
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
+#include "GameData/Components/DeathComponent.generated.h"
 
-DeadEntitiesDestructionSystem::DeadEntitiesDestructionSystem(
-		RaccoonEcs::ComponentFilter<const DeathComponent>&& deathFilter,
-		RaccoonEcs::EntityRemover&& entityRemover,
-		WorldHolder& worldHolder) noexcept
-	: mDeathFilter(std::move(deathFilter))
-	, mEntityRemover(std::move(entityRemover))
-	, mWorldHolder(worldHolder)
+DeadEntitiesDestructionSystem::DeadEntitiesDestructionSystem(WorldHolder& worldHolder) noexcept
+	: mWorldHolder(worldHolder)
 {
 }
 
@@ -23,10 +19,10 @@ void DeadEntitiesDestructionSystem::update()
 	World& world = mWorldHolder.getWorld();
 
 	TupleVector<WorldCell*, Entity, const DeathComponent*> components;
-	world.getSpatialData().getAllCellManagers().getSpatialComponentsWithEntities(mDeathFilter, components);
+	world.getSpatialData().getAllCellManagers().getSpatialComponentsWithEntities<const DeathComponent>(components);
 
 	for (const auto& componentTuple : components)
 	{
-		mEntityRemover.removeEntity(std::get<0>(componentTuple)->getEntityManager(), std::get<1>(componentTuple));
+		std::get<0>(componentTuple)->getEntityManager().removeEntity(std::get<1>(componentTuple));
 	}
 }

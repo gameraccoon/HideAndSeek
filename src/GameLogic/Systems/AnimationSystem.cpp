@@ -6,19 +6,16 @@
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
+#include "GameData/Components/SpriteRenderComponent.generated.h"
+#include "GameData/Components/AnimationClipsComponent.generated.h"
+#include "GameData/Components/AnimationGroupsComponent.generated.h"
+#include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
 
 AnimationSystem::AnimationSystem(
-		RaccoonEcs::ComponentFilter<AnimationGroupsComponent, AnimationClipsComponent>&& animUpdateFilter,
-		RaccoonEcs::ComponentFilter<AnimationClipsComponent, SpriteRenderComponent>&& animRenderFilter,
-		RaccoonEcs::ComponentFilter<const StateMachineComponent>&& stateMachineFilter,
-		RaccoonEcs::ComponentFilter<const WorldCachedDataComponent>&& worldCachedDataFilter,
 		WorldHolder& worldHolder,
 		const TimeData& time) noexcept
-	: mAnimUpdateFilter(std::move(animUpdateFilter))
-	, mAnimRenderFilter(std::move(animRenderFilter))
-	, mStateMachineFilter(std::move(stateMachineFilter))
-	, mWorldCachedDataFilter(std::move(worldCachedDataFilter))
-	, mWorldHolder(worldHolder)
+	: mWorldHolder(worldHolder)
 	, mTime(time)
 {
 }
@@ -30,17 +27,16 @@ void AnimationSystem::update()
 	GameData& gameData = mWorldHolder.getGameData();
 	float dt = mTime.dt;
 
-	const auto [stateMachines] = mStateMachineFilter.getComponents(gameData.getGameComponents());
+	const auto [stateMachines] = gameData.getGameComponents().getComponents<const StateMachineComponent>();
 
-	const auto [worldCachedData] = mWorldCachedDataFilter.getComponents(world.getWorldComponents());
+	const auto [worldCachedData] = world.getWorldComponents().getComponents<const WorldCachedDataComponent>();
 	Vector2D workingRect = worldCachedData->getScreenSize();
 	Vector2D cameraLocation = worldCachedData->getCameraPos();
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(cameraLocation, workingRect);
 
 	// update animation clip from FSM
-	spatialManager.forEachComponentSet(
-		mAnimUpdateFilter,
+	spatialManager.forEachComponentSet<AnimationGroupsComponent, AnimationClipsComponent>(
 		[dt, stateMachines](AnimationGroupsComponent* animationGroups, AnimationClipsComponent* animationClips)
 	{
 		for (auto& data : animationGroups->getDataRef())
@@ -57,8 +53,7 @@ void AnimationSystem::update()
 	});
 
 	// update animation frame
-	spatialManager.forEachComponentSet(
-			mAnimRenderFilter,
+	spatialManager.forEachComponentSet<AnimationClipsComponent, SpriteRenderComponent>(
 			[dt](AnimationClipsComponent* animationClips, SpriteRenderComponent* spriteRender)
 	{
 		std::vector<AnimationClip>& animationDatas = animationClips->getDatasRef();

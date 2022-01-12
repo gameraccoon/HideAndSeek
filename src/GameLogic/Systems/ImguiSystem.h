@@ -6,10 +6,6 @@
 #include <vector>
 
 #include <raccoon-ecs/system.h>
-#include <raccoon-ecs/async_operations.h>
-
-#include "GameData/Components/ImguiComponent.generated.h"
-#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "HAL/EngineFwd.h"
 
@@ -28,22 +24,16 @@ class ImguiSystem : public RaccoonEcs::System
 {
 public:
 	ImguiSystem(
-		RaccoonEcs::ComponentAdder<ImguiComponent>&& imguiAdder,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent> renderAccessorFilter,
-		RaccoonEcs::InnerDataAccessor&& innerDataAccessor,
 		ImguiDebugData& debugData,
 		HAL::Engine& engine) noexcept;
 	~ImguiSystem() override = default;
 
 	void update() override;
-	void initResources() override;
+	void init() override;
 	void shutdown() override;
 	static std::string GetSystemId() { return "ImguiSystem"; }
 
 private:
-	RaccoonEcs::ComponentAdder<ImguiComponent> mImguiAdder;
-	RaccoonEcs::ComponentFilter<RenderAccessorComponent> mRenderAccessorFilter;
-	RaccoonEcs::InnerDataAccessor mInnerDataAccessor;
 	HAL::Engine& mEngine;
 	ImguiDebugData& mDebugData;
 

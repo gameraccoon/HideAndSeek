@@ -236,8 +236,7 @@ void TransformEditorToolbox::onEntitySelected(const std::optional<EntityReferenc
 	if (entityRef.has_value() && entityRef->cellPos.has_value())
 	{
 		WorldCell* cell = world->getSpatialData().getCell(*entityRef->cellPos);
-		RaccoonEcs::EntitySelector<TransformComponent> entitySelector(gEditorDataAccessor);
-		if (cell != nullptr && entitySelector.doesEntityHaveComponent(cell->getEntityManager(), entityRef->entity))
+		if (cell != nullptr && gEditorDataAccessor.getSingleThreadedEntityManager(cell->getEntityManager()).doesEntityHaveComponent<TransformComponent>(entityRef->entity))
 		{
 			SpatialEntity spatialEntity(entityRef->entity, *entityRef->cellPos);
 			mContent->mSelectedEntities.push_back(spatialEntity);

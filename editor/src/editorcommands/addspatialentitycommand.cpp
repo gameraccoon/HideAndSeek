@@ -18,7 +18,7 @@ void AddSpatialEntityCommand::doCommand(World* world)
 {
 	WorldCell& cell = world->getSpatialData().getOrCreateCell(mEntity.cell);
 	EntityManager& cellEnttiyManager = gEditorDataAccessor.getSingleThreadedEntityManager(cell.getEntityManager());
-	cellEnttiyManager.reinsertPrevioslyExistingEntity(mEntity.entity.getEntity());
+	cellEnttiyManager.addExistingEntityUnsafe(mEntity.entity.getEntity());
 	TransformComponent* transform = cellEnttiyManager.addComponent<TransformComponent>(mEntity.entity.getEntity());
 	transform->setLocation(mLocation);
 }

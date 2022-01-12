@@ -82,7 +82,7 @@ namespace Json
 		for (const auto& entityData : entitiesJson)
 		{
 			Entity entity(entityData.get<Entity::EntityId>());
-			outEntityManager.reinsertPrevioslyExistingEntity(entity);
+			outEntityManager.addExistingEntityUnsafe(entity);
 			entities.push_back(entity);
 		}
 

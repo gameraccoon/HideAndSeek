@@ -8,20 +8,16 @@
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/AnimationGroupsComponent.generated.h"
 
 
 CharacterStateSystem::CharacterStateSystem(
-		RaccoonEcs::ComponentFilter<const StateMachineComponent>&& stateMachineFilter,
-		RaccoonEcs::ComponentFilter<CharacterStateComponent>&& characterStateFilter,
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, MovementComponent>&& characterMovementFilter,
-		RaccoonEcs::ComponentFilter<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>&& characterMovementAnimationFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData) noexcept
-	: mStateMachineFilter(std::move(stateMachineFilter))
-	, mCharacterStateFilter(std::move(characterStateFilter))
-	, mCharacterMovementFilter(std::move(characterMovementFilter))
-	, mCharacterMovementAnimationFilter(std::move(characterMovementAnimationFilter))
-	, mWorldHolder(worldHolder)
+	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 {
 }
@@ -43,14 +39,13 @@ void CharacterStateSystem::update()
 	GameData& gameData = mWorldHolder.getGameData();
 	float dt = mTime.dt;
 
-	auto [stateMachine] = mStateMachineFilter.getComponents(gameData.getGameComponents());
+	auto [stateMachine] = gameData.getGameComponents().getComponents<StateMachineComponent>();
 
 	if (stateMachine)
 	{
 		auto allCellManagers = world.getSpatialData().getAllCellManagers();
 		// update states
-		allCellManagers.forEachComponentSet(
-			mCharacterStateFilter,
+		allCellManagers.forEachComponentSet<CharacterStateComponent>(
 			[stateMachine, dt](CharacterStateComponent* characterState)
 		{
 			// calculate state
@@ -59,8 +54,7 @@ void CharacterStateSystem::update()
 		});
 
 		// update movements
-		allCellManagers.forEachComponentSet(
-			mCharacterMovementFilter,
+		allCellManagers.forEachComponentSet<const CharacterStateComponent, MovementComponent>(
 			[stateMachine, dt](const CharacterStateComponent* characterState, MovementComponent* movement)
 		{
 			CharacterState state = characterState->getState();
@@ -76,8 +70,7 @@ void CharacterStateSystem::update()
 		});
 
 		// update animation
-		allCellManagers.forEachComponentSet(
-			mCharacterMovementAnimationFilter,
+		allCellManagers.forEachComponentSet<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>(
 			[stateMachine, dt](const CharacterStateComponent* characterState, const MovementComponent* movement, AnimationGroupsComponent* animationGroups)
 		{
 			CharacterState state = characterState->getState();

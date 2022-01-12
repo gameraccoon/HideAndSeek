@@ -131,7 +131,7 @@ namespace NavMeshGenerator
 	{
 		std::size_t operator() (const SortedBorderPair& p) const
 		{
-			return std::hash<size_t>()(p.first) ^ (std::hash<size_t>()(p.second) << 1);
+			return std::hash<size_t>()(p.first) ^ std::rotl(std::hash<size_t>()(p.second), 7);
 		}
 	};
 

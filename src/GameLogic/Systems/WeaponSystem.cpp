@@ -5,24 +5,20 @@
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 #include "GameData/Spatial/SpatialEntity.h"
+#include "GameData/Components/WeaponComponent.generated.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/HealthComponent.generated.h"
+#include "GameData/Components/DeathComponent.generated.h"
 
 #include "Utils/Geometry/RayTrace.h"
 
 
 WeaponSystem::WeaponSystem(
-		RaccoonEcs::ComponentFilter<WeaponComponent, CharacterStateComponent>&& stateAndWeaponFilter,
-		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
-		RaccoonEcs::ComponentFilter<HealthComponent>&& healthFilter,
-		RaccoonEcs::ComponentAdder<DeathComponent>&& deathAdder,
-		RaccoonEcs::ComponentFilter<const CollisionComponent, const TransformComponent>&& collisionFilter,
 		WorldHolder& worldHolder,
 		const TimeData& timeData) noexcept
-	: mStateAndWeaponFilter(std::move(stateAndWeaponFilter))
-	, mTransformFilter(std::move(transformFilter))
-	, mHealthFilter(std::move(healthFilter))
-	, mDeathAdder(std::move(deathAdder))
-	, mCollisionFilter(std::move(collisionFilter))
-	, mWorldHolder(worldHolder)
+	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 {
 }
@@ -55,8 +51,7 @@ void WeaponSystem::update()
 	GameplayTimestamp currentTime = mTime.currentTimestamp;
 
 	std::vector<ShotInfo> shotsToMake;
-	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity(
-		mStateAndWeaponFilter,
+	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<WeaponComponent, CharacterStateComponent>(
 		[currentTime, &shotsToMake](WorldCell* cell, Entity entity, WeaponComponent* weapon, CharacterStateComponent* characterState)
 	{
 		if (characterState->getState() == CharacterState::Shoot || characterState->getState() == CharacterState::WalkAndShoot)
@@ -77,13 +72,12 @@ void WeaponSystem::update()
 	std::vector<HitInfo> hitsDone;
 	for (const ShotInfo& shotInfo : shotsToMake)
 	{
-		auto [transform] = mTransformFilter.getEntityComponents(shotInfo.instigatorCell->getEntityManager(), shotInfo.instigator);
+		auto [transform] = shotInfo.instigatorCell->getEntityManager().getEntityComponents<TransformComponent>(shotInfo.instigator);
 		if (transform)
 		{
 			Vector2D traceEndPoint = transform->getLocation() + Vector2D(transform->getRotation()) * shotInfo.distance;
 			RayTrace::TraceResult result = RayTrace::Trace(
 				world,
-				mCollisionFilter,
 				transform->getLocation(),
 				traceEndPoint
 			);
@@ -105,7 +99,7 @@ void WeaponSystem::update()
 		WorldCell* cell = world.getSpatialData().getCell(hit.hitEntity.cell);
 		AssertFatal(cell != nullptr, "Cell of the hit object is not found");
 
-		auto [health] = mHealthFilter.getEntityComponents(cell->getEntityManager(), hit.hitEntity.entity.getEntity());
+		auto [health] = cell->getEntityManager().getEntityComponents<HealthComponent>(hit.hitEntity.entity.getEntity());
 		if (health == nullptr)
 		{
 			// entity doesn't have health
@@ -116,7 +110,7 @@ void WeaponSystem::update()
 		health->setHealthValue(healthValue);
 		if (healthValue < 0.0f)
 		{
-			mDeathAdder.addComponent(cell->getEntityManager(), hit.hitEntity.entity.getEntity());
+			cell->getEntityManager().addComponent<DeathComponent>(hit.hitEntity.entity.getEntity());
 		}
 	}
 }

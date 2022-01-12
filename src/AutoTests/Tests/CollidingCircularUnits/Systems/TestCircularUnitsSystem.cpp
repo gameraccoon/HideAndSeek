@@ -3,18 +3,17 @@
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestCircularUnitsSystem.h"
 
 #include "GameData/World.h"
+#include "GameData/Components/NavMeshComponent.generated.h"
+#include "GameData/Components/AiControllerComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
 
 
 TestCircularUnitsSystem::TestCircularUnitsSystem(
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
-		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
-		RaccoonEcs::ComponentFilter<const AiControllerComponent, const TransformComponent, MovementComponent>&& aiMovementFilter,
 		WorldHolder& worldHolder,
 		const TimeData& time) noexcept
-	: mTrackedFilter(std::move(trackedFilter))
-	, mTransformFilter(std::move(transformFilter))
-	, mAiMovementFilter(std::move(aiMovementFilter))
-	, mWorldHolder(worldHolder)
+	: mWorldHolder(worldHolder)
 	, mTime(time)
 {
 }
@@ -24,13 +23,13 @@ void TestCircularUnitsSystem::update()
 	World& world = mWorldHolder.getWorld();
 	float dt = mTime.dt;
 
-	std::optional<std::pair<AsyncEntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(mTrackedFilter, STR_TO_ID("ControlledEntity"));
+	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
 	if (!playerEntity.has_value())
 	{
 		return;
 	}
 
-	const auto [playerTransform] = playerEntity->first.getComponents(mTransformFilter);
+	const auto [playerTransform] = playerEntity->first.getComponents<const TransformComponent>();
 	if (playerTransform == nullptr)
 	{
 		return;
@@ -39,8 +38,7 @@ void TestCircularUnitsSystem::update()
 	Vector2D targetLocation = playerTransform->getLocation();
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getAllCellManagers();
-	spatialManager.forEachComponentSet(
-		mAiMovementFilter,
+	spatialManager.forEachComponentSet<const AiControllerComponent, const TransformComponent, MovementComponent>(
 		[targetLocation, dt](const AiControllerComponent* /*aiController*/, const TransformComponent* transform, MovementComponent* movement)
 		{
 			Vector2D nextStep = targetLocation - transform->getLocation();

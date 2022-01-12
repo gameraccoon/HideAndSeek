@@ -20,16 +20,6 @@ CellPos CellPos::operator+(const CellPosDiff& diff) const
 	return CellPos(x + diff.x, y + diff.y);
 }
 
-bool CellPos::operator==(const CellPos& other) const
-{
-	return x == other.x && y == other.y;
-}
-
-bool CellPos::operator!=(const CellPos& other) const
-{
-	return !(*this == other);
-}
-
 void to_json(nlohmann::json& outJson, const CellPos& pos)
 {
 	outJson = nlohmann::json{

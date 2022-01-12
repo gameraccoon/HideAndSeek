@@ -15,16 +15,16 @@ class ImguiComponentInspectorWindow
 public:
 	ImguiComponentInspectorWindow();
 
-	void update(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor);
+	void update(ImguiDebugData& debugData);
 
 	bool isVisible = false;
 
 private:
-	void applyFilters(ImguiDebugData& debugData, const RaccoonEcs::InnerDataAccessor& dataAccessor);
+	void applyFilters(ImguiDebugData& debugData);
 
 	void showEntityId();
 	void showFilteredEntities();
-	void showComponentsInspector(const RaccoonEcs::InnerDataAccessor& dataAccessor);
+	void showComponentsInspector();
 
 private:
 	char mEntityFilterBuffer[128] = "";

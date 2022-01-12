@@ -10,3 +10,6 @@
 [submodule "external/include/raccoon-ecs"]
 	path = external/include/raccoon-ecs
 	url = git@github.com:gameraccoon/raccoon-ecs.git
+[submodule "external/sources/cameron314/concurrentqueue"]
+	path = external/include/cameron314/concurrentqueue
+	url = git@github.com:gameraccoon/concurrentqueue.git

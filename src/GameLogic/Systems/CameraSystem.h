@@ -3,13 +3,6 @@
 #include <unordered_map>
 
 #include <raccoon-ecs/system.h>
-#include <raccoon-ecs/async_operations.h>
-
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/WorldCachedDataComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
-#include "GameData/Components/ImguiComponent.generated.h"
-#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/InputData.h"
@@ -21,11 +14,6 @@ class CameraSystem : public RaccoonEcs::System
 {
 public:
 	CameraSystem(
-		RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent>&& cameraMoveFilter,
-		RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent>&& trackedFilter,
-		RaccoonEcs::ComponentFilter<const TransformComponent>&& transformFilter,
-		RaccoonEcs::ComponentFilter<const ImguiComponent>&& imguiFilter,
-		RaccoonEcs::ComponentFilter<WorldCachedDataComponent>&& worldCachedDataFilter,
 		WorldHolder& worldHolder,
 		const InputData& inputData) noexcept;
 	~CameraSystem() override = default;
@@ -34,11 +22,6 @@ public:
 	static std::string GetSystemId() { return "CameraSystem"; }
 
 private:
-	RaccoonEcs::ComponentFilter<const TransformComponent, MovementComponent> mCameraMoveFilter;
-	RaccoonEcs::ComponentFilter<const TrackedSpatialEntitiesComponent> mTrackedFilter;
-	RaccoonEcs::ComponentFilter<const TransformComponent> mTransformFilter;
-	RaccoonEcs::ComponentFilter<const ImguiComponent> mImguiFilter;
-	RaccoonEcs::ComponentFilter<WorldCachedDataComponent> mWorldCachedDataFilter;
 	WorldHolder& mWorldHolder;
 	const InputData& mInputData;
 };

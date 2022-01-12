@@ -13,6 +13,8 @@
 #include "Base/Types/TemplateHelpers.h"
 
 #include "GameData/GameData.h"
+#include "GameData/Components/ImguiComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "HAL/Base/Engine.h"
 
@@ -20,15 +22,9 @@
 
 
 ImguiSystem::ImguiSystem(
-		RaccoonEcs::ComponentAdder<ImguiComponent>&& imguiAdder,
-		RaccoonEcs::ComponentFilter<RenderAccessorComponent> renderAccessorFilter,
-		RaccoonEcs::InnerDataAccessor&& innerDataAccessor,
 		ImguiDebugData& debugData,
 		HAL::Engine& engine) noexcept
-	: mImguiAdder(std::move(imguiAdder))
-	, mRenderAccessorFilter(std::move(renderAccessorFilter))
-	, mInnerDataAccessor(std::move(innerDataAccessor))
-	, mEngine(engine)
+	: mEngine(engine)
 	, mDebugData(debugData)
 {
 }
@@ -39,7 +35,7 @@ void ImguiSystem::update()
 	GameData& gameData = mDebugData.worldHolder.getGameData();
 
 	// check if we need to render imgui
-	ImguiComponent* imgui = mImguiAdder.getOrAddComponent(gameData.getGameComponents());
+	ImguiComponent* imgui = gameData.getGameComponents().getOrAddComponent<ImguiComponent>();
 
 	if (!imgui->getIsImguiVisible())
 	{
@@ -69,7 +65,7 @@ void ImguiSystem::update()
 		ImGui::NewFrame();
 
 		// update the window hierarchy
-		mImguiMainMenu.update(mDebugData, mInnerDataAccessor);
+		mImguiMainMenu.update(mDebugData);
 
 		// rendering imgui to the viewport
 		ImGui::Render();
@@ -90,7 +86,7 @@ void ImguiSystem::update()
 	sharedData->onFinished.wait(lock, [&sharedData]{ return sharedData->isFinised; });
 }
 
-void ImguiSystem::initResources()
+void ImguiSystem::init()
 {
 	SCOPED_PROFILER("ImguiSystem::initResources");
 
