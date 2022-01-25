@@ -107,18 +107,18 @@ namespace ShapeOperations
 		if (border1.a.isNearlyEqualTo(intersectionPoint))
 		{
 			firstPoint = border1.b;
-            isCheckInverted = !isCheckInverted;
+			isCheckInverted = !isCheckInverted;
 		}
 		else
 		{
 			firstPoint = border1.a;
 		}
 
-        Vector2D secondPoint;
+		Vector2D secondPoint;
 		if (border2.b.isNearlyEqualTo(intersectionPoint))
 		{
 			secondPoint = border2.a;
-            isCheckInverted = !isCheckInverted;
+			isCheckInverted = !isCheckInverted;
 		}
 		else
 		{
@@ -566,13 +566,15 @@ namespace ShapeOperations
 			[](const SimpleBorder& border) { return border.a == border.b; }
 		);
 
+		using VectorKey = Vector2DKey<>;
+
 		// collect neighboring borders
-		std::unordered_map<Vector2DKey<>, std::vector<BorderInfo>> points;
+		std::unordered_map<VectorKey, std::vector<BorderInfo>> points;
 		for (size_t i = 0, iSize = inOutShape.size(); i < iSize; ++i)
 		{
 			const SimpleBorder& border = inOutShape[i];
-			points[Vector2DKey(border.a)].emplace_back(border.b, i, true);
-			points[Vector2DKey(border.b)].emplace_back(border.a, i, false);
+			points[VectorKey(border.a)].emplace_back(border.b, i, true);
+			points[VectorKey(border.b)].emplace_back(border.a, i, false);
 		}
 
 		// iterate over all neighboring border pairs and join ones that produce a straight line
@@ -590,9 +592,10 @@ namespace ShapeOperations
 					// skip borders that have opposite directions
 					if (borders[i].isFirstPoint != borders[j].isFirstPoint)
 					{
-						// process borders that produce a straight line
-						const float area = Collide::SignedArea(pos.value, borders[i].secondBorderPoint, borders[j].secondBorderPoint);
-						if (Math::IsNearZero(area, 0.01f))
+						const Vector2D vec1 = pos.value - borders[i].secondBorderPoint;
+						const Vector2D vec2 = pos.value - borders[j].secondBorderPoint;
+						const float dotProduct = Vector2D::DotProduct(vec1.unit(), vec2.unit());
+						if (dotProduct < -0.98f)
 						{
 							const size_t finalBorderIdx = borders[i].borderIndex;
 							const size_t borderIdxToRemove = borders[j].borderIndex;
@@ -603,7 +606,7 @@ namespace ShapeOperations
 								Vector2D secondFinalBorderPoint;
 								// replace border i with the merged border in the final shape
 								SimpleBorder& finalBorder = inOutShape[finalBorderIdx];
-								if (finalBorder.a.isNearlyEqualTo(pos.value))
+								if (finalBorder.a.isNearlyEqualTo(pos.value, 0.001f))
 								{
 									finalBorder.a = movedBorderPoint;
 									secondFinalBorderPoint = finalBorder.b;
@@ -615,7 +618,7 @@ namespace ShapeOperations
 								}
 
 								// update secondBorderPoint of the intersection from another side of the final border
-								auto pointsIt = points.find(Vector2DKey(secondFinalBorderPoint));
+								auto pointsIt = points.find(VectorKey(secondFinalBorderPoint));
 								// ignore if the other border was already processed
 								if (pointsIt != points.end())
 								{
@@ -633,8 +636,8 @@ namespace ShapeOperations
 							// link the final border instead of the removed border
 							{
 								const SimpleBorder borderToRemove = inOutShape[borderIdxToRemove];
-								const Vector2D anotherIntersectionPoint = (borderToRemove.a.isNearlyEqualTo(pos.value)) ? borderToRemove.b : borderToRemove.a;
-								auto pointsIt = points.find(Vector2DKey(anotherIntersectionPoint));
+								const Vector2D anotherIntersectionPoint = (borderToRemove.a.isNearlyEqualTo(pos.value, 0.001f)) ? borderToRemove.b : borderToRemove.a;
+								auto pointsIt = points.find(VectorKey(anotherIntersectionPoint));
 								// ignore if the other border was already processed
 								if (pointsIt != points.end())
 								{
