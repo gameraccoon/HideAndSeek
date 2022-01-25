@@ -8,13 +8,19 @@
 inline void EnableFailOnAssert() noexcept
 {
 #ifdef DEBUG_CHECKS
-	gGlobalAssertHandler = [](){ GTEST_FAIL(); };
-	gGlobalFatalAssertHandler = [](){ GTEST_FAIL(); };
+	gGlobalAssertHandler = [](){
+		GTEST_FAIL();
+	};
+	gGlobalFatalAssertHandler = [](){
+		GTEST_FAIL();
+	};
 	gGlobalAllowAssertLogs = true;
 #endif // DEBUG_CHECKS
 
 #ifdef RACCOON_ECS_DEBUG_CHECKS_ENABLED
-	RaccoonEcs::gErrorHandler = [](const std::string& error) { ReportFatalError(error); };
+	RaccoonEcs::gErrorHandler = [](const std::string& error){
+		ReportFatalError(error);
+	};
 #endif // RACCOON_ECS_DEBUG_CHECKS_ENABLED
 }
 
