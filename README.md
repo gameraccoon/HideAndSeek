@@ -34,15 +34,10 @@ Code that can be used in any other module:
 - macros (for compiler specific features support)
 - custom string types (stringIDs, localizable strings, resource paths)
 
-#### ECS
-ECS code that can be used independently of the project (but need to be decoupled from Base module for that, which is trivial though)
-- base classes for ECS Components and Systems
-- logic and helper-classes for entities/components manipulation
-
 #### GameData
 Contains gameplay related data that will be stored in components.
-- ECS Components and data for them
-- some utilitar classes that don't have gameplay code: Vector2D, FSM, ...
+- ECS Components (code-generated from jsons) and data for them
+- some utilitar classes that don't have gameplay-specific code: Vector2D, FSM, ...
 
 #### Utils
 Gameplay specific code and utilities code.
@@ -51,6 +46,7 @@ Gameplay specific code and utilities code.
 
 #### HAL
 Hardware Abstraction Layer
+
 High-level interfaces to input, graphic libraries, sound libraries, ...
 
 #### GameLogic
