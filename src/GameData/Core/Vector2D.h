@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstring>
 
 #include <nlohmann/json_fwd.hpp>
 
@@ -92,20 +93,31 @@ struct Vector2DKey
 {
 	static constexpr float Multiplier = static_cast<float>(1 << PrecisionBin);
 
-	float keyX;
-	float keyY;
+	struct Key {
+		long x;
+		long y;
+	};
 
+	Key key;
 	Vector2D value;
 
 	constexpr explicit Vector2DKey(Vector2D value)
-		: keyX(std::round(value.x * Multiplier))
-		, keyY(std::round(value.y * Multiplier))
+		: key(static_cast<long>(std::round(value.x * Multiplier)), static_cast<long>(std::round(value.y * Multiplier)))
 		, value(value)
 	{}
 
 	[[nodiscard]] constexpr bool operator==(const Vector2DKey& other) const noexcept
 	{
-		return keyX == other.keyX && keyY == other.keyY;
+		return key.x == other.key.x && key.y == other.key.y;
+	}
+
+	[[nodiscard]] constexpr bool operator<(const Vector2DKey& other) const noexcept
+	{
+		return std::memcmp(&key, &other.key, sizeof(Key)) < 0;
+	}
+
+	Vector2D calcRoundedValue() const {
+		return Vector2D{static_cast<float>(key.x) / Multiplier, static_cast<float>(key.y) / Multiplier};
 	}
 };
 
@@ -125,7 +137,7 @@ namespace std
 	{
 		std::size_t operator()(const Vector2DKey<Precision>& k) const
 		{
-			return hash<float>()(k.keyX) ^ std::rotl(hash<float>()(k.keyY), 7);
+			return hash<long>()(k.key.x) ^ std::rotl(hash<long>()(k.key.y), 7);
 		}
 	};
 }

@@ -4,7 +4,6 @@
 
 #include <array>
 #include <algorithm>
-#include <cstring>
 #include <numeric>
 #include <ranges>
 #include <unordered_map>
@@ -75,9 +74,9 @@ namespace ShapeOperations
 		CutDirection cutDirection;
 	};
 
-	size_t addIntersectionPoint(Vector2D intersectionPoint, std::unordered_set<Vector2D>& intersectionPointsSet, std::vector<Vector2D>& intersectionPoints)
+	size_t addIntersectionPoint(Vector2DKey<> intersectionPoint, std::unordered_set<Vector2DKey<>>& intersectionPointsSet, std::vector<Vector2DKey<>>& intersectionPoints)
 	{
-		auto insertionResult = intersectionPointsSet.insert(intersectionPoint);
+		auto insertionResult = intersectionPointsSet.emplace(intersectionPoint);
 
 		if (!insertionResult.second)
 		{
@@ -177,8 +176,8 @@ namespace ShapeOperations
 	static void AddOverlappingLinesIntersectionPoints(
 			const SimpleBorder& borderA,
 			const SimpleBorder& borderB,
-			std::unordered_set<Vector2D>& intersectionPointsSet,
-			std::vector<Vector2D>& intersectionPoints,
+			std::unordered_set<Vector2DKey<>>& intersectionPointsSet,
+			std::vector<Vector2DKey<>>& intersectionPoints,
 			std::vector<BorderIntersection>& borderAIntersections,
 			std::vector<BorderIntersection>& borderBIntersections)
 	{
@@ -204,7 +203,7 @@ namespace ShapeOperations
 		{
 			if (IsInside(transformedB.a.x, transformedA.a.x, transformedA.b.x))
 			{
-				size_t pointIdx = addIntersectionPoint(borderB.a, intersectionPointsSet, intersectionPoints);
+				size_t pointIdx = addIntersectionPoint(Vector2DKey<>(borderB.a), intersectionPointsSet, intersectionPoints);
 
 				borderAIntersections.emplace_back(
 					pointIdx,
@@ -227,7 +226,7 @@ namespace ShapeOperations
 
 			if (IsInside(transformedB.b.x, transformedA.a.x, transformedA.b.x))
 			{
-				size_t pointIdx = addIntersectionPoint(borderB.b, intersectionPointsSet, intersectionPoints);
+				size_t pointIdx = addIntersectionPoint(Vector2DKey<>(borderB.b), intersectionPointsSet, intersectionPoints);
 
 				borderAIntersections.emplace_back(
 					pointIdx,
@@ -250,7 +249,7 @@ namespace ShapeOperations
 
 			if (IsInside(transformedA.a.x, transformedB.a.x, transformedB.b.x))
 			{
-				size_t pointIdx = addIntersectionPoint(borderA.a, intersectionPointsSet, intersectionPoints);
+				size_t pointIdx = addIntersectionPoint(Vector2DKey<>(borderA.a), intersectionPointsSet, intersectionPoints);
 
 				borderAIntersections.emplace_back(
 					pointIdx,
@@ -273,7 +272,7 @@ namespace ShapeOperations
 
 			if (IsInside(transformedA.b.x, transformedB.a.x, transformedB.b.x))
 			{
-				size_t pointIdx = addIntersectionPoint(borderA.b, intersectionPointsSet, intersectionPoints);
+				size_t pointIdx = addIntersectionPoint(Vector2DKey<>(borderA.b), intersectionPointsSet, intersectionPoints);
 
 				borderAIntersections.emplace_back(
 					pointIdx,
@@ -373,20 +372,56 @@ namespace ShapeOperations
 
 	std::vector<SimpleBorder> GetUnion(const std::vector<SimpleBorder>& shape1, const std::vector<SimpleBorder>& shape2)
 	{
+		using VectorKey = Vector2DKey<>;
+		using KeyPair = std::pair<VectorKey, VectorKey>;
+		using IndexPair = std::pair<size_t, size_t>;
+
+		std::vector<VectorKey> shapePoints;
+		std::unordered_map<VectorKey, size_t> shapePointsMap;
+		std::vector<IndexPair> shape1Borders;
+		shape1Borders.reserve(shape1.size());
+		std::vector<IndexPair> shape2Borders;
+		shape2Borders.reserve(shape2.size());
+
+		auto getKeyIndex = [&shapePoints, &shapePointsMap](const Vector2D pos) -> size_t
+		{
+			const VectorKey key(pos);
+			auto it = shapePointsMap.find(key);
+			if (it != shapePointsMap.end())
+			{
+				return it->second;
+			}
+
+			shapePoints.push_back(key);
+			shapePointsMap.emplace(key, shapePoints.size() - 1);
+			return shapePoints.size() - 1;
+		};
+
+		for (const SimpleBorder& border : shape1)
+		{
+			shape1Borders.emplace_back(getKeyIndex(border.a), getKeyIndex(border.b));
+		}
+		for (const SimpleBorder& border : shape2)
+		{
+			shape2Borders.emplace_back(getKeyIndex(border.a), getKeyIndex(border.b));
+		}
+
 		const size_t shape1BordersCount = shape1.size();
-		std::vector<Vector2D> intersectionPoints;
-		std::unordered_set<Vector2D> intersectionPointsSet;
+		std::vector<VectorKey> intersectionPoints;
+		std::unordered_set<VectorKey> intersectionPointsSet;
 		std::unordered_map<size_t, std::vector<BorderIntersection>> borderIntersections;
 
 		// find all intersections
-		for (size_t i = 0; i < shape1.size(); ++i)
+		for (size_t i = 0; i < shape1Borders.size(); ++i)
 		{
-			SimpleBorder border = shape1[i];
+			IndexPair borderIdxs = shape1Borders[i];
+			SimpleBorder border{shapePoints[borderIdxs.first].calcRoundedValue(), shapePoints[borderIdxs.second].calcRoundedValue()};
 			// create items even for the borders without intersections
 			std::vector<BorderIntersection>& intersections = borderIntersections[i];
 			for (size_t j = 0; j < shape2.size(); ++j)
 			{
-				SimpleBorder otherBorder = shape2[j];
+				IndexPair otherBorderIdxs = shape2Borders[j];
+				SimpleBorder otherBorder{shapePoints[otherBorderIdxs.first].calcRoundedValue(), shapePoints[otherBorderIdxs.second].calcRoundedValue()};
 				if (!Collide::AreLinesIntersect(border.a, border.b, otherBorder.a, otherBorder.b))
 				{
 					continue;
@@ -412,7 +447,7 @@ namespace ShapeOperations
 					// are in clockwise or counterclockwise order
 					bool isClockwiseRotation = FindBordersRotationAroundPoint(border, otherBorder, intersectionPoint);
 
-					size_t pointIdx = addIntersectionPoint(intersectionPoint, intersectionPointsSet, intersectionPoints);
+					size_t pointIdx = addIntersectionPoint(VectorKey(intersectionPoint), intersectionPointsSet, intersectionPoints);
 					intersections.emplace_back(
 						pointIdx,
 						CutDirection(
@@ -434,16 +469,14 @@ namespace ShapeOperations
 			}
 		}
 
+		// create empty items for the borders without intersections
+		for (size_t j = 0; j < shape2.size(); ++j)
 		{
-			// create empty items for the borders without intersections
-			for (size_t j = 0; j < shape2.size(); ++j)
-			{
-				borderIntersections.try_emplace(shape1BordersCount + j);
-			}
+			borderIntersections.try_emplace(shape1BordersCount + j);
 		}
 
-		std::vector<SimpleBorder> fracturedBorders;
-		std::unordered_map<Vector2D, std::vector<size_t>> borderConnections;
+		std::vector<KeyPair> fracturedBorders;
+		std::unordered_map<VectorKey, std::vector<size_t>> borderConnections;
 
 		// split borders into smaller parts
 		for (const auto& [borderIndex, intersections] : borderIntersections)
@@ -454,11 +487,11 @@ namespace ShapeOperations
 				BorderPoint(border.a),
 				BorderPoint(border.b)
 			});
-			std::vector<float> borderPointFractions({0.0f, 1.0f});
+			std::vector<float> borderPointFractions({0.0f, (border.a - border.b).size()});
 			for (auto [intersectionIdx, cutDirection] : intersections)
 			{
-				const Vector2D intersectionPoint = intersectionPoints[intersectionIdx];
-				const float intersectionFraction = Vector2D::InvLerp(border.a, border.b, intersectionPoint);
+				const VectorKey& intersectionPoint = intersectionPoints[intersectionIdx];
+				const float intersectionFraction = (border.a - intersectionPoint.value).size();
 				// ToDo: replace binary search with linear (it's likely to have a very small amount of intersections)
 				const auto it = std::lower_bound(borderPointFractions.begin(), borderPointFractions.end(), intersectionFraction);
 				const size_t newPosition = std::distance(borderPointFractions.begin(), it);
@@ -474,37 +507,37 @@ namespace ShapeOperations
 				else
 				{
 					borderPointFractions.insert(it, intersectionFraction);
-					borderPoints.emplace(borderPoints.begin() + static_cast<ptrdiff_t>(newPosition), intersectionPoint, cutDirection);
+					borderPoints.emplace(borderPoints.begin() + static_cast<ptrdiff_t>(newPosition), intersectionPoint.value, cutDirection);
 				}
 			}
 
 			AssertFatal(!borderPoints.empty(), "borderPoints should always contain at least two elements");
 			for (size_t i = 1; i < borderPoints.size(); ++i)
 			{
-				fracturedBorders.emplace_back(borderPoints[i - 1].pos, borderPoints[i].pos);
+				fracturedBorders.emplace_back(VectorKey(borderPoints[i - 1].pos), VectorKey(borderPoints[i].pos));
 
 				if (!IsSideOutside(borderPoints[i - 1].cutDirection.secondSidePosition)
 					&& !IsSideOutside(borderPoints[i].cutDirection.firstSidePosition))
 				{
-					borderConnections[fracturedBorders.back().a].push_back(fracturedBorders.size() - 1);
+					borderConnections[fracturedBorders.back().first].push_back(fracturedBorders.size() - 1);
 				}
 			}
 		}
 
 		// find all chains of borders that should be eliminated
 		std::vector<size_t> bordersToRemove;
-		for (Vector2D intersectionPoint : intersectionPoints)
+		for (const VectorKey& intersectionPoint : intersectionPoints)
 		{
 			const std::vector<size_t>& connections = borderConnections[intersectionPoint];
 			for (size_t startBorderIdx : connections)
 			{
-				if (fracturedBorders[startBorderIdx].a == intersectionPoint)
+				if (fracturedBorders[startBorderIdx].first == intersectionPoint)
 				{
 					size_t borderIdx = startBorderIdx;
 					while(true) // exit in the middle
 					{
 						bordersToRemove.push_back(borderIdx);
-						Vector2D nextPoint = fracturedBorders[borderIdx].b;
+						VectorKey nextPoint(fracturedBorders[borderIdx].second);
 						const std::vector<size_t>& nextConnections = borderConnections[nextPoint];
 						size_t nextConnectionsCount = nextConnections.size();
 
@@ -534,15 +567,24 @@ namespace ShapeOperations
 
 		// remove any duplicated borders
 		// ToDo: probably need to correct the logic above to normally eliminate such borders
-		// instead of doing this NlogN overcomplicated and not always correct (-0) stuff to fight a super-rare case
-		static_assert(sizeof(SimpleBorder) == sizeof(float)*4, "SimpleBorder should have size of 4 floats");
-		std::ranges::sort(fracturedBorders, [](const SimpleBorder& left, const SimpleBorder& right) {
-			return std::memcmp(&left, &right, sizeof(SimpleBorder)) < 0;
-		});
+		// instead of doing this NlogN overcomplicated stuff to fight a super-rare case
+		std::ranges::sort(fracturedBorders);
 		auto last = std::unique(fracturedBorders.begin(), fracturedBorders.end());
 		fracturedBorders.erase(last, fracturedBorders.end());
 
-		return fracturedBorders;
+		std::vector<SimpleBorder> resultingBorders;
+		resultingBorders.resize(fracturedBorders.size());
+
+		std::ranges::transform(
+			fracturedBorders.begin(),
+			fracturedBorders.end(),
+			resultingBorders.begin(),
+			[](const KeyPair& k){
+				return SimpleBorder{ k.first.value, k.second.value };
+			}
+		);
+
+		return resultingBorders;
 	}
 
 	struct BorderInfo
