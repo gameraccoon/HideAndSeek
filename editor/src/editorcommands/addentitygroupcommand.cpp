@@ -6,8 +6,6 @@
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Serialization/Json/EntityManager.h"
 
-#include "src/EditorDataAccessor.h"
-
 AddEntityGroupCommand::AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, const Json::ComponentSerializationHolder& jsonSerializerHolder, const Vector2D& shift)
 	: EditorCommand(EffectBitset(EffectType::Entities))
 	, mEntities(entities)
@@ -18,11 +16,10 @@ AddEntityGroupCommand::AddEntityGroupCommand(const std::vector<nlohmann::json>& 
 
 void AddEntityGroupCommand::doCommand(World* world)
 {
-	RaccoonEcs::EntityTransferer entityTransferer(gEditorDataAccessor);
 	mCreatedEntities.clear();
 	CellPos initialPos(0, 0);
 	WorldCell& cell = world->getSpatialData().getOrCreateCell(initialPos);
-	EntityManager& cellEntityManager = gEditorDataAccessor.getSingleThreadedEntityManager(cell.getEntityManager());
+	EntityManager& cellEntityManager = cell.getEntityManager();
 	for (const auto& serializedObject : mEntities)
 	{
 		CellPos cellPos = initialPos;
@@ -38,7 +35,7 @@ void AddEntityGroupCommand::doCommand(World* world)
 			{
 				WorldCell& otherCell = world->getSpatialData().getOrCreateCell(cellPos);
 				// the component pointer get invalidated from this line
-				entityTransferer.transferEntity(cell.getEntityManager(), otherCell.getEntityManager(), entity);
+				cell.getEntityManager().transferEntityTo(otherCell.getEntityManager(), entity);
 			}
 		}
 		mCreatedEntities.emplace_back(entity, cellPos);
@@ -50,6 +47,6 @@ void AddEntityGroupCommand::undoCommand(World* world)
 	for (auto [entity, cellPos] : mCreatedEntities)
 	{
 		WorldCell& cell = world->getSpatialData().getOrCreateCell(cellPos);
-		gEditorDataAccessor.getSingleThreadedEntityManager(cell.getEntityManager()).removeEntity(entity.getEntity());
+		cell.getEntityManager().removeEntity(entity.getEntity());
 	}
 }

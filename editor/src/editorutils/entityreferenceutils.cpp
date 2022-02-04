@@ -2,8 +2,6 @@
 
 #include "GameData/World.h"
 
-#include "src/EditorDataAccessor.h"
-
 namespace Utils
 {
 	std::optional<EntityView> GetEntityView(const EntityReference& reference, World* world)
@@ -12,7 +10,7 @@ namespace Utils
 		{
 			if (WorldCell* cell = world->getSpatialData().getCell(*reference.cellPos)) // spatial entity
 			{
-				return EntityView(reference.entity, gEditorDataAccessor.getSingleThreadedEntityManager(cell->getEntityManager()));
+				return EntityView(reference.entity, cell->getEntityManager());
 			}
 			else
 			{
@@ -21,7 +19,7 @@ namespace Utils
 		}
 		else // world entity
 		{
-			return EntityView(reference.entity, gEditorDataAccessor.getSingleThreadedEntityManager(world->getEntityManager()));
+			return EntityView(reference.entity, world->getEntityManager());
 		}
 	}
 
@@ -31,7 +29,7 @@ namespace Utils
 		{
 			if (WorldCell* cell = world->getSpatialData().getCell(spatialEntity.cell))
 			{
-				return EntityView(spatialEntity.entity.getEntity(), gEditorDataAccessor.getSingleThreadedEntityManager(cell->getEntityManager()));
+				return EntityView(spatialEntity.entity.getEntity(), cell->getEntityManager());
 			}
 		}
 		return std::nullopt;
