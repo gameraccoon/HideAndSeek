@@ -103,6 +103,7 @@ private:
 	void onCopyCommand();
 	void onPasteCommand();
 	void onDeleteCommand();
+	void unselectNonExistingEntities();
 	QVector2D getWidgetCenter() const;
 
 private:

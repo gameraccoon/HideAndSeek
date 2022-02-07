@@ -212,6 +212,8 @@ void TransformEditorToolbox::onCommandExecuted(EditorCommand::EffectBitset effec
 		}
 	}
 
+	unselectNonExistingEntities();
+
 	mContent->repaint();
 }
 
@@ -385,6 +387,32 @@ void TransformEditorToolbox::onDeleteCommand()
 	);
 
 	mContent->repaint();
+}
+
+void TransformEditorToolbox::unselectNonExistingEntities()
+{
+	World* world = mContent->mWorld;
+
+	if (world == nullptr)
+	{
+		return;
+	}
+
+	auto [begin, end] = std::ranges::remove_if(mContent->mSelectedEntities,
+		[world](const SpatialEntity& spatialEntity)
+		{
+			WorldCell* cell = world->getSpatialData().getCell(spatialEntity.cell);
+
+			if (cell == nullptr) {
+				return true;
+			}
+
+			return !cell->getEntityManager().hasEntity(spatialEntity.entity.getEntity());
+		}
+	);
+	mContent->mSelectedEntities.erase(begin, end);
+
+	mContent->setGroupCenter(GetEntityGroupPosition(mContent->mSelectedEntities, mContent->mWorld));
 }
 
 QVector2D TransformEditorToolbox::getWidgetCenter() const
