@@ -21,6 +21,8 @@ namespace ShapeOperations
 		explicit MergedGeometry(const std::vector<SimpleBorder>& simpleBorders);
 		explicit MergedGeometry(std::vector<SimpleBorder>&& simpleBorders);
 
+		void updateAABB();
+
 		Shape borders;
 		BoundingBox aabb
 		{

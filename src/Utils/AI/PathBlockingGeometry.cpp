@@ -49,21 +49,11 @@ namespace PathBlockingGeometry
 		);
 
 		// gather the results as set of points
-		outGeometry.clear();
-		for (std::vector<Vector2D>& geometry : splitGeometry)
+		outGeometry = splitGeometry;
+		for (std::vector<Vector2D>& geometry : outGeometry)
 		{
-			const size_t pointsSize = geometry.size();
-
-			outGeometry.emplace_back();
-			std::vector<Vector2D>& polygon = outGeometry.back();
-			polygon.resize(pointsSize);
-
-			for (size_t i = 0; i < pointsSize; ++i)
-			{
-				// path blocking geometry has the opposite winding order
-				const Vector2D point = geometry[pointsSize - 1 - i];
-				polygon[i] = point;
-			}
+			// path blocking geometry has the opposite winding order
+			std::reverse(geometry.begin(), geometry.end());
 		}
 	}
 } // namespace PathBlockingGeometry

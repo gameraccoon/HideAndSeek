@@ -744,7 +744,7 @@ namespace ShapeOperations
 			return;
 		}
 
-		for (size_t i = 0; i < inOutGeometry.size() - 1; ++i)
+		for (size_t i = 0; i + 1 < inOutGeometry.size(); ++i)
 		{
 			MergedGeometry& firstGeometry = inOutGeometry[i];
 			for (size_t j = i + 1; j < inOutGeometry.size(); ++j)
@@ -757,11 +757,11 @@ namespace ShapeOperations
 
 					// save the new geometry to the position of the first figure
 					firstGeometry.borders = std::move(newShape);
+					firstGeometry.updateAABB();
 					// remove the second figure
 					inOutGeometry.erase(inOutGeometry.begin() + static_cast<ptrdiff_t>(j));
 					// retry all collision tests with the first figure
 					--i;
-					break;
 				}
 			}
 		}
@@ -800,14 +800,16 @@ namespace ShapeOperations
 	MergedGeometry::MergedGeometry(const std::vector<SimpleBorder>& simpleBorders)
 		: borders(simpleBorders)
 	{
-		for (const SimpleBorder& border : borders)
-		{
-			UpdateAABBFromBorder(aabb, border);
-		}
+		updateAABB();
 	}
 
 	MergedGeometry::MergedGeometry(std::vector<SimpleBorder>&& simpleBorders)
 		: borders(std::move(simpleBorders))
+	{
+		updateAABB();
+	}
+
+	void MergedGeometry::updateAABB()
 	{
 		for (const SimpleBorder& border : borders)
 		{
