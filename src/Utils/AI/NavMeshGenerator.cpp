@@ -70,8 +70,8 @@ namespace NavMeshGenerator
 			polygons.push_back(std::move(ttplPolygon));
 		}
 
-		TPPLPartition pp;
-		pp.Triangulate_MONO(&polygons, &resultPolygons);
+		TPPLPartition pp{};
+		pp.Triangulate_EC(&polygons, &resultPolygons);
 
 		std::unordered_map<IntVector2D, size_t> verticesMap;
 		for (const TPPLPoly& polygon : resultPolygons)

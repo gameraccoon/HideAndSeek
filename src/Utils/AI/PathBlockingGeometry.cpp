@@ -13,7 +13,7 @@
 
 namespace PathBlockingGeometry
 {
-	static const float GEOMETRY_EXTENT = 0.0f;
+	static const float GEOMETRY_EXTENT = 17.0f;
 
 	void CalculatePathBlockingGeometry(std::vector<std::vector<Vector2D>>& outGeometry, const TupleVector<const CollisionComponent*, const TransformComponent*>& components)
 	{
@@ -39,21 +39,19 @@ namespace PathBlockingGeometry
 		// merge intersecting shapes
 		ShapeOperations::MergeGeometry(mergedGeometry);
 
-		std::vector<std::vector<Vector2D>> splitGeometry;
-		splitGeometry.reserve(mergedGeometry.size() * 2);
+		outGeometry.clear();
+		outGeometry.reserve(mergedGeometry.size());
 		std::ranges::for_each(mergedGeometry,
-			[&splitGeometry](ShapeOperations::MergedGeometry& geometry)
+			[&outGeometry](ShapeOperations::MergedGeometry& geometry)
 			{
-				ShapeOperations::SplitIntoConvexShapes(splitGeometry, geometry.borders);
+				ShapeOperations::SortBorders(geometry.borders);
+				outGeometry.emplace_back(geometry.borders.size());
+				std::vector<Vector2D>& newGeometry = outGeometry.back();
+				for (size_t i = 0; i < geometry.borders.size(); ++i)
+				{
+					newGeometry[geometry.borders.size() - i - 1] = geometry.borders[i].a;
+				}
 			}
 		);
-
-		// gather the results as set of points
-		outGeometry = splitGeometry;
-		for (std::vector<Vector2D>& geometry : outGeometry)
-		{
-			// path blocking geometry has the opposite winding order
-			std::reverse(geometry.begin(), geometry.end());
-		}
 	}
 } // namespace PathBlockingGeometry

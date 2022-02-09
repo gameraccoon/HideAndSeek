@@ -824,7 +824,7 @@ namespace ShapeOperations
 
 		std::vector<TPPLPoly> polygons;
 
-		for (size_t i = 0; i < shapes.size() - 1; ++i)
+		for (size_t i = 0; i + 1 < shapes.size(); ++i)
 		{
 			const size_t pointsCount = shapes[i + 1] - shapes[i];
 
