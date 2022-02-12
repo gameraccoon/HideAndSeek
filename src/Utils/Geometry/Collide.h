@@ -23,6 +23,8 @@ namespace Collide
 	bool AreLinesParallel(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2);
 	bool IsLineIntersectAABB(const BoundingBox& box, const Vector2D& start, const Vector2D& finish);
 	Vector2D GetPointIntersect2Lines(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2);
+	float DistanceToLineSegmentSq(Vector2D lineA, Vector2D lineB, Vector2D point);
+	float FindDistanceToConvexHullSq(const std::vector<Vector2D>& hull, Vector2D point);
 }
 
 // macro that calls CODE for each border, where i and j are indexes of the vertices of this border

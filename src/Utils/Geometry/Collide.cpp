@@ -357,4 +357,30 @@ namespace Collide
 		// if lines not intersected
 		return ZERO_VECTOR;
 	}
+
+	float DistanceToLineSegmentSq(Vector2D lineA, Vector2D lineB, Vector2D point)
+	{
+		const float segmentLengthSq = (lineB - lineA).qSize();
+		if (segmentLengthSq == 0.0f) return (point - lineA).qSize();
+		const float t = std::clamp(Vector2D::DotProduct(point - lineA, lineB - lineA) / segmentLengthSq, 0.0f, 1.0f);
+		const Vector2D projection = lineA + t * (lineB - lineA);
+		return (point - projection).qSize();
+	}
+
+	float FindDistanceToConvexHullSq(const std::vector<Vector2D>& hull, Vector2D point)
+	{
+		float minDist = std::numeric_limits<float>::max();
+
+		const size_t hullSize = hull.size();
+		FOR_EACH_BORDER(hullSize,
+		{
+			const float dist = DistanceToLineSegmentSq(hull[i], hull[j], point);
+			if (dist < minDist)
+			{
+				minDist = dist;
+			}
+		})
+
+		return minDist;
+	}
 }
