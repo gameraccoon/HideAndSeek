@@ -17,7 +17,7 @@ namespace PathFinding
 
 	bool IsPointInsideConvexHull(Vector2D point, const std::vector<Vector2D>& hull)
 	{
-		size_t hullSize = hull.size();
+		const size_t hullSize = hull.size();
 		FOR_EACH_BORDER(hullSize,
 		{
 			if (Collide::SignedArea(point, hull[i], hull[j]) < 0.0f)
@@ -56,7 +56,40 @@ namespace PathFinding
 			}
 		}
 
-		return INVALID_POLYGON;
+		// try to search closest polygon
+		size_t closestPolygon = INVALID_POLYGON;
+		float minDistanceSq = std::numeric_limits<float>::max();
+		for (int dx = -1; dx <= 1; ++dx)
+		{
+			const int pointX = cellPoint.x + dx;
+			for (int dy = -1; dy <= 1; ++dy)
+			{
+				const int pointY = cellPoint.y + dy;
+				if (pointX >= 0 && pointX < navMesh.spatialHash.hashSize.x
+					&&
+					pointY >= 0 && pointY < navMesh.spatialHash.hashSize.y)
+				{
+					const std::vector<size_t>& cellPolygons = navMesh.spatialHash.polygonsHash[cellPoint.x + cellPoint.y * navMesh.spatialHash.hashSize.x];
+					for (size_t polygon : cellPolygons)
+					{
+						size_t polyShift = polygon * navMesh.geometry.verticesPerPoly;
+						for (size_t i = 0; i < navMesh.geometry.verticesPerPoly; ++i)
+						{
+							polygonPoints[i] = navMesh.geometry.vertices[navMesh.geometry.indexes[polyShift + i]];
+						}
+
+						const float distSq = Collide::FindDistanceToConvexHullSq(polygonPoints, point);
+						if (distSq < minDistanceSq)
+						{
+							minDistanceSq = distSq;
+							closestPolygon = polygon;
+						}
+					}
+				}
+			}
+		}
+
+		return closestPolygon;
 	}
 
 	struct LineSegmentToNeighborIntersection
