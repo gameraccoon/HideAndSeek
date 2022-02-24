@@ -142,7 +142,7 @@ void TransformEditorToolbox::show()
 	QObject::connect(scaleSlider, &QSlider::valueChanged, this, &TransformEditorToolbox::onScaleChanged);
 	layout->addWidget(scaleSlider);
 
-	mContent->OnEntitiesMoved.assign([this](std::vector<SpatialEntity> entities, const Vector2D& shift){onEntitiesMoved(entities, shift);});
+	mContent->OnEntitiesMoved.assign([this](const std::vector<SpatialEntity>& entities, const Vector2D& shift){onEntitiesMoved(entities, shift);});
 }
 
 bool TransformEditorToolbox::isShown() const

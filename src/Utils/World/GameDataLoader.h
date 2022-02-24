@@ -7,6 +7,11 @@
 class World;
 class GameData;
 
+
+namespace Json {
+	class ComponentSerializationHolder;
+}
+
 namespace GameDataLoader
 {
 	void SaveWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder);

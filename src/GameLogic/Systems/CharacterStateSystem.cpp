@@ -46,7 +46,7 @@ void CharacterStateSystem::update()
 		auto allCellManagers = world.getSpatialData().getAllCellManagers();
 		// update states
 		allCellManagers.forEachComponentSet<CharacterStateComponent>(
-			[stateMachine, dt](CharacterStateComponent* characterState)
+			[&stateMachine](CharacterStateComponent* characterState)
 		{
 			// calculate state
 			CharacterState state = stateMachine->getCharacterSM().getNextState(characterState->getBlackboard(), characterState->getState());
@@ -55,7 +55,7 @@ void CharacterStateSystem::update()
 
 		// update movements
 		allCellManagers.forEachComponentSet<const CharacterStateComponent, MovementComponent>(
-			[stateMachine, dt](const CharacterStateComponent* characterState, MovementComponent* movement)
+			[dt](const CharacterStateComponent* characterState, MovementComponent* movement)
 		{
 			CharacterState state = characterState->getState();
 			// allow movement
@@ -71,7 +71,7 @@ void CharacterStateSystem::update()
 
 		// update animation
 		allCellManagers.forEachComponentSet<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>(
-			[stateMachine, dt](const CharacterStateComponent* characterState, const MovementComponent* movement, AnimationGroupsComponent* animationGroups)
+			[](const CharacterStateComponent* characterState, const MovementComponent* movement, AnimationGroupsComponent* animationGroups)
 		{
 			CharacterState state = characterState->getState();
 

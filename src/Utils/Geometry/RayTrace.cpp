@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#include "Base/Types/TemplateAliases.h"
+
 #include "Utils/Geometry/RayTrace.h"
 
 #include <algorithm>

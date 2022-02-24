@@ -12,19 +12,6 @@
 
 #include "Utils/World/GameDataLoader.h"
 
-#include "GameLogic/Systems/RenderSystem.h"
-#include "GameLogic/Systems/ControlSystem.h"
-#include "GameLogic/Systems/CollisionSystem.h"
-#include "GameLogic/Systems/ResourceStreamingSystem.h"
-#include "GameLogic/Systems/AiSystem.h"
-#include "GameLogic/Systems/CharacterStateSystem.h"
-#include "GameLogic/Systems/DebugDrawSystem.h"
-#include "GameLogic/Systems/MovementSystem.h"
-#include "GameLogic/Systems/AnimationSystem.h"
-#include "GameLogic/Systems/CameraSystem.h"
-#include "GameLogic/Systems/WeaponSystem.h"
-#include "GameLogic/Systems/DeadEntitiesDestructionSystem.h"
-
 #ifdef IMGUI_ENABLED
 #include "GameLogic/Systems/ImguiSystem.h"
 #endif // IMGUI_ENABLED
