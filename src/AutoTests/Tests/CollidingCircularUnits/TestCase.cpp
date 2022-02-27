@@ -28,14 +28,14 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& argumen
 {
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 
-	getSystemsManager().registerSystem<TestUnitsCountControlSystem>(getWorldHolder());
-	getSystemsManager().registerSystem<TestCircularUnitsSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
-	getSystemsManager().registerSystem<CameraSystem>(getWorldHolder(), getInputData());
-	getSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
-	getSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getTime(), getResourceManager(), getThreadPool());
+	getGameLogicSystemsManager().registerSystem<TestUnitsCountControlSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<TestCircularUnitsSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder(), getInputData());
+	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
+	getGameLogicSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getTime(), getResourceManager(), getThreadPool());
 
 	Vector2D playerPos{ZERO_VECTOR};
 

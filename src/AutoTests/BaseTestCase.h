@@ -24,7 +24,7 @@ public:
 	BaseTestCase(int width, int height);
 
 	TestChecklist start(const ArgumentsParser& arguments);
-	void innerUpdate(float dt) final;
+	void fixedTimeUpdate(float dt) final;
 	void setKeyboardKeyState(int, bool) override {}
 	void setMouseKeyState(int, bool) override {}
 

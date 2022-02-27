@@ -73,28 +73,28 @@ void HapGame::setMouseKeyState(int key, bool isPressed)
 
 void HapGame::initSystems()
 {
-	SCOPED_PROFILER("Game::initSystems");
-	getSystemsManager().registerSystem<ControlSystem>(getWorldHolder(), getInputData());
-	getSystemsManager().registerSystem<AiSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<WeaponSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<DeadEntitiesDestructionSystem>(getWorldHolder());
-	getSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
-	getSystemsManager().registerSystem<CameraSystem>(getWorldHolder(), getInputData());
-	getSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
-	getSystemsManager().registerSystem<AnimationSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getTime(), getResourceManager(), getThreadPool());
-	getSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getTime(), getResourceManager());
+	SCOPED_PROFILER("HapGame::initSystems");
+	getPreFrameSystemsManager().registerSystem<ControlSystem>(getWorldHolder(), getInputData());
+	getGameLogicSystemsManager().registerSystem<AiSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<WeaponSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<DeadEntitiesDestructionSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder(), getInputData());
+	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<AnimationSystem>(getWorldHolder(), getTime());
+	getPostFrameSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
+	getPostFrameSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getTime(), getResourceManager(), getThreadPool());
+	getPostFrameSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getTime(), getResourceManager());
 
 #ifdef IMGUI_ENABLED
-	getSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, getEngine());
+	getPostFrameSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, getEngine());
 #endif // IMGUI_ENABLED
 }
 
 void HapGame::initResources()
 {
-	SCOPED_PROFILER("Game::initResources");
+	SCOPED_PROFILER("HapGame::initResources");
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
-	getSystemsManager().initResources();
+	Game::initResources();
 }

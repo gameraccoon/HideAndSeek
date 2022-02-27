@@ -33,10 +33,9 @@ public:
 	Game(int width, int height);
 
 	void start(const ArgumentsParser& arguments, int workerThreadsCount);
-	void update(float dt) final;
-	void preInnderUpdate();
-	virtual void innerUpdate(float dt);
-	void postInnerUpdate();
+	void dynamicTimePreFrameUpdate(float dt) final;
+	void fixedTimeUpdate(float dt) override;
+	void dynamicTimePostFrameUpdate(float dt) final;
 	void setKeyboardKeyState(int key, bool isPressed) override;
 	void setMouseKeyState(int key, bool isPressed) override;
 	void initResources() override;
@@ -44,7 +43,9 @@ public:
 protected:
 	ComponentFactory& getComponentFactory() { return mComponentFactory; }
 	WorldHolder& getWorldHolder() { return mWorldHolder; }
-	RaccoonEcs::SystemsManager& getSystemsManager() { return mSystemsManager; }
+	RaccoonEcs::SystemsManager& getPreFrameSystemsManager() { return mPreFrameSystemsManager; }
+	RaccoonEcs::SystemsManager& getGameLogicSystemsManager() { return mGameLogicSystemsManager; }
+	RaccoonEcs::SystemsManager& getPostFrameSystemsManager() { return mPostFrameSystemsManager; }
 	InputData& getInputData() { return mInputData; }
 	const TimeData& getTime() const { return mTime; }
 	RaccoonEcs::ThreadPool& getThreadPool() { return mThreadPool; }
@@ -65,7 +66,9 @@ private:
 	InputData mInputData;
 
 	RaccoonEcs::ThreadPool mThreadPool;
-	RaccoonEcs::SystemsManager mSystemsManager;
+	RaccoonEcs::SystemsManager mPreFrameSystemsManager;
+	RaccoonEcs::SystemsManager mGameLogicSystemsManager;
+	RaccoonEcs::SystemsManager mPostFrameSystemsManager;
 	Json::ComponentSerializationHolder mComponentSerializers;
 	TimeData mTime;
 	RenderThreadManager mRenderThread;
@@ -79,6 +82,7 @@ private:
 	std::vector<double> mFrameDurations;
 	std::vector<std::pair<size_t, ScopedProfilerThreadData::Records>> mScopedProfileRecords;
 	std::mutex mScopedProfileRecordsMutex;
+	std::chrono::time_point<std::chrono::system_clock> mFrameBeginTime;
 #endif // ENABLE_SCOPED_PROFILER
 
 #ifdef IMGUI_ENABLED

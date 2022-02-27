@@ -22,7 +22,10 @@ namespace HAL
 	ConcurrentAccessDetector gSDLAccessDetector;
 #endif
 
-	static const float MAX_FRAME_TICKS = 300.0f;
+	static const float ONE_SECOND_TICKS = 1000.0f;
+	static const float ONE_TICK_SECONDS = 1.0f / ONE_SECOND_TICKS;
+	static const Uint32 ONE_FRAME_TICKS = 16;
+	static const float ONE_FRAME_SEC = ONE_FRAME_TICKS * ONE_TICK_SECONDS;
 
 	struct Engine::Impl
 	{
@@ -30,7 +33,7 @@ namespace HAL
 		Internal::Window mWindow;
 		Internal::GlContext mGlContext;
 		Graphics::Renderer mRenderer;
-		float mElapsedTicks;
+		Uint32 mLastFrameTicks;
 		IGame* mGame;
 		bool mQuit;
 
@@ -43,7 +46,7 @@ namespace HAL
 			, mWindow(windowWidth, windowHeight)
 			, mGlContext(mWindow)
 			, mRenderer()
-			, mElapsedTicks(static_cast<float>(SDL_GetTicks()))
+			, mLastFrameTicks(SDL_GetTicks())
 			, mGame(nullptr)
 			, mQuit(false)
 			, mMouseX(static_cast<float>(windowWidth) * 0.5f)
@@ -156,21 +159,38 @@ namespace HAL
 		{
 			parseEvents();
 
-			float currentTicks = static_cast<float>(SDL_GetTicks());
-			float lastFrameTicks = currentTicks - mElapsedTicks;
-			mElapsedTicks = currentTicks;
+			Uint32 currentTicks = static_cast<float>(SDL_GetTicks());
 
-			if (lastFrameTicks == 0)
-			{
+			// time wrapped around, start counting time to frame from now
+			if (currentTicks < mLastFrameTicks) {
+				mLastFrameTicks = currentTicks;
 				continue;
 			}
 
-			lastFrameTicks = std::min(lastFrameTicks, MAX_FRAME_TICKS);
-			float lastFrameSeconds = lastFrameTicks * 0.001f;
-
-			if (mGame)
+			Uint32 ticks = currentTicks - mLastFrameTicks;
+			if (ticks >= ONE_FRAME_TICKS)
 			{
-				mGame->update(lastFrameSeconds);
+				const float lastFrameDurationSec = ticks * ONE_TICK_SECONDS;
+
+				if (mGame)
+				{
+					mGame->dynamicTimePreFrameUpdate(lastFrameDurationSec);
+				}
+
+				while (ticks >= ONE_FRAME_TICKS)
+				{
+					if (mGame)
+					{
+						mGame->fixedTimeUpdate(ONE_FRAME_SEC);
+					}
+					ticks -= ONE_FRAME_TICKS;
+				}
+
+				if (mGame)
+				{
+					mGame->dynamicTimePostFrameUpdate(lastFrameDurationSec);
+				}
+				mLastFrameTicks = currentTicks - ticks;
 			}
 		}
 	}

@@ -25,13 +25,11 @@ TestChecklist BaseTestCase::start(const ArgumentsParser& arguments)
 	return std::move(mTestChecklist);
 }
 
-void BaseTestCase::innerUpdate(float)
+void BaseTestCase::fixedTimeUpdate(float dt)
 {
-	constexpr float fixedDt = 1.0f / 60.0f;
-
 	do
 	{
-		Game::innerUpdate(fixedDt);
+		Game::fixedTimeUpdate(dt);
 		++mTicksCount;
 	}
 	while (mOneFrame && mTicksCount < mTicksToFinish);

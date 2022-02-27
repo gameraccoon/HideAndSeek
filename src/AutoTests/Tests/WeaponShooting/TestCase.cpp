@@ -38,17 +38,17 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& arguments)
 	mTestChecklist.checks.emplace("destroyedEntities", std::make_unique<DestroyedEntitiesTestCheck>(100));
 	DestroyedEntitiesTestCheck& destroyedEntitiesTestCheck = *static_cast<DestroyedEntitiesTestCheck*>(mTestChecklist.checks["destroyedEntities"].get());
 
-	getSystemsManager().registerSystem<TestSpawnShootableUnitsSystem>(getWorldHolder());
-	getSystemsManager().registerSystem<TestShootingControlSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
-	getSystemsManager().registerSystem<CameraSystem>(getWorldHolder(), getInputData());
-	getSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(),getTime());
-	getSystemsManager().registerSystem<WeaponSystem>(getWorldHolder(), getTime());
-	getSystemsManager().registerSystem<TestDestroyedEntitiesRegistrationSystem>(getWorldHolder(), destroyedEntitiesTestCheck);
-	getSystemsManager().registerSystem<DeadEntitiesDestructionSystem>(getWorldHolder());
-	getSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
-	getSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getTime(), getResourceManager(), getThreadPool());
+	getGameLogicSystemsManager().registerSystem<TestSpawnShootableUnitsSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<TestShootingControlSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder(), getInputData());
+	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(),getTime());
+	getGameLogicSystemsManager().registerSystem<WeaponSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<TestDestroyedEntitiesRegistrationSystem>(getWorldHolder(), destroyedEntitiesTestCheck);
+	getGameLogicSystemsManager().registerSystem<DeadEntitiesDestructionSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
+	getGameLogicSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getTime(), getResourceManager(), getThreadPool());
 
 	World& world = getWorldHolder().getWorld();
 

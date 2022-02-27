@@ -70,26 +70,13 @@ void Game::setMouseKeyState(int key, bool isPressed)
 	mInputData.mouseKeyStates.updateState(key, isPressed);
 }
 
-void Game::update(float dt)
+void Game::dynamicTimePreFrameUpdate(float /*dt*/)
 {
-	SCOPED_PROFILER("Game::update");
+	SCOPED_PROFILER("Game::dynamicTimePreFrameUpdate");
 #ifdef ENABLE_SCOPED_PROFILER
-	std::chrono::time_point<std::chrono::system_clock> frameBeginTime = std::chrono::system_clock::now();
+	mFrameBeginTime = std::chrono::system_clock::now();
 #endif // ENABLE_SCOPED_PROFILER
 
-	preInnderUpdate();
-	innerUpdate(dt);
-	postInnerUpdate();
-
-#ifdef ENABLE_SCOPED_PROFILER
-	std::chrono::time_point<std::chrono::system_clock> frameEndTime = std::chrono::system_clock::now();
-	mFrameDurations.push_back(std::chrono::duration<double, std::micro>(frameEndTime - frameBeginTime).count());
-#endif // ENABLE_SCOPED_PROFILER
-}
-
-void Game::preInnderUpdate()
-{
-	SCOPED_PROFILER("Game::preInnderUpdate");
 	std::unique_ptr<RenderData> renderCommands = std::make_unique<RenderData>();
 	TemplateHelpers::EmplaceVariant<SwapBuffersCommand>(renderCommands->layers);
 	mRenderThread.getAccessor().submitData(std::move(renderCommands));
@@ -98,31 +85,44 @@ void Game::preInnderUpdate()
 	mInputData.mousePos = getEngine().getMousePos();
 
 	mDebugBehavior.preInnerUpdate(*this);
+
+	mPreFrameSystemsManager.update();
 }
 
-void Game::innerUpdate(float dt)
+void Game::fixedTimeUpdate(float dt)
 {
-	SCOPED_PROFILER("Game::innerUpdate");
+	SCOPED_PROFILER("Game::fixedTimeUpdate");
+
 	mTime.update(dt);
-	mSystemsManager.update();
+	mGameLogicSystemsManager.update();
 }
 
-void Game::postInnerUpdate()
+void Game::dynamicTimePostFrameUpdate(float /*dt*/)
 {
-	SCOPED_PROFILER("Game::postInnerUpdate");
+	SCOPED_PROFILER("Game::dynamicTimePostFrameUpdate");
+
+	mPostFrameSystemsManager.update();
+
 	// test code
 	//mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
 
 	mInputData.clearAfterFrame();
 
 	mDebugBehavior.postInnerUpdate(*this);
+
+#ifdef ENABLE_SCOPED_PROFILER
+	std::chrono::time_point<std::chrono::system_clock> frameEndTime = std::chrono::system_clock::now();
+	mFrameDurations.push_back(std::chrono::duration<double, std::micro>(frameEndTime - mFrameBeginTime).count());
+#endif // ENABLE_SCOPED_PROFILER
 }
 
 void Game::initResources()
 {
 	SCOPED_PROFILER("Game::initResources");
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
-	mSystemsManager.initResources();
+	mPreFrameSystemsManager.initResources();
+	mGameLogicSystemsManager.initResources();
+	mPostFrameSystemsManager.initResources();
 }
 
 void Game::onGameShutdown()
@@ -166,7 +166,9 @@ void Game::onGameShutdown()
 		ProfileDataWriter::PrintFrameDurationStatsToFile(mFrameDurationsOutputPath, mFrameDurations);
 	}
 #endif // ENABLE_SCOPED_PROFILER
-	mSystemsManager.shutdown();
+	mPreFrameSystemsManager.shutdown();
+	mGameLogicSystemsManager.shutdown();
+	mPostFrameSystemsManager.shutdown();
 }
 
 void Game::workingThreadSaveProfileData()
