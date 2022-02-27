@@ -20,7 +20,12 @@ TestChecklist BaseTestCase::start(const ArgumentsParser& arguments)
 {
 	mOneFrame = arguments.hasArgument("one-frame");
 
+	ComponentsRegistration::RegisterComponents(getComponentFactory());
+	ComponentsRegistration::RegisterJsonSerializers(getComponentSerializers());
+
 	initTestCase(arguments);
+
+	Game::start(arguments, 3);
 
 	return std::move(mTestChecklist);
 }
@@ -39,14 +44,6 @@ void BaseTestCase::fixedTimeUpdate(float dt)
 		finalizeTestCase();
 		getEngine().quit();
 	}
-}
-
-void BaseTestCase::startGame(const ArgumentsParser& arguments)
-{
-	ComponentsRegistration::RegisterComponents(getComponentFactory());
-	ComponentsRegistration::RegisterJsonSerializers(getComponentSerializers());
-
-	Game::start(arguments, 3);
 }
 
 void BaseTestCase::finalizeTestCase()

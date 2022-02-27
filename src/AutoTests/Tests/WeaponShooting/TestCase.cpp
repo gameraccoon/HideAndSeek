@@ -31,7 +31,7 @@
 #include "AutoTests/Tests/WeaponShooting/Systems/TestSpawnShootableUnitsSystem.h"
 #include "AutoTests/Tests/WeaponShooting/Systems/TestDestroyedEntitiesRegistrationSystem.h"
 
-void WeaponShootingTestCase::initTestCase(const ArgumentsParser& arguments)
+void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 {
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 
@@ -91,6 +91,4 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& arguments)
 	camera.addComponent<MovementComponent>();
 
 	mTicksToFinish = 300;
-
-	startGame(arguments);
 }

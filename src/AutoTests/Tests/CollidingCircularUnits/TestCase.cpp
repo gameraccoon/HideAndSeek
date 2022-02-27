@@ -24,7 +24,7 @@
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestCircularUnitsSystem.h"
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestUnitsCountControlSystem.h"
 
-void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& arguments)
+void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 {
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 
@@ -68,6 +68,4 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& argumen
 		transform->setLocation(cameraPos);
 	}
 	camera.addComponent<MovementComponent>();
-
-	startGame(arguments);
 }

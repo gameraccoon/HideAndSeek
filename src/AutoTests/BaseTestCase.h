@@ -29,7 +29,6 @@ public:
 	void setMouseKeyState(int, bool) override {}
 
 protected:
-	void startGame(const ArgumentsParser& arguments);
 	virtual void initTestCase(const ArgumentsParser& arguments) = 0;
 	virtual void finalizeTestCase();
 
