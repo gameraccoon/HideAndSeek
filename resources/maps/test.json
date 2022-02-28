@@ -1,5 +1,5 @@
 {
-    "version": "d_2J7Hpv7qCV",
+    "version": "d_2m8xcX8GJp",
     "world": {
         "entity_manager": {
             "components": null,
@@ -1873,6 +1873,53 @@
                         },
                         "entity_manager": {
                             "components": {
+                                "AnimationGroupCreatorComponent": [
+                                    null,
+                                    {
+                                        "animationGroups": [
+                                            "resources/animations/character/feet_animgroup.json",
+                                            "resources/animations/character/handgun_animgroup.json"
+                                        ],
+                                        "clipParams": [
+                                            {
+                                                "isLooped": true,
+                                                "speed": 1.0
+                                            },
+                                            {
+                                                "isLooped": true,
+                                                "speed": 1.0
+                                            }
+                                        ],
+                                        "spriteParams": [
+                                            {
+                                                "anchor": {
+                                                    "x": 0.699999988079071,
+                                                    "y": 0.5
+                                                },
+                                                "size": {
+                                                    "x": 20.0,
+                                                    "y": 20.0
+                                                }
+                                            },
+                                            {
+                                                "anchor": {
+                                                    "x": 0.5,
+                                                    "y": 0.5
+                                                },
+                                                "size": {
+                                                    "x": 32.0,
+                                                    "y": 32.0
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "CharacterStateComponent": [
+                                    null,
+                                    {
+                                        "state": "Idle"
+                                    }
+                                ],
                                 "CollisionComponent": [
                                     {
                                         "geometry": {
@@ -1900,6 +1947,13 @@
                                     },
                                     {
                                         "geometry": {
+                                            "points": [],
+                                            "radius": 16.0,
+                                            "type": "Circular"
+                                        }
+                                    },
+                                    {
+                                        "geometry": {
                                             "points": [
                                                 {
                                                     "x": 10.0,
@@ -1923,11 +1977,34 @@
                                         }
                                     }
                                 ],
+                                "HealthComponent": [
+                                    null,
+                                    {
+                                        "healthValue": 100.0
+                                    }
+                                ],
                                 "LightComponent": [
+                                    null,
                                     null,
                                     null,
                                     {
                                         "brightness": 1.0
+                                    }
+                                ],
+                                "MovementComponent": [
+                                    null,
+                                    {
+                                        "originalSpeed": 30.0,
+                                        "previousStep": {
+                                            "x": 0.0,
+                                            "y": 0.0
+                                        }
+                                    }
+                                ],
+                                "SpatialTrackComponent": [
+                                    null,
+                                    {
+                                        "id": "ControlledEntity"
                                     }
                                 ],
                                 "SpriteCreatorComponent": [
@@ -1948,6 +2025,7 @@
                                             }
                                         ]
                                     },
+                                    null,
                                     {
                                         "descriptions": [
                                             {
@@ -1978,6 +2056,15 @@
                                     },
                                     {
                                         "location": {
+                                            "x": -60.0,
+                                            "y": 59.0
+                                        },
+                                        "rotation": {
+                                            "v": 0.0
+                                        }
+                                    },
+                                    {
+                                        "location": {
                                             "x": -137.0,
                                             "y": 93.0
                                         },
@@ -1994,10 +2081,19 @@
                                             "v": 0.0
                                         }
                                     }
+                                ],
+                                "WeaponComponent": [
+                                    null,
+                                    {
+                                        "damageValue": 10.0,
+                                        "shotDistance": 400.0,
+                                        "shotPeriod": 0.5
+                                    }
                                 ]
                             },
                             "entities": [
                                 464039981,
+                                509098326,
                                 1840415736,
                                 2141412817
                             ]
@@ -2392,68 +2488,17 @@
                             "components": {
                                 "AiControllerComponent": [
                                     null,
-                                    null,
                                     {
                                         "isEnemy": true
                                     }
                                 ],
-                                "AnimationGroupCreatorComponent": [
-                                    {
-                                        "animationGroups": [
-                                            "resources/animations/character/feet_animgroup.json",
-                                            "resources/animations/character/handgun_animgroup.json"
-                                        ],
-                                        "clipParams": [
-                                            {
-                                                "isLooped": true,
-                                                "speed": 1.0
-                                            },
-                                            {
-                                                "isLooped": true,
-                                                "speed": 1.0
-                                            }
-                                        ],
-                                        "spriteParams": [
-                                            {
-                                                "anchor": {
-                                                    "x": 0.699999988079071,
-                                                    "y": 0.5
-                                                },
-                                                "size": {
-                                                    "x": 20.0,
-                                                    "y": 20.0
-                                                }
-                                            },
-                                            {
-                                                "anchor": {
-                                                    "x": 0.5,
-                                                    "y": 0.5
-                                                },
-                                                "size": {
-                                                    "x": 32.0,
-                                                    "y": 32.0
-                                                }
-                                            }
-                                        ]
-                                    }
-                                ],
                                 "CharacterStateComponent": [
-                                    {
-                                        "state": "Idle"
-                                    },
                                     null,
                                     {
                                         "state": "Idle"
                                     }
                                 ],
                                 "CollisionComponent": [
-                                    {
-                                        "geometry": {
-                                            "points": [],
-                                            "radius": 16.0,
-                                            "type": "Circular"
-                                        }
-                                    },
                                     null,
                                     {
                                         "geometry": {
@@ -2488,9 +2533,6 @@
                                     }
                                 ],
                                 "HealthComponent": [
-                                    {
-                                        "healthValue": 100.0
-                                    },
                                     null,
                                     {
                                         "healthValue": 100.0
@@ -2510,25 +2552,14 @@
                                             "x": 0.0,
                                             "y": 0.0
                                         }
-                                    },
-                                    {
-                                        "originalSpeed": 30.0,
-                                        "previousStep": {
-                                            "x": 0.0,
-                                            "y": 0.0
-                                        }
                                     }
                                 ],
                                 "SpatialTrackComponent": [
-                                    {
-                                        "id": "ControlledEntity"
-                                    },
                                     {
                                         "id": "CameraEntity"
                                     }
                                 ],
                                 "SpriteCreatorComponent": [
-                                    null,
                                     null,
                                     {
                                         "descriptions": [
@@ -2568,15 +2599,6 @@
                                 "TransformComponent": [
                                     {
                                         "location": {
-                                            "x": 89.0,
-                                            "y": 98.0
-                                        },
-                                        "rotation": {
-                                            "v": 0.0
-                                        }
-                                    },
-                                    {
-                                        "location": {
                                             "x": 79.0,
                                             "y": 40.0
                                         },
@@ -2602,17 +2624,9 @@
                                             "v": 0.0
                                         }
                                     }
-                                ],
-                                "WeaponComponent": [
-                                    {
-                                        "damageValue": 10.0,
-                                        "shotDistance": 400.0,
-                                        "shotPeriod": 0.5
-                                    }
                                 ]
                             },
                             "entities": [
-                                509098326,
                                 1343345105,
                                 1743997843,
                                 1850216587
