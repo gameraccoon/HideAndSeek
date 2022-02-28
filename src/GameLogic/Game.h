@@ -82,7 +82,7 @@ private:
 	std::vector<double> mFrameDurations;
 	std::vector<std::pair<size_t, ScopedProfilerThreadData::Records>> mScopedProfileRecords;
 	std::mutex mScopedProfileRecordsMutex;
-	std::chrono::time_point<std::chrono::system_clock> mFrameBeginTime;
+	std::chrono::time_point<std::chrono::steady_clock> mFrameBeginTime;
 #endif // ENABLE_SCOPED_PROFILER
 
 #ifdef IMGUI_ENABLED

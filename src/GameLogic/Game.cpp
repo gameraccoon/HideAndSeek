@@ -74,7 +74,7 @@ void Game::dynamicTimePreFrameUpdate(float /*dt*/)
 {
 	SCOPED_PROFILER("Game::dynamicTimePreFrameUpdate");
 #ifdef ENABLE_SCOPED_PROFILER
-	mFrameBeginTime = std::chrono::system_clock::now();
+	mFrameBeginTime = std::chrono::steady_clock::now();
 #endif // ENABLE_SCOPED_PROFILER
 
 	std::unique_ptr<RenderData> renderCommands = std::make_unique<RenderData>();
@@ -111,7 +111,7 @@ void Game::dynamicTimePostFrameUpdate(float /*dt*/)
 	mDebugBehavior.postInnerUpdate(*this);
 
 #ifdef ENABLE_SCOPED_PROFILER
-	std::chrono::time_point<std::chrono::system_clock> frameEndTime = std::chrono::system_clock::now();
+	std::chrono::time_point<std::chrono::steady_clock> frameEndTime = std::chrono::steady_clock::now();
 	mFrameDurations.push_back(std::chrono::duration<double, std::micro>(frameEndTime - mFrameBeginTime).count());
 #endif // ENABLE_SCOPED_PROFILER
 }
