@@ -25,6 +25,10 @@ namespace Graphics
 
 		bool isValid() const override;
 
+		static std::string GetUniqueId(const std::string& filename);
+		static InitSteps GetInitSteps();
+		DeinitSteps getDeinitSteps() const override;
+
 	private:
 		const Internal::Surface* mSurface = nullptr;
 		QuadUV mUV;

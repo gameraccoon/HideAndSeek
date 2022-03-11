@@ -12,6 +12,15 @@
 			"flags": ["get_by_ref"]
 		},
 		{
+			"name": "animationGroupHandles",
+			"type": "std::vector<ResourceHandle>",
+			"includes": [
+				"<vector>",
+				"\"GameData/Core/ResourceHandle.h\""
+			],
+			"flags": ["get_by_ref", "transient"]
+		},
+		{
 			"name": "clipParams",
 			"type": "std::vector<AnimationClipParams>",
 			"includes": [

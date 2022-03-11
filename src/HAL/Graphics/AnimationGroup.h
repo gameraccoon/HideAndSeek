@@ -24,6 +24,10 @@ namespace Graphics
 		std::map<StringId, std::vector<ResourceHandle>> getAnimationClips() const { return mAnimationClips; }
 		StringId getDefaultState() const { return mDefaultState; }
 
+		static std::string GetUniqueId(const std::string& filename);
+		static InitSteps GetInitSteps();
+		DeinitSteps getDeinitSteps() const override;
+
 	private:
 		std::map<StringId, std::vector<ResourceHandle>> mAnimationClips;
 		StringId mStateMachineId;

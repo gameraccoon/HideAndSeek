@@ -3,6 +3,8 @@
 #include "SdlSurface.h"
 
 #include "Base/Debug/ConcurrentAccessDetector.h"
+#include "Base/Types/ComplexTypes/UniqueAny.h"
+#include "Base/Types/String/Path.h"
 
 #include <stdexcept>
 #include <string>
@@ -22,15 +24,33 @@ namespace Graphics
 {
 	namespace Internal
 	{
-		static void InitSurfaceRenderThread(std::unique_ptr<HAL::Resource>& resource)
+		static UniqueAny LoadSurfaceInitStep(UniqueAny&& resource, HAL::ResourceManager&, ResourceHandle)
 		{
-			SCOPED_PROFILER("InitSurfaceRenderThread");
-			if (!resource->isValid())
+			SCOPED_PROFILER("LoadSurfaceInitStep");
+
+			const ResourcePath* pathPtr = resource.cast<ResourcePath>();
+
+			if (!pathPtr)
 			{
-				return;
+				ReportFatalError("We got an incorrect type of value when loading a surface in CreateSurfaceInitStep");
+				return {};
 			}
 
-			Surface* surface = static_cast<Surface*>(resource.get());
+			return UniqueAny::Create<std::unique_ptr<Surface>>(std::make_unique<Surface>(*pathPtr));
+		}
+
+		static UniqueAny InitSurfaceRenderThread(UniqueAny&& resource, HAL::ResourceManager&, ResourceHandle)
+		{
+			SCOPED_PROFILER("InitSurfaceRenderThread");
+			std::unique_ptr<Surface>* surfacePtr = resource.cast<std::unique_ptr<Surface>>();
+
+			if (!surfacePtr)
+			{
+				ReportFatalError("We got an incorrect type of value when initing a surface in InitSurfaceRenderThread");
+				return {};
+			}
+
+			Surface* surface = surfacePtr->get();
 
 			unsigned int textureId;
 			glGenTextures(1, &textureId);
@@ -53,7 +73,7 @@ namespace Graphics
 				break;
 			default:
 				ReportError("Image with unknown channel profile");
-				return;
+				return {};
 			}
 
 			glTexImage2D(
@@ -70,14 +90,23 @@ namespace Graphics
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			return;
+
+			return UniqueAny::Create<HAL::Resource::Ptr>(std::move(*surfacePtr));
 		}
 
-		static void DeinitSurfaceRenderThread(std::unique_ptr<HAL::Resource>& resource)
+		static UniqueAny DeinitSurfaceRenderThread(UniqueAny&& resource, HAL::ResourceManager&, ResourceHandle)
 		{
-			Surface* surface = static_cast<Surface*>(resource.get());
+			std::unique_ptr<Surface>* surfacePtr = resource.cast<std::unique_ptr<Surface>>();
+
+			if (surfacePtr) {
+				ReportFatalError("We got an incorrect type of value when deinitializing a surface");
+				return {};
+			}
+
+			Surface* surface = surfacePtr->get();
 			unsigned int textureId = surface->getTextureId();
 			glDeleteTextures(1, &textureId);
+			return {};
 		}
 
 		Surface::Surface(const std::string& filename)
@@ -124,9 +153,13 @@ namespace Graphics
 		{
 			return {
 				InitStep{
+					.thread = Thread::Any,
+					.init = &LoadSurfaceInitStep,
+				},
+				InitStep{
 					.thread = Thread::Render,
 					.init = &InitSurfaceRenderThread,
-				}
+				},
 			};
 		}
 
@@ -136,7 +169,7 @@ namespace Graphics
 				DeinitStep{
 					.thread = Thread::Render,
 					.deinit = &DeinitSurfaceRenderThread,
-				}
+				},
 			};
 		}
 	}

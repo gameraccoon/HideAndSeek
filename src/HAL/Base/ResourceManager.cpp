@@ -10,203 +10,37 @@
 
 #include <nlohmann/json.hpp>
 
-#include "HAL/Audio/Music.h"
-#include "HAL/Audio/Sound.h"
-#include "HAL/Graphics/Font.h"
 #include "HAL/Graphics/Sprite.h"
 #include "HAL/Graphics/SpriteAnimationClip.h"
 #include "HAL/Graphics/AnimationGroup.h"
-#include "HAL/Internal/SdlSurface.h"
 
 namespace HAL
 {
-	void ResourceDependencies::setFirstDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency)
-	{
-		dependencies[dependentResource].push_back(dependency);
-		dependentResources[dependency].push_back(dependentResource);
-	}
-
-	void ResourceDependencies::setFirstDependOnSecond(ResourceHandle dependentResource, const std::vector<ResourceHandle>& dependencies)
-	{
-		for (ResourceHandle dependency : dependencies)
-		{
-			setFirstDependOnSecond(dependentResource, dependency);
-		}
-	}
-
-	const std::vector<ResourceHandle>& ResourceDependencies::getDependencies(ResourceHandle resource) const
-	{
-		static const std::vector<ResourceHandle> emptyVector;
-		if (auto it = dependencies.find(resource); it != dependencies.end())
-		{
-			return it->second;
-		}
-		else
-		{
-			return emptyVector;
-		}
-	}
-
-	const std::vector<ResourceHandle>& ResourceDependencies::getDependentResources(ResourceHandle resource) const
-	{
-		static const std::vector<ResourceHandle> emptyVector;
-		if (auto it = dependentResources.find(resource); it != dependentResources.end())
-		{
-			return it->second;
-		}
-		else
-		{
-			return emptyVector;
-		}
-	}
-
-	std::vector<ResourceHandle> RuntimeDependencies::removeResource(ResourceHandle resource)
-	{
-		std::vector<ResourceHandle> result;
-		if (auto it = dependencies.find(resource); it != dependencies.end())
-		{
-			result = std::move(it->second);
-			dependencies.erase(it);
-		}
-
-		if (auto it = dependentResources.find(resource); it != dependentResources.end())
-		{
-			Assert(it->second.empty(), "We removing a resource that have dependent resources: %d", resource);
-			dependentResources.erase(it);
-		}
-		return result;
-	}
-
-	std::vector<ResourceHandle> LoadDependencies::resolveDependency(ResourceHandle dependency)
-	{
-		std::vector<ResourceHandle> result;
-
-		// move the dependent resources to "result" and remove the record
-		if (auto it = dependentResources.find(dependency); it != dependentResources.end())
-		{
-			result = std::move(it->second);
-			dependentResources.erase(it);
-		}
-
-		// check that our dependencies are empty and remove the record
-		if (auto it = dependencies.find(dependency); it != dependencies.end())
-		{
-			Assert(it->second.empty(), "We resolving dependency that have unresolved dependencies itself: %d", dependency);
-			dependencies.erase(it);
-		}
-
-		// resolve dependencies for the dependent resources
-		// and filter "result" to keep only fully resolved ones
-		for (int i = 0; i < static_cast<int>(result.size()); ++i)
-		{
-			auto it = dependencies.find(result[i]);
-			if (it != dependencies.end())
-			{
-				auto removedRange = std::ranges::remove_if(it->second, [dependency](ResourceHandle handle){
-					return handle == dependency;
-				});
-				Assert(!removedRange.empty(), "We've got a dependent resource missing info about its dependency");
-
-				it->second.erase(removedRange.begin(), removedRange.end());
-
-				// not fully resolved yet, remove from "result"
-				if (!it->second.empty())
-				{
-					result.erase(result.begin() + i);
-					--i;
-				}
-			}
-			else
-			{
-				ReportError("We tried to resolve a dependency, but it's already resolved");
-			}
-		}
-
-		return result;
-	}
-
-	ResourceHandle ResourceStorage::createResourceLock(const ResourcePath& path)
-	{
-		ResourceHandle currentHandle(handleIdx);
-		pathsMap[path] = currentHandle;
-		pathFindMap[currentHandle] = path;
-		resourceLocksCount[currentHandle] = 1;
-		++handleIdx;
-		return currentHandle;
-	}
+#ifdef CONCURRENT_ACCESS_DETECTION
+	ConcurrentAccessDetector gResourceManagerAccessDetector;
+#endif // CONCURRENT_ACCESS_DETECTION
 
 	ResourceManager::ResourceManager() noexcept = default;
 
 	ResourceHandle ResourceManager::lockSprite(const ResourcePath& path, Resource::Thread currentThread)
 	{
-		std::scoped_lock l(mDataMutex);
-		std::string spritePathId = "spr-" + path;
-		return lockCustomResource<Graphics::Sprite>(
-			static_cast<ResourcePath>(spritePathId),
-			&ResourceManager::StartSpriteLoading,
-			currentThread,
-			static_cast<ResourcePath>(path)
-		);
+		return lockResourceFromThread<Graphics::Sprite>(currentThread, path);
 	}
 
 	ResourceHandle ResourceManager::lockSpriteAnimationClip(const ResourcePath& path, Resource::Thread currentThread)
 	{
-		std::scoped_lock l(mDataMutex);
-
-		return lockCustomResource<Graphics::SpriteAnimationClip>(
-			path,
-			[](ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const ResourcePath& path){
-				std::vector<ResourcePath> framePaths = resourceManager.loadSpriteAnimClipData(path);
-				std::vector<ResourceHandle> frames;
-				for (const auto& animFramePath : framePaths)
-				{
-					ResourceHandle spriteHandle = resourceManager.lockSprite(animFramePath);
-					resourceManager.mDependencies.setFirstDependOnSecond(handle, spriteHandle);
-					frames.push_back(spriteHandle);
-				}
-
-				resourceManager.finalizeResourceLoading(
-					handle,
-					std::make_unique<Graphics::SpriteAnimationClip>(std::move(frames)),
-					currentThread
-				);
-			},
-			currentThread,
-			path
-		);
+		return lockResourceFromThread<Graphics::SpriteAnimationClip>(currentThread, path);
 	}
 
 	ResourceHandle ResourceManager::lockAnimationGroup(const ResourcePath& path, Resource::Thread currentThread)
 	{
-		std::scoped_lock l(mDataMutex);
-
-		return lockCustomResource<Graphics::AnimationGroup>(
-			path,
-			[](ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const ResourcePath& path){
-				AnimGroupData animGroupData = resourceManager.loadAnimGroupData(path);
-
-				std::map<StringId, std::vector<ResourceHandle>> animClips;
-				for (const auto& animClipPath : animGroupData.clips)
-				{
-					ResourceHandle clipHandle = resourceManager.lockSpriteAnimationClip(animClipPath.second);
-					resourceManager.mDependencies.setFirstDependOnSecond(handle, clipHandle);
-					animClips.emplace(animClipPath.first, resourceManager.tryGetResource<Graphics::SpriteAnimationClip>(clipHandle)->getSprites());
-				}
-
-				resourceManager.finalizeResourceLoading(
-					handle,
-					std::make_unique<Graphics::AnimationGroup>(std::move(animClips), animGroupData.stateMachineID, animGroupData.defaultState),
-					currentThread
-				);
-			},
-			currentThread,
-			path
-		);
+		return lockResourceFromThread<Graphics::AnimationGroup>(currentThread, path);
 	}
 
 	void ResourceManager::unlockResource(ResourceHandle handle)
 	{
 		std::scoped_lock l(mDataMutex);
+		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 		auto locksCntIt = mStorage.resourceLocksCount.find(handle);
 		if ALMOST_NEVER(locksCntIt == mStorage.resourceLocksCount.end())
 		{
@@ -232,7 +66,7 @@ namespace HAL
 					mLoading.resourcesWaitingDeinit.push_back(
 						std::make_unique<ResourceLoading::UnloadingData>(
 							handle,
-							std::move(resourceIt->second),
+							UniqueAny::Create<Resource::Ptr>(std::move(resourceIt->second)),
 							std::move(deinitSteps)
 						)
 					);
@@ -254,6 +88,7 @@ namespace HAL
 	{
 		SCOPED_PROFILER("ResourceManager::loadAtlasesData");
 		std::scoped_lock l(mDataMutex);
+		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 		namespace fs = std::filesystem;
 		fs::path listFsPath(static_cast<std::string>(listPath));
 
@@ -283,6 +118,7 @@ namespace HAL
 	{
 		SCOPED_PROFILER("ResourceManager::runThreadTasks");
 		std::unique_lock l(mDataMutex);
+		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 		for (int i = 0; i < static_cast<int>(mLoading.resourcesWaitingInit.size()); ++i)
 		{
 			ResourceLoading::LoadingDataPtr& loadingData = mLoading.resourcesWaitingInit[static_cast<size_t>(i)];
@@ -291,12 +127,25 @@ namespace HAL
 				const Resource::InitStep& step = loadingData->stepsLeft.front();
 				if (step.thread == currentThread || step.thread == Resource::Thread::Any)
 				{
-					step.init(loadingData->resource);
+					loadingData->resourceData = step.init(std::move(loadingData->resourceData), *this, loadingData->handle);
 					loadingData->stepsLeft.pop_front();
+
+					// found a dependecy that need to resolve first
+					auto it = mLoading.resourcesWaitingDependencies.find(loadingData->handle);
+					if (it != mLoading.resourcesWaitingDependencies.end())
+					{
+						it->second = std::move(loadingData);
+						// this invalidates "step" variable
+						mLoading.resourcesWaitingInit.erase(mLoading.resourcesWaitingInit.begin() + i);
+						--i;
+						break;
+					}
+
 					// done all steps
 					if (loadingData->stepsLeft.empty())
 					{
-						finalizeResourceLoading(loadingData->handle, std::move(loadingData->resource), currentThread);
+						Resource::Ptr* resultDataPtr = loadingData->resourceData.cast<Resource::Ptr>();
+						finalizeResourceLoading(loadingData->handle, (resultDataPtr ? std::move(*resultDataPtr) : Resource::Ptr{}));
 						// this invalidates "step" variable
 						mLoading.resourcesWaitingInit.erase(mLoading.resourcesWaitingInit.begin() + i);
 						--i;
@@ -312,13 +161,13 @@ namespace HAL
 
 		for (int i = 0; i < static_cast<int>(mLoading.resourcesWaitingDeinit.size()); ++i)
 		{
-			auto&& [handle, resource, steps] = *mLoading.resourcesWaitingDeinit[static_cast<size_t>(i)];
+			auto&& [handle, resourceData, steps] = *mLoading.resourcesWaitingDeinit[static_cast<size_t>(i)];
 			while (!steps.empty())
 			{
 				const Resource::DeinitStep& step = steps.front();
 				if (step.thread == currentThread || step.thread == Resource::Thread::Any)
 				{
-					step.deinit(resource);
+					resourceData = step.deinit(std::move(resourceData), *this, handle);
 					steps.pop_front();
 					// done all steps
 					if (steps.empty())
@@ -332,8 +181,15 @@ namespace HAL
 		}
 	}
 
+	const std::unordered_map<ResourcePath, ResourceStorage::AtlasFrameData>& ResourceManager::getAtlasFrames() const
+	{
+		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
+		return mStorage.atlasFrames;
+	}
+
 	void ResourceManager::startResourceLoading(ResourceLoading::LoadingDataPtr&& loadingData, Resource::Thread currentThread)
 	{
+		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 		SCOPED_PROFILER("ResourceManager::startResourceLoading");
 		auto deletionIt = std::ranges::find_if(
 			mLoading.resourcesWaitingDeinit,
@@ -346,31 +202,29 @@ namespace HAL
 		// revive a resource that we were about to delete
 		if (deletionIt != mLoading.resourcesWaitingDeinit.end())
 		{
-			finalizeResourceLoading(loadingData->handle, std::move((*deletionIt)->resource), currentThread);
+			Resource::Ptr* resourcePtr = (*deletionIt)->resourceData.cast<Resource::Ptr>();
+			finalizeResourceLoading(loadingData->handle, (resourcePtr ? std::move(*resourcePtr) : Resource::Ptr{}));
 			mLoading.resourcesWaitingDeinit.erase(deletionIt);
 			ReportError("This code is incomplete, the resource can be half-unloaded");
 			return;
 		}
 
-		if (loadingData->factoryFn)
-		{
-			if (loadingData->factoryThread == currentThread || loadingData->factoryThread == Resource::Thread::Any)
-			{
-				loadingData->resource = loadingData->factoryFn();
-			}
-			else
-			{
-				ReportError("Construction of a resource from a specific thread is not implemented yet. Use InitSteps instead");
-			}
-		}
-
+		bool hasUnresolvedDeps = false;
 		while (!loadingData->stepsLeft.empty())
 		{
 			Resource::InitStep& step = loadingData->stepsLeft.front();
 			if (step.thread == currentThread || step.thread == Resource::Thread::Any)
 			{
-				step.init(loadingData->resource);
+				loadingData->resourceData = step.init(std::move(loadingData->resourceData), *this, loadingData->handle);
 				loadingData->stepsLeft.pop_front();
+
+				auto it = mLoading.resourcesWaitingDependencies.find(loadingData->handle);
+				if (it != mLoading.resourcesWaitingDependencies.end())
+				{
+					it->second = std::move(loadingData);
+					hasUnresolvedDeps = true;
+					break;
+				}
 			}
 			else
 			{
@@ -378,18 +232,23 @@ namespace HAL
 			}
 		}
 
-		if (!loadingData->stepsLeft.empty())
+		if (!hasUnresolvedDeps)
 		{
-			mLoading.resourcesWaitingInit.push_back(std::move(loadingData));
-		}
-		else
-		{
-			finalizeResourceLoading(loadingData->handle, std::move(loadingData->resource), currentThread);
+			if (!loadingData->stepsLeft.empty())
+			{
+				mLoading.resourcesWaitingInit.push_back(std::move(loadingData));
+			}
+			else
+			{
+				Resource::Ptr* resourcePtr = loadingData->resourceData.cast<Resource::Ptr>();
+				finalizeResourceLoading(loadingData->handle, (resourcePtr ? std::move(*resourcePtr) : Resource::Ptr{}));
+			}
 		}
 	}
 
 	void ResourceManager::loadOneAtlasData(const ResourcePath& path)
 	{
+		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 		SCOPED_PROFILER("ResourceManager::loadOneAtlasData");
 		namespace fs = std::filesystem;
 		fs::path atlasDescPath(static_cast<std::string>(path));
@@ -437,74 +296,20 @@ namespace HAL
 		}
 	}
 
-	std::vector<ResourcePath> ResourceManager::loadSpriteAnimClipData(const ResourcePath& path)
+	void ResourceManager::setFirstResourceDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency)
 	{
-		SCOPED_PROFILER("ResourceManager::loadSpriteAnimClipData");
-		namespace fs = std::filesystem;
-		fs::path atlasDescPath(static_cast<std::string>(path));
-
-		std::vector<ResourcePath> result;
-		ResourcePath pathBase;
-		int framesCount = 0;
-
-		try
+		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
+		mDependencies.setFirstDependOnSecond(dependentResource, dependency);
+		if (auto it = mStorage.resources.find(dependency); it == mStorage.resources.end() || it->second == nullptr)
 		{
-			std::ifstream animDescriptionFile(atlasDescPath);
-			nlohmann::json animJson;
-			animDescriptionFile >> animJson;
-
-			animJson.at("path").get_to(pathBase);
-			animJson.at("frames").get_to(framesCount);
+			mLoading.loadDependencies.setFirstDependOnSecond(dependentResource, dependency);
+			mLoading.resourcesWaitingDependencies.emplace(dependentResource, ResourceLoading::LoadingDataPtr{});
 		}
-		catch(const std::exception& e)
-		{
-			LogError("Can't open animation data '%s': %s", path.c_str(), e.what());
-		}
-
-		for (int i = 0; i < framesCount; ++i)
-		{
-			result.emplace_back(pathBase + std::to_string(i) + ".png");
-		}
-
-		return result;
 	}
 
-	ResourceManager::AnimGroupData ResourceManager::loadAnimGroupData(const ResourcePath& path)
+	void ResourceManager::finalizeResourceLoading(ResourceHandle handle, Resource::Ptr&& resource)
 	{
-		SCOPED_PROFILER("ResourceManager::loadAnimGroupData");
-		namespace fs = std::filesystem;
-		fs::path atlasDescPath(static_cast<std::string>(path));
-
-		AnimGroupData result;
-		ResourcePath pathBase;
-
-		try
-		{
-			std::ifstream animDescriptionFile(atlasDescPath);
-			nlohmann::json animJson;
-			animDescriptionFile >> animJson;
-
-			animJson.at("clips").get_to(result.clips);
-			animJson.at("stateMachineID").get_to(result.stateMachineID);
-			animJson.at("defaultState").get_to(result.defaultState);
-		}
-		catch(const std::exception& e)
-		{
-			LogError("Can't open animation group data '%s': %s", path.c_str(), e.what());
-		}
-
-		return result;
-	}
-
-	void ResourceManager::createLoadDependency(ResourceHandle dependency, ResourceLoading::LoadingDataPtr&& loadingData)
-	{
-		ResourceHandle handle = loadingData->handle;
-		mLoading.loadDependencies.setFirstDependOnSecond(handle, dependency);
-		mLoading.resourcesWaitingDependencies.emplace(handle, std::move(loadingData));
-	}
-
-	void ResourceManager::finalizeResourceLoading(ResourceHandle handle, Resource::Ptr&& resource, Resource::Thread currentThread)
-	{
+		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 		SCOPED_PROFILER("ResourceManager::finalizeResourceLoading");
 		mStorage.resources[handle] = std::move(resource);
 
@@ -518,53 +323,17 @@ namespace HAL
 				continue;
 			}
 
-			ResourceLoading::LoadingDataPtr loadData = std::move(it->second);
+			// continue loading a resource that was waiting for this dependency
+			if (it->second->stepsLeft.empty())
+			{
+				Resource::Ptr* resultDataPtr = it->second->resourceData.cast<Resource::Ptr>();
+				finalizeResourceLoading(readyResourceHandle, (resultDataPtr ? std::move(*resultDataPtr) : Resource::Ptr{}));
+			}
+			else
+			{
+				mLoading.resourcesWaitingInit.push_back(std::move(it->second));
+			}
 			mLoading.resourcesWaitingDependencies.erase(it);
-			startResourceLoading(std::move(loadData), currentThread);
-		}
-	}
-
-	void ResourceManager::StartSpriteLoading(ResourceManager& resourceManager, ResourceHandle handle, Resource::Thread currentThread, const ResourcePath& path)
-	{
-		SCOPED_PROFILER("ResourceManager::StartSpriteLoading");
-		ResourceHandle originalSurfaceHandle;
-		auto it = resourceManager.mStorage.atlasFrames.find(path);
-		std::string surfacePath;
-		Graphics::QuadUV spriteUV;
-
-		if (it != resourceManager.mStorage.atlasFrames.end())
-		{
-			surfacePath = it->second.atlasPath;
-			spriteUV = it->second.quadUV;
-		}
-		else
-		{
-			surfacePath = path;
-		}
-		originalSurfaceHandle = resourceManager.lockResource<Graphics::Internal::Surface>(surfacePath);
-		resourceManager.mDependencies.setFirstDependOnSecond(handle, originalSurfaceHandle);
-
-		if (const Graphics::Internal::Surface* surface = resourceManager.tryGetResource<Graphics::Internal::Surface>(originalSurfaceHandle))
-		{
-			resourceManager.finalizeResourceLoading(handle, std::make_unique<Graphics::Sprite>(surface, spriteUV), currentThread);
-		}
-		else
-		{
-			auto factoryFn = [&resourceManager, originalSurfaceHandle, spriteUV]{
-				const Graphics::Internal::Surface* surface = resourceManager.tryGetResource<Graphics::Internal::Surface>(originalSurfaceHandle);
-				AssertRelease(surface != nullptr, "The surface should be loaded before loading sprite");
-				return std::make_unique<Graphics::Sprite>(surface, spriteUV);
-			};
-
-			resourceManager.createLoadDependency(
-				originalSurfaceHandle,
-				std::make_unique<ResourceLoading::LoadingData>(
-					handle,
-					Graphics::Sprite::GetInitSteps(),
-					factoryFn,
-					Graphics::Sprite::GetCreateThread()
-				)
-			);
 		}
 	}
 }

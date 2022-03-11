@@ -5,10 +5,15 @@
 #include <memory>
 #include <functional>
 
+#include "Base/Types/ComplexTypes/UniqueAny.h"
+
 #include <GameData/Core/ResourceHandle.h>
 
 namespace HAL
 {
+	// yes, this is kind of circular dependency, but Resource loading logic and ResourceManager are heavilly bound together
+	class ResourceManager;
+
 	/**
 	 * Base class for any resource type
 	 */
@@ -25,7 +30,7 @@ namespace HAL
 			None
 		};
 
-		using InitFn = std::function<void(Resource::Ptr&)>;
+		using InitFn = std::function<UniqueAny(UniqueAny&&, ResourceManager&, ResourceHandle)>;
 
 		struct InitStep
 		{
