@@ -119,7 +119,6 @@ void Game::dynamicTimePostFrameUpdate(float /*dt*/)
 void Game::initResources()
 {
 	SCOPED_PROFILER("Game::initResources");
-	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 	mPreFrameSystemsManager.initResources();
 	mGameLogicSystemsManager.initResources();
 	mPostFrameSystemsManager.initResources();
