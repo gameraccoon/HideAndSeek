@@ -11,21 +11,21 @@
 namespace TypesEditConstructor
 {
 	template<>
-	Edit<Entity>::Ptr FillEdit<Entity>::Call(QLayout* layout, const QString& label, const Entity& initialValue)
+	Edit<RaccoonEcs::Entity>::Ptr FillEdit<RaccoonEcs::Entity>::Call(QLayout* layout, const QString& label, const RaccoonEcs::Entity& initialValue)
 	{
 		FillLabel(layout, label);
 
 		QHBoxLayout *innerLayout = HS_NEW QHBoxLayout;
 
-		Edit<Entity>::Ptr edit = std::make_shared<Edit<Entity>>(initialValue);
-		Edit<Entity>::WeakPtr editWeakPtr = edit;
+		Edit<RaccoonEcs::Entity>::Ptr edit = std::make_shared<Edit<RaccoonEcs::Entity>>(initialValue);
+		Edit<RaccoonEcs::Entity>::WeakPtr editWeakPtr = edit;
 
-		Edit<Entity::EntityId>::Ptr editAngle = FillEdit<Entity::EntityId>::Call(innerLayout, "id", initialValue.getId());
-		editAngle->bindOnChange([editWeakPtr](float /*oldValue*/, Entity::EntityId newValue, bool)
+		Edit<RaccoonEcs::Entity::EntityId>::Ptr editAngle = FillEdit<RaccoonEcs::Entity::EntityId>::Call(innerLayout, "id", initialValue.getId());
+		editAngle->bindOnChange([editWeakPtr](float /*oldValue*/, RaccoonEcs::Entity::EntityId newValue, bool)
 		{
-			if (Edit<Entity>::Ptr edit = editWeakPtr.lock())
+			if (Edit<RaccoonEcs::Entity>::Ptr edit = editWeakPtr.lock())
 			{
-				edit->transmitValueChange(Entity(newValue));
+				edit->transmitValueChange(RaccoonEcs::Entity(newValue));
 			}
 		});
 		edit->addChild(editAngle);
