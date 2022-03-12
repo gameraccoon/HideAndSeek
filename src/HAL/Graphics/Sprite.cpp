@@ -25,7 +25,7 @@ namespace Graphics
 
 		if (!pathPtr)
 		{
-			ReportFatalError("We got an incorrect type of value when loading a sprite in StartSpriteLoading");
+			ReportFatalError("We got an incorrect type of value when loading a sprite in StartSpriteLoading (expected ResourcePath)");
 			return {};
 		}
 
@@ -55,7 +55,7 @@ namespace Graphics
 
 		if (!spriteData)
 		{
-			ReportFatalError("We got an incorrect type of value when initing a sprite in CreateSpriteInitStep");
+			ReportFatalError("We got an incorrect type of value when initing a sprite in CreateSpriteInitStep (expected LoadSpriteData)");
 			return {};
 		}
 

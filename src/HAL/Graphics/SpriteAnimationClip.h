@@ -11,8 +11,6 @@
 #include "HAL/Base/Resource.h"
 #include "HAL/Base/Types.h"
 
-#include "HAL/Graphics/Sprite.h"
-
 namespace Graphics
 {
 	class SpriteAnimationClip : public HAL::Resource

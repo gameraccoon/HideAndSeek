@@ -12,6 +12,7 @@
 #include "HAL/Base/Engine.h"
 #include "HAL/Base/ResourceManager.h"
 #include "HAL/Internal/SdlSurface.h"
+#include "HAL/Graphics/Sprite.h"
 
 namespace Graphics
 {
@@ -55,7 +56,7 @@ namespace Graphics
 
 		if (!pathPtr)
 		{
-			ReportFatalError("We got an incorrect type of value when loading a sprite in CreateAnimationClip");
+			ReportFatalError("We got an incorrect type of value when loading a sprite in CreateAnimationClip (expected ResourcePath)");
 			return {};
 		}
 
@@ -65,7 +66,7 @@ namespace Graphics
 		std::vector<ResourceHandle> frames;
 		for (const auto& animFramePath : framePaths)
 		{
-			ResourceHandle spriteHandle = resourceManager.lockSprite(animFramePath);
+			ResourceHandle spriteHandle = resourceManager.lockResource<Sprite>(animFramePath);
 			resourceManager.setFirstResourceDependOnSecond(handle, spriteHandle);
 			frames.push_back(spriteHandle);
 		}

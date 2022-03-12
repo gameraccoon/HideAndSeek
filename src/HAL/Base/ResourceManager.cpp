@@ -10,10 +10,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include "HAL/Graphics/Sprite.h"
-#include "HAL/Graphics/SpriteAnimationClip.h"
-#include "HAL/Graphics/AnimationGroup.h"
-
 namespace HAL
 {
 #ifdef CONCURRENT_ACCESS_DETECTION
@@ -21,21 +17,6 @@ namespace HAL
 #endif // CONCURRENT_ACCESS_DETECTION
 
 	ResourceManager::ResourceManager() noexcept = default;
-
-	ResourceHandle ResourceManager::lockSprite(const ResourcePath& path, Resource::Thread currentThread)
-	{
-		return lockResourceFromThread<Graphics::Sprite>(currentThread, path);
-	}
-
-	ResourceHandle ResourceManager::lockSpriteAnimationClip(const ResourcePath& path, Resource::Thread currentThread)
-	{
-		return lockResourceFromThread<Graphics::SpriteAnimationClip>(currentThread, path);
-	}
-
-	ResourceHandle ResourceManager::lockAnimationGroup(const ResourcePath& path, Resource::Thread currentThread)
-	{
-		return lockResourceFromThread<Graphics::AnimationGroup>(currentThread, path);
-	}
 
 	void ResourceManager::unlockResource(ResourceHandle handle)
 	{

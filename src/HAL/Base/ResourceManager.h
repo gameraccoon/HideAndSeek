@@ -1,8 +1,6 @@
 #pragma once
 
-#include <map>
 #include <unordered_map>
-#include <functional>
 #include <mutex>
 
 #include "Base/Types/String/Path.h"
@@ -37,10 +35,6 @@ namespace HAL
 		ResourceManager& operator=(const ResourceManager&) = delete;
 		ResourceManager(ResourceManager&&) = delete;
 		ResourceManager& operator=(ResourceManager&&) = delete;
-
-		ResourceHandle lockSprite(const ResourcePath& path, Resource::Thread currentThread = Resource::Thread::Any);
-		ResourceHandle lockSpriteAnimationClip(const ResourcePath& path, Resource::Thread currentThread = Resource::Thread::Any);
-		ResourceHandle lockAnimationGroup(const ResourcePath& path, Resource::Thread currentThread = Resource::Thread::Any);
 
 		template<typename T, typename... Args>
 		[[nodiscard]] ResourceHandle lockResource(Args&&... args)
@@ -112,8 +106,6 @@ namespace HAL
 		const std::unordered_map<ResourcePath, ResourceStorage::AtlasFrameData>& getAtlasFrames() const;
 
 	private:
-		ResourceHandle lockSurface(const ResourcePath& path);
-
 		void startResourceLoading(ResourceLoading::LoadingDataPtr&& loadingGata, Resource::Thread currentThread);
 		void loadOneAtlasData(const ResourcePath& path);
 		void finalizeResourceLoading(ResourceHandle handle, Resource::Ptr&& resource);

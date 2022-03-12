@@ -23,6 +23,8 @@
 
 #include "GameLogic/Render/RenderAccessor.h"
 
+#include "HAL/Graphics/Sprite.h"
+
 #include <glm/matrix.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -37,7 +39,7 @@ RenderSystem::RenderSystem(
 	, mResourceManager(resourceManager)
 	, mThreadPool(threadPool)
 {
-	mLightSpriteHandle = resourceManager.lockSprite("resources/textures/light.png");
+	mLightSpriteHandle = resourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/light.png"));
 }
 
 void RenderSystem::update()
@@ -137,7 +139,7 @@ void RenderSystem::drawBackground(RenderData& renderData, World& world, Vector2D
 	{
 		if (!backgroundTexture->getSprite().spriteHandle.isValid())
 		{
-			backgroundTexture->getSpriteRef().spriteHandle = mResourceManager.lockSprite(backgroundTexture->getSpriteDesc().path);
+			backgroundTexture->getSpriteRef().spriteHandle = mResourceManager.lockResource<Graphics::Sprite>(backgroundTexture->getSpriteDesc().path);
 			backgroundTexture->getSpriteRef().params = backgroundTexture->getSpriteDesc().params;
 		}
 

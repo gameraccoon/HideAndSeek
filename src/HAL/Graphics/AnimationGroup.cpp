@@ -64,7 +64,7 @@ namespace Graphics
 
 		if (!pathPtr)
 		{
-			ReportFatalError("We got an incorrect type of value when loading a sprite in CalculateSpriteDependencies");
+			ReportFatalError("We got an incorrect type of value when loading a sprite in CalculateSpriteDependencies (expected ResourcePath)");
 			return {};
 		}
 
@@ -77,7 +77,7 @@ namespace Graphics
 		animGroupLoadData.stateMachineID = animGroupData.stateMachineID;
 		for (auto&& [animClipPath, resourcePath] : animGroupData.clips)
 		{
-			ResourceHandle clipHandle = resourceManager.lockSpriteAnimationClip(resourcePath);
+			ResourceHandle clipHandle = resourceManager.lockResource<SpriteAnimationClip>(resourcePath);
 			resourceManager.setFirstResourceDependOnSecond(handle, clipHandle);
 			animGroupLoadData.clips.emplace(std::move(animClipPath), clipHandle);
 		}

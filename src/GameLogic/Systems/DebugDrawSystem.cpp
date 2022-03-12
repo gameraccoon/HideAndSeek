@@ -22,6 +22,7 @@
 #include "Utils/Geometry/VisibilityPolygon.h"
 
 #include "HAL/Graphics/Font.h"
+#include "HAL/Graphics/Sprite.h"
 
 #include "GameLogic/Render/RenderAccessor.h"
 
@@ -266,9 +267,9 @@ void DebugDrawSystem::update()
 void DebugDrawSystem::init()
 {
 	SCOPED_PROFILER("DebugDrawSystem::initResources");
-	mCollisionSpriteHandle = mResourceManager.lockSprite("resources/textures/collision.png");
-	mNavmeshSpriteHandle = mResourceManager.lockSprite("resources/textures/testTexture.png");
-	mPointTextureHandle = mResourceManager.lockSprite("resources/textures/collision.png");
-	mLineTextureHandle = mResourceManager.lockSprite("resources/textures/testTexture.png");
+	mCollisionSpriteHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/collision.png"));
+	mNavmeshSpriteHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/testTexture.png"));
+	mPointTextureHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/collision.png"));
+	mLineTextureHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/testTexture.png"));
 	mFontHandle = mResourceManager.lockResource<Graphics::Font>("resources/fonts/prstart.ttf", 16);
 }
