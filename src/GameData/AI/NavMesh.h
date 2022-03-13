@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "GameData/Core/Vector2D.h"
-#include "GameData/Core/IntVector2D.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Geometry/IntVector2D.h"
 
 struct NavMesh
 {

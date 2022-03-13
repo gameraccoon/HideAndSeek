@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "GameData/Core/Vector2D.h"
-#include "GameData/Core/Border.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Geometry/Border.h"
 
 class LightBlockingGeometryComponent;
 

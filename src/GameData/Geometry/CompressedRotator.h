@@ -5,7 +5,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <type_traits>
 
-#include "GameData/Core/Rotator.h"
+#include "GameData/Geometry/Rotator.h"
 
 /**
  * Compresses rotation value into a quantized integer using RL encoding

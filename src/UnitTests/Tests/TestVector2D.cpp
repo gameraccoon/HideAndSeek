@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
 
 
 TEST(Vector2D, Creation)

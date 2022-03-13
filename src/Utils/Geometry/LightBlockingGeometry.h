@@ -5,9 +5,9 @@
 
 #include "Base/Types/TemplateAliases.h"
 
-#include "GameData/Core/Hull.h"
+#include "GameData/Geometry/Hull.h"
 
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
 #include "GameData/Spatial/CellPos.h"
 
 class WorldCell;

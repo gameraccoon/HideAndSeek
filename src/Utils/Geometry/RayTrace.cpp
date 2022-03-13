@@ -9,9 +9,9 @@
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 
-#include "GameData/Core/Vector2D.h"
-#include "GameData/Core/Rotator.h"
-#include "GameData/Core/BoundingBox.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Geometry/Rotator.h"
+#include "GameData/Geometry/BoundingBox.h"
 #include "GameData/World.h"
 
 #include "Utils/Geometry/Collide.h"

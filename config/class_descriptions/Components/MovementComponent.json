@@ -17,28 +17,28 @@
 			"name": "moveDirection",
 			"type": "Vector2D",
 			"default": " = ZERO_VECTOR",
-			"includes": ["\"GameData/Core/Vector2D.h\""],
+			"includes": ["\"GameData/Geometry/Vector2D.h\""],
 			"flags": ["transient"]
 		},
 		{
 			"name": "sightDirection",
 			"type": "Vector2D",
 			"default": " = ZERO_VECTOR",
-			"includes": ["\"GameData/Core/Vector2D.h\""],
+			"includes": ["\"GameData/Geometry/Vector2D.h\""],
 			"flags": ["transient"]
 		},
 		{
 			"name": "nextStep",
 			"type": "Vector2D",
 			"default": " = ZERO_VECTOR",
-			"includes": ["\"GameData/Core/Vector2D.h\""],
+			"includes": ["\"GameData/Geometry/Vector2D.h\""],
 			"flags": ["transient"]
 		},
 		{
 			"name": "previousStep",
 			"type": "Vector2D",
 			"default": " = ZERO_VECTOR",
-			"includes": ["\"GameData/Core/Vector2D.h\""]
+			"includes": ["\"GameData/Geometry/Vector2D.h\""]
 		}
 	]
 }

@@ -6,7 +6,7 @@
 
 #include "Base/Types/String/StringId.h"
 
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
 #include "GameData/Time/GameplayTimestamp.h"
 
 namespace ImguiDataInspection

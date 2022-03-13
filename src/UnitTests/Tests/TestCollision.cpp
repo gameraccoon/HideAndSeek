@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "GameData/World.h"
-#include "GameData/Core/Hull.h"
+#include "GameData/Geometry/Hull.h"
 
 #include "Utils/Geometry/Collide.h"
 #include "Utils/Functional/ScopeFinalizer.h"

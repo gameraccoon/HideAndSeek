@@ -4,8 +4,8 @@
 
 #include "Base/Types/BasicTypes.h"
 
-#include "GameData/Core/Vector2D.h"
-#include "GameData/Core/CompressedRotator.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Geometry/CompressedRotator.h"
 
 TEST(CompressedRotator, Value)
 {

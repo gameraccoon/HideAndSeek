@@ -7,7 +7,7 @@
 			"name": "cameraPos",
 			"type": "Vector2D",
 			"default": " = ZERO_VECTOR",
-			"includes": ["\"GameData/Core/Vector2D.h\""],
+			"includes": ["\"GameData/Geometry/Vector2D.h\""],
 			"flags": ["transient"]
 		},
 		{
@@ -21,7 +21,7 @@
 			"name": "screenSize",
 			"type": "Vector2D",
 			"default": " = ZERO_VECTOR",
-			"includes": ["\"GameData/Core/Vector2D.h\""],
+			"includes": ["\"GameData/Geometry/Vector2D.h\""],
 			"flags": ["transient"]
 		}
 

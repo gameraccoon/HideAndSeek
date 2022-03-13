@@ -10,7 +10,7 @@
 
 #include "Base/Types/TemplateAliases.h"
 
-#include "GameData/Core/BoundingBox.h"
+#include "GameData/Geometry/BoundingBox.h"
 
 #include "Utils/Geometry/Collide.h"
 

@@ -2,7 +2,7 @@
 
 #include "GameLogic/Systems/CharacterStateSystem.h"
 
-#include "GameData/Core/Rotator.h"
+#include "GameData/Geometry/Rotator.h"
 
 #include "GameData/Enums/MoveDirection4.generated.h"
 

@@ -11,7 +11,7 @@
 #include <chrono>
 #endif // ENABLE_SCOPED_PROFILER
 
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
 
 #include "HAL/Base/Types.h"
 

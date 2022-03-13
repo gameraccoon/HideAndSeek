@@ -12,7 +12,7 @@
 #include <raccoon-ecs/delegates.h>
 
 #include "GameData/EcsDefinitions.h"
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
 #include "GameData/Spatial/SpatialEntity.h"
 #include "GameData/Spatial/CellPos.h"
 

@@ -6,14 +6,14 @@
 			"name": "location",
 			"type": "Vector2D",
 			"default": " = ZERO_VECTOR",
-			"includes": ["\"GameData/Core/Vector2D.h\""],
+			"includes": ["\"GameData/Geometry/Vector2D.h\""],
 			"flags": ["custom_editor"]
 		},
 		{
 			"name": "rotation",
 			"type": "Rotator",
 			"default": " = Rotator(0.0f)",
-			"includes": ["\"GameData/Core/Rotator.h\""]
+			"includes": ["\"GameData/Geometry/Rotator.h\""]
 		},
 		{
 			"name": "updateTimestamp",

@@ -1,6 +1,6 @@
 #include "Base/precomp.h"
 
-#include "GameData/Core/BoundingBox.h"
+#include "GameData/Geometry/BoundingBox.h"
 
 
 BoundingBox BoundingBox::operator+(Vector2D shift) const noexcept

@@ -1,6 +1,6 @@
 #include "Base/precomp.h"
 
-#include "GameData/Core/Rotator.h"
+#include "GameData/Geometry/Rotator.h"
 
 #include <nlohmann/json.hpp>
 

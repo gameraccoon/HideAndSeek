@@ -3,9 +3,9 @@
 #include <vector>
 #include <limits>
 
-#include "GameData/Core/Vector2D.h"
-#include "GameData/Core/Border.h"
-#include "GameData/Core/BoundingBox.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Geometry/Border.h"
+#include "GameData/Geometry/BoundingBox.h"
 
 namespace ShapeOperations
 {

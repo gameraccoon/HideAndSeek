@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
 
 namespace Graphics
 {

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "GameData/Core/Vector2D.h"
+#include "nlohmann/json_fwd.hpp"
+
+#include "GameData/Geometry/Vector2D.h"
 
 class Border
 {

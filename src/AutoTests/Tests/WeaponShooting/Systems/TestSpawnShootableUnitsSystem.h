@@ -5,7 +5,7 @@
 #include <raccoon-ecs/system.h>
 
 #include "GameData/EcsDefinitions.h"
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 

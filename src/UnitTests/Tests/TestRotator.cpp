@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "GameData/Core/Rotator.h"
+#include "GameData/Geometry/Rotator.h"
 
 
 TEST(Rotator, Comparison)

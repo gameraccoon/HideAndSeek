@@ -1,6 +1,8 @@
 #include "Base/precomp.h"
 
-#include "GameData/Core/Border.h"
+#include "GameData/Geometry/Border.h"
+
+#include "nlohmann/json.hpp"
 
 
 Border::Border(Vector2D a, Vector2D b) noexcept

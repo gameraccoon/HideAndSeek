@@ -4,8 +4,8 @@
 #include "GameData/Spatial/SpatialEntityManager.h"
 #include "GameData/Spatial/WorldCell.h"
 #include "GameData/Spatial/CellPos.h"
-#include "GameData/Core/Vector2D.h"
-#include "GameData/Core/BoundingBox.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Geometry/BoundingBox.h"
 
 class SpatialWorldData
 {

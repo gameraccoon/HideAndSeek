@@ -7,7 +7,7 @@
 #include "Utils/AI/PathFinding.h"
 
 #include "GameData/AI/NavMesh.h"
-#include "GameData/Core/BoundingBox.h"
+#include "GameData/Geometry/BoundingBox.h"
 
 #include "Utils/Geometry/Collide.h"
 

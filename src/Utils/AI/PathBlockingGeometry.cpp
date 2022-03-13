@@ -5,7 +5,7 @@
 
 #include "Utils/AI/PathBlockingGeometry.h"
 
-#include "GameData/Core/Hull.h"
+#include "GameData/Geometry/Hull.h"
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 

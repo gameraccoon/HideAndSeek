@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GameData/Core/Vector2D.h>
+#include <GameData/Geometry/Vector2D.h>
 #include <Base/Types/TemplateAliases.h>
 
 class TransformComponent;
