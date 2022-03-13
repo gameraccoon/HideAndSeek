@@ -67,7 +67,7 @@ namespace Graphics
 		for (const auto& animFramePath : framePaths)
 		{
 			ResourceHandle spriteHandle = resourceManager.lockResource<Sprite>(animFramePath);
-			resourceManager.setFirstResourceDependOnSecond(handle, spriteHandle);
+			resourceManager.setFirstResourceDependOnSecond(handle, spriteHandle, HAL::DependencyType::Unload);
 			frames.push_back(spriteHandle);
 		}
 

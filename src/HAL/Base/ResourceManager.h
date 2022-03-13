@@ -21,6 +21,20 @@ namespace HAL
 	extern ConcurrentAccessDetector gResourceManagerAccessDetector;
 #endif // CONCURRENT_ACCESS_DETECTION
 
+	struct DependencyType
+	{
+		// not using enum class to avoid static-casting
+		enum Type : unsigned char
+		{
+			None = 0,
+			// if set, the next step of resource loading will wait until the dependent resource is loaded
+			Load = 1 << 0,
+			// if set, the resource won't be unloaded automatically until the dependent resource is unloaded
+			Unload = 1 << 1,
+			LoadAndUnload = Load | Unload
+		};
+	};
+
 	/**
 	 * Class that manages resources such as textures
 	 */
@@ -99,7 +113,7 @@ namespace HAL
 
 		void runThreadTasks(Resource::Thread currentThread);
 
-		void setFirstResourceDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency);
+		void setFirstResourceDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency, DependencyType::Type type = DependencyType::LoadAndUnload);
 
 		// for now atlasses are always loaded and don't require dependecy management
 		// if that ever changes, manage atlasses as any other resources and remove this method

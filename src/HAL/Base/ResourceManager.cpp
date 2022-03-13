@@ -277,14 +277,22 @@ namespace HAL
 		}
 	}
 
-	void ResourceManager::setFirstResourceDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency)
+	void ResourceManager::setFirstResourceDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency, DependencyType::Type type)
 	{
 		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
-		mDependencies.setFirstDependOnSecond(dependentResource, dependency);
-		if (auto it = mStorage.resources.find(dependency); it == mStorage.resources.end() || it->second == nullptr)
+		if (type & DependencyType::Unload)
 		{
-			mLoading.loadDependencies.setFirstDependOnSecond(dependentResource, dependency);
-			mLoading.resourcesWaitingDependencies.emplace(dependentResource, ResourceLoading::LoadingDataPtr{});
+			mDependencies.setFirstDependOnSecond(dependentResource, dependency);
+		}
+
+		if (type & DependencyType::Load)
+		{
+			// add dependency only if the resource is not loaded yet
+			if (auto it = mStorage.resources.find(dependency); it == mStorage.resources.end() || it->second == nullptr)
+			{
+				mLoading.loadDependencies.setFirstDependOnSecond(dependentResource, dependency);
+				mLoading.resourcesWaitingDependencies.emplace(dependentResource, ResourceLoading::LoadingDataPtr{});
+			}
 		}
 	}
 
