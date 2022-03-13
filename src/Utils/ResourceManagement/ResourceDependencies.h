@@ -3,9 +3,9 @@
 #include <vector>
 #include <unordered_map>
 
-#include "GameData/Core/ResourceHandle.h"
+#include "GameData/Resources/ResourceHandle.h"
 
-namespace HAL
+namespace ResourceLoading
 {
 	class ResourceDependencies
 	{

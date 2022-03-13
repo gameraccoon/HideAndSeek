@@ -1,8 +1,8 @@
 #include "Base/precomp.h"
 
-#include "HAL/Internal/ResourceManagement/ResourceStorageData.h"
+#include "Utils/ResourceManagement/ResourceStorageData.h"
 
-namespace HAL
+namespace ResourceLoading
 {
 	ResourceHandle ResourceStorage::createResourceLock(const ResourcePath& path)
 	{

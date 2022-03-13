@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "GameData/Core/ResourceHandle.h"
+#include "GameData/Resources/ResourceHandle.h"
 #include "GameData/FSM/Blackboard.h"
 
 template <typename StateIdType>

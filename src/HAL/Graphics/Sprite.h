@@ -2,7 +2,8 @@
 
 #include "HAL/EngineFwd.h"
 
-#include "HAL/Base/Resource.h"
+#include "GameData/Resources/Resource.h"
+
 #include "HAL/Base/Types.h"
 
 namespace Graphics
@@ -12,7 +13,7 @@ namespace Graphics
 		class Surface;
 	}
 
-	class Sprite : public HAL::Resource
+	class Sprite : public Resource
 	{
 	public:
 		Sprite(const Internal::Surface* surface, QuadUV uv);

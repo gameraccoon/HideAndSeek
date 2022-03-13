@@ -5,9 +5,10 @@
 
 #include "GameLogic/Render/RenderAccessor.h"
 
+class ResourceManager;
+
 namespace HAL
 {
-	class ResourceManager;
 	class Engine;
 }
 
@@ -23,18 +24,18 @@ public:
 
 	RenderAccessor& getAccessor() { return mRenderAccessor; }
 
-	void startThread(HAL::ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn);
+	void startThread(ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn);
 	void shutdownThread();
 
 	// temp code
-	void testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine);
+	void testRunMainThread(RenderAccessor& renderAccessor, ResourceManager& resourceManager, HAL::Engine& engine);
 
 private:
 	using RenderDataVector = std::vector<std::unique_ptr<RenderData>>;
 
 private:
-	static void RenderThreadFunction(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine);
-	static void ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine);
+	static void RenderThreadFunction(RenderAccessor& renderAccessor, ResourceManager& resourceManager, HAL::Engine& engine);
+	static void ConsumeAndRenderQueue(RenderDataVector&& dataToRender, ResourceManager& resourceManager, HAL::Engine& engine);
 
 private:
 	// contains everything needed to communicate with the render thread

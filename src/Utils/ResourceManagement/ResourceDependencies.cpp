@@ -1,11 +1,11 @@
 #include "Base/precomp.h"
 
-#include "HAL/Internal/ResourceManagement/ResourceDependencies.h"
+#include "Utils/ResourceManagement/ResourceDependencies.h"
 
 #include <ranges>
 #include <algorithm>
 
-namespace HAL
+namespace ResourceLoading
 {
 	void ResourceDependencies::setFirstDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency)
 	{

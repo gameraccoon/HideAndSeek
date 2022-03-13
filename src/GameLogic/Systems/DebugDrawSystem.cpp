@@ -29,7 +29,7 @@
 DebugDrawSystem::DebugDrawSystem(
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
-		HAL::ResourceManager& resourceManager) noexcept
+		ResourceManager& resourceManager) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(timeData)
 	, mResourceManager(resourceManager)

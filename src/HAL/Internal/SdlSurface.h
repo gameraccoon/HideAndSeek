@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 
-#include "HAL/Base/Resource.h"
+#include "GameData/Resources/Resource.h"
 
 struct SDL_Surface;
 
@@ -11,7 +11,7 @@ namespace Graphics
 {
 	namespace Internal
 	{
-		class Surface : public HAL::Resource
+		class Surface : public Resource
 		{
 		public:
 			explicit Surface(const std::string& filename);

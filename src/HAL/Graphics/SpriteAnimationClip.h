@@ -6,14 +6,16 @@
 
 #include <vector>
 
-#include "GameData/Core/ResourceHandle.h"
+#include "GameData/Resources/ResourceHandle.h"
+#include "GameData/Resources/Resource.h"
 
-#include "HAL/Base/Resource.h"
 #include "HAL/Base/Types.h"
+
+#include "HAL/Graphics/Sprite.h"
 
 namespace Graphics
 {
-	class SpriteAnimationClip : public HAL::Resource
+	class SpriteAnimationClip : public Resource
 	{
 	public:
 		SpriteAnimationClip() = default;

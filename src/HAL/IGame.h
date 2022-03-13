@@ -1,7 +1,5 @@
 #pragma once
 
-#include "HAL/Base/ResourceManager.h"
-
 namespace HAL
 {
 	class IGame

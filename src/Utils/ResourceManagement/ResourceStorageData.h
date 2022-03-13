@@ -5,12 +5,12 @@
 
 #include "Base/Types/String/Path.h"
 
-#include "GameData/Core/ResourceHandle.h"
+#include "GameData/Resources/ResourceHandle.h"
+#include "GameData/Resources/Resource.h"
 
-#include "HAL/Base/Resource.h"
 #include "HAL/Base/Types.h"
 
-namespace HAL
+namespace ResourceLoading
 {
 	// storage for loaded and ready resources
 	class ResourceStorage

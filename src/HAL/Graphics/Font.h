@@ -2,14 +2,14 @@
 
 #include "Base/Types/String/Path.h"
 
-#include "HAL/Base/Resource.h"
+#include "GameData/Resources/Resource.h"
 
 struct FC_Font;
 struct SDL_Renderer;
 
 namespace Graphics
 {
-	class Font : public HAL::Resource
+	class Font : public Resource
 	{
 	public:
 		Font() = default;

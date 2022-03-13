@@ -5,8 +5,9 @@
 
 #include <raccoon-ecs/system.h>
 
-#include "HAL/Base/ResourceManager.h"
 #include "HAL/EngineFwd.h"
+
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
@@ -23,7 +24,7 @@ public:
 	DebugDrawSystem(
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
-		HAL::ResourceManager& resourceManager) noexcept;
+		ResourceManager& resourceManager) noexcept;
 	~DebugDrawSystem() override = default;
 
 	void update() override;
@@ -33,7 +34,7 @@ public:
 private:
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
-	HAL::ResourceManager& mResourceManager;
+	ResourceManager& mResourceManager;
 
 	ResourceHandle mCollisionSpriteHandle;
 	ResourceHandle mNavmeshSpriteHandle;

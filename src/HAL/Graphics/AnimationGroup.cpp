@@ -9,9 +9,10 @@
 #include "Base/Types/String/Path.h"
 
 #include "HAL/Base/Engine.h"
-#include "HAL/Base/ResourceManager.h"
 #include "HAL/Internal/SdlSurface.h"
 #include "HAL/Graphics/SpriteAnimationClip.h"
+
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 namespace Graphics
 {
@@ -56,7 +57,7 @@ namespace Graphics
 		return result;
 	}
 
-	static UniqueAny CalculateAnimationGroupDependencies(UniqueAny&& resource, HAL::ResourceManager& resourceManager, ResourceHandle handle)
+	static UniqueAny CalculateAnimationGroupDependencies(UniqueAny&& resource, ResourceManager& resourceManager, ResourceHandle handle)
 	{
 		SCOPED_PROFILER("CalculateSpriteDependencies");
 
@@ -85,7 +86,7 @@ namespace Graphics
 		return UniqueAny::Create<AnimGroupLoadData>(std::move(animGroupLoadData));
 	}
 
-	static UniqueAny CreateAnimationGroup(UniqueAny&& resource, HAL::ResourceManager& resourceManager, ResourceHandle)
+	static UniqueAny CreateAnimationGroup(UniqueAny&& resource, ResourceManager& resourceManager, ResourceHandle)
 	{
 		SCOPED_PROFILER("CreateAnimationGroup");
 
@@ -103,7 +104,7 @@ namespace Graphics
 			animClips.emplace(std::move(clipPath), resourceManager.tryGetResource<Graphics::SpriteAnimationClip>(clipHandle)->getSprites());
 		}
 
-		return UniqueAny::Create<HAL::Resource::Ptr>(std::make_unique<Graphics::AnimationGroup>(std::move(animClips), animGroupLoadData->stateMachineID, animGroupLoadData->defaultState));
+		return UniqueAny::Create<Resource::Ptr>(std::make_unique<Graphics::AnimationGroup>(std::move(animClips), animGroupLoadData->stateMachineID, animGroupLoadData->defaultState));
 	}
 
 	AnimationGroup::AnimationGroup(std::map<StringId, std::vector<ResourceHandle>>&& animationClips, StringId stateMachineId, StringId defaultState)
@@ -123,7 +124,7 @@ namespace Graphics
 		return filename;
 	}
 
-	HAL::Resource::InitSteps AnimationGroup::GetInitSteps()
+	Resource::InitSteps AnimationGroup::GetInitSteps()
 	{
 		return {
 			InitStep{
@@ -137,7 +138,7 @@ namespace Graphics
 		};
 	}
 
-	HAL::Resource::DeinitSteps AnimationGroup::getDeinitSteps() const
+	Resource::DeinitSteps AnimationGroup::getDeinitSteps() const
 	{
 		return {};
 	}

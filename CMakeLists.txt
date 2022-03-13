@@ -118,9 +118,9 @@ endfunction()
 
 add_folder_as_library(${GAME_SRC_DIR}/Base Base)
 add_folder_as_library(${GAME_SRC_DIR}/GameData GameData)
-add_folder_as_library(${GAME_SRC_DIR}/GameLogic GameLogic)
 add_folder_as_library(${GAME_SRC_DIR}/Utils Utils)
 add_folder_as_library(${GAME_SRC_DIR}/HAL Hal)
+add_folder_as_library(${GAME_SRC_DIR}/GameLogic GameLogic)
 
 file(GLOB_RECURSE APP_SRC RELATIVE "" FOLLOW_SYMLINKS "${GAME_SRC_DIR}/GameMain/*")
 add_executable(${APP_NAME} "${APP_SRC}")

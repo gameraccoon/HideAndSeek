@@ -31,7 +31,7 @@
 RenderSystem::RenderSystem(
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
-		HAL::ResourceManager& resourceManager,
+		ResourceManager& resourceManager,
 		RaccoonEcs::ThreadPool& threadPool
 	) noexcept
 	: mWorldHolder(worldHolder)

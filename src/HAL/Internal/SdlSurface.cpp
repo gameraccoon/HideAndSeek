@@ -6,6 +6,8 @@
 #include "Base/Types/ComplexTypes/UniqueAny.h"
 #include "Base/Types/String/Path.h"
 
+#include "GameData/Resources/ResourceHandle.h"
+
 #include <stdexcept>
 #include <string>
 #include <glew/glew.h>
@@ -24,7 +26,7 @@ namespace Graphics
 {
 	namespace Internal
 	{
-		static UniqueAny LoadSurfaceInitStep(UniqueAny&& resource, HAL::ResourceManager&, ResourceHandle)
+		static UniqueAny LoadSurfaceInitStep(UniqueAny&& resource, ResourceManager&, ResourceHandle)
 		{
 			SCOPED_PROFILER("LoadSurfaceInitStep");
 
@@ -39,7 +41,7 @@ namespace Graphics
 			return UniqueAny::Create<std::unique_ptr<Surface>>(std::make_unique<Surface>(*pathPtr));
 		}
 
-		static UniqueAny InitSurfaceRenderThread(UniqueAny&& resource, HAL::ResourceManager&, ResourceHandle)
+		static UniqueAny InitSurfaceRenderThread(UniqueAny&& resource, ResourceManager&, ResourceHandle)
 		{
 			SCOPED_PROFILER("InitSurfaceRenderThread");
 			std::unique_ptr<Surface>* surfacePtr = resource.cast<std::unique_ptr<Surface>>();
@@ -91,10 +93,10 @@ namespace Graphics
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-			return UniqueAny::Create<HAL::Resource::Ptr>(std::move(*surfacePtr));
+			return UniqueAny::Create<Resource::Ptr>(std::move(*surfacePtr));
 		}
 
-		static UniqueAny DeinitSurfaceRenderThread(UniqueAny&& resource, HAL::ResourceManager&, ResourceHandle)
+		static UniqueAny DeinitSurfaceRenderThread(UniqueAny&& resource, ResourceManager&, ResourceHandle)
 		{
 			std::unique_ptr<Surface>* surfacePtr = resource.cast<std::unique_ptr<Surface>>();
 

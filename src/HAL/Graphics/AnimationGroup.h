@@ -4,16 +4,16 @@
 #include <vector>
 #include <map>
 
-#include "GameData/Core/ResourceHandle.h"
+#include "GameData/Resources/ResourceHandle.h"
+#include "GameData/Resources/Resource.h"
 
 #include "HAL/EngineFwd.h"
-#include "HAL/Base/Resource.h"
 #include "HAL/Base/Types.h"
 #include "HAL/Graphics/Sprite.h"
 
 namespace Graphics
 {
-	class AnimationGroup : public HAL::Resource
+	class AnimationGroup : public Resource
 	{
 	public:
 		AnimationGroup() = default;

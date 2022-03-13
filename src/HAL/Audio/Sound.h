@@ -2,13 +2,13 @@
 
 #include "Base/Types/String/Path.h"
 
-#include "HAL/Base/Resource.h"
+#include "GameData/Resources/Resource.h"
 
 struct Mix_Chunk;
 
 namespace Audio
 {
-	class Sound : public HAL::Resource
+	class Sound : public Resource
 	{
 	public:
 		Sound() = default;

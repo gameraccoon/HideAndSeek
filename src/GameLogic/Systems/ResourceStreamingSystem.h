@@ -4,7 +4,7 @@
 
 #include <raccoon-ecs/system.h>
 
-#include "HAL/Base/ResourceManager.h"
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
@@ -16,7 +16,7 @@ class ResourceStreamingSystem : public RaccoonEcs::System
 public:
 	ResourceStreamingSystem(
 		WorldHolder& worldHolder,
-		HAL::ResourceManager& resourceManager) noexcept;
+		ResourceManager& resourceManager) noexcept;
 	~ResourceStreamingSystem() override = default;
 
 	void update() override;
@@ -24,5 +24,5 @@ public:
 
 private:
 	WorldHolder& mWorldHolder;
-	HAL::ResourceManager& mResourceManager;
+	ResourceManager& mResourceManager;
 };

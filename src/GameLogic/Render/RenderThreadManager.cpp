@@ -10,17 +10,18 @@
 #include "Base/Types/ComplexTypes/VectorUtils.h"
 
 #include "HAL/Base/Math.h"
-#include "HAL/Base/ResourceManager.h"
 #include "HAL/Graphics/Renderer.h"
 #include "HAL/Graphics/Sprite.h"
 #include "HAL/Base/Engine.h"
+
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 RenderThreadManager::~RenderThreadManager()
 {
 	shutdownThread();
 }
 
-void RenderThreadManager::startThread(HAL::ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn)
+void RenderThreadManager::startThread(ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn)
 {
 	mRenderThread = std::make_unique<std::thread>(
 		[&renderAccessor = mRenderAccessor, &resourceManager, &engine, threadInitializeFn]
@@ -48,9 +49,9 @@ void RenderThreadManager::shutdownThread()
 	}
 }
 
-void RenderThreadManager::testRunMainThread(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
+void RenderThreadManager::testRunMainThread(RenderAccessor& renderAccessor, ResourceManager& resourceManager, HAL::Engine& engine)
 {
-	resourceManager.runThreadTasks(HAL::Resource::Thread::Render);
+	resourceManager.runThreadTasks(Resource::Thread::Render);
 	ConsumeAndRenderQueue(std::move(renderAccessor.dataToTransfer), resourceManager, engine);
 }
 
@@ -59,7 +60,7 @@ namespace RenderThreadManagerInternal
 	class RenderVisitor
 	{
 	public:
-		RenderVisitor(HAL::ResourceManager& resourceManager, HAL::Engine& engine)
+		RenderVisitor(ResourceManager& resourceManager, HAL::Engine& engine)
 			: mResourceManager(resourceManager)
 			, mEngine(engine)
 		{}
@@ -209,12 +210,12 @@ namespace RenderThreadManagerInternal
 		}
 
 	private:
-		HAL::ResourceManager& mResourceManager;
+		ResourceManager& mResourceManager;
 		HAL::Engine& mEngine;
 	};
 }
 
-void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
+void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, ResourceManager& resourceManager, HAL::Engine& engine)
 {
 	std::vector<std::unique_ptr<RenderData>> dataToRender;
 	while(true)
@@ -234,7 +235,7 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 			renderAccessor.dataToTransfer.clear();
 		}
 
-		resourceManager.runThreadTasks(HAL::Resource::Thread::Render);
+		resourceManager.runThreadTasks(Resource::Thread::Render);
 		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
 	}
 
@@ -243,7 +244,7 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, H
 #endif // ENABLE_SCOPED_PROFILER
 }
 
-void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, HAL::ResourceManager& resourceManager, HAL::Engine& engine)
+void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, ResourceManager& resourceManager, HAL::Engine& engine)
 {
 	SCOPED_PROFILER("RenderThreadManager::ConsumeAndRenderQueue");
 	using namespace RenderThreadManagerInternal;

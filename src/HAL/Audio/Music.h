@@ -2,14 +2,14 @@
 
 #include "Base/Types/String/Path.h"
 
-#include "HAL/Base/Resource.h"
+#include "GameData/Resources/Resource.h"
 
 struct _Mix_Music;
 typedef struct _Mix_Music Mix_Music;
 
 namespace Audio
 {
-	class Music : public HAL::Resource
+	class Music : public Resource
 	{
 	public:
 		Music() = default;

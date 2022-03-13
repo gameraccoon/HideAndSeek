@@ -9,10 +9,10 @@
 
 #include "Base/Types/String/Path.h"
 
+#include "Utils/ResourceManagement/ResourceManager.h"
+
 #include "HAL/Base/Engine.h"
-#include "HAL/Base/ResourceManager.h"
 #include "HAL/Internal/SdlSurface.h"
-#include "HAL/Graphics/Sprite.h"
 
 namespace Graphics
 {
@@ -48,7 +48,7 @@ namespace Graphics
 		return result;
 	}
 
-	static UniqueAny CreateAnimationClip(UniqueAny&& resource, HAL::ResourceManager& resourceManager, ResourceHandle handle)
+	static UniqueAny CreateAnimationClip(UniqueAny&& resource, ResourceManager& resourceManager, ResourceHandle handle)
 	{
 		SCOPED_PROFILER("CreateAnimationClip");
 
@@ -67,11 +67,11 @@ namespace Graphics
 		for (const auto& animFramePath : framePaths)
 		{
 			ResourceHandle spriteHandle = resourceManager.lockResource<Sprite>(animFramePath);
-			resourceManager.setFirstResourceDependOnSecond(handle, spriteHandle, HAL::DependencyType::Unload);
+			resourceManager.setFirstResourceDependOnSecond(handle, spriteHandle, ResourceDependencyType::Unload);
 			frames.push_back(spriteHandle);
 		}
 
-		return UniqueAny::Create<HAL::Resource::Ptr>(std::make_unique<Graphics::SpriteAnimationClip>(std::move(frames)));
+		return UniqueAny::Create<Resource::Ptr>(std::make_unique<Graphics::SpriteAnimationClip>(std::move(frames)));
 	}
 
 	SpriteAnimationClip::SpriteAnimationClip(std::vector<ResourceHandle>&& sprites)
@@ -99,7 +99,7 @@ namespace Graphics
 		return filename;
 	}
 
-	HAL::Resource::InitSteps SpriteAnimationClip::GetInitSteps()
+	Resource::InitSteps SpriteAnimationClip::GetInitSteps()
 	{
 		return {
 			InitStep{
@@ -109,7 +109,7 @@ namespace Graphics
 		};
 	}
 
-	HAL::Resource::DeinitSteps SpriteAnimationClip::getDeinitSteps() const
+	Resource::DeinitSteps SpriteAnimationClip::getDeinitSteps() const
 	{
 		return {};
 	}

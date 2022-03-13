@@ -13,8 +13,9 @@
 
 #include "GameData/Core/Vector2D.h"
 
-#include "HAL/Base/ResourceManager.h"
 #include "HAL/Base/Types.h"
+
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 struct BackgroundRenderData
 {

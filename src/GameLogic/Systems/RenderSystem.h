@@ -5,8 +5,7 @@
 
 #include <raccoon-ecs/system.h>
 
-#include "HAL/Base/ResourceManager.h"
-
+#include "Utils/ResourceManagement/ResourceManager.h"
 #include "Utils/Multithreading/ThreadPool.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
@@ -23,7 +22,7 @@ public:
 	RenderSystem(
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
-		HAL::ResourceManager& resourceManager,
+		ResourceManager& resourceManager,
 		RaccoonEcs::ThreadPool& threadPool) noexcept;
 
 	~RenderSystem() override = default;
@@ -39,7 +38,7 @@ private:
 private:
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
-	HAL::ResourceManager& mResourceManager;
+	ResourceManager& mResourceManager;
 	RaccoonEcs::ThreadPool& mThreadPool;
 	ResourceHandle mLightSpriteHandle;
 };

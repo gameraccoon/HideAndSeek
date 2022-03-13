@@ -3,11 +3,12 @@
 #include "Base/Types/String/Path.h"
 
 #include "HAL/Graphics/Sprite.h"
-#include "HAL/Base/ResourceManager.h"
 
 #include "HAL/Internal/SdlSurface.h"
 #include "HAL/Base/Types.h"
 #include "HAL/Base/Engine.h"
+
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 namespace Graphics
 {
@@ -17,7 +18,7 @@ namespace Graphics
 		QuadUV uv;
 	};
 
-	static UniqueAny CalculateSpriteDependencies(UniqueAny&& resource, HAL::ResourceManager& resourceManager, ResourceHandle handle)
+	static UniqueAny CalculateSpriteDependencies(UniqueAny&& resource, ResourceManager& resourceManager, ResourceHandle handle)
 	{
 		SCOPED_PROFILER("CalculateSpriteDependencies");
 
@@ -48,7 +49,7 @@ namespace Graphics
 		return UniqueAny::Create<LoadSpriteData>(originalSurfaceHandle, spriteUV);
 	}
 
-	static UniqueAny CreateSpriteInitStep(UniqueAny&& resource, HAL::ResourceManager& resourceManager, ResourceHandle)
+	static UniqueAny CreateSpriteInitStep(UniqueAny&& resource, ResourceManager& resourceManager, ResourceHandle)
 	{
 		SCOPED_PROFILER("CreateSpriteInitStep");
 		const LoadSpriteData* spriteData = resource.cast<LoadSpriteData>();
@@ -62,7 +63,7 @@ namespace Graphics
 		const Graphics::Internal::Surface* surface = resourceManager.tryGetResource<Graphics::Internal::Surface>(spriteData->surfaceHandle);
 		AssertRelease(surface != nullptr, "The surface should be loaded before loading sprite");
 
-		return UniqueAny::Create<HAL::Resource::Ptr>(std::make_unique<Graphics::Sprite>(surface, spriteData->uv));
+		return UniqueAny::Create<Resource::Ptr>(std::make_unique<Graphics::Sprite>(surface, spriteData->uv));
 	}
 
 	Sprite::Sprite(const Internal::Surface* surface, QuadUV uv)
@@ -96,7 +97,7 @@ namespace Graphics
 		return std::string("spr-") + filename;
 	}
 
-	HAL::Resource::InitSteps Sprite::GetInitSteps()
+	Resource::InitSteps Sprite::GetInitSteps()
 	{
 		return {
 			InitStep{
@@ -110,7 +111,7 @@ namespace Graphics
 		};
 	}
 
-	HAL::Resource::DeinitSteps Sprite::getDeinitSteps() const
+	Resource::DeinitSteps Sprite::getDeinitSteps() const
 	{
 		return {};
 	}

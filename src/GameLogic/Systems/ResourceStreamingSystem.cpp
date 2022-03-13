@@ -18,7 +18,7 @@
 
 ResourceStreamingSystem::ResourceStreamingSystem(
 		WorldHolder& worldHolder,
-		HAL::ResourceManager& resourceManager) noexcept
+		ResourceManager& resourceManager) noexcept
 	: mWorldHolder(worldHolder)
 	, mResourceManager(resourceManager)
 {

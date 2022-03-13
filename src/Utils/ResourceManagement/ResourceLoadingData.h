@@ -2,13 +2,14 @@
 
 #include "Base/Types/ComplexTypes/UniqueAny.h"
 
-#include "HAL/Base/Resource.h"
-#include "HAL/Internal/ResourceManagement/ResourceDependencies.h"
+#include "GameData/Resources/Resource.h"
 
-namespace HAL
+#include "Utils/ResourceManagement/ResourceDependencies.h"
+
+namespace ResourceLoading
 {
 	// data for loading and resolving dependencies on load
-	class ResourceLoading
+	class ResourceLoad
 	{
 	public:
 		struct LoadingData

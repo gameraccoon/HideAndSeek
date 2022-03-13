@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "GameData/Core/ResourceHandle.h"
+#include "GameData/Resources/ResourceHandle.h"
 #include "GameData/Resources/AnimationClipParams.h"
 
 struct AnimationClip
