@@ -4,7 +4,6 @@
 
 #include "sdl/SDL_mixer.h"
 
-#include "HAL/Internal/SdlSurface.h"
 #include "HAL/Base/Engine.h"
 
 namespace Audio

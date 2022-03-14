@@ -8,20 +8,17 @@
 
 namespace Graphics
 {
-	namespace Internal
-	{
-		class Surface;
-	}
+	class Surface;
 
 	class Sprite : public Resource
 	{
 	public:
-		Sprite(const Internal::Surface* surface, QuadUV uv);
+		Sprite(const Surface* surface, QuadUV uv);
 
 		int getHeight() const;
 		int getWidth() const;
 
-		const Internal::Surface* getSurface() const;
+		const Surface* getSurface() const;
 		QuadUV getUV() const { return mUV; }
 
 		bool isValid() const override;
@@ -31,7 +28,7 @@ namespace Graphics
 		DeinitSteps getDeinitSteps() const override;
 
 	private:
-		const Internal::Surface* mSurface = nullptr;
+		const Surface* mSurface = nullptr;
 		QuadUV mUV;
 	};
 }

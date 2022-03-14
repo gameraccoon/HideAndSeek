@@ -1,6 +1,6 @@
 #include "Base/precomp.h"
 
-#include "HAL/Graphics/AnimationGroup.h"
+#include "GameLogic/Resources/AnimationGroup.h"
 
 #include <filesystem>
 
@@ -9,8 +9,9 @@
 #include "Base/Types/String/Path.h"
 
 #include "HAL/Base/Engine.h"
-#include "HAL/Internal/SdlSurface.h"
-#include "HAL/Graphics/SpriteAnimationClip.h"
+#include "HAL/Graphics/SdlSurface.h"
+
+#include "GameLogic/Resources/SpriteAnimationClip.h"
 
 #include "Utils/ResourceManagement/ResourceManager.h"
 

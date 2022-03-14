@@ -4,7 +4,7 @@
 
 #include "HAL/Graphics/Sprite.h"
 
-#include "HAL/Internal/SdlSurface.h"
+#include "HAL/Graphics/SdlSurface.h"
 #include "HAL/Base/Types.h"
 #include "HAL/Base/Engine.h"
 
@@ -44,7 +44,7 @@ namespace Graphics
 		{
 			surfacePath = path;
 		}
-		ResourceHandle originalSurfaceHandle = resourceManager.lockResource<Graphics::Internal::Surface>(static_cast<ResourcePath>(surfacePath));
+		ResourceHandle originalSurfaceHandle = resourceManager.lockResource<Graphics::Surface>(static_cast<ResourcePath>(surfacePath));
 		resourceManager.setFirstResourceDependOnSecond(handle, originalSurfaceHandle);
 		return UniqueAny::Create<LoadSpriteData>(originalSurfaceHandle, spriteUV);
 	}
@@ -60,13 +60,13 @@ namespace Graphics
 			return {};
 		}
 
-		const Graphics::Internal::Surface* surface = resourceManager.tryGetResource<Graphics::Internal::Surface>(spriteData->surfaceHandle);
+		const Graphics::Surface* surface = resourceManager.tryGetResource<Graphics::Surface>(spriteData->surfaceHandle);
 		AssertRelease(surface != nullptr, "The surface should be loaded before loading sprite");
 
 		return UniqueAny::Create<Resource::Ptr>(std::make_unique<Graphics::Sprite>(surface, spriteData->uv));
 	}
 
-	Sprite::Sprite(const Internal::Surface* surface, QuadUV uv)
+	Sprite::Sprite(const Surface* surface, QuadUV uv)
 		: mSurface(surface)
 		, mUV(uv)
 	{
@@ -82,7 +82,7 @@ namespace Graphics
 		return mSurface->getWidth();
 	}
 
-	const Internal::Surface* Sprite::getSurface() const
+	const Surface* Sprite::getSurface() const
 	{
 		return mSurface;
 	}

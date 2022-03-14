@@ -7,8 +7,6 @@
 #include "GameData/Resources/ResourceHandle.h"
 #include "GameData/Resources/Resource.h"
 
-#include "HAL/EngineFwd.h"
-#include "HAL/Base/Types.h"
 #include "HAL/Graphics/Sprite.h"
 
 namespace Graphics

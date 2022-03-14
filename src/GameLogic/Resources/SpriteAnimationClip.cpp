@@ -1,6 +1,6 @@
 #include "Base/precomp.h"
 
-#include "HAL/Graphics/SpriteAnimationClip.h"
+#include "GameLogic/Resources/SpriteAnimationClip.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -11,8 +11,7 @@
 
 #include "Utils/ResourceManagement/ResourceManager.h"
 
-#include "HAL/Base/Engine.h"
-#include "HAL/Internal/SdlSurface.h"
+#include "HAL/Graphics/Sprite.h"
 
 namespace Graphics
 {

@@ -12,9 +12,8 @@
 #include "HAL/Internal/GlContext.h"
 
 #include "HAL/Internal/SdlWindow.h"
-#include "HAL/Internal/SdlSurface.h"
+#include "HAL/Graphics/SdlSurface.h"
 #include "HAL/Graphics/Font.h"
-#include "HAL/Internal/SdlSurface.h"
 
 
 static constexpr double MATH_PI = 3.14159265358979323846;
@@ -28,7 +27,7 @@ namespace HAL
 
 namespace Graphics
 {
-	void Render::DrawQuad(const Internal::Surface& surface, const glm::mat4& transform, Vector2D size, Graphics::QuadUV uv, float alpha)
+	void Render::DrawQuad(const Surface& surface, const glm::mat4& transform, Vector2D size, Graphics::QuadUV uv, float alpha)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glLoadMatrixf(reinterpret_cast<const float*>(&transform));
@@ -44,7 +43,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::DrawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size)
+	void Render::DrawQuad(const Surface& surface, Vector2D pos, Vector2D size)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glm::mat4 transform{ 1.0f };
@@ -62,7 +61,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::DrawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size, Vector2D anchor, float rotation, Graphics::QuadUV uv, float alpha)
+	void Render::DrawQuad(const Surface& surface, Vector2D pos, Vector2D size, Vector2D anchor, float rotation, Graphics::QuadUV uv, float alpha)
 	{
 		glm::mat4 transform{ 1.0f };
 		transform = glm::translate(transform, glm::vec3(pos.x, pos.y, 0.0f));
@@ -71,7 +70,7 @@ namespace Graphics
 		DrawQuad(surface, transform, size, uv, alpha);
 	}
 
-	void Render::DrawFan(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
+	void Render::DrawFan(const Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glLoadMatrixf(reinterpret_cast<const float*>(&transform));
@@ -88,7 +87,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::DrawStrip(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
+	void Render::DrawStrip(const Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glLoadMatrixf(reinterpret_cast<const float*>(&transform));
@@ -105,7 +104,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::DrawTiledQuad(const Internal::Surface& surface, Vector2D start, Vector2D size, const QuadUV& uv)
+	void Render::DrawTiledQuad(const Surface& surface, Vector2D start, Vector2D size, const QuadUV& uv)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glm::mat4 transform{ 1.0f };

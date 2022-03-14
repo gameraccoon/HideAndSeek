@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <vector>
 
 #include <glm/fwd.hpp>
 
@@ -23,15 +24,16 @@ namespace Graphics
 {
 	class Font;
 	class Texture;
+	class Surface;
 
 	namespace Render
 	{
-		void DrawQuad(const Internal::Surface& surface, const glm::mat4& transform, Vector2D size, QuadUV uv, float alpha = 1.0f);
-		void DrawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size);
-		void DrawQuad(const Internal::Surface& surface, Vector2D pos, Vector2D size, Vector2D anchor, float rotation, QuadUV uv, float alpha = 1.0f);
-		void DrawFan(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
-		void DrawStrip(const Internal::Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
-		void DrawTiledQuad(const Internal::Surface& surface, Vector2D start, Vector2D size, const QuadUV& uv);
+		void DrawQuad(const Surface& surface, const glm::mat4& transform, Vector2D size, QuadUV uv, float alpha = 1.0f);
+		void DrawQuad(const Surface& surface, Vector2D pos, Vector2D size);
+		void DrawQuad(const Surface& surface, Vector2D pos, Vector2D size, Vector2D anchor, float rotation, QuadUV uv, float alpha = 1.0f);
+		void DrawFan(const Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
+		void DrawStrip(const Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
+		void DrawTiledQuad(const Surface& surface, Vector2D start, Vector2D size, const QuadUV& uv);
 	}
 
 	class Renderer

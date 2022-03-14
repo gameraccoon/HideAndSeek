@@ -1,17 +1,10 @@
 #pragma once
 
 #include <memory>
-
-#include "HAL/EngineFwd.h"
-
 #include <vector>
 
 #include "GameData/Resources/ResourceHandle.h"
 #include "GameData/Resources/Resource.h"
-
-#include "HAL/Base/Types.h"
-
-#include "HAL/Graphics/Sprite.h"
 
 namespace Graphics
 {

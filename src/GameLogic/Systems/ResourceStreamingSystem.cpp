@@ -13,8 +13,9 @@
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 
 #include "HAL/Graphics/Sprite.h"
-#include "HAL/Graphics/SpriteAnimationClip.h"
-#include "HAL/Graphics/AnimationGroup.h"
+
+#include "GameLogic/Resources/SpriteAnimationClip.h"
+#include "GameLogic/Resources/AnimationGroup.h"
 
 ResourceStreamingSystem::ResourceStreamingSystem(
 		WorldHolder& worldHolder,
