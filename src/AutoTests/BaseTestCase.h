@@ -21,7 +21,7 @@
 class BaseTestCase : public Game
 {
 public:
-	BaseTestCase(int width, int height);
+	using Game::Game;
 
 	TestChecklist start(const ArgumentsParser& arguments);
 	void fixedTimeUpdate(float dt) final;

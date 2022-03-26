@@ -11,7 +11,7 @@
 class HapGame : public Game
 {
 public:
-	HapGame(int width, int height);
+	using Game::Game;
 
 	void start(ArgumentsParser& arguments);
 	void initResources() override;

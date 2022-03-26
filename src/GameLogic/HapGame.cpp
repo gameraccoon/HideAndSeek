@@ -39,11 +39,6 @@
 
 #include "GameLogic/Initialization/StateMachines.h"
 
-HapGame::HapGame(int width, int height)
-	: Game(width, height)
-{
-}
-
 void HapGame::start(ArgumentsParser& arguments)
 {
 	SCOPED_PROFILER("HapGame::start");

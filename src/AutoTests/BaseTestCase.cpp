@@ -11,11 +11,6 @@
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 
-BaseTestCase::BaseTestCase(int width, int height)
-	: Game(width, height)
-{
-}
-
 TestChecklist BaseTestCase::start(const ArgumentsParser& arguments)
 {
 	mOneFrame = arguments.hasArgument("one-frame");
