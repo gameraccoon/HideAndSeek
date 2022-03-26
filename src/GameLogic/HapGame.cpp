@@ -61,16 +61,6 @@ void HapGame::start(ArgumentsParser& arguments)
 	Game::start(arguments, workerThreadCount);
 }
 
-void HapGame::setKeyboardKeyState(int key, bool isPressed)
-{
-	getInputData().keyboardKeyStates.updateState(key, isPressed);
-}
-
-void HapGame::setMouseKeyState(int key, bool isPressed)
-{
-	getInputData().mouseKeyStates.updateState(key, isPressed);
-}
-
 void HapGame::initSystems()
 {
 	SCOPED_PROFILER("HapGame::initSystems");

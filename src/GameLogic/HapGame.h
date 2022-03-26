@@ -14,8 +14,6 @@ public:
 	HapGame(int width, int height);
 
 	void start(ArgumentsParser& arguments);
-	void setKeyboardKeyState(int key, bool isPressed) override;
-	void setMouseKeyState(int key, bool isPressed) override;
 	void initResources() override;
 
 private:
