@@ -18,8 +18,8 @@
 
 #include "GameLogic/Initialization/StateMachines.h"
 
-Game::Game(int width, int height)
-	: HAL::GameBase(width, height)
+Game::Game(HAL::Engine* engine, ResourceManager& resourceManager)
+	: HAL::GameBase(engine, resourceManager)
 	, mThreadPool(0, [this]{ workingThreadSaveProfileData(); })
 {
 }

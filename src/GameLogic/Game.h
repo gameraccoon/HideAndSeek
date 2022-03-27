@@ -30,7 +30,7 @@
 class Game : public HAL::GameBase
 {
 public:
-	Game(int width, int height);
+	Game(HAL::Engine* engine, ResourceManager& resourceManager);
 
 	void preStart(const ArgumentsParser& arguments, int workerThreadsCount);
 	void start();

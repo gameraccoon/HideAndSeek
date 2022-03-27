@@ -4,14 +4,14 @@
 
 #include "HAL/EngineFwd.h"
 
-#include "Utils/ResourceManagement/ResourceManager.h"
+class ResourceManager;
 
 namespace HAL
 {
 	class GameBase : public IGame
 	{
 	public:
-		GameBase(int windowWidth, int windowHeight);
+		GameBase(Engine* engine, ResourceManager& resourceManager);
 		~GameBase() override;
 
 	protected:
@@ -19,7 +19,7 @@ namespace HAL
 		ResourceManager& getResourceManager();
 
 	private:
-		std::unique_ptr<Engine> mEngine;
-		std::unique_ptr<ResourceManager> mResourceManager;
+		Engine* mEngine;
+		ResourceManager& mResourceManager;
 	};
 }
