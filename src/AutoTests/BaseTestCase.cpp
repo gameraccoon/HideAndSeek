@@ -20,7 +20,9 @@ TestChecklist BaseTestCase::start(const ArgumentsParser& arguments)
 
 	initTestCase(arguments);
 
-	Game::start(arguments, 3);
+	Game::preStart(arguments, 3);
+	Game::start();
+	Game::onGameShutdown();
 
 	return std::move(mTestChecklist);
 }
@@ -37,7 +39,7 @@ void BaseTestCase::fixedTimeUpdate(float dt)
 	if (mTicksCount >= mTicksToFinish)
 	{
 		finalizeTestCase();
-		getEngine().quit();
+		getEngine()->quit();
 	}
 }
 

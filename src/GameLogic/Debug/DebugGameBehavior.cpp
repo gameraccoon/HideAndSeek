@@ -11,7 +11,14 @@ void DebugGameBehavior::preInnerUpdate(Game& game)
 	if (mForcedInputData.has_value())
 	{
 		game.mInputData = *mForcedInputData;
-		game.mInputData.windowSize = game.getEngine().getWindowSize();
+		if ALMOST_ALWAYS(HAL::Engine* engine = game.getEngine())
+		{
+			game.mInputData.windowSize = engine->getWindowSize();
+		}
+		else
+		{
+			ReportError("Engine was not available for debug game behavior object");
+		}
 		game.mInputData.mousePos = Vector2D::HadamardProduct(game.mInputData.mousePos, game.mInputData.windowSize);
 	}
 }
@@ -23,7 +30,10 @@ void DebugGameBehavior::postInnerUpdate(Game& game)
 		--mFramesBeforeShutdown;
 		if (mFramesBeforeShutdown <= 0)
 		{
-			game.getEngine().quit();
+			if ALMOST_ALWAYS(HAL::Engine* engine = game.getEngine())
+			{
+				engine->quit();
+			}
 		}
 	}
 }

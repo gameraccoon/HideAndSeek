@@ -19,7 +19,9 @@ int main(int argc, char** argv)
 	ArgumentsParser arguments(argc, argv);
 
 	HapGame game(800, 600);
-	game.start(arguments);
+	game.preStart(arguments);
+	game.start();
+	game.onGameShutdown();
 
 	return 0;
 }

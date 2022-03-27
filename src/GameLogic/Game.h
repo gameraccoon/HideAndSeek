@@ -32,7 +32,10 @@ class Game : public HAL::GameBase
 public:
 	Game(int width, int height);
 
-	void start(const ArgumentsParser& arguments, int workerThreadsCount);
+	void preStart(const ArgumentsParser& arguments, int workerThreadsCount);
+	void start();
+	void onGameShutdown();
+
 	void dynamicTimePreFrameUpdate(float dt) final;
 	void fixedTimeUpdate(float dt) override;
 	void dynamicTimePostFrameUpdate(float dt) final;
@@ -53,7 +56,6 @@ protected:
 	Json::ComponentSerializationHolder& getComponentSerializers() { return mComponentSerializers; }
 
 private:
-	void onGameShutdown();
 	void workingThreadSaveProfileData();
 
 private:

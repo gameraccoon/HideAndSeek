@@ -15,7 +15,7 @@ namespace HAL
 		~GameBase() override;
 
 	protected:
-		Engine& getEngine();
+		Engine* getEngine();
 		ResourceManager& getResourceManager();
 
 	private:

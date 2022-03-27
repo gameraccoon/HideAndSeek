@@ -39,7 +39,7 @@
 
 #include "GameLogic/Initialization/StateMachines.h"
 
-void HapGame::start(ArgumentsParser& arguments)
+void HapGame::preStart(ArgumentsParser& arguments)
 {
 	SCOPED_PROFILER("HapGame::start");
 
@@ -53,12 +53,15 @@ void HapGame::start(ArgumentsParser& arguments)
 	GameDataLoader::LoadWorld(getWorldHolder().getWorld(), arguments.getArgumentValue("world", "test"), getComponentSerializers());
 	GameDataLoader::LoadGameData(getGameData(), arguments.getArgumentValue("gameData", "gameData"), getComponentSerializers());
 
-	Game::start(arguments, workerThreadCount);
+	Game::preStart(arguments, workerThreadCount);
 }
 
 void HapGame::initSystems()
 {
 	SCOPED_PROFILER("HapGame::initSystems");
+
+	AssertFatal(getEngine(), "HapGame was created without Engine, we are going to crash");
+
 	getPreFrameSystemsManager().registerSystem<ControlSystem>(getWorldHolder(), getInputData());
 	getGameLogicSystemsManager().registerSystem<AiSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<WeaponSystem>(getWorldHolder(), getTime());
@@ -73,7 +76,7 @@ void HapGame::initSystems()
 	getPostFrameSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getTime(), getResourceManager());
 
 #ifdef IMGUI_ENABLED
-	getPostFrameSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, getEngine());
+	getPostFrameSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, *getEngine());
 #endif // IMGUI_ENABLED
 }
 

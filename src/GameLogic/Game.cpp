@@ -12,10 +12,6 @@
 
 #include "Utils/World/GameDataLoader.h"
 
-#ifdef IMGUI_ENABLED
-#include "GameLogic/Systems/ImguiSystem.h"
-#endif // IMGUI_ENABLED
-
 #ifdef ENABLE_SCOPED_PROFILER
 #include "Utils/Profiling/ProfileDataWriter.h"
 #endif // ENABLE_SCOPED_PROFILER
@@ -28,7 +24,7 @@ Game::Game(int width, int height)
 {
 }
 
-void Game::start([[maybe_unused]] const ArgumentsParser& arguments, int workerThreadsCount)
+void Game::preStart([[maybe_unused]] const ArgumentsParser& arguments, int workerThreadsCount)
 {
 	SCOPED_PROFILER("Game::start");
 	mDebugBehavior.processArguments(arguments);
@@ -44,20 +40,31 @@ void Game::start([[maybe_unused]] const ArgumentsParser& arguments, int workerTh
 
 	mWorld.getWorldComponents().addComponent<WorldCachedDataComponent>();
 
-	RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
-	renderAccessor->setAccessor(&mRenderThread.getAccessor());
+	if (HAL::Engine* engine = getEngine())
+	{
+		RenderAccessorComponent* renderAccessor = mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>();
+		renderAccessor->setAccessor(&mRenderThread.getAccessor());
 
-	getEngine().releaseRenderContext();
-	mRenderThread.startThread(getResourceManager(), getEngine(), [&engine = getEngine()]{ engine.acquireRenderContext(); });
+		engine->releaseRenderContext();
+		mRenderThread.startThread(getResourceManager(), *getEngine(), [engine]{ engine->acquireRenderContext(); });
+	}
 
 #ifdef ENABLE_SCOPED_PROFILER
 	mScopedProfileOutputPath = arguments.getArgumentValue("profile-systems", mScopedProfileOutputPath);
 #endif // ENABLE_SCOPED_PROFILER
+}
 
+void Game::start()
+{
 	// start the main loop
-	getEngine().start(this);
-
-	onGameShutdown();
+	if (HAL::Engine* engine = getEngine())
+	{
+		engine->start(this);
+	}
+	else
+	{
+		ReportFatalError("Trying to start() game with no Engine");
+	}
 }
 
 void Game::setKeyboardKeyState(int key, bool isPressed)
@@ -81,8 +88,11 @@ void Game::dynamicTimePreFrameUpdate(float /*dt*/)
 	TemplateHelpers::EmplaceVariant<SwapBuffersCommand>(renderCommands->layers);
 	mRenderThread.getAccessor().submitData(std::move(renderCommands));
 
-	mInputData.windowSize = getEngine().getWindowSize();
-	mInputData.mousePos = getEngine().getMousePos();
+	if (HAL::Engine* engine = getEngine())
+	{
+		mInputData.windowSize = engine->getWindowSize();
+		mInputData.mousePos = engine->getMousePos();
+	}
 
 	mDebugBehavior.preInnerUpdate(*this);
 
