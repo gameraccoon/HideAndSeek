@@ -1,6 +1,6 @@
 #include "Base/precomp.h"
 
-#include "GameLogic/HapGame.h"
+#include "GameLogic/Game/HapGame.h"
 
 #include "Base/Types/TemplateHelpers.h"
 
@@ -39,7 +39,7 @@
 
 #include "GameLogic/Initialization/StateMachines.h"
 
-void HapGame::preStart(ArgumentsParser& arguments)
+void HapGame::preStart(ArgumentsParser& arguments, RenderAccessor& renderAccessor)
 {
 	SCOPED_PROFILER("HapGame::start");
 
@@ -48,12 +48,13 @@ void HapGame::preStart(ArgumentsParser& arguments)
 
 	initSystems();
 
-	const int workerThreadCount = 3;
-
 	GameDataLoader::LoadWorld(getWorldHolder().getWorld(), arguments.getArgumentValue("world", "test"), getComponentSerializers());
 	GameDataLoader::LoadGameData(getGameData(), arguments.getArgumentValue("gameData", "gameData"), getComponentSerializers());
 
-	Game::preStart(arguments, workerThreadCount);
+	RenderAccessorComponent* renderAccessorComponent = getGameData().getGameComponents().getOrAddComponent<RenderAccessorComponent>();
+	renderAccessorComponent->setAccessor(&renderAccessor);
+
+	Game::preStart(arguments);
 }
 
 void HapGame::initSystems()

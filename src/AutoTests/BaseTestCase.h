@@ -1,29 +1,18 @@
 #pragma once
 
-#include <raccoon-ecs/systems_manager.h>
-
-#include "GameData/EcsDefinitions.h"
-#include "GameData/World.h"
-#include "GameData/GameData.h"
-
-#include "Utils/Application/ArgumentsParser.h"
-
-#include "HAL/GameBase.h"
-
-#include "GameLogic/Game.h"
-#include "GameLogic/SharedManagers/TimeData.h"
-#include "GameLogic/SharedManagers/WorldHolder.h"
-#include "GameLogic/SharedManagers/InputData.h"
-#include "GameLogic/Render/RenderThreadManager.h"
+#include "GameLogic/Game/Game.h"
 
 #include "AutoTests/TestChecklist.h"
+
+class RenderAccessor;
+class ArgumentParser;
 
 class BaseTestCase : public Game
 {
 public:
 	using Game::Game;
 
-	TestChecklist start(const ArgumentsParser& arguments);
+	TestChecklist start(const ArgumentsParser& arguments, RenderAccessor& renderAccessor);
 	void fixedTimeUpdate(float dt) final;
 	void setKeyboardKeyState(int, bool) override {}
 	void setMouseKeyState(int, bool) override {}

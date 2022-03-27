@@ -8,31 +8,26 @@
 #include "GameData/GameData.h"
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
-#include "Utils/Application/ArgumentsParser.h"
-#include "Utils/Multithreading/ThreadPool.h"
-
 #include "HAL/GameBase.h"
 
 #include "GameLogic/Debug/DebugGameBehavior.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/InputData.h"
-#include "GameLogic/Render/RenderThreadManager.h"
 
 #ifdef IMGUI_ENABLED
 #include "GameLogic/Imgui/ImguiDebugData.h"
 #endif
 
-#ifdef ENABLE_SCOPED_PROFILER
-#include <mutex>
-#endif
+class ArgumentsParser;
+class ThreadPool;
 
 class Game : public HAL::GameBase
 {
 public:
-	Game(HAL::Engine* engine, ResourceManager& resourceManager);
+	Game(HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool);
 
-	void preStart(const ArgumentsParser& arguments, int workerThreadsCount);
+	void preStart(const ArgumentsParser& arguments);
 	void start();
 	void onGameShutdown();
 
@@ -51,7 +46,7 @@ protected:
 	RaccoonEcs::SystemsManager& getPostFrameSystemsManager() { return mPostFrameSystemsManager; }
 	InputData& getInputData() { return mInputData; }
 	const TimeData& getTime() const { return mTime; }
-	RaccoonEcs::ThreadPool& getThreadPool() { return mThreadPool; }
+	ThreadPool& getThreadPool() { return mThreadPool; }
 	GameData& getGameData() { return mGameData; }
 	Json::ComponentSerializationHolder& getComponentSerializers() { return mComponentSerializers; }
 
@@ -67,23 +62,16 @@ private:
 
 	InputData mInputData;
 
-	RaccoonEcs::ThreadPool mThreadPool;
+	ThreadPool& mThreadPool;
 	RaccoonEcs::SystemsManager mPreFrameSystemsManager;
 	RaccoonEcs::SystemsManager mGameLogicSystemsManager;
 	RaccoonEcs::SystemsManager mPostFrameSystemsManager;
 	Json::ComponentSerializationHolder mComponentSerializers;
 	TimeData mTime;
-	RenderThreadManager mRenderThread;
-	const int MainThreadId = 0;
-	int mWorkerThreadsCount = 3;
-	int mRenderThreadId = mWorkerThreadsCount + 1;
 
 #ifdef ENABLE_SCOPED_PROFILER
-	std::string mScopedProfileOutputPath = "./scoped_profile.json";
 	std::string mFrameDurationsOutputPath = "./frame_times.csv";
 	std::vector<double> mFrameDurations;
-	std::vector<std::pair<size_t, ScopedProfilerThreadData::Records>> mScopedProfileRecords;
-	std::mutex mScopedProfileRecordsMutex;
 	std::chrono::time_point<std::chrono::steady_clock> mFrameBeginTime;
 #endif // ENABLE_SCOPED_PROFILER
 

@@ -2,25 +2,27 @@
 
 #include "AutoTests/BaseTestCase.h"
 
-#include <memory>
+#include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
+#include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 
-#include "Base/Types/TemplateHelpers.h"
+#include "Utils/Application/ArgumentsParser.h"
 
 #include "HAL/Base/Engine.h"
 
-#include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
-#include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
-
-TestChecklist BaseTestCase::start(const ArgumentsParser& arguments)
+TestChecklist BaseTestCase::start(const ArgumentsParser& arguments, RenderAccessor& renderAccessor)
 {
 	mOneFrame = arguments.hasArgument("one-frame");
 
 	ComponentsRegistration::RegisterComponents(getComponentFactory());
 	ComponentsRegistration::RegisterJsonSerializers(getComponentSerializers());
 
+	RenderAccessorComponent* renderAccessorComponent = getGameData().getGameComponents().getOrAddComponent<RenderAccessorComponent>();
+	renderAccessorComponent->setAccessor(&renderAccessor);
+
 	initTestCase(arguments);
 
-	Game::preStart(arguments, 3);
+	Game::preStart(arguments);
 	Game::start();
 	Game::onGameShutdown();
 

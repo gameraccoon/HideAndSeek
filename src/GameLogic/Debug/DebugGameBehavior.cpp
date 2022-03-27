@@ -2,9 +2,11 @@
 
 #include "GameLogic/Debug/DebugGameBehavior.h"
 
+#include "Utils/Application/ArgumentsParser.h"
+
 #include "HAL/Base/Engine.h"
 
-#include "GameLogic/Game.h"
+#include "GameLogic/Game/Game.h"
 
 void DebugGameBehavior::preInnerUpdate(Game& game)
 {

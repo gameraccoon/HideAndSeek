@@ -10,26 +10,28 @@
 
 #include "HAL/Base/Engine.h"
 
+#include "GameLogic/Game/ApplicationData.h"
+
 #include "AutoTests/Tests/CollidingCircularUnits/TestCase.h"
 #include "AutoTests/Tests/WeaponShooting/TestCase.h"
 #include "AutoTests/TestChecklist.h"
 
-using CasesMap = std::map<std::string, std::function<std::unique_ptr<BaseTestCase>(HAL::Engine*, ResourceManager&)>>;
+using CasesMap = std::map<std::string, std::function<std::unique_ptr<BaseTestCase>(HAL::Engine*, ResourceManager&, ThreadPool&)>>;
 
 static CasesMap GetCases()
 {
 	return CasesMap
 	({
 		{
-			"CollidingCircularUnits", [](HAL::Engine* engine, ResourceManager& resourceManager)
+			"CollidingCircularUnits", [](HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool)
 			{
-				return std::make_unique<CollidingCircularUnitsTestCase>(engine, resourceManager);
+				return std::make_unique<CollidingCircularUnitsTestCase>(engine, resourceManager, threadPool);
 			}
 		},
 		{
-			"WeaponShooting", [](HAL::Engine* engine, ResourceManager& resourceManager)
+			"WeaponShooting", [](HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool)
 			{
-				return std::make_unique<WeaponShootingTestCase>(engine, resourceManager);
+				return std::make_unique<WeaponShootingTestCase>(engine, resourceManager, threadPool);
 			}
 		}
 	});
@@ -87,11 +89,22 @@ int main(int argc, char** argv)
 	auto caseIt = cases.find(arguments.getArgumentValue("case"));
 	if (caseIt != cases.end())
 	{
+		ApplicationData applicationData(arguments.getIntArgumentValue("profile-systems", ApplicationData::DefaultWorkerThreadCount));
 		HAL::Engine engine(800, 600);
 		ResourceManager resourceManager;
-		std::unique_ptr<BaseTestCase> testCase = caseIt->second(&engine, resourceManager);
-		TestChecklist checklist = testCase->start(arguments);
+
+		// switch render context to render thread
+		engine.releaseRenderContext();
+		applicationData.renderThread.startThread(resourceManager, engine, [&engine]{ engine.acquireRenderContext(); });
+
+		std::unique_ptr<BaseTestCase> testCase = caseIt->second(&engine, resourceManager, applicationData.threadPool);
+		TestChecklist checklist = testCase->start(arguments, applicationData.renderThread.getAccessor());
 		bool isSuccessful = ValidateChecklist(checklist);
+
+		applicationData.shutdownThreads(); // this call waits for the threads to be joined
+
+		applicationData.writeProfilingData(); // this call waits for the data to be written to the files
+
 		return isSuccessful ? 0 : 1;
 	}
 	else

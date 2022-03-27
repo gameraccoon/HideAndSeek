@@ -29,6 +29,35 @@ std::string ArgumentsParser::getArgumentValue(const std::string& argument, const
 	return defaultValue;
 }
 
+int ArgumentsParser::getIntArgumentValue(const std::string& argument, int defaultValue) const
+{
+	std::vector<std::string>::const_iterator itr = std::find(this->mTokens.begin(), this->mTokens.end(), mArgumentSwitch + argument);
+
+	if (itr != mTokens.end())
+	{
+		++itr;
+		if (itr != mTokens.end())
+		{
+			auto beginIt = itr->begin();
+			if (itr->size() > 1u && *beginIt == '-')
+			{
+				++beginIt;
+			}
+
+			if (std::all_of(beginIt, itr->end(), [](char c){ return isdigit(c) != 0; }))
+			{
+				return std::atoi(itr->c_str());
+			}
+			else
+			{
+				ReportFatalError("Argument %s doesn't have integer value, the value is %s", argument.c_str(), itr->c_str());
+			}
+		}
+	}
+
+	return defaultValue;
+}
+
 bool ArgumentsParser::hasArgument(const std::string& argument) const
 {
 	return std::find(mTokens.begin(), mTokens.end(), mArgumentSwitch + argument) != mTokens.end();

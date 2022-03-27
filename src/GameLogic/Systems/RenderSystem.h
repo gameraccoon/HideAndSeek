@@ -23,7 +23,7 @@ public:
 		WorldHolder& worldHolder,
 		const TimeData& timeData,
 		ResourceManager& resourceManager,
-		RaccoonEcs::ThreadPool& threadPool) noexcept;
+		ThreadPool& threadPool) noexcept;
 
 	~RenderSystem() override = default;
 
@@ -39,6 +39,6 @@ private:
 	WorldHolder& mWorldHolder;
 	const TimeData& mTime;
 	ResourceManager& mResourceManager;
-	RaccoonEcs::ThreadPool& mThreadPool;
+	ThreadPool& mThreadPool;
 	ResourceHandle mLightSpriteHandle;
 };
