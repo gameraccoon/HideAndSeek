@@ -27,7 +27,6 @@ namespace HAL
 		Vector2D getMousePos() const;
 
 		void start(IGame* game);
-		void quit();
 
 		Graphics::Renderer& getRenderer();
 

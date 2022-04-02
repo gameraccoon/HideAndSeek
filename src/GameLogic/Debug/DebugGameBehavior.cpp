@@ -32,10 +32,7 @@ void DebugGameBehavior::postInnerUpdate(Game& game)
 		--mFramesBeforeShutdown;
 		if (mFramesBeforeShutdown <= 0)
 		{
-			if ALMOST_ALWAYS(HAL::Engine* engine = game.getEngine())
-			{
-				engine->quit();
-			}
+			game.quitGame();
 		}
 	}
 }

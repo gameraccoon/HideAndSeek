@@ -18,8 +18,14 @@ public:
 	void preStart(ArgumentsParser& arguments, RenderAccessor& renderAccessor);
 	void initResources() override;
 
+	void quitGame() override { mShouldQuit = true; }
+	bool shouldQuitGame() const override { return mShouldQuit; }
+
 private:
 	void initSystems();
+
+private:
+	bool mShouldQuit = false;
 
 #ifdef IMGUI_ENABLED
 	ImguiDebugData mImguiDebugData{getWorldHolder(), getTime(), getComponentFactory(), {}};

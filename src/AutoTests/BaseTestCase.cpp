@@ -41,7 +41,7 @@ void BaseTestCase::fixedTimeUpdate(float dt)
 	if (mTicksCount >= mTicksToFinish)
 	{
 		finalizeTestCase();
-		getEngine()->quit();
+		mShouldQuit = true;
 	}
 }
 

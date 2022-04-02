@@ -17,6 +17,9 @@ public:
 	void setKeyboardKeyState(int, bool) override {}
 	void setMouseKeyState(int, bool) override {}
 
+	bool shouldQuitGame() const override { return mShouldQuit; }
+	void quitGame() override { mShouldQuit = true; }
+
 protected:
 	virtual void initTestCase(const ArgumentsParser& arguments) = 0;
 	virtual void finalizeTestCase();
@@ -28,4 +31,5 @@ protected:
 private:
 	int mTicksCount = 0;
 	bool mOneFrame = false;
+	bool mShouldQuit = false;
 };
