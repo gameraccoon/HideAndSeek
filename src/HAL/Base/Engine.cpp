@@ -22,11 +22,6 @@ namespace HAL
 	ConcurrentAccessDetector gSDLAccessDetector;
 #endif
 
-	static const float ONE_SECOND_TICKS = 1000.0f;
-	static const float ONE_TICK_SECONDS = 1.0f / ONE_SECOND_TICKS;
-	static const Uint32 ONE_FRAME_TICKS = 16;
-	static const float ONE_FRAME_SEC = ONE_FRAME_TICKS * ONE_TICK_SECONDS;
-
 	struct Engine::Impl
 	{
 		Internal::SDLInstance mSdl;
