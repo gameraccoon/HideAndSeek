@@ -28,12 +28,13 @@ namespace Graphics
 
 	namespace Render
 	{
-		void DrawQuad(const Surface& surface, const glm::mat4& transform, Vector2D size, QuadUV uv, float alpha = 1.0f);
-		void DrawQuad(const Surface& surface, Vector2D pos, Vector2D size);
-		void DrawQuad(const Surface& surface, Vector2D pos, Vector2D size, Vector2D anchor, float rotation, QuadUV uv, float alpha = 1.0f);
-		void DrawFan(const Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
-		void DrawStrip(const Surface& surface, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
-		void DrawTiledQuad(const Surface& surface, Vector2D start, Vector2D size, const QuadUV& uv);
+		void BindSurface(const Surface& surface);
+		void DrawQuad(const glm::mat4& transform, Vector2D size, QuadUV uv, float alpha = 1.0f);
+		void DrawQuad(Vector2D pos, Vector2D size);
+		void DrawQuad(Vector2D pos, Vector2D size, Vector2D anchor, float rotation, QuadUV uv, float alpha = 1.0f);
+		void DrawFan(const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
+		void DrawStrip(const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
+		void DrawTiledQuad(Vector2D start, Vector2D size, const QuadUV& uv);
 	}
 
 	class Renderer

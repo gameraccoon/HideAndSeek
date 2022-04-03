@@ -60,9 +60,10 @@ namespace RenderThreadManagerInternal
 	class RenderVisitor
 	{
 	public:
-		RenderVisitor(ResourceManager& resourceManager, HAL::Engine& engine)
+		RenderVisitor(ResourceManager& resourceManager, HAL::Engine& engine, const Graphics::Surface*& lastSurface)
 			: mResourceManager(resourceManager)
 			, mEngine(engine)
+			, mLastSurface(lastSurface)
 		{}
 
 		void operator()(BackgroundRenderData&& bgData)
@@ -76,8 +77,8 @@ namespace RenderThreadManagerInternal
 				return;
 			}
 
+			bindSurface(bgSprite->getSurface());
 			Graphics::Render::DrawTiledQuad(
-				*bgSprite->getSurface(),
 				bgData.start,
 				bgData.size,
 				bgData.uv
@@ -108,8 +109,8 @@ namespace RenderThreadManagerInternal
 			const Vector2D drawShift = fanData.start + fanData.size;
 			glm::mat4 transform(1.0f);
 			transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
+			bindSurface(sprite->getSurface());
 			Graphics::Render::DrawFan(
-				*sprite->getSurface(),
 				points,
 				transform,
 				fanData.alpha
@@ -126,8 +127,8 @@ namespace RenderThreadManagerInternal
 				return;
 			}
 
+			bindSurface(sprite->getSurface());
 			Graphics::Render::DrawQuad(
-				*sprite->getSurface(),
 				quadData.position,
 				quadData.size,
 				quadData.anchor,
@@ -157,7 +158,8 @@ namespace RenderThreadManagerInternal
 
 			glm::mat4 transform(1.0f);
 			transform = glm::translate(transform, glm::vec3(polygonData.drawShift.x, polygonData.drawShift.y, 0.0f));
-			Graphics::Render::DrawFan(*sprite->getSurface(), polygonData.points, transform, 0.3f);
+			bindSurface(sprite->getSurface());
+			Graphics::Render::DrawFan(polygonData.points, transform, 0.3f);
 		}
 
 		void operator()(StripRenderData&& stripData)
@@ -179,7 +181,8 @@ namespace RenderThreadManagerInternal
 
 			glm::mat4 transform(1.0f);
 			transform = glm::translate(transform, glm::vec3(stripData.drawShift.x, stripData.drawShift.y, 0.0f));
-			Graphics::Render::DrawStrip(*sprite->getSurface(), stripData.points, transform, stripData.alpha);
+			bindSurface(sprite->getSurface());
+			Graphics::Render::DrawStrip(stripData.points, transform, stripData.alpha);
 		}
 
 		void operator()(const TextRenderData& /*textData*/)
@@ -210,8 +213,19 @@ namespace RenderThreadManagerInternal
 		}
 
 	private:
+		void bindSurface(const Graphics::Surface* surface)
+		{
+			if (surface != mLastSurface)
+			{
+				mLastSurface = surface;
+				Graphics::Render::BindSurface(*surface);
+			}
+		}
+
+	private:
 		ResourceManager& mResourceManager;
 		HAL::Engine& mEngine;
+		const Graphics::Surface*& mLastSurface;
 	};
 }
 
@@ -283,9 +297,10 @@ void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender,
 		}
 
 		RenderData* renderData = dataToRender[i].get();
+		const Graphics::Surface* lastSurface = nullptr;
 		for (RenderData::Layer& layer : renderData->layers)
 		{
-			std::visit(RenderVisitor{resourceManager, engine}, std::move(layer));
+			std::visit(RenderVisitor{resourceManager, engine, lastSurface}, std::move(layer));
 		}
 	}
 	dataToRender.clear();
