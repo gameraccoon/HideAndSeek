@@ -28,7 +28,7 @@ namespace HAL
 		Internal::Window mWindow;
 		Internal::GlContext mGlContext{mWindow};
 		Graphics::Renderer mRenderer;
-		Uint32 mLastFrameTicks;
+		Uint64 mLastFrameTicks;
 		IGame* mGame = nullptr;
 
 		float mMouseX;
@@ -38,7 +38,7 @@ namespace HAL
 		Impl(int windowWidth, int windowHeight) noexcept
 			: mSdl(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE)
 			, mWindow(windowWidth, windowHeight)
-			, mLastFrameTicks(SDL_GetTicks())
+			, mLastFrameTicks(SDL_GetTicks64())
 			, mMouseX(static_cast<float>(windowWidth) * 0.5f)
 			, mMouseY(static_cast<float>(windowHeight) * 0.5f)
 		{
@@ -144,17 +144,25 @@ namespace HAL
 		{
 			parseEvents();
 
-			Uint32 currentTicks = static_cast<float>(SDL_GetTicks());
+			Uint64 currentTicks = static_cast<float>(SDL_GetTicks64());
 
-			// time wrapped around, start counting time to frame from now
-			if (currentTicks < mLastFrameTicks) {
+			// time was adjusted to past or wrapped around type, start counting time to frame from now
+			if (currentTicks < mLastFrameTicks)
+			{
 				mLastFrameTicks = currentTicks;
 				continue;
 			}
 
-			Uint32 ticks = currentTicks - mLastFrameTicks;
-			if (ticks >= ONE_FRAME_TICKS)
+			Uint64 ticks = currentTicks - mLastFrameTicks;
+			if (ticks >= ONE_FIXED_UPDATE_TICKS)
 			{
+				// if we exceeded max frame ticks last frame, that likely mean we were staying on a breakpoint
+				// readjust to normal ticking speed
+				if (ticks > MAX_FRAME_TICKS)
+				{
+					ticks = ONE_FIXED_UPDATE_TICKS;
+				}
+
 				const float lastFrameDurationSec = ticks * ONE_TICK_SECONDS;
 
 				if (mGame)
@@ -162,13 +170,13 @@ namespace HAL
 					mGame->dynamicTimePreFrameUpdate(lastFrameDurationSec);
 				}
 
-				while (ticks >= ONE_FRAME_TICKS)
+				while (ticks >= ONE_FIXED_UPDATE_TICKS)
 				{
 					if (mGame)
 					{
-						mGame->fixedTimeUpdate(ONE_FRAME_SEC);
+						mGame->fixedTimeUpdate(ONE_FIXED_UPDATE_SEC);
 					}
-					ticks -= ONE_FRAME_TICKS;
+					ticks -= ONE_FIXED_UPDATE_TICKS;
 				}
 
 				if (mGame)
@@ -185,7 +193,8 @@ namespace HAL
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
-			switch (event.type) {
+			switch (event.type)
+			{
 			case SDL_QUIT:
 				mGame->quitGame();
 				break;
