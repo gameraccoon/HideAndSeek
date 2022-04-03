@@ -140,6 +140,7 @@ namespace HAL
 
 	void Engine::Impl::start()
 	{
+		AssertFatal(mGame, "Game should be set to Engine before calling start()");
 		while (!mGame->shouldQuitGame())
 		{
 			parseEvents();
@@ -153,6 +154,7 @@ namespace HAL
 				continue;
 			}
 
+			int iterations = 0;
 			Uint64 ticks = currentTicks - mLastFrameTicks;
 			if (ticks >= ONE_FIXED_UPDATE_TICKS)
 			{
@@ -165,31 +167,30 @@ namespace HAL
 
 				const float lastFrameDurationSec = ticks * ONE_TICK_SECONDS;
 
-				if (mGame)
-				{
-					mGame->dynamicTimePreFrameUpdate(lastFrameDurationSec);
-				}
+				mGame->dynamicTimePreFrameUpdate(lastFrameDurationSec);
 
 				while (ticks >= ONE_FIXED_UPDATE_TICKS)
 				{
-					if (mGame)
-					{
-						mGame->fixedTimeUpdate(ONE_FIXED_UPDATE_SEC);
-					}
+					mGame->fixedTimeUpdate(ONE_FIXED_UPDATE_SEC);
 					ticks -= ONE_FIXED_UPDATE_TICKS;
+					++iterations;
 				}
 
-				if (mGame)
-				{
-					mGame->dynamicTimePostFrameUpdate(lastFrameDurationSec);
-				}
+				mGame->dynamicTimePostFrameUpdate(lastFrameDurationSec);
 				mLastFrameTicks = currentTicks - ticks;
+			}
+
+			if (iterations <= 1)
+			{
+				// give some time to other threads while waiting
+				std::this_thread::yield();
 			}
 		}
 	}
 
 	void Engine::Impl::parseEvents()
 	{
+		SCOPED_PROFILER("Engine::Impl::parseEvents");
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
