@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <functional>
 #include <mutex>
+#include <thread>
+#include <condition_variable>
 
 #include "Base/Types/String/Path.h"
 
@@ -40,7 +42,7 @@ class ResourceManager
 public:
 	explicit ResourceManager() noexcept;
 
-	~ResourceManager() = default;
+	~ResourceManager();
 
 	ResourceManager(const ResourceManager&) = delete;
 	ResourceManager& operator=(const ResourceManager&) = delete;
@@ -116,6 +118,10 @@ public:
 	// if that ever changes, manage atlasses as any other resources and remove this method
 	const std::unordered_map<ResourcePath, ResourceLoading::ResourceStorage::AtlasFrameData>& getAtlasFrames() const;
 
+	void startLoadingThread(std::function<void()>&& threadFinalizerFn = nullptr);
+	// this call will wait for the thread to join
+	void stopLoadingThread();
+
 private:
 	void startResourceLoading(ResourceLoading::ResourceLoad::LoadingDataPtr&& loadingGata, Resource::Thread currentThread);
 	void loadOneAtlasData(const ResourcePath& path);
@@ -125,6 +131,10 @@ private:
 	ResourceLoading::ResourceStorage mStorage;
 	ResourceLoading::ResourceLoad mLoading;
 	ResourceLoading::RuntimeDependencies mDependencies;
+
+	std::thread mLoadingThread;
+	bool mShouldStopLoadingThread = false;
+	std::condition_variable_any mNotifyLoadingThread;
 
 	std::recursive_mutex mDataMutex;
 

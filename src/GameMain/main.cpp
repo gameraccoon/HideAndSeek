@@ -25,13 +25,12 @@ int main(int argc, char** argv)
 
 	ApplicationData applicationData(arguments.getIntArgumentValue("profile-systems", ApplicationData::DefaultWorkerThreadCount));
 	HAL::Engine engine(800, 600);
-	ResourceManager resourceManager;
 
 	// switch render context to render thread
 	engine.releaseRenderContext();
-	applicationData.renderThread.startThread(resourceManager, engine, [&engine]{ engine.acquireRenderContext(); });
+	applicationData.renderThread.startThread(applicationData.resourceManager, engine, [&engine]{ engine.acquireRenderContext(); });
 
-	HapGame game(&engine, resourceManager, applicationData.threadPool);
+	HapGame game(&engine, applicationData.resourceManager, applicationData.threadPool);
 	game.preStart(arguments, applicationData.renderThread.getAccessor());
 	game.start(); // this call waits until the game is being shut down
 	game.onGameShutdown();

@@ -153,7 +153,7 @@ namespace Graphics
 	{
 		return {
 			InitStep{
-				.thread = Thread::Any,
+				.thread = Thread::Loading,
 				.init = &LoadSurfaceInitStep,
 			},
 			InitStep{

@@ -16,6 +16,11 @@ ConcurrentAccessDetector ResourceManager::gResourceManagerAccessDetector;
 
 ResourceManager::ResourceManager() noexcept = default;
 
+ResourceManager::~ResourceManager()
+{
+	stopLoadingThread();
+}
+
 void ResourceManager::unlockResource(ResourceHandle handle)
 {
 	std::scoped_lock l(mDataMutex);
@@ -96,17 +101,23 @@ void ResourceManager::loadAtlasesData(const ResourcePath& listPath)
 void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 {
 	SCOPED_PROFILER("ResourceManager::runThreadTasks");
-	std::unique_lock l(mDataMutex);
-	DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
-	for (int i = 0; i < static_cast<int>(mLoading.resourcesWaitingInit.size()); ++i)
+	std::unique_lock lock(mDataMutex);
+	bool shouldWakeUpLoadingThread = false;
+	for (auto resourceIt = mLoading.resourcesWaitingInit.begin(); resourceIt != mLoading.resourcesWaitingInit.end(); ++resourceIt)
 	{
-		ResourceLoading::ResourceLoad::LoadingDataPtr& loadingData = mLoading.resourcesWaitingInit[static_cast<size_t>(i)];
+		ResourceLoading::ResourceLoad::LoadingDataPtr& loadingData = *resourceIt;
 		while (!loadingData->stepsLeft.empty())
 		{
-			const Resource::InitStep& step = loadingData->stepsLeft.front();
+			Resource::InitStep& step = loadingData->stepsLeft.front();
 			if (step.thread == currentThread || step.thread == Resource::Thread::Any)
 			{
+				// don't allow any other thread to take the step
+				step.thread = currentThread;
+
+				lock.unlock();
 				loadingData->resourceData = step.init(std::move(loadingData->resourceData), *this, loadingData->handle);
+				lock.lock();
+
 				loadingData->stepsLeft.pop_front();
 
 				// found a dependecy that need to resolve first
@@ -115,8 +126,8 @@ void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 				{
 					it->second = std::move(loadingData);
 					// this invalidates "step" variable
-					mLoading.resourcesWaitingInit.erase(mLoading.resourcesWaitingInit.begin() + i);
-					--i;
+					resourceIt = mLoading.resourcesWaitingInit.erase(resourceIt);
+					--resourceIt;
 					break;
 				}
 
@@ -126,37 +137,57 @@ void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 					Resource::Ptr* resultDataPtr = loadingData->resourceData.cast<Resource::Ptr>();
 					finalizeResourceLoading(loadingData->handle, (resultDataPtr ? std::move(*resultDataPtr) : Resource::Ptr{}));
 					// this invalidates "step" variable
-					mLoading.resourcesWaitingInit.erase(mLoading.resourcesWaitingInit.begin() + i);
-					--i;
+					resourceIt = mLoading.resourcesWaitingInit.erase(resourceIt);
+					--resourceIt;
 					break;
 				}
 			}
 			else
 			{
+				if (step.thread == Resource::Thread::Loading)
+				{
+					shouldWakeUpLoadingThread = true;
+				}
 				break;
 			}
 		}
 	}
 
-	for (int i = 0; i < static_cast<int>(mLoading.resourcesWaitingDeinit.size()); ++i)
+	for (auto resourceIt = mLoading.resourcesWaitingDeinit.begin(); resourceIt != mLoading.resourcesWaitingDeinit.end(); ++resourceIt)
 	{
-		auto&& [handle, resourceData, steps] = *mLoading.resourcesWaitingDeinit[static_cast<size_t>(i)];
+		auto&& [handle, resourceData, steps] = **resourceIt;
 		while (!steps.empty())
 		{
-			const Resource::DeinitStep& step = steps.front();
+			Resource::DeinitStep& step = steps.front();
 			if (step.thread == currentThread || step.thread == Resource::Thread::Any)
 			{
 				resourceData = step.deinit(std::move(resourceData), *this, handle);
 				steps.pop_front();
+
 				// done all steps
 				if (steps.empty())
 				{
-					mLoading.resourcesWaitingDeinit.erase(mLoading.resourcesWaitingDeinit.begin() + i);
-					--i;
+					resourceIt = mLoading.resourcesWaitingDeinit.erase(resourceIt);
+					--resourceIt;
 					break;
 				}
 			}
+			else
+			{
+				if (step.thread == Resource::Thread::Loading)
+				{
+					shouldWakeUpLoadingThread = true;
+				}
+				break;
+			}
 		}
+	}
+
+	lock.unlock();
+
+	if (shouldWakeUpLoadingThread)
+	{
+		mNotifyLoadingThread.notify_one();
 	}
 }
 
@@ -166,10 +197,54 @@ const std::unordered_map<ResourcePath, ResourceLoading::ResourceStorage::AtlasFr
 	return mStorage.atlasFrames;
 }
 
+void ResourceManager::startLoadingThread(std::function<void()>&& threadFinalizerFn)
+{
+	AssertFatal(!mLoadingThread.joinable(), "Tried to start already started thread");
+	mLoadingThread = std::thread([this, finalizeFn = std::move(threadFinalizerFn)]{
+		while (true)
+		{
+			{
+				std::unique_lock lock(mDataMutex);
+				mNotifyLoadingThread.wait(lock, [this]{ return mShouldStopLoadingThread || !mLoading.resourcesWaitingInit.empty(); });
+
+				if (mShouldStopLoadingThread)
+				{
+					break;
+				}
+			}
+
+			runThreadTasks(Resource::Thread::Loading);
+		}
+
+		if (finalizeFn)
+		{
+			finalizeFn();
+		}
+	});
+}
+
+void ResourceManager::stopLoadingThread()
+{
+	if (mLoadingThread.joinable())
+	{
+		{
+			std::scoped_lock l(mDataMutex);
+			mShouldStopLoadingThread = true;
+		}
+
+		mNotifyLoadingThread.notify_one();
+
+		mLoadingThread.join();
+
+		// if for some reason we want to restart the tread in this class
+		mShouldStopLoadingThread = false;
+	}
+}
+
 void ResourceManager::startResourceLoading(ResourceLoading::ResourceLoad::LoadingDataPtr&& loadingData, Resource::Thread currentThread)
 {
-	DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 	SCOPED_PROFILER("ResourceManager::startResourceLoading");
+	std::unique_lock lock(mDataMutex);
 	auto deletionIt = std::ranges::find_if(
 		mLoading.resourcesWaitingDeinit,
 		[handle = loadingData->handle](const ResourceLoading::ResourceLoad::UnloadingDataPtr& resourceUnloadData)
@@ -189,12 +264,19 @@ void ResourceManager::startResourceLoading(ResourceLoading::ResourceLoad::Loadin
 	}
 
 	bool hasUnresolvedDeps = false;
+	bool shouldWakeUpLoadingThread = false;
 	while (!loadingData->stepsLeft.empty())
 	{
 		Resource::InitStep& step = loadingData->stepsLeft.front();
 		if (step.thread == currentThread || step.thread == Resource::Thread::Any)
 		{
+			// don't allow any other thread to take the step
+			step.thread = currentThread;
+
+			lock.unlock();
 			loadingData->resourceData = step.init(std::move(loadingData->resourceData), *this, loadingData->handle);
+			lock.lock();
+
 			loadingData->stepsLeft.pop_front();
 
 			auto it = mLoading.resourcesWaitingDependencies.find(loadingData->handle);
@@ -207,6 +289,10 @@ void ResourceManager::startResourceLoading(ResourceLoading::ResourceLoad::Loadin
 		}
 		else
 		{
+			if (step.thread == Resource::Thread::Loading)
+			{
+				shouldWakeUpLoadingThread = true;
+			}
 			break;
 		}
 	}
@@ -222,6 +308,13 @@ void ResourceManager::startResourceLoading(ResourceLoading::ResourceLoad::Loadin
 			Resource::Ptr* resourcePtr = loadingData->resourceData.cast<Resource::Ptr>();
 			finalizeResourceLoading(loadingData->handle, (resourcePtr ? std::move(*resourcePtr) : Resource::Ptr{}));
 		}
+	}
+
+	lock.unlock();
+
+	if (shouldWakeUpLoadingThread)
+	{
+		mNotifyLoadingThread.notify_one();
 	}
 }
 

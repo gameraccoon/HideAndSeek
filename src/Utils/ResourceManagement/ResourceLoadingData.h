@@ -50,9 +50,9 @@ namespace ResourceLoading
 		using UnloadingDataPtr = std::unique_ptr<UnloadingData>;
 
 	public:
-		std::vector<LoadingDataPtr> resourcesWaitingInit;
+		std::list<LoadingDataPtr> resourcesWaitingInit;
 		std::unordered_map<ResourceHandle, LoadingDataPtr> resourcesWaitingDependencies;
-		std::vector<UnloadingDataPtr> resourcesWaitingDeinit;
+		std::list<UnloadingDataPtr> resourcesWaitingDeinit;
 		LoadDependencies loadDependencies;
 	};
 }

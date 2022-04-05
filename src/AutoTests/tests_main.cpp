@@ -91,13 +91,12 @@ int main(int argc, char** argv)
 	{
 		ApplicationData applicationData(arguments.getIntArgumentValue("profile-systems", ApplicationData::DefaultWorkerThreadCount));
 		HAL::Engine engine(800, 600);
-		ResourceManager resourceManager;
 
 		// switch render context to render thread
 		engine.releaseRenderContext();
-		applicationData.renderThread.startThread(resourceManager, engine, [&engine]{ engine.acquireRenderContext(); });
+		applicationData.renderThread.startThread(applicationData.resourceManager, engine, [&engine]{ engine.acquireRenderContext(); });
 
-		std::unique_ptr<BaseTestCase> testCase = caseIt->second(&engine, resourceManager, applicationData.threadPool);
+		std::unique_ptr<BaseTestCase> testCase = caseIt->second(&engine, applicationData.resourceManager, applicationData.threadPool);
 		TestChecklist checklist = testCase->start(arguments, applicationData.renderThread.getAccessor());
 		bool isSuccessful = ValidateChecklist(checklist);
 
