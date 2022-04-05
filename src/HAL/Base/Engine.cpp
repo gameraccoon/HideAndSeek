@@ -5,6 +5,7 @@
 #include "Base/Debug/ConcurrentAccessDetector.h"
 
 #include <algorithm>
+#include <thread>
 
 #include <glew/glew.h>
 

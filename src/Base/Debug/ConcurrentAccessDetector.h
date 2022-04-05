@@ -1,11 +1,12 @@
 #pragma once
 
+#ifdef CONCURRENT_ACCESS_DETECTION
+
 #include <atomic>
 #include <thread>
 
 #include "Base/Debug/Assert.h"
 
-#ifdef CONCURRENT_ACCESS_DETECTION
 /**
  * You can use this object to detect data races in debug mode, skipping any checks in release builds
  * Use it as if you use mutex:
@@ -22,10 +23,10 @@ public:
 	{
 	public:
 		template<typename Func = std::nullptr_t>
-		explicit Guard(ConcurrentAccessDetector& detector, Func errorHandler = nullptr)
+		explicit Guard(ConcurrentAccessDetector& detector, const char* filename = "", int line = 0, Func errorHandler = nullptr)
 			: mDetector(detector)
 		{
-			mDetector.acquire(errorHandler);
+			mDetector.acquire(filename, line, errorHandler);
 		}
 
 		~Guard()
@@ -42,6 +43,49 @@ public:
 		ConcurrentAccessDetector& mDetector;
 	};
 
+	class UniqueGuard
+	{
+	public:
+		template<typename Func = std::nullptr_t>
+		explicit UniqueGuard(ConcurrentAccessDetector& detector, const char* filename = "", int line = 0, Func errorHandler = nullptr)
+			: mDetector(detector)
+		{
+			mDetector.acquire(filename, line, errorHandler);
+		}
+
+		~UniqueGuard()
+		{
+			if (mIsAcquired)
+			{
+				mDetector.release();
+			}
+		}
+
+		void release()
+		{
+			AssertFatal(mIsAcquired, "Tried to release non-acquired UniqueGuard");
+			mDetector.release();
+			mIsAcquired = false;
+		}
+
+		template<typename Func = std::nullptr_t>
+		void reacquire(const char* filename = "", int line = 0, Func errorHandler = nullptr)
+		{
+			AssertFatal(!mIsAcquired, "Tried to reacquire non-acquired UniqueGuard");
+			mDetector.acquire(filename, line, errorHandler);
+			mIsAcquired = true;
+		}
+
+		UniqueGuard(const Guard&) = delete;
+		UniqueGuard& operator==(const Guard&) = delete;
+		UniqueGuard(Guard&&) = delete;
+		UniqueGuard& operator==(Guard&&) = delete;
+
+	private:
+		ConcurrentAccessDetector& mDetector;
+		bool mIsAcquired = true;
+	};
+
 public:
 	ConcurrentAccessDetector() = default;
 	~ConcurrentAccessDetector()
@@ -55,7 +99,7 @@ public:
 	ConcurrentAccessDetector& operator=(ConcurrentAccessDetector&&) = delete;
 
 	template<typename Func = std::nullptr_t>
-	void acquire(Func errorHandler = nullptr)
+	void acquire(const char* filename = "", int line = 0, Func errorHandler = nullptr)
 	{
 		// Note that this code doesn't have to be 100% thread-safe
 		// covering 90% cases is enough to detect data races
@@ -72,7 +116,7 @@ public:
 				}
 				else
 				{
-					ReportErrorRelease("A data race detected");
+					ReportErrorRelease("A data race detected (%s:%d) and (%s:%d)", mLastLockedFile, mLastLockedLine, filename, line);
 					(void)errorHandler;
 				}
 			}
@@ -80,6 +124,8 @@ public:
 		else
 		{
 			mOwningThreadID.store(std::this_thread::get_id(), std::memory_order_relaxed);
+			mLastLockedFile = filename;
+			mLastLockedLine = line;
 		}
 	}
 
@@ -91,22 +137,12 @@ public:
 private:
 	std::atomic<int> mAcquiredCount{0};
 	std::atomic<std::thread::id> mOwningThreadID;
+	const char* mLastLockedFile = "";
+	int mLastLockedLine = 0;
 };
 #else
 class ConcurrentAccessDetector
 {
-public:
-	class Guard
-	{
-	public:
-		explicit Guard(ConcurrentAccessDetector&) {}
-		~Guard() = default;
-		Guard(const Guard&) = delete;
-		Guard& operator=(const Guard&) = delete;
-		Guard(Guard&&) = delete;
-		Guard& operator=(Guard&&) = delete;
-	};
-
 public:
 	ConcurrentAccessDetector() = default;
 	~ConcurrentAccessDetector() = default;
@@ -114,17 +150,26 @@ public:
 	ConcurrentAccessDetector& operator=(const ConcurrentAccessDetector&) = delete;
 	ConcurrentAccessDetector(ConcurrentAccessDetector&&) = delete;
 	ConcurrentAccessDetector& operator=(ConcurrentAccessDetector&&) = delete;
-
-	void aquire() {}
-	void release() {}
 };
 #endif // CONCURRENT_ACCESS_DETECTION
 
 #ifdef CONCURRENT_ACCESS_DETECTION
-#define DETECT_CONCURRENT_ACCESS_NAME(A,B) A##B
-#define DETECT_CONCURRENT_ACCESS_IMPL(dataRaceDetector, namePostfix) ConcurrentAccessDetector::Guard DETECT_CONCURRENT_ACCESS_NAME(cadg_inst_, namePostfix)((dataRaceDetector), []{ReportErrorRelease("A data race detected");})
+
+#define HELPER_DETECT_CONCURRENT_ACCESS_NAME(A,B) A##B
+#define HELPER_DETECT_CONCURRENT_ACCESS_IMPL(dataRaceDetector, namePostfix) ConcurrentAccessDetector::Guard HELPER_DETECT_CONCURRENT_ACCESS_NAME(cadg_inst_, namePostfix)((dataRaceDetector), __FILE__, __LINE__)
 // macro generates a unique instance name of the guard for us
-#define DETECT_CONCURRENT_ACCESS(dataRaceDetector) DETECT_CONCURRENT_ACCESS_IMPL((dataRaceDetector), __COUNTER__)
+#define DETECT_CONCURRENT_ACCESS(dataRaceDetector) HELPER_DETECT_CONCURRENT_ACCESS_IMPL((dataRaceDetector), __COUNTER__)
+
+// we specify the name of the guard as the second argument and should use it to unlock or lock back the guard
+#define DETECT_CONCURRENT_ACCESS_UNLOCKABLE(dataRaceDetector, guardName) ConcurrentAccessDetector::UniqueGuard (guardName)((dataRaceDetector), __FILE__, __LINE__)
+#define CONCURRENT_ACCESS_DETECTOR_MANUAL_UNLOCK(guard) guard.release();
+#define CONCURRENT_ACCESS_DETECTOR_MANUAL_LOCK(guard) guard.reacquire(__FILE__, __LINE__);
+
 #else
+
 #define DETECT_CONCURRENT_ACCESS(dataRaceDetector)
+#define DETECT_CONCURRENT_ACCESS_UNLOCKABLE(dataRaceDetector, guardName)
+#define CONCURRENT_ACCESS_DETECTOR_MANUAL_UNLOCK(guard)
+#define CONCURRENT_ACCESS_DETECTOR_MANUAL_LOCK(guard)
+
 #endif // CONCURRENT_ACCESS_DETECTION
