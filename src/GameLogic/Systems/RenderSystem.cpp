@@ -253,7 +253,6 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 
 		// calculate how many threads we need
 		const size_t threadsCount = mThreadPool.getThreadsCount();
-		AssertFatal(threadsCount != 0, "Jobs Worker Manager threads count can't be zero");
 		const size_t minimumComponentsForThread = 3;
 		const size_t componentsToRecalculate = lightComponentSets.size();
 		const size_t chunksCount = std::max(static_cast<size_t>(1), std::min(GetJobDivisor(threadsCount + 1), componentsToRecalculate / minimumComponentsForThread));

@@ -63,8 +63,6 @@ public:
 	template<typename TaskFnT, typename FinalizeFnT>
 	void executeTask(TaskFnT&& taskFn, FinalizeFnT&& finalizeFn, size_t groupId = 0, bool wakeUpThread = true)
 	{
-		AssertFatal(!mThreads.empty(), "No threads to execute the task");
-
 		{
 			std::lock_guard<std::mutex> lock(mDataMutex);
 			FinalizerGroup& group = getOrCreateFinalizerGroup(groupId);
@@ -82,8 +80,6 @@ public:
 	template<typename TaskFnT, typename FinalizeFnT>
 	void executeTasks(std::vector<std::pair<TaskFnT, FinalizeFnT>>&& tasks, size_t groupId = 0, size_t threadsToWakeUp = std::numeric_limits<size_t>::max())
 	{
-		AssertFatal(!mThreads.empty(), "No threads to execute the task");
-
 		threadsToWakeUp = std::max(tasks.size(), threadsToWakeUp);
 
 		{
@@ -118,6 +114,8 @@ public:
 	 */
 	void finalizeTasks(size_t groupId = 0)
 	{
+		AssertFatal(!mThreads.empty(), "No threads available to run the tasks, run threads or use processAndFinalizeTasks instead of finalizeTasks");
+
 		std::unique_lock lock(mDataMutex);
 		FinalizerGroup& finalizerGroup = getOrCreateFinalizerGroup(groupId);
 		lock.unlock();
@@ -241,13 +239,9 @@ private:
 		}
 		else
 		{
-			size_t tasksLeftCount = 0;
+			[[maybe_unused]] int tasksLeftCount = 0;
 			tasksLeftCount = --finalizerGroup.tasksNotFinalizedCount;
-
-			if (tasksLeftCount <= 0)
-			{
-				Assert(tasksLeftCount == 0, "finalizerGroup.tasksLeftCount should never be negative");
-			}
+			Assert(tasksLeftCount >= 0, "finalizerGroup.tasksLeftCount should never be negative");
 		}
 	}
 
