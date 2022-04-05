@@ -30,6 +30,8 @@ namespace NavMeshGenerator
 
 	void GenerateNavMeshGeometry(NavMesh::Geometry& outGeometry, const std::vector<std::vector<Vector2D>>& pathBlockingGeometry, Vector2D start, Vector2D size)
 	{
+		SCOPED_PROFILER("GenerateNavMeshGeometry");
+
 		outGeometry.vertices.clear();
 		outGeometry.indexes.clear();
 		// only triangles are supported now
@@ -142,6 +144,7 @@ namespace NavMeshGenerator
 
 	void LinkNavMesh(NavMesh::InnerLinks& outLinks, const NavMesh::Geometry& geometry)
 	{
+		SCOPED_PROFILER("LinkNavMesh");
 		Assert(geometry.isCalculated, "Geometry should be calculated before calculating links");
 
 		// form a dictionary with borders as keys and polygon indexes as values
@@ -291,6 +294,7 @@ namespace NavMeshGenerator
 
 	void BuildSpatialHash(NavMesh::SpatialHash& outSpatialHash, const NavMesh::Geometry& geometry, HashGenerationType generationType)
 	{
+		SCOPED_PROFILER("BuildSpatialHash");
 		Assert(geometry.isCalculated, "Geometry should be calculated before calculating spatial hash");
 
 		Vector2D cellsCountFloat = Vector2D::HadamardProduct(geometry.navMeshSize, Vector2D(1.0f / outSpatialHash.cellSize, 1.0f / outSpatialHash.cellSize));

@@ -56,6 +56,7 @@ void AiSystem::update()
 
 	if (needUpdate)
 	{
+		SCOPED_PROFILER("AiSystem::update navmesh");
 		NavMesh& navMesh = navMeshComponent->getNavMeshRef();
 		NavMeshGenerator::GenerateNavMeshGeometry(navMesh.geometry, pathBlockingGeometry->getPolygons(), Vector2D(-5000.0f, -5000.0f), Vector2D(10000.0f, 10000.0f));
 		NavMeshGenerator::LinkNavMesh(navMesh.links, navMesh.geometry);
@@ -88,6 +89,7 @@ void AiSystem::update()
 		[targetLocation, &navMesh, timestampNow, navmeshUpdateTimestamp, debugDraw]
 			(AiControllerComponent* aiController, const TransformComponent* transform, MovementComponent* movement, CharacterStateComponent* characterState)
 	{
+		SCOPED_PROFILER("AiSystem::update update one character");
 		Vector2D currentLocation = transform->getLocation();
 
 		TravelPath& pathData = aiController->getPathRef();

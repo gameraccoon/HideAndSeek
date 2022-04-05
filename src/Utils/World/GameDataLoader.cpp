@@ -29,6 +29,8 @@ namespace GameDataLoader
 
 	static void SaveLightBlockingGeometry(const World& world, const std::filesystem::path& levelPath, const std::string& version)
 	{
+		SCOPED_PROFILER("SaveLightBlockingGeometry");
+
 		namespace fs = std::filesystem;
 
 		fs::path geometryPath(levelPath);
@@ -56,6 +58,8 @@ namespace GameDataLoader
 
 	static void GenerateLightBlockingGeometry(World& world)
 	{
+		SCOPED_PROFILER("GenerateLightBlockingGeometry");
+
 		TupleVector<WorldCell*, const CollisionComponent*, const TransformComponent*> components;
 		world.getSpatialData().getAllCellManagers().getSpatialComponents<const CollisionComponent, const TransformComponent>(components);
 		std::unordered_map<CellPos, std::vector<SimpleBorder>> lightBlockingGeometryPieces;
@@ -72,6 +76,8 @@ namespace GameDataLoader
 
 	static void LoadLightBlockingGeometry(World& world, const std::filesystem::path& levelPath, const std::string& levelVersion)
 	{
+		SCOPED_PROFILER("LoadLightBlockingGeometry");
+
 		namespace fs = std::filesystem;
 
 		fs::path geometryPath(levelPath);
@@ -108,6 +114,8 @@ namespace GameDataLoader
 
 	static void SavePathBlockingGeometry(const World& world, const std::filesystem::path& levelPath, const std::string& version)
 	{
+		SCOPED_PROFILER("SavePathBlockingGeometry");
+
 		namespace fs = std::filesystem;
 
 		fs::path geometryPath(levelPath);
@@ -130,6 +138,8 @@ namespace GameDataLoader
 
 	static void GeneratePathBlockingGeometry(World& world)
 	{
+		SCOPED_PROFILER("GeneratePathBlockingGeometry");
+
 		TupleVector<const CollisionComponent*, const TransformComponent*> components;
 		world.getSpatialData().getAllCellManagers().getComponents<const CollisionComponent, const TransformComponent>(components);
 
@@ -169,6 +179,8 @@ namespace GameDataLoader
 
 	void SaveWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
+		SCOPED_PROFILER("SaveWorld");
+
 		namespace fs = std::filesystem;
 		fs::path levelPath(levelName);
 
@@ -208,6 +220,8 @@ namespace GameDataLoader
 
 	void LoadWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
+		SCOPED_PROFILER("LoadWorld");
+
 		namespace fs = std::filesystem;
 		fs::path levelPath(levelName);
 
