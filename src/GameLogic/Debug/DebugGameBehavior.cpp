@@ -13,15 +13,6 @@ void DebugGameBehavior::preInnerUpdate(Game& game)
 	if (mForcedInputData.has_value())
 	{
 		game.mInputData = *mForcedInputData;
-		if ALMOST_ALWAYS(HAL::Engine* engine = game.getEngine())
-		{
-			game.mInputData.windowSize = engine->getWindowSize();
-		}
-		else
-		{
-			ReportError("Engine was not available for debug game behavior object");
-		}
-		game.mInputData.mousePos = Vector2D::HadamardProduct(game.mInputData.mousePos, game.mInputData.windowSize);
 	}
 }
 
@@ -42,7 +33,9 @@ void DebugGameBehavior::processArguments(const ArgumentsParser& arguments)
 	if (arguments.hasArgument("disable-input"))
 	{
 		mForcedInputData = InputData();
-		mForcedInputData->mousePos = Vector2D(0.5f, 0.5f);
+		Input::ControllerState& mouseState = mForcedInputData->controllerStates[Input::ControllerType::Mouse];
+		mouseState.updateAxis(0, 0.5f);
+		mouseState.updateAxis(1, 0.5f);
 	}
 
 	if (arguments.hasArgument("time-limit"))

@@ -8,18 +8,19 @@
 
 #include "GameData/Spatial/SpatialWorldData.h"
 
-#include "GameData/Components/SpriteCreatorComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/StateMachineComponent.generated.h"
 #include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/SpriteCreatorComponent.generated.h"
+#include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
 
-#include "GameLogic/Systems/RenderSystem.h"
-#include "GameLogic/Systems/CollisionSystem.h"
-#include "GameLogic/Systems/ResourceStreamingSystem.h"
-#include "GameLogic/Systems/MovementSystem.h"
-#include "GameLogic/Systems/CharacterStateSystem.h"
 #include "GameLogic/Systems/CameraSystem.h"
+#include "GameLogic/Systems/CharacterStateSystem.h"
+#include "GameLogic/Systems/CollisionSystem.h"
+#include "GameLogic/Systems/InputSystem.h"
+#include "GameLogic/Systems/MovementSystem.h"
+#include "GameLogic/Systems/RenderSystem.h"
+#include "GameLogic/Systems/ResourceStreamingSystem.h"
 
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestCircularUnitsSystem.h"
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestUnitsCountControlSystem.h"
@@ -28,10 +29,11 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 {
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 
+	getGameLogicSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData(), getTime());
 	getGameLogicSystemsManager().registerSystem<TestUnitsCountControlSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<TestCircularUnitsSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
-	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder(), getInputData());
+	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());

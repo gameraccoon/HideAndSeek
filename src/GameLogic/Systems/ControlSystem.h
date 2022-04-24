@@ -4,25 +4,20 @@
 
 #include <raccoon-ecs/system.h>
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
-#include "GameLogic/SharedManagers/InputData.h"
+class InputData;
+class WorldHolder;
 
 /**
- * System that handles movement controls
+ * System that processes gameplay controls
  */
 class ControlSystem : public RaccoonEcs::System
 {
 public:
-	ControlSystem(WorldHolder& worldHolder, const InputData& inputData) noexcept;
-	~ControlSystem() override = default;
+	ControlSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 	static std::string GetSystemId() { return "ControlSystem"; }
 
 private:
-	void processPlayerInput();
-
-private:
 	WorldHolder& mWorldHolder;
-	const InputData& mInputData;
 };

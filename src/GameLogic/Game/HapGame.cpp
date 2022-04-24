@@ -16,18 +16,19 @@
 
 #include "Utils/World/GameDataLoader.h"
 
-#include "GameLogic/Systems/RenderSystem.h"
-#include "GameLogic/Systems/ControlSystem.h"
-#include "GameLogic/Systems/CollisionSystem.h"
-#include "GameLogic/Systems/ResourceStreamingSystem.h"
 #include "GameLogic/Systems/AiSystem.h"
-#include "GameLogic/Systems/CharacterStateSystem.h"
-#include "GameLogic/Systems/DebugDrawSystem.h"
-#include "GameLogic/Systems/MovementSystem.h"
 #include "GameLogic/Systems/AnimationSystem.h"
 #include "GameLogic/Systems/CameraSystem.h"
-#include "GameLogic/Systems/WeaponSystem.h"
+#include "GameLogic/Systems/CharacterStateSystem.h"
+#include "GameLogic/Systems/CollisionSystem.h"
+#include "GameLogic/Systems/ControlSystem.h"
 #include "GameLogic/Systems/DeadEntitiesDestructionSystem.h"
+#include "GameLogic/Systems/DebugDrawSystem.h"
+#include "GameLogic/Systems/InputSystem.h"
+#include "GameLogic/Systems/MovementSystem.h"
+#include "GameLogic/Systems/RenderSystem.h"
+#include "GameLogic/Systems/ResourceStreamingSystem.h"
+#include "GameLogic/Systems/WeaponSystem.h"
 
 #ifdef IMGUI_ENABLED
 #include "GameLogic/Systems/ImguiSystem.h"
@@ -63,12 +64,13 @@ void HapGame::initSystems()
 
 	AssertFatal(getEngine(), "HapGame was created without Engine, we are going to crash");
 
-	getPreFrameSystemsManager().registerSystem<ControlSystem>(getWorldHolder(), getInputData());
+	getPreFrameSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData(), getTime());
+	getGameLogicSystemsManager().registerSystem<ControlSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<AiSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<WeaponSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<DeadEntitiesDestructionSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
-	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder(), getInputData());
+	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<AnimationSystem>(getWorldHolder(), getTime());

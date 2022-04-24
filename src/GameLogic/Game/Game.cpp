@@ -53,12 +53,12 @@ void Game::start()
 
 void Game::setKeyboardKeyState(int key, bool isPressed)
 {
-	mInputData.keyboardKeyStates.updateState(key, isPressed);
+	mInputData.controllerStates[Input::ControllerType::Keyboard].updateButtonState(key, isPressed);
 }
 
 void Game::setMouseKeyState(int key, bool isPressed)
 {
-	mInputData.mouseKeyStates.updateState(key, isPressed);
+	mInputData.controllerStates[Input::ControllerType::Mouse].updateButtonState(key, isPressed);
 }
 
 void Game::dynamicTimePreFrameUpdate(float /*dt*/)
@@ -78,8 +78,14 @@ void Game::dynamicTimePreFrameUpdate(float /*dt*/)
 
 	if (HAL::Engine* engine = getEngine())
 	{
-		mInputData.windowSize = engine->getWindowSize();
-		mInputData.mousePos = engine->getMousePos();
+		const Vector2D windowSize = engine->getWindowSize();
+		const Vector2D mousePos = engine->getMousePos();
+		auto& mouseState = mInputData.controllerStates[Input::ControllerType::Mouse];
+
+		mouseState.updateAxis(0, (mousePos.x / windowSize.x) * 2.0f - 1.0f);
+		mouseState.updateAxis(1, (mousePos.y / windowSize.y) * 2.0f - 1.0f);
+
+		mWorld.getWorldComponents().getOrAddComponent<WorldCachedDataComponent>()->setScreenSize(windowSize);
 	}
 
 	mDebugBehavior.preInnerUpdate(*this);
@@ -93,6 +99,7 @@ void Game::fixedTimeUpdate(float dt)
 
 	mTime.update(dt);
 	mGameLogicSystemsManager.update();
+	mInputData.resetLastFrameStates();
 }
 
 void Game::dynamicTimePostFrameUpdate(float /*dt*/)
@@ -103,8 +110,6 @@ void Game::dynamicTimePostFrameUpdate(float /*dt*/)
 
 	// test code
 	//mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
-
-	mInputData.clearAfterFrame();
 
 	mDebugBehavior.postInnerUpdate(*this);
 

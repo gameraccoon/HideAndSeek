@@ -8,22 +8,23 @@
 
 #include "GameData/Spatial/SpatialWorldData.h"
 
-#include "GameData/Components/SpriteCreatorComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/StateMachineComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
-#include "GameData/Components/WeaponComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/SpriteCreatorComponent.generated.h"
+#include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/WeaponComponent.generated.h"
 
-#include "GameLogic/Systems/RenderSystem.h"
-#include "GameLogic/Systems/CollisionSystem.h"
-#include "GameLogic/Systems/ResourceStreamingSystem.h"
-#include "GameLogic/Systems/MovementSystem.h"
-#include "GameLogic/Systems/CharacterStateSystem.h"
 #include "GameLogic/Systems/CameraSystem.h"
-#include "GameLogic/Systems/WeaponSystem.h"
+#include "GameLogic/Systems/CharacterStateSystem.h"
+#include "GameLogic/Systems/CollisionSystem.h"
 #include "GameLogic/Systems/DeadEntitiesDestructionSystem.h"
+#include "GameLogic/Systems/InputSystem.h"
+#include "GameLogic/Systems/MovementSystem.h"
+#include "GameLogic/Systems/RenderSystem.h"
+#include "GameLogic/Systems/ResourceStreamingSystem.h"
+#include "GameLogic/Systems/WeaponSystem.h"
 
 #include "GameLogic/Initialization/StateMachines.h"
 
@@ -38,10 +39,11 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	mTestChecklist.checks.emplace("destroyedEntities", std::make_unique<DestroyedEntitiesTestCheck>(100));
 	DestroyedEntitiesTestCheck& destroyedEntitiesTestCheck = *static_cast<DestroyedEntitiesTestCheck*>(mTestChecklist.checks["destroyedEntities"].get());
 
+	getGameLogicSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData(), getTime());
 	getGameLogicSystemsManager().registerSystem<TestSpawnShootableUnitsSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<TestShootingControlSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
-	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder(), getInputData());
+	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
 	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(),getTime());
 	getGameLogicSystemsManager().registerSystem<WeaponSystem>(getWorldHolder(), getTime());

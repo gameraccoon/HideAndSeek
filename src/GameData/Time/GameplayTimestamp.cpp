@@ -88,4 +88,4 @@ void from_json(const nlohmann::json& json, GameplayTimestamp& outTimestamp)
 	json.at("value").get_to(outTimestamp.mTimestamp);
 }
 
-static_assert(std::is_trivially_copyable<GameplayTimestamp>(), "Vector2D should be trivially copyable");
+static_assert(std::is_trivially_copyable<GameplayTimestamp>(), "GameplayTimestamp should be trivially copyable");

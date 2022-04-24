@@ -1,21 +1,21 @@
 #pragma once
 
-#include "GameData/Geometry/Vector2D.h"
+#include <unordered_map>
 
-#include "HAL/KeyStatesMap.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Input/ControllerState.h"
 
 class InputData
 {
 public:
-	void clearAfterFrame()
+	void resetLastFrameStates()
 	{
-		keyboardKeyStates.clearLastFrameState();
-		mouseKeyStates.clearLastFrameState();
+		for (auto& controllerState : controllerStates)
+		{
+			controllerState.second.clearLastFrameState();
+		}
 	}
 
 public:
-	HAL::KeyStatesMap keyboardKeyStates;
-	HAL::KeyStatesMap mouseKeyStates;
-	Vector2D mousePos = ZERO_VECTOR;
-	Vector2D windowSize = ZERO_VECTOR;
+	Input::PlayerControllerStates controllerStates;
 };
