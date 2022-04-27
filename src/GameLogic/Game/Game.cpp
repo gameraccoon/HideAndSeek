@@ -58,14 +58,6 @@ void Game::dynamicTimePreFrameUpdate(float dt)
 	mFrameBeginTime = std::chrono::steady_clock::now();
 #endif // ENABLE_SCOPED_PROFILER
 
-	RenderAccessorComponent* renderAccessorComponent = getGameData().getGameComponents().getOrAddComponent<RenderAccessorComponent>();
-	if (RenderAccessor* renderAccessor = renderAccessorComponent->getAccessor())
-	{
-		std::unique_ptr<RenderData> renderCommands = std::make_unique<RenderData>();
-		TemplateHelpers::EmplaceVariant<SwapBuffersCommand>(renderCommands->layers);
-		renderAccessor->submitData(std::move(renderCommands));
-	}
-
 	mTime.dt = dt;
 
 	if (HAL::Engine* engine = getEngine())
@@ -99,6 +91,14 @@ void Game::dynamicTimePostFrameUpdate(float dt)
 	//mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
 
 	mDebugBehavior.postInnerUpdate(*this);
+
+	RenderAccessorComponent* renderAccessorComponent = getGameData().getGameComponents().getOrAddComponent<RenderAccessorComponent>();
+	if (RenderAccessor* renderAccessor = renderAccessorComponent->getAccessor())
+	{
+		std::unique_ptr<RenderData> renderCommands = std::make_unique<RenderData>();
+		TemplateHelpers::EmplaceVariant<SwapBuffersCommand>(renderCommands->layers);
+		renderAccessor->submitData(std::move(renderCommands));
+	}
 
 #ifdef ENABLE_SCOPED_PROFILER
 	std::chrono::time_point<std::chrono::steady_clock> frameEndTime = std::chrono::steady_clock::now();

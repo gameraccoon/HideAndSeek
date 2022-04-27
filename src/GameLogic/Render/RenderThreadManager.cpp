@@ -30,6 +30,10 @@ void RenderThreadManager::startThread(ResourceManager& resourceManager, HAL::Eng
 			{
 				threadInitializeFn();
 			}
+
+			// prepare the buffer to render the first frame
+			glClear(GL_COLOR_BUFFER_BIT);
+
 			RenderThreadManager::RenderThreadFunction(renderAccessor, resourceManager, engine);
 		}
 	);
