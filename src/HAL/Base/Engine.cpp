@@ -32,7 +32,6 @@ namespace HAL
 		Internal::Window mWindow;
 		Internal::GlContext mGlContext{mWindow};
 		Graphics::Renderer mRenderer;
-		Uint64 mLastFrameTicks;
 		IGame* mGame = nullptr;
 		InputControllersData* mInputDataPtr = nullptr;
 
@@ -137,43 +136,52 @@ namespace HAL
 	void Engine::Impl::start()
 	{
 		AssertFatal(mGame, "Game should be set to Engine before calling start()");
+		// we advance the time a bit differently, fixed frame time is advanced in steps
+		Uint64 lastFixedFrameTicks = SDL_GetTicks64();
+		// and real time is update with the exact time passed from last processed frame
+		Uint64 lastRealFrameTicks = SDL_GetTicks64();
 		while (!mGame->shouldQuitGame())
 		{
 			parseEvents();
 
-			Uint64 currentTicks = static_cast<float>(SDL_GetTicks64());
+			Uint64 currentTicks = SDL_GetTicks64();
 
 			// time was adjusted to past or wrapped around type, start counting time to frame from now
-			if (currentTicks < mLastFrameTicks)
+			if (currentTicks < lastFixedFrameTicks || currentTicks < lastRealFrameTicks)
 			{
-				mLastFrameTicks = currentTicks;
+				lastFixedFrameTicks = currentTicks;
+				lastRealFrameTicks = currentTicks;
 				continue;
 			}
 
 			int iterations = 0;
-			Uint64 ticks = currentTicks - mLastFrameTicks;
-			if (ticks >= ONE_FIXED_UPDATE_TICKS)
+			Uint64 fixedFrameticksLeft = currentTicks - lastFixedFrameTicks;
+			if (fixedFrameticksLeft >= ONE_FIXED_UPDATE_TICKS)
 			{
+				Uint64 passedRealTicks = currentTicks - lastRealFrameTicks;
 				// if we exceeded max frame ticks last frame, that likely mean we were staying on a breakpoint
 				// readjust to normal ticking speed
-				if (ticks > MAX_FRAME_TICKS)
+				if (fixedFrameticksLeft > MAX_FRAME_TICKS)
 				{
-					ticks = ONE_FIXED_UPDATE_TICKS;
+					LogInfo("Continued from a breakpoint or had a huge lag");
+					fixedFrameticksLeft = ONE_FIXED_UPDATE_TICKS;
+					passedRealTicks = ONE_FIXED_UPDATE_TICKS;
 				}
 
-				const float lastFrameDurationSec = ticks * ONE_TICK_SECONDS;
+				const float lastFrameDurationSec = passedRealTicks * ONE_TICK_SECONDS;
 
 				mGame->dynamicTimePreFrameUpdate(lastFrameDurationSec);
 
-				while (ticks >= ONE_FIXED_UPDATE_TICKS)
+				while (fixedFrameticksLeft >= ONE_FIXED_UPDATE_TICKS)
 				{
 					mGame->fixedTimeUpdate(ONE_FIXED_UPDATE_SEC);
-					ticks -= ONE_FIXED_UPDATE_TICKS;
+					fixedFrameticksLeft -= ONE_FIXED_UPDATE_TICKS;
 					++iterations;
 				}
 
 				mGame->dynamicTimePostFrameUpdate(lastFrameDurationSec);
-				mLastFrameTicks = currentTicks - ticks;
+				lastFixedFrameTicks = currentTicks - fixedFrameticksLeft;
+				lastRealFrameTicks = currentTicks;
 			}
 
 			if (iterations <= 1)

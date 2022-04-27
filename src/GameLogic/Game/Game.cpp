@@ -51,7 +51,7 @@ void Game::start()
 	}
 }
 
-void Game::dynamicTimePreFrameUpdate(float /*dt*/)
+void Game::dynamicTimePreFrameUpdate(float dt)
 {
 	SCOPED_PROFILER("Game::dynamicTimePreFrameUpdate");
 #ifdef ENABLE_SCOPED_PROFILER
@@ -65,6 +65,8 @@ void Game::dynamicTimePreFrameUpdate(float /*dt*/)
 		TemplateHelpers::EmplaceVariant<SwapBuffersCommand>(renderCommands->layers);
 		renderAccessor->submitData(std::move(renderCommands));
 	}
+
+	mTime.dt = dt;
 
 	if (HAL::Engine* engine = getEngine())
 	{
@@ -85,9 +87,11 @@ void Game::fixedTimeUpdate(float dt)
 	mInputControllersData.resetLastFrameStates();
 }
 
-void Game::dynamicTimePostFrameUpdate(float /*dt*/)
+void Game::dynamicTimePostFrameUpdate(float dt)
 {
 	SCOPED_PROFILER("Game::dynamicTimePostFrameUpdate");
+
+	mTime.dt = dt;
 
 	mPostFrameSystemsManager.update();
 
