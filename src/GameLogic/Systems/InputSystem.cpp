@@ -102,14 +102,13 @@ void InputSystem::processGameplayInput()
 
 	GameplayInputComponent* gameplayInput = world.getWorldComponents().getOrAddComponent<GameplayInputComponent>();
 	GameplayInput::FrameState& gameplayInputState = gameplayInput->getCurrentFrameStateRef();
-	gameplayInputState.setCurrentFrameTimestamp(mTime.currentTimestamp);
 
 	// Debug keybindings (static variable just for now, it should be data-driven and stored somewhere)
 	static InputBindings gameplayBindings = GetDebugInputBindings();
 
 	for (const auto& pair : gameplayBindings.keyBindings)
 	{
-		gameplayInputState.updateKey(pair.first, InputBindings::IsKeyPressed(pair.second, controllerStates), currentTimestamp);
+		gameplayInputState.updateKey(pair.first, InputBindings::GetKeyState(pair.second, controllerStates), currentTimestamp);
 	}
 
 	for (const auto& pair : gameplayBindings.axisBindings)

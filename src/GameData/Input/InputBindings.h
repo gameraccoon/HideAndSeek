@@ -13,7 +13,7 @@ namespace Input
 	{
 	public:
 		virtual ~KeyBinding() = default;
-		virtual bool isActive(const PlayerControllerStates& controllerStates) const = 0;
+		virtual GameplayInput::KeyState getState(const PlayerControllerStates& controllerStates) const = 0;
 	};
 
 	class AxisBinding
@@ -30,7 +30,7 @@ namespace Input
 	{
 	public:
 		PressSingleButtonKeyBinding(ControllerType controllerType, int button);
-		bool isActive(const PlayerControllerStates& controllerStates) const override;
+		GameplayInput::KeyState getState(const PlayerControllerStates& controllerStates) const override;
 
 	private:
 		const ControllerType mControllerType;
@@ -47,7 +47,7 @@ namespace Input
 	{
 	public:
 		PressButtonChordKeyBinding(ControllerType controllerType, const std::vector<int>& buttons);
-		bool isActive(const PlayerControllerStates& controllerStates) const override;
+		GameplayInput::KeyState getState(const PlayerControllerStates& controllerStates) const override;
 
 	private:
 		const ControllerType mControllerType;
@@ -104,9 +104,9 @@ namespace Input
 		AxisBindingMap axisBindings;
 
 		/**
-		 * return true if any of bindings associated to this key are pressed
+		 * returns a state which is a consensus between key states from across all bindings
 		 */
-		static bool IsKeyPressed(const std::vector<std::unique_ptr<KeyBinding>>& bindings, const PlayerControllerStates& controllerStates);
+		static GameplayInput::KeyState GetKeyState(const std::vector<std::unique_ptr<KeyBinding>>& bindings, const PlayerControllerStates& controllerStates);
 
 		/**
 		 * returns an average value from multiple bindings

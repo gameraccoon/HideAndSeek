@@ -6,6 +6,14 @@
 
 namespace GameplayInput
 {
+	enum class KeyState
+	{
+		Inactive = 0,
+		JustActivated = 1,
+		Active = 2,
+		JustDeactivated = 3,
+	};
+
 	enum class InputAxis
 	{
 		MoveHorizontal = 0,
@@ -30,24 +38,22 @@ namespace GameplayInput
 		void updateAxis(InputAxis axis, float newValue);
 		float getAxisValue(InputAxis axis) const;
 
-		void updateKey(InputKey key, bool isPressed, GameplayTimestamp currentTimestamp);
-		bool isJustPressed(InputKey key) const;
-		bool isJustReleased(InputKey key) const;
-		bool isPressed(InputKey key) const;
+		void updateKey(InputKey key, KeyState newState, GameplayTimestamp currentTimestamp);
+		KeyState getKeyState(InputKey key) const;
+		bool isKeyJustActivated(InputKey key) const;
+		bool isKeyActive(InputKey key) const;
+		bool isKeyJustDeactivated(InputKey key) const;
 		GameplayTimestamp getLastFlipTime(InputKey key) const;
 
-		void setCurrentFrameTimestamp(GameplayTimestamp timestamp);
-
 	private:
-		struct KeyState
+		struct KeyInfo
 		{
-			bool isPressed = false;
+			KeyState state = KeyState::Inactive;
 			GameplayTimestamp lastFlipTime;
 		};
 
 	private:
-		std::array<float, static_cast<size_t>(InputAxis::Count)> mAxes;
-		std::array<KeyState, static_cast<size_t>(InputKey::Count)> mKeys;
-		GameplayTimestamp mCurrentFrameTimestamp;
+		std::array<float, static_cast<size_t>(InputAxis::Count)> mAxes{};
+		std::array<KeyInfo, static_cast<size_t>(InputKey::Count)> mKeys;
 	};
 }

@@ -6,15 +6,20 @@ namespace Input
 {
 	void ControllerState::updateButtonState(int button, bool isPressed)
 	{
-		if (isPressed && mPressedButtons.find(button) == mPressedButtons.end())
+		const bool wasPressed = mPressedButtons.find(button) != mPressedButtons.end();
+		if (isPressed)
 		{
 			mPressedButtons.insert(button);
-			mLastFramePressedButtons.push_back(button);
+			if (!wasPressed) {
+				mLastFramePressedButtons.push_back(button);
+			}
 		}
 		else if (!isPressed)
 		{
 			mPressedButtons.erase(button);
-			mLastFrameReleasedButtons.push_back(button);
+			if (wasPressed) {
+				mLastFrameReleasedButtons.push_back(button);
+			}
 		}
 	}
 

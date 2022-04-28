@@ -14,39 +14,41 @@ namespace GameplayInput
 		return mAxes[static_cast<size_t>(axis)];
 	}
 
-	void FrameState::updateKey(InputKey key, bool isPressed, GameplayTimestamp currentTimestamp)
+	void FrameState::updateKey(InputKey key, KeyState newState, GameplayTimestamp currentTimestamp)
 	{
-		KeyState& state = mKeys[static_cast<size_t>(key)];
-		if (state.isPressed != isPressed)
+		KeyInfo& info = mKeys[static_cast<size_t>(key)];
+		if ((info.state == KeyState::Active || info.state == KeyState::JustActivated) != (newState == KeyState::Active || newState == KeyState::JustActivated)
+			|| !info.lastFlipTime.isInitialized())
 		{
-			state.isPressed = isPressed;
-			state.lastFlipTime = currentTimestamp;
+			info.lastFlipTime = currentTimestamp;
 		}
+		info.state = newState;
 	}
 
-	bool FrameState::isJustPressed(InputKey key) const
+	KeyState FrameState::getKeyState(InputKey key) const
 	{
-		return mKeys[static_cast<size_t>(key)].isPressed && mKeys[static_cast<size_t>(key)].lastFlipTime == mCurrentFrameTimestamp;
+		return mKeys[static_cast<size_t>(key)].state;
 	}
 
-	bool FrameState::isJustReleased(InputKey key) const
+	bool FrameState::isKeyJustActivated(InputKey key) const
 	{
-		return !mKeys[static_cast<size_t>(key)].isPressed && mKeys[static_cast<size_t>(key)].lastFlipTime == mCurrentFrameTimestamp;
+		return getKeyState(key) == KeyState::JustActivated;
 	}
 
-	bool FrameState::isPressed(InputKey key) const
+	bool FrameState::isKeyActive(InputKey key) const
 	{
-		return mKeys[static_cast<size_t>(key)].isPressed;
+		const KeyState state = getKeyState(key);
+		return state == KeyState::Active || state == KeyState::JustActivated;
+	}
+
+	bool FrameState::isKeyJustDeactivated(InputKey key) const
+	{
+		return getKeyState(key) == KeyState::JustDeactivated;
 	}
 
 	GameplayTimestamp FrameState::getLastFlipTime(InputKey key) const
 	{
 		return mKeys[static_cast<size_t>(key)].lastFlipTime;
-	}
-
-	void FrameState::setCurrentFrameTimestamp(GameplayTimestamp timestamp)
-	{
-		mCurrentFrameTimestamp = timestamp;
 	}
 }
 

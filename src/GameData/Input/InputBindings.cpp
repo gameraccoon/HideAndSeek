@@ -9,19 +9,26 @@ namespace Input
 	PressSingleButtonKeyBinding::PressSingleButtonKeyBinding(ControllerType controllerType, int button)
 		: mControllerType(controllerType)
 		, mButton(button)
-	{
+	{}
 
-	}
-
-	bool PressSingleButtonKeyBinding::isActive(const PlayerControllerStates& controllerStates) const
+	GameplayInput::KeyState PressSingleButtonKeyBinding::getState(const PlayerControllerStates& controllerStates) const
 	{
+		using namespace GameplayInput;
+
 		const auto& it = controllerStates.find(mControllerType);
 		if (it == controllerStates.end())
 		{
-			return false;
+			return KeyState::Inactive;
 		}
 
-		return it->second.isButtonPressed(mButton);
+		if (it->second.isButtonPressed(mButton))
+		{
+			return it->second.isButtonJustPressed(mButton) ? KeyState::JustActivated : KeyState::Active;
+		}
+		else
+		{
+			return it->second.isButtonJustReleased(mButton) ? KeyState::JustDeactivated: KeyState::Inactive;
+		}
 	}
 
 	PressButtonChordKeyBinding::PressButtonChordKeyBinding(ControllerType controllerType, const std::vector<int>& buttons)
@@ -29,23 +36,63 @@ namespace Input
 		, mButtons(buttons)
 	{}
 
-	bool PressButtonChordKeyBinding::isActive(const PlayerControllerStates& controllerStates) const
+	GameplayInput::KeyState PressButtonChordKeyBinding::getState(const PlayerControllerStates& controllerStates) const
 	{
+		using namespace GameplayInput;
+
 		if (mButtons.empty())
 		{
-			return false;
+			return KeyState::Inactive;
 		}
 
 		const auto& it = controllerStates.find(mControllerType);
 		if (it == controllerStates.end())
 		{
-			return false;
+			return KeyState::Inactive;
 		}
 
-		return std::all_of(mButtons.begin(), mButtons.end(), [&state = it->second](int button)
+		size_t countPressed = 0;
+		// note that some keys can be justPressed and justReleased during the same frame
+		int countJustPressed = 0;
+		int countJustReleased = 0;
+		int flipFloppedDownUp = 0;
+		int flipFloppedUpDown = 0;
+
+		for (const int button : mButtons)
 		{
-			return state.isButtonPressed(button);
-		});
+			// none of these three are exclusive
+			const bool isPressed = it->second.isButtonPressed(button);
+			const bool isJustPressed = it->second.isButtonJustPressed(button);
+			const bool isJustReleased = it->second.isButtonJustReleased(button);
+
+			// to manage special cases when one button changed state twice in one frame
+			const bool flipFlopDownUp = isJustPressed && isJustReleased && !isPressed;
+			const bool flipFlopUpDown = isJustPressed && isJustReleased && isPressed;
+
+			countPressed += isPressed ? 1 : 0;
+			countJustPressed += isJustPressed ? 1 : 0;
+			countJustReleased += isJustReleased ? 1 : 0;
+			flipFloppedDownUp += flipFlopDownUp ? 1 : 0;
+			flipFloppedUpDown += flipFlopUpDown ? 1 : 0;
+		}
+
+		if (countPressed == mButtons.size()) // all pressed
+		{
+			if (countJustPressed - countJustReleased + flipFloppedUpDown > 0)
+			{
+				return KeyState::JustActivated;
+			}
+			return KeyState::Active;
+		}
+		else
+		{
+			// the chord was pressed last frame
+			if (static_cast<size_t>(countPressed - countJustPressed + countJustReleased + flipFloppedDownUp) == mButtons.size())
+			{
+				return KeyState::JustDeactivated;
+			}
+			return KeyState::Inactive;
+		}
 	}
 
 	PositiveButtonAxisBinding::PositiveButtonAxisBinding(ControllerType controllerType, int button)
@@ -81,33 +128,56 @@ namespace Input
 		return (it != controllerStates.end()) ? it->second.getAxisValue(mAxis) : 0.0f;
 	}
 
-	bool InputBindings::IsKeyPressed(const std::vector<std::unique_ptr<KeyBinding>>& bindings, const PlayerControllerStates& controllerStates)
+	GameplayInput::KeyState InputBindings::GetKeyState(const std::vector<std::unique_ptr<KeyBinding>>& bindings, const PlayerControllerStates& controllerStates)
 	{
-		return std::any_of(bindings.begin(), bindings.end(), [&controllerStates](const std::unique_ptr<KeyBinding>& binding)
+		using namespace GameplayInput;
+
+		// the most common case, also the easiest
+		if (bindings.size() == 1)
 		{
-			return binding->isActive(controllerStates);
-		});
+			return bindings.front()->getState(controllerStates);
+		}
+
+		std::array<int, 4> states{};
+		for (const std::unique_ptr<KeyBinding>& binding : bindings)
+		{
+			++states[static_cast<size_t>(binding->getState(controllerStates))];
+		}
+
+		// we have at least one active or activated binding at this frame
+		if ((states[static_cast<size_t>(KeyState::Active)] + states[static_cast<size_t>(KeyState::JustActivated)]) > 0)
+		{
+			// we didn't have active bindings last frame
+			if ((states[static_cast<size_t>(KeyState::Active)] + states[static_cast<size_t>(KeyState::JustDeactivated)]) == 0)
+			{
+				return KeyState::JustActivated;
+			}
+
+			// at least one of the bindings was active last frame
+			return KeyState::Active;
+		}
+		else
+		{
+			// at least one of the bindings was active last frame
+			if (states[static_cast<size_t>(KeyState::JustDeactivated)] > 0)
+			{
+				return KeyState::JustDeactivated;
+			}
+			return KeyState::Inactive;
+		}
 	}
 
 	float InputBindings::GetBlendedAxisValue(const std::vector<std::unique_ptr<AxisBinding>>& bindings, const PlayerControllerStates& controllerStates)
 	{
-		float accumulatedValue = 0.0f;
-		int validBindings = 0;
+		float maxPositive = 0.0f;
+		float maxNegative = 0.0f;
 		for (const std::unique_ptr<AxisBinding>& binding : bindings)
 		{
 			const float axisValue = binding->getAxisValue(controllerStates);
-			if (axisValue != 0.0f)
-			{
-				accumulatedValue += axisValue;
-				++validBindings;
-			}
+			maxPositive = std::max(maxPositive, axisValue);
+			maxNegative = std::max(maxNegative, -axisValue);
 		}
 
-		if (validBindings == 0)
-		{
-			return 0.0f;
-		}
-
-		return accumulatedValue / validBindings;
+		return maxPositive - maxNegative;
 	}
 }

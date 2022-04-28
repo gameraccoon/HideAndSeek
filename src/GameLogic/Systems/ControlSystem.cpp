@@ -36,8 +36,8 @@ void ControlSystem::update()
 	GameplayInputComponent* gameplayInput = world.getWorldComponents().getOrAddComponent<GameplayInputComponent>();
 	const GameplayInput::FrameState& inputState = gameplayInput->getCurrentFrameState();
 
-	const bool isSprintPressed = inputState.isPressed(GameplayInput::InputKey::Sprint);
-	const bool isShootPressed = inputState.isPressed(GameplayInput::InputKey::Shoot);
+	const bool isSprintPressed = inputState.isKeyActive(GameplayInput::InputKey::Sprint);
+	const bool isShootPressed = inputState.isKeyActive(GameplayInput::InputKey::Shoot);
 
 	const Vector2D movementDirection(inputState.getAxisValue(GameplayInput::InputAxis::MoveHorizontal), inputState.getAxisValue(GameplayInput::InputAxis::MoveVertical));
 	const Vector2D aimDirection(inputState.getAxisValue(GameplayInput::InputAxis::AimHorizontal), inputState.getAxisValue(GameplayInput::InputAxis::AimVertical));
