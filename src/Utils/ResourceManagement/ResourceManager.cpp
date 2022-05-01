@@ -103,8 +103,9 @@ void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 	SCOPED_PROFILER("ResourceManager::runThreadTasks");
 	std::unique_lock lock(mDataMutex);
 	bool shouldWakeUpLoadingThread = false;
-	for (auto resourceIt = mLoading.resourcesWaitingInit.begin(); resourceIt != mLoading.resourcesWaitingInit.end(); ++resourceIt)
+	for (auto resourceIt = mLoading.resourcesWaitingInit.begin(); resourceIt != mLoading.resourcesWaitingInit.end();)
 	{
+		bool skipIncrement = false;
 		ResourceLoading::ResourceLoad::LoadingDataPtr& loadingData = *resourceIt;
 		while (!loadingData->stepsLeft.empty())
 		{
@@ -127,7 +128,7 @@ void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 					it->second = std::move(loadingData);
 					// this invalidates "step" variable
 					resourceIt = mLoading.resourcesWaitingInit.erase(resourceIt);
-					--resourceIt;
+					skipIncrement = true; // need to skip because erase already points to the next element
 					break;
 				}
 
@@ -138,7 +139,7 @@ void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 					finalizeResourceLoading(loadingData->handle, (resultDataPtr ? std::move(*resultDataPtr) : Resource::Ptr{}));
 					// this invalidates "step" variable
 					resourceIt = mLoading.resourcesWaitingInit.erase(resourceIt);
-					--resourceIt;
+					skipIncrement = true; // need to skip because erase already points to the next element
 					break;
 				}
 			}
@@ -150,6 +151,11 @@ void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 				}
 				break;
 			}
+		}
+
+		if (!skipIncrement)
+		{
+			++resourceIt;
 		}
 	}
 
