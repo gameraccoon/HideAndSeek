@@ -136,7 +136,7 @@ public:
 		{
 			if (size_t count = finalizerGroup.readyFinalizers.try_dequeue_bulk(finalizersToExecute.begin(), finalizersToExecute.size()); count > 0)
 			{
-				finalizerGroup.tasksNotFinalizedCount -= count;
+				finalizerGroup.tasksNotFinalizedCount -= static_cast<int>(count);
 				finalizeReadyTasks(finalizersToExecute, count);
 				continue;
 			}
@@ -253,7 +253,7 @@ private:
 		{
 			if (size_t count = finalizerGroup.readyFinalizers.try_dequeue_bulk(finalizersToExecute.begin(), finalizersToExecute.size()); count > 0)
 			{
-				finalizerGroup.tasksNotFinalizedCount -= count;
+				finalizerGroup.tasksNotFinalizedCount -= static_cast<int>(count);
 				finalizeReadyTasks(finalizersToExecute, count);
 			}
 		}

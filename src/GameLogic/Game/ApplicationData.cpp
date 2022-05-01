@@ -55,7 +55,7 @@ void ApplicationData::writeProfilingData()
 #endif // ENABLE_SCOPED_PROFILER
 }
 
-void ApplicationData::threadSaveProfileData([[maybe_unused]] int threadIndex)
+void ApplicationData::threadSaveProfileData([[maybe_unused]] size_t threadIndex)
 {
 #ifdef ENABLE_SCOPED_PROFILER
 	std::lock_guard l(mScopedProfileRecordsMutex);
