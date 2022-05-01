@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "GameLogic/SharedManagers/InputData.h"
+#include "HAL/InputControllersData.h"
 
 class Game;
 class ArgumentsParser;
@@ -15,6 +15,6 @@ public:
 	void processArguments(const ArgumentsParser& arguments);
 
 private:
-	std::optional<InputData> mForcedInputData;
+	std::optional<HAL::InputControllersData> mForcedInputData;
 	int mFramesBeforeShutdown = -1;
 };

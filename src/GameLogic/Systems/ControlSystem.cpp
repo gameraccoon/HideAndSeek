@@ -12,7 +12,6 @@
 #include "GameData/Components/TransformComponent.generated.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
-#include "GameLogic/SharedManagers/InputData.h"
 
 
 ControlSystem::ControlSystem(WorldHolder& worldHolder) noexcept
@@ -65,4 +64,3 @@ void ControlSystem::update()
 		movement->setSightDirection(aimDirection);
 	}
 }
-

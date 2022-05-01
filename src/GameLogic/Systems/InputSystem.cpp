@@ -13,12 +13,13 @@
 #include "GameData/Components/ImguiComponent.generated.h"
 #include "GameData/Components/GameplayInputComponent.generated.h"
 
+#include "HAL/InputControllersData.h"
+
 #include "GameLogic/SharedManagers/WorldHolder.h"
-#include "GameLogic/SharedManagers/InputData.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 
 
-InputSystem::InputSystem(WorldHolder& worldHolder, const InputData& inputData, const TimeData& timeData) noexcept
+InputSystem::InputSystem(WorldHolder& worldHolder, const HAL::InputControllersData& inputData, const TimeData& timeData) noexcept
 	: mWorldHolder(worldHolder)
 	, mInputData(inputData)
 	, mTime(timeData)

@@ -14,8 +14,6 @@ public:
 
 	TestChecklist start(const ArgumentsParser& arguments, RenderAccessor& renderAccessor);
 	void fixedTimeUpdate(float dt) final;
-	void setKeyboardKeyState(int, bool) override {}
-	void setMouseKeyState(int, bool) override {}
 
 	bool shouldQuitGame() const override { return mShouldQuit; }
 	void quitGame() override { mShouldQuit = true; }

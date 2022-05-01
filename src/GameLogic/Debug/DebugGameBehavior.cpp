@@ -12,7 +12,7 @@ void DebugGameBehavior::preInnerUpdate(Game& game)
 {
 	if (mForcedInputData.has_value())
 	{
-		game.mInputData = *mForcedInputData;
+		game.mInputControllersData = *mForcedInputData;
 	}
 }
 
@@ -32,10 +32,7 @@ void DebugGameBehavior::processArguments(const ArgumentsParser& arguments)
 {
 	if (arguments.hasArgument("disable-input"))
 	{
-		mForcedInputData = InputData();
-		Input::ControllerState& mouseState = mForcedInputData->controllerStates[Input::ControllerType::Mouse];
-		mouseState.updateAxis(0, 0.5f);
-		mouseState.updateAxis(1, 0.5f);
+		mForcedInputData = HAL::InputControllersData();
 	}
 
 	if (arguments.hasArgument("time-limit"))

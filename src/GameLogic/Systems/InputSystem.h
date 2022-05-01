@@ -3,8 +3,12 @@
 #include <raccoon-ecs/system.h>
 
 class WorldHolder;
-class InputData;
 class TimeData;
+
+namespace HAL
+{
+	class InputControllersData;
+}
 
 /**
  * System that transforms raw controller input into gameplay input commands
@@ -12,7 +16,7 @@ class TimeData;
 class InputSystem : public RaccoonEcs::System
 {
 public:
-	InputSystem(WorldHolder& worldHolder, const InputData& inputData, const TimeData& timeData) noexcept;
+	InputSystem(WorldHolder& worldHolder, const HAL::InputControllersData& inputData, const TimeData& timeData) noexcept;
 
 	void update() override;
 	static std::string GetSystemId() { return "InputSystem"; }
@@ -23,6 +27,6 @@ private:
 
 private:
 	WorldHolder& mWorldHolder;
-	const InputData& mInputData;
+	const HAL::InputControllersData& mInputData;
 	const TimeData& mTime;
 };

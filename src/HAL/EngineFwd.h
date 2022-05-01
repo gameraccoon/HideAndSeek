@@ -3,6 +3,7 @@
 namespace HAL
 {
 	class Engine;
+	class InputControllersData;
 }
 
 namespace Graphics

@@ -2,8 +2,6 @@
 
 #include "HAL/Base/Engine.h"
 
-#include "Base/Debug/ConcurrentAccessDetector.h"
-
 #include <algorithm>
 #include <thread>
 
@@ -12,7 +10,10 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
+#include "Base/Debug/ConcurrentAccessDetector.h"
+
 #include "HAL/IGame.h"
+#include "HAL/InputControllersData.h"
 #include "HAL/Internal/GlContext.h"
 #include "HAL/Internal/Sdl.h"
 #include "HAL/Internal/SdlWindow.h"
@@ -26,22 +27,22 @@ namespace HAL
 	struct Engine::Impl
 	{
 		Internal::SDLInstance mSdl;
+		const int mWindowWidth;
+		const int mWindowHeight;
 		Internal::Window mWindow;
 		Internal::GlContext mGlContext{mWindow};
 		Graphics::Renderer mRenderer;
 		Uint64 mLastFrameTicks;
 		IGame* mGame = nullptr;
+		InputControllersData* mInputDataPtr = nullptr;
 
-		float mMouseX;
-		float mMouseY;
 		SDL_Event mLastEvent;
 
 		Impl(int windowWidth, int windowHeight) noexcept
 			: mSdl(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE)
+			, mWindowWidth(windowWidth)
+			, mWindowHeight(windowHeight)
 			, mWindow(windowWidth, windowHeight)
-			, mLastFrameTicks(SDL_GetTicks64())
-			, mMouseX(static_cast<float>(windowWidth) * 0.5f)
-			, mMouseY(static_cast<float>(windowHeight) * 0.5f)
 		{
 		}
 
@@ -52,9 +53,7 @@ namespace HAL
 	};
 
 	Engine::Engine(int windowWidth, int windowHeight) noexcept
-		: WindowWidth(windowWidth)
-		, WindowHeight(windowHeight)
-		, mPimpl(HS_NEW Impl(windowWidth, windowHeight))
+		: mPimpl(HS_NEW Impl(windowWidth, windowHeight))
 	{
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -67,7 +66,7 @@ namespace HAL
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0.0, WindowWidth, WindowHeight, 0.0, -1.0, 1.0);
+		glOrtho(0.0, windowWidth, windowHeight, 0.0, -1.0, 1.0);
 		glMatrixMode(GL_MODELVIEW);
 
 		if (TTF_Init() == -1)
@@ -87,14 +86,10 @@ namespace HAL
 		TTF_Quit();
 	}
 
-	Vector2D Engine::getMousePos() const
-	{
-		return Vector2D(mPimpl->mMouseX, mPimpl->mMouseY);
-	}
-
-	void Engine::start(IGame* game)
+	void Engine::start(IGame* game, InputControllersData* inputData)
 	{
 		mPimpl->mGame = game;
+		mPimpl->mInputDataPtr = inputData;
 		mPimpl->mWindow.show();
 		game->initResources();
 		mPimpl->start();
@@ -108,7 +103,7 @@ namespace HAL
 
 	Vector2D Engine::getWindowSize() const
 	{
-		return Vector2D(static_cast<float>(WindowWidth), static_cast<float>(WindowHeight));
+		return Vector2D(static_cast<float>(mPimpl->mWindowWidth), static_cast<float>(mPimpl->mWindowHeight));
 	}
 
 	void Engine::releaseRenderContext()
@@ -201,20 +196,40 @@ namespace HAL
 				mGame->quitGame();
 				break;
 			case SDL_KEYDOWN:
-				mGame->setKeyboardKeyState(event.key.keysym.sym, true);
+				if (mInputDataPtr)
+				{
+					mInputDataPtr->controllerStates[Input::ControllerType::Keyboard].updateButtonState(event.key.keysym.sym, true);
+				}
 				break;
 			case SDL_KEYUP:
-				mGame->setKeyboardKeyState(event.key.keysym.sym, false);
+				if (mInputDataPtr)
+				{
+					mInputDataPtr->controllerStates[Input::ControllerType::Keyboard].updateButtonState(event.key.keysym.sym, false);
+				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				mGame->setMouseKeyState(event.button.button, true);
+				if (mInputDataPtr)
+				{
+					mInputDataPtr->controllerStates[Input::ControllerType::Mouse].updateButtonState(event.button.button, true);
+				}
 				break;
 			case SDL_MOUSEBUTTONUP:
-				mGame->setMouseKeyState(event.button.button, false);
+				if (mInputDataPtr)
+				{
+					mInputDataPtr->controllerStates[Input::ControllerType::Mouse].updateButtonState(event.button.button, false);
+				}
 				break;
 			case SDL_MOUSEMOTION:
-				mMouseX = static_cast<float>(event.motion.x);
-				mMouseY = static_cast<float>(event.motion.y);
+				if (mInputDataPtr)
+				{
+					const Vector2D windowSize{static_cast<float>(mWindowWidth), static_cast<float>(mWindowHeight)};
+					const Vector2D mouseRelativePos{
+						(event.motion.x / windowSize.x) * 2.0f - 1.0f,
+						(event.motion.y / windowSize.y) * 2.0f - 1.0f
+					};
+					mInputDataPtr->controllerStates[Input::ControllerType::Mouse].updateAxis(0, mouseRelativePos.x);
+					mInputDataPtr->controllerStates[Input::ControllerType::Mouse].updateAxis(1, mouseRelativePos.y);
+				}
 				break;
 			default:
 				break;

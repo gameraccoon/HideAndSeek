@@ -14,6 +14,7 @@ union SDL_Event;
 namespace HAL
 {
 	class IGame;
+	class InputControllersData;
 
 	class Engine
 	{
@@ -39,9 +40,7 @@ namespace HAL
 
 		~Engine();
 
-		Vector2D getMousePos() const;
-
-		void start(IGame* game);
+		void start(IGame* game, InputControllersData* inputData);
 
 		Graphics::Renderer& getRenderer();
 
@@ -56,9 +55,6 @@ namespace HAL
 		SDL_Event& getLastEventRef();
 
 	private:
-		const int WindowWidth;
-		const int WindowHeight;
-
 		struct Impl;
 		std::unique_ptr<Impl> mPimpl;
 	};

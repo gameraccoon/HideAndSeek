@@ -9,11 +9,11 @@
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 #include "HAL/GameBase.h"
+#include "HAL/InputControllersData.h"
 
 #include "GameLogic/Debug/DebugGameBehavior.h"
 #include "GameLogic/SharedManagers/TimeData.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
-#include "GameLogic/SharedManagers/InputData.h"
 
 #ifdef IMGUI_ENABLED
 #include "GameLogic/Imgui/ImguiDebugData.h"
@@ -34,8 +34,6 @@ public:
 	void dynamicTimePreFrameUpdate(float dt) final;
 	void fixedTimeUpdate(float dt) override;
 	void dynamicTimePostFrameUpdate(float dt) final;
-	void setKeyboardKeyState(int key, bool isPressed) override;
-	void setMouseKeyState(int key, bool isPressed) override;
 	void initResources() override;
 
 protected:
@@ -44,7 +42,7 @@ protected:
 	RaccoonEcs::SystemsManager& getPreFrameSystemsManager() { return mPreFrameSystemsManager; }
 	RaccoonEcs::SystemsManager& getGameLogicSystemsManager() { return mGameLogicSystemsManager; }
 	RaccoonEcs::SystemsManager& getPostFrameSystemsManager() { return mPostFrameSystemsManager; }
-	InputData& getInputData() { return mInputData; }
+	HAL::InputControllersData& getInputData() { return mInputControllersData; }
 	const TimeData& getTime() const { return mTime; }
 	ThreadPool& getThreadPool() { return mThreadPool; }
 	GameData& getGameData() { return mGameData; }
@@ -60,7 +58,7 @@ private:
 	GameData mGameData{mComponentFactory};
 	WorldHolder mWorldHolder{&mWorld, mGameData};
 
-	InputData mInputData;
+	HAL::InputControllersData mInputControllersData;
 
 	ThreadPool& mThreadPool;
 	RaccoonEcs::SystemsManager mPreFrameSystemsManager;
