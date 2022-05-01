@@ -18,8 +18,8 @@ namespace ResourceLoading
 		const std::vector<ResourceHandle>& getDependentResources(ResourceHandle resource) const;
 
 	protected:
-		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> dependencies;
-		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> dependentResources;
+		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> mDependencies;
+		std::unordered_map<ResourceHandle, std::vector<ResourceHandle>> mDependentResources;
 	};
 
 	class RuntimeDependencies : public ResourceDependencies

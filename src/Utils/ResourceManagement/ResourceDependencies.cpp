@@ -9,8 +9,8 @@ namespace ResourceLoading
 {
 	void ResourceDependencies::setFirstDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency)
 	{
-		dependencies[dependentResource].push_back(dependency);
-		dependentResources[dependency].push_back(dependentResource);
+		mDependencies[dependentResource].push_back(dependency);
+		mDependentResources[dependency].push_back(dependentResource);
 	}
 
 	void ResourceDependencies::setFirstDependOnSecond(ResourceHandle dependentResource, const std::vector<ResourceHandle>& dependencies)
@@ -24,7 +24,7 @@ namespace ResourceLoading
 	const std::vector<ResourceHandle>& ResourceDependencies::getDependencies(ResourceHandle resource) const
 	{
 		static const std::vector<ResourceHandle> emptyVector;
-		if (auto it = dependencies.find(resource); it != dependencies.end())
+		if (auto it = mDependencies.find(resource); it != mDependencies.end())
 		{
 			return it->second;
 		}
@@ -37,7 +37,7 @@ namespace ResourceLoading
 	const std::vector<ResourceHandle>& ResourceDependencies::getDependentResources(ResourceHandle resource) const
 	{
 		static const std::vector<ResourceHandle> emptyVector;
-		if (auto it = dependentResources.find(resource); it != dependentResources.end())
+		if (auto it = mDependentResources.find(resource); it != mDependentResources.end())
 		{
 			return it->second;
 		}
@@ -50,16 +50,16 @@ namespace ResourceLoading
 	std::vector<ResourceHandle> RuntimeDependencies::removeResource(ResourceHandle resource)
 	{
 		std::vector<ResourceHandle> result;
-		if (auto it = dependencies.find(resource); it != dependencies.end())
+		if (auto it = mDependencies.find(resource); it != mDependencies.end())
 		{
 			result = std::move(it->second);
-			dependencies.erase(it);
+			mDependencies.erase(it);
 		}
 
-		if (auto it = dependentResources.find(resource); it != dependentResources.end())
+		if (auto it = mDependentResources.find(resource); it != mDependentResources.end())
 		{
 			Assert(it->second.empty(), "We removing a resource that have dependent resources: %d", resource);
-			dependentResources.erase(it);
+			mDependentResources.erase(it);
 		}
 		return result;
 	}
@@ -69,25 +69,25 @@ namespace ResourceLoading
 		std::vector<ResourceHandle> result;
 
 		// move the dependent resources to "result" and remove the record
-		if (auto it = dependentResources.find(dependency); it != dependentResources.end())
+		if (auto it = mDependentResources.find(dependency); it != mDependentResources.end())
 		{
 			result = std::move(it->second);
-			dependentResources.erase(it);
+			mDependentResources.erase(it);
 		}
 
 		// check that our dependencies are empty and remove the record
-		if (auto it = dependencies.find(dependency); it != dependencies.end())
+		if (auto it = mDependencies.find(dependency); it != mDependencies.end())
 		{
 			AssertFatal(it->second.empty(), "We resolving dependency that have unresolved dependencies itself: %d", dependency);
-			dependencies.erase(it);
+			mDependencies.erase(it);
 		}
 
 		// resolve dependencies for the dependent resources
 		// and filter "result" to keep only fully resolved ones
 		for (int i = 0; i < static_cast<int>(result.size()); ++i)
 		{
-			auto it = dependencies.find(result[i]);
-			if (it != dependencies.end())
+			auto it = mDependencies.find(result[i]);
+			if (it != mDependencies.end())
 			{
 				auto removedRange = std::ranges::remove_if(it->second, [dependency](ResourceHandle handle){
 					return handle == dependency;
