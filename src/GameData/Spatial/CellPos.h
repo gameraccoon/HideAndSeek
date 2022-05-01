@@ -26,7 +26,7 @@ struct CellPos
 
 	CellPosDiff operator-(const CellPos& other) const;
 	CellPos operator+(const CellPosDiff& diff) const;
-	bool operator<=>(const CellPos&) const = default;
+	std::strong_ordering operator<=>(const CellPos&) const = default;
 
 	friend void to_json(nlohmann::json& outJson, const CellPos& pos);
 	friend void from_json(const nlohmann::json& json, CellPos& outPos);
