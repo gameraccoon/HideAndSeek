@@ -24,6 +24,11 @@ public:
 		shutdown();
 	}
 
+	ThreadPool(const ThreadPool&) = delete;
+	ThreadPool& operator=(const ThreadPool&) = delete;
+	ThreadPool(ThreadPool&&) = delete;
+	ThreadPool& operator=(ThreadPool&&) = delete;
+
 	void shutdown()
 	{
 		{
@@ -123,13 +128,13 @@ public:
 		finalizeTaskForGroup(finalizerGroup);
 	}
 
-	void processAndFinalizeTasks(size_t groupId = 0)
+	void processAndFinalizeTasks(size_t finalizationGroupId = 0)
 	{
 		std::vector<Finalizer> finalizersToExecute(24);
 		Task currentTask;
 
 		std::unique_lock lock(mDataMutex);
-		FinalizerGroup& finalizerGroup = getOrCreateFinalizerGroup(groupId);
+		FinalizerGroup& finalizerGroup = getOrCreateFinalizerGroup(finalizationGroupId);
 		lock.unlock();
 
 		while(finalizerGroup.tasksNotFinalizedCount.load(std::memory_order::acquire) > 0)
@@ -146,10 +151,10 @@ public:
 			{
 				currentTask = std::move(mTasksQueue.front());
 				mTasksQueue.pop_front();
-				FinalizerGroup& finalizerGroup = getOrCreateFinalizerGroup(currentTask.groupId);
+				FinalizerGroup& taskFinalizerGroup = getOrCreateFinalizerGroup(currentTask.groupId);
 				lock.unlock();
 
-				processAndFinalizeOneTask(groupId, finalizerGroup, currentTask);
+				processAndFinalizeOneTask(finalizationGroupId, taskFinalizerGroup, currentTask);
 			}
 			else
 			{
@@ -192,7 +197,7 @@ private:
 			, finalizeFn(std::move(finalizeFn))
 		{}
 
-		size_t groupId;
+		size_t groupId = 0;
 		TaskFn taskFn;
 		FinalizeFn finalizeFn;
 	};
@@ -218,7 +223,11 @@ private:
 
 			std::any result = currentTask.taskFn();
 
-			taskPostProcess(currentTask, std::move(result));
+			std::unique_lock lock(mDataMutex);
+			FinalizerGroup& finalizerGroup = getOrCreateFinalizerGroup(currentTask.groupId);
+			lock.unlock();
+
+			taskPostProcess(currentTask, finalizerGroup, std::move(result));
 		}
 
 		if (mThreadPreShutdownTask)
@@ -227,12 +236,8 @@ private:
 		}
 	}
 
-	void taskPostProcess(Task& currentTask, std::any&& result)
+	void taskPostProcess(Task& currentTask, FinalizerGroup& finalizerGroup, std::any&& result)
 	{
-		std::unique_lock lock(mDataMutex);
-		FinalizerGroup& finalizerGroup = getOrCreateFinalizerGroup(currentTask.groupId);
-		lock.unlock();
-
 		if (currentTask.finalizeFn)
 		{
 			finalizerGroup.readyFinalizers.enqueue_emplace(std::move(currentTask.finalizeFn), std::move(result));
@@ -285,17 +290,21 @@ private:
 		return *groupPtr;
 	}
 
-	void processAndFinalizeOneTask(size_t groupId, FinalizerGroup& finalizerGroup, Task& currentTask)
+	void processAndFinalizeOneTask(size_t finalizationGroupId, FinalizerGroup& finalizerGroup, Task& currentTask)
 	{
 		std::any result = currentTask.taskFn();
 
-		if (currentTask.groupId == groupId)
+		if (currentTask.groupId == finalizationGroupId)
 		{
 			if (currentTask.finalizeFn)
 			{
 				currentTask.finalizeFn(std::move(result));
 			}
 			--finalizerGroup.tasksNotFinalizedCount;
+		}
+		else
+		{
+			taskPostProcess(currentTask, finalizerGroup, std::move(result));
 		}
 	}
 
