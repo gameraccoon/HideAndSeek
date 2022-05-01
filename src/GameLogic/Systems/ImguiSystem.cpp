@@ -57,7 +57,10 @@ void ImguiSystem::update()
 	SynchroneousRenderData& syncData = TemplateHelpers::EmplaceVariant<SynchroneousRenderData>(renderData->layers);
 
 	syncData.renderThreadFn = [this] {
-		ImGui_ImplSDL2_ProcessEvent(&mEngine.getLastEventRef());
+		for (SDL_Event& sdlEvent : mEngine.getLastFrameEvents())
+		{
+			ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
+		}
 
 		// start the imgui frame
 		ImGui_ImplOpenGL2_NewFrame();

@@ -35,7 +35,7 @@ namespace HAL
 		IGame* mGame = nullptr;
 		InputControllersData* mInputDataPtr = nullptr;
 
-		SDL_Event mLastEvent;
+		std::vector<SDL_Event> mLastFrameEvents;
 
 		Impl(int windowWidth, int windowHeight) noexcept
 			: mSdl(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE)
@@ -127,10 +127,10 @@ namespace HAL
 		return mPimpl->mGlContext.getRawGLContext();
 	}
 
-	SDL_Event& Engine::getLastEventRef()
+	std::vector<SDL_Event>& Engine::getLastFrameEvents()
 	{
 		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
-		return mPimpl->mLastEvent;
+		return mPimpl->mLastFrameEvents;
 	}
 
 	void Engine::Impl::start()
@@ -182,6 +182,8 @@ namespace HAL
 				mGame->dynamicTimePostFrameUpdate(lastFrameDurationSec);
 				lastFixedFrameTicks = currentTicks - fixedFrameticksLeft;
 				lastRealFrameTicks = currentTicks;
+
+				mLastFrameEvents.clear();
 			}
 
 			if (iterations <= 1)
@@ -198,6 +200,11 @@ namespace HAL
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
+			if (event.type > SDL_LASTEVENT)
+			{
+				continue;
+			}
+
 			switch (event.type)
 			{
 			case SDL_QUIT:
@@ -242,7 +249,8 @@ namespace HAL
 			default:
 				break;
 			}
+
+			mLastFrameEvents.push_back(event);
 		}
-		mLastEvent = event;
 	}
 }

@@ -52,7 +52,8 @@ namespace HAL
 		// for debug tools such as imgui
 		SDL_Window* getRawWindow();
 		void* getRawGlContext();
-		SDL_Event& getLastEventRef();
+
+		std::vector<SDL_Event>& getLastFrameEvents();
 
 	private:
 		struct Impl;
