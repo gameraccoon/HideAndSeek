@@ -762,6 +762,7 @@ namespace ShapeOperations
 					inOutGeometry.erase(inOutGeometry.begin() + static_cast<ptrdiff_t>(j));
 					// retry all collision tests with the first figure
 					--i;
+					break;
 				}
 			}
 		}
