@@ -170,16 +170,19 @@ namespace HAL
 
 				const float lastFrameDurationSec = passedRealTicks * ONE_TICK_SECONDS;
 
-				mGame->dynamicTimePreFrameUpdate(lastFrameDurationSec);
-
 				while (fixedFrameticksLeft >= ONE_FIXED_UPDATE_TICKS)
 				{
-					mGame->fixedTimeUpdate(ONE_FIXED_UPDATE_SEC);
 					fixedFrameticksLeft -= ONE_FIXED_UPDATE_TICKS;
 					++iterations;
 				}
 
-				mGame->dynamicTimePostFrameUpdate(lastFrameDurationSec);
+				mGame->dynamicTimePreFrameUpdate(lastFrameDurationSec, iterations);
+				for (int i = 0; i < iterations; ++i)
+				{
+					mGame->fixedTimeUpdate(ONE_FIXED_UPDATE_SEC);
+				}
+				mGame->dynamicTimePostFrameUpdate(lastFrameDurationSec, iterations);
+
 				lastFixedFrameTicks = currentTicks - fixedFrameticksLeft;
 				lastRealFrameTicks = currentTicks;
 

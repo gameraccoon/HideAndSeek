@@ -31,9 +31,9 @@ public:
 	void start();
 	void onGameShutdown();
 
-	void dynamicTimePreFrameUpdate(float dt) final;
+	void dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates) final;
 	void fixedTimeUpdate(float dt) override;
-	void dynamicTimePostFrameUpdate(float dt) final;
+	void dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates) final;
 	void initResources() override;
 
 protected:

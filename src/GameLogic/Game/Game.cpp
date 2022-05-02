@@ -51,7 +51,7 @@ void Game::start()
 	}
 }
 
-void Game::dynamicTimePreFrameUpdate(float dt)
+void Game::dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates)
 {
 	SCOPED_PROFILER("Game::dynamicTimePreFrameUpdate");
 #ifdef ENABLE_SCOPED_PROFILER
@@ -59,6 +59,7 @@ void Game::dynamicTimePreFrameUpdate(float dt)
 #endif // ENABLE_SCOPED_PROFILER
 
 	mTime.dt = dt;
+	mTime.fixedTimeUpdatesThisFrame = plannedFixedTimeUpdates;
 
 	if (HAL::Engine* engine = getEngine())
 	{
@@ -79,11 +80,12 @@ void Game::fixedTimeUpdate(float dt)
 	mInputControllersData.resetLastFrameStates();
 }
 
-void Game::dynamicTimePostFrameUpdate(float dt)
+void Game::dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates)
 {
 	SCOPED_PROFILER("Game::dynamicTimePostFrameUpdate");
 
 	mTime.dt = dt;
+	mTime.fixedTimeUpdatesThisFrame = processedFixedTimeUpdates;
 
 	mPostFrameSystemsManager.update();
 

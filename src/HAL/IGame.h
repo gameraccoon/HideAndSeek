@@ -6,9 +6,9 @@ namespace HAL
 	{
 	public:
 		virtual ~IGame() = default;
-		virtual void dynamicTimePreFrameUpdate(float dt) = 0;
+		virtual void dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates) = 0;
 		virtual void fixedTimeUpdate(float dt) = 0;
-		virtual void dynamicTimePostFrameUpdate(float dt) = 0;
+		virtual void dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates) = 0;
 		virtual void initResources() = 0;
 
 		virtual void quitGame() = 0;
