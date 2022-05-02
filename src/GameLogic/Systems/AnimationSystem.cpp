@@ -25,7 +25,7 @@ void AnimationSystem::update()
 	SCOPED_PROFILER("AnimationSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
-	float dt = mTime.dt;
+	float dt = mTime.lastFixedUpdateDt;
 
 	const auto [stateMachines] = gameData.getGameComponents().getComponents<const StateMachineComponent>();
 

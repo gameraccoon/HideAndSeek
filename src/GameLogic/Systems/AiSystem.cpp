@@ -30,7 +30,7 @@ void AiSystem::update()
 {
 	SCOPED_PROFILER("AiSystem::update");
 	World& world = mWorldHolder.getWorld();
-	const GameplayTimestamp timestampNow = mTime.currentTimestamp;
+	const GameplayTimestamp timestampNow = mTime.lastFixedUpdateTimestamp;
 
 	NavMeshComponent* navMeshComponent = world.getWorldComponents().getOrAddComponent<NavMeshComponent>();
 

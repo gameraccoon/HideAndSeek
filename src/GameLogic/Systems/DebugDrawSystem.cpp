@@ -256,9 +256,9 @@ void DebugDrawSystem::update()
 	auto [debugDraw] = gameData.getGameComponents().getComponents<DebugDrawComponent>();
 	if (debugDraw != nullptr)
 	{
-		RemoveOldDrawElement(debugDraw->getWorldPointsRef(), mTime.currentTimestamp);
-		RemoveOldDrawElement(debugDraw->getScreenPointsRef(), mTime.currentTimestamp);
-		RemoveOldDrawElement(debugDraw->getWorldLineSegmentsRef(), mTime.currentTimestamp);
+		RemoveOldDrawElement(debugDraw->getWorldPointsRef(), mTime.lastFixedUpdateTimestamp);
+		RemoveOldDrawElement(debugDraw->getScreenPointsRef(), mTime.lastFixedUpdateTimestamp);
+		RemoveOldDrawElement(debugDraw->getWorldLineSegmentsRef(), mTime.lastFixedUpdateTimestamp);
 	}
 
 	renderAccessor->submitData(std::move(renderData));

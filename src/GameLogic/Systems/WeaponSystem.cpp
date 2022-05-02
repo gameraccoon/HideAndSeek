@@ -48,7 +48,7 @@ void WeaponSystem::update()
 {
 	SCOPED_PROFILER("WeaponSystem::update");
 	World& world = mWorldHolder.getWorld();
-	GameplayTimestamp currentTime = mTime.currentTimestamp;
+	GameplayTimestamp currentTime = mTime.lastFixedUpdateTimestamp;
 
 	std::vector<ShotInfo> shotsToMake;
 	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<WeaponComponent, CharacterStateComponent>(

@@ -98,7 +98,7 @@ void InputSystem::processGameplayInput()
 	using namespace Input;
 
 	World& world = mWorldHolder.getWorld();
-	const GameplayTimestamp currentTimestamp = mTime.currentTimestamp;
+	const GameplayTimestamp currentTimestamp = mTime.lastFixedUpdateTimestamp.getIncreasedByFloatTime(mTime.lastFixedUpdateDt);
 	const PlayerControllerStates& controllerStates = mInputData.controllerStates;
 
 	GameplayInputComponent* gameplayInput = world.getWorldComponents().getOrAddComponent<GameplayInputComponent>();

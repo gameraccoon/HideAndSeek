@@ -58,8 +58,8 @@ void Game::dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates)
 	mFrameBeginTime = std::chrono::steady_clock::now();
 #endif // ENABLE_SCOPED_PROFILER
 
-	mTime.dt = dt;
-	mTime.fixedTimeUpdatesThisFrame = plannedFixedTimeUpdates;
+	mTime.lastUpdateDt = dt;
+	mTime.countFixedTimeUpdatesThisFrame = plannedFixedTimeUpdates;
 
 	if (HAL::Engine* engine = getEngine())
 	{
@@ -75,7 +75,7 @@ void Game::fixedTimeUpdate(float dt)
 {
 	SCOPED_PROFILER("Game::fixedTimeUpdate");
 
-	mTime.update(dt);
+	mTime.fixedUpdate(dt);
 	mGameLogicSystemsManager.update();
 	mInputControllersData.resetLastFrameStates();
 }
@@ -84,8 +84,8 @@ void Game::dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates)
 {
 	SCOPED_PROFILER("Game::dynamicTimePostFrameUpdate");
 
-	mTime.dt = dt;
-	mTime.fixedTimeUpdatesThisFrame = processedFixedTimeUpdates;
+	mTime.lastUpdateDt = dt;
+	mTime.countFixedTimeUpdatesThisFrame = processedFixedTimeUpdates;
 
 	mPostFrameSystemsManager.update();
 

@@ -204,7 +204,7 @@ static size_t GetJobDivisor(size_t maxThreadsCount)
 void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, std::vector<WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize)
 {
 	SCOPED_PROFILER("RenderSystem::drawLights");
-	const GameplayTimestamp timestampNow = mTime.currentTimestamp;
+	const GameplayTimestamp timestampNow = mTime.lastFixedUpdateTimestamp;
 
 	// get all the collidable components
 	std::vector<const LightBlockingGeometryComponent*> lightBlockingComponents;

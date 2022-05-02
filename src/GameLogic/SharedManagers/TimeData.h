@@ -5,11 +5,12 @@
 class TimeData
 {
 public:
-	void update(float dt);
+	void fixedUpdate(float dt, u32 updatesCount = 1);
 
 public:
-	float dt = 0.0f;
-	int fixedTimeUpdatesThisFrame = 1;
-	GameplayTimestamp currentTimestamp{0};
-	u32 frameNumber = 0;
+	float lastUpdateDt = 0.0f;
+	float lastFixedUpdateDt = 0.0f;
+	GameplayTimestamp lastFixedUpdateTimestamp{0};
+	u32 lastFixedUpdateIndex = 0;
+	int countFixedTimeUpdatesThisFrame = 1;
 };

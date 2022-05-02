@@ -37,7 +37,7 @@ void CharacterStateSystem::update()
 	SCOPED_PROFILER("CharacterStateSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
-	float dt = mTime.dt;
+	float dt = mTime.lastFixedUpdateDt;
 
 	auto [stateMachine] = gameData.getGameComponents().getComponents<StateMachineComponent>();
 

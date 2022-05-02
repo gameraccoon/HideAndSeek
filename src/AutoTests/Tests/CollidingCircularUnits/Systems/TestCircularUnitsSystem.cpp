@@ -21,7 +21,7 @@ TestCircularUnitsSystem::TestCircularUnitsSystem(
 void TestCircularUnitsSystem::update()
 {
 	World& world = mWorldHolder.getWorld();
-	float dt = mTime.dt;
+	float dt = mTime.lastFixedUpdateDt;
 
 	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
 	if (!playerEntity.has_value())
