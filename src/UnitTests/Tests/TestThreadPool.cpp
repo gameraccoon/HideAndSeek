@@ -234,43 +234,18 @@ TEST(ThreadPool, ProcessTwoGroupsInParallel)
 	int finalizeCount2 = 0;
 
 	ThreadPool threadPool{2};
-	std::thread secondGroupProcessor([&threadPool]
-	{
-		threadPool.processAndFinalizeTasks(1);
-	});
 
 	threadPool.executeTask([&callCount]{ ++callCount; return std::any(); }, [&finalizeCount1](std::any&&){ ++finalizeCount1; }, 0);
 	threadPool.executeTask([&callCount]{ ++callCount; return std::any(); }, [&finalizeCount2](std::any&&){ ++finalizeCount2; }, 1);
 	threadPool.executeTask([&callCount]{ ++callCount; return std::any(); }, [&finalizeCount1](std::any&&){ ++finalizeCount1; }, 0);
 	threadPool.executeTask([&callCount]{ ++callCount; return std::any(); }, [&finalizeCount2](std::any&&){ ++finalizeCount2; }, 1);
 	threadPool.executeTask([&callCount]{ ++callCount; return std::any(); }, [&finalizeCount1](std::any&&){ ++finalizeCount1; }, 0);
+
 	threadPool.processAndFinalizeTasks(0);
-
-	secondGroupProcessor.join();
-
-	EXPECT_EQ(callCount, 5);
-	EXPECT_EQ(finalizeCount1, 3);
-	EXPECT_EQ(finalizeCount2, 2);
-}
-
-TEST(ThreadPool, ProcessTwoGroupsInParallelExplicitlyWithoutWakingUpThreads)
-{
-	std::atomic<int> callCount = 0;
-	int finalizeCount1 = 0;
-	int finalizeCount2 = 0;
-
-	ThreadPool threadPool{2};
 	std::thread secondGroupProcessor([&threadPool]
 	{
 		threadPool.processAndFinalizeTasks(1);
 	});
-
-	threadPool.executeTask([&callCount] { ++callCount; return std::any(); }, [&finalizeCount1](std::any &&) { ++finalizeCount1; }, 0, false);
-	threadPool.executeTask([&callCount] { ++callCount; return std::any(); }, [&finalizeCount2](std::any&&){ ++finalizeCount2; }, 1, false);
-	threadPool.executeTask([&callCount] { ++callCount; return std::any(); }, [&finalizeCount1](std::any&&){ ++finalizeCount1; }, 0, false);
-	threadPool.executeTask([&callCount] { ++callCount; return std::any(); }, [&finalizeCount2](std::any&&){ ++finalizeCount2; }, 1, false);
-	threadPool.executeTask([&callCount] { ++callCount; return std::any(); }, [&finalizeCount1](std::any&&){ ++finalizeCount1; }, 0, false);
-	threadPool.processAndFinalizeTasks(0);
 
 	secondGroupProcessor.join();
 
