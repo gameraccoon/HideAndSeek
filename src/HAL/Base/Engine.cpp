@@ -7,7 +7,6 @@
 
 #include <glew/glew.h>
 
-#include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
 #include "Base/Debug/ConcurrentAccessDetector.h"
@@ -34,6 +33,8 @@ namespace HAL
 		Graphics::Renderer mRenderer;
 		IGame* mGame = nullptr;
 		InputControllersData* mInputDataPtr = nullptr;
+		Uint32 mLastTicks = 0;
+		Uint32 mTicksEpoch = 0;
 
 		std::vector<SDL_Event> mLastFrameEvents;
 
@@ -49,6 +50,7 @@ namespace HAL
 
 		void start();
 		void parseEvents();
+		Uint64 getTicks();
 	};
 
 	Engine::Engine(int windowWidth, int windowHeight) noexcept
@@ -68,21 +70,15 @@ namespace HAL
 		glOrtho(0.0, windowWidth, windowHeight, 0.0, -1.0, 1.0);
 		glMatrixMode(GL_MODELVIEW);
 
-		if (TTF_Init() == -1)
-		{
-			ReportError("TTF_Init failed");
-		}
-
 		if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
 		{
-			ReportError("TTF_Init failed");
+			ReportError("SDL_mixer init failed");
 		}
 	}
 
 	Engine::~Engine()
 	{
 		Mix_CloseAudio();
-		TTF_Quit();
 	}
 
 	void Engine::start(IGame* game, InputControllersData* inputData)
@@ -133,18 +129,30 @@ namespace HAL
 		return mPimpl->mLastFrameEvents;
 	}
 
+	Uint64 Engine::Impl::getTicks()
+	{
+		const Uint32 ticks = SDL_GetTicks();
+		if ALMOST_NEVER(ticks < mLastTicks)
+		{
+			Assert(mLastTicks > (1 << 16), "Time wrapped over too big period");
+			++mTicksEpoch;
+		}
+
+		return (static_cast<Uint64>(mTicksEpoch) << 32) + ticks;
+	}
+
 	void Engine::Impl::start()
 	{
 		AssertFatal(mGame, "Game should be set to Engine before calling start()");
 		// we advance the time a bit differently, fixed frame time is advanced in steps
-		Uint64 lastFixedFrameTicks = SDL_GetTicks64();
+		Uint64 lastFixedFrameTicks = getTicks();
 		// and real time is update with the exact time passed from last processed frame
-		Uint64 lastRealFrameTicks = SDL_GetTicks64();
+		Uint64 lastRealFrameTicks = getTicks();
 		while (!mGame->shouldQuitGame())
 		{
 			parseEvents();
 
-			Uint64 currentTicks = SDL_GetTicks64();
+			Uint64 currentTicks = getTicks();
 
 			// time was adjusted to past or wrapped around type, start counting time to frame from now
 			if (currentTicks < lastFixedFrameTicks || currentTicks < lastRealFrameTicks)

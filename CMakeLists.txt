@@ -164,7 +164,6 @@ set(GENERAL_PROJECT_LIBS
 	SDL2
 	SDL2_image
 	SDL2_mixer
-	SDL2_ttf
 	SDL2main
 )
 
