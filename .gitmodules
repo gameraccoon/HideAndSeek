@@ -1,12 +1,12 @@
 [submodule "editor/Qt-Advanced-Docking-System"]
 	path = editor/Qt-Advanced-Docking-System
-	url = ../Qt-Advanced-Docking-System.git
+	url = git@github.com:gameraccoon/Qt-Advanced-Docking-System.git
 [submodule "external/sources/imgui"]
 	path = external/sources/imgui
-	url = ../../ocornut/imgui.git
+	url = git@github.com:ocornut/imgui.git
 [submodule "external/sources/soa-sort"]
 	path = external/sources/soa-sort
-	url = ../soa-sort.git
+	url = git@github.com:gameraccoon/soa-sort.git
 [submodule "external/include/raccoon-ecs"]
 	path = external/include/raccoon-ecs
 	url = git@github.com:gameraccoon/raccoon-ecs.git
