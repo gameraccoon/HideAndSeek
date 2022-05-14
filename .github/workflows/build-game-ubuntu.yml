@@ -30,6 +30,10 @@ jobs:
     - name: Checkout submodules
       run: git submodule update --init --recursive
 
+    # need it to avoid faulures due to old repo links
+    - name: Update deb repo links
+      run: sudo apt-get update
+
     - name: Install sdl
       run: sudo apt-get install libsdl2-2.0-0 libsdl2-dev libsdl2-image-2.0-0 libsdl2-image-dev libsdl2-mixer-2.0-0 libsdl2-mixer-dev libsdl2-ttf-2.0-0 libsdl2-ttf-dev
 
