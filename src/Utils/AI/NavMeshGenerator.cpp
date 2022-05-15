@@ -73,7 +73,7 @@ namespace NavMeshGenerator
 		}
 
 		TPPLPartition pp{};
-		pp.Triangulate_EC(&polygons, &resultPolygons);
+		pp.Triangulate_MONO(&polygons, &resultPolygons);
 
 		std::unordered_map<IntVector2D, size_t> verticesMap;
 		for (const TPPLPoly& polygon : resultPolygons)
