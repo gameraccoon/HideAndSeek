@@ -1,0 +1,10 @@
+#pragma once
+
+// This file is generated, don't make any manual changes
+
+inline std::unordered_map<uint64_t, std::string> GetGatheredStringIds() noexcept
+{{
+	return {{
+		{string_map_item}
+	}};
+}}

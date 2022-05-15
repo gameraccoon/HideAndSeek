@@ -1,0 +1,68 @@
+name: Ubuntu - build and run unit-tests
+
+on:
+  push:
+    paths:
+      - .github/workflows/build-game-ubuntu.yml
+      - cmake/**
+      - config/**
+      - external/**
+      - src/**
+      - CMakeLists.txt
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release]
+    env:
+      BUILD_TYPE: ${{matrix.build_type}}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build/game
+
+    - name: Reconfigure git to use HTTP authentication
+      run: >
+        git config --global url."https://github.com/".insteadOf
+        git@github.com:
+
+    - name: Update LFS files
+      run: |
+        git lfs install
+        git lfs pull
+
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
+
+    - name: Update deb repo links
+      run: sudo apt-get update
+
+    - name: Install sdl
+      run: sudo apt-get install libsdl2-2.0-0 libsdl2-dev libsdl2-image-2.0-0 libsdl2-image-dev libsdl2-mixer-2.0-0 libsdl2-mixer-dev libsdl2-ttf-2.0-0 libsdl2-ttf-dev
+
+    - name: Install GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 11
+        platform: x64
+
+    - name: Generate project
+      shell: bash
+      working-directory: ${{github.workspace}}/build/game
+      env:
+        CC: gcc-11
+        CXX: g++-11
+      run: cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build/game
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Run unit tests
+      working-directory: ${{github.workspace}}/bin
+      run: ./UnitTests

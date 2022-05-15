@@ -2,27 +2,27 @@
 
 #include "editorcommand.h"
 
-#include "ECS/Entity.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
+#include "GameData/EcsDefinitions.h"
 
 #include <nlohmann/json.hpp>
 
-#include <QString>
+#include "src/editorutils/componentreference.h"
 
 class World;
-class ComponentFactory;
 
 class RemoveComponentCommand : public EditorCommand
 {
 public:
-	RemoveComponentCommand(Entity mEntity, const QString& typeName, ComponentFactory* factory);
+	RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const Json::ComponentSerializationHolder& jsonSerializerHolder, const ComponentFactory& componentFactory);
 
-	bool doCommand(World* world) override;
-	bool undoCommand(World* world) override;
-	EffectType getEffectType() override;
+	void doCommand(World* world) override;
+	void undoCommand(World* world) override;
 
 private:
-	Entity mEntity;
-	QString mComponentTypeName;
-	ComponentFactory* mComponentFactory;
+	ComponentSourceReference mSource;
+	StringId mComponentTypeName;
+	const Json::ComponentSerializationHolder& mComponentSerializerHolder;
+	const ComponentFactory& mComponentFactory;
 	nlohmann::json mSerializedComponent;
 };

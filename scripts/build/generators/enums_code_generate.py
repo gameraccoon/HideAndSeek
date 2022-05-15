@@ -49,7 +49,7 @@ def append_attributes_data_dictionary(data_dictionary, data_description):
 
         # generate content
         for enum_value in enum_values:
-            # skip delimiters for the last attribute
+            # skip delimiters for the last item
             if enum_value is enum_values[len(enum_values) - 1]:
                 delimiter_dict = empty_delimiter_dictionary
             else:

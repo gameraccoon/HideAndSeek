@@ -1,23 +1,25 @@
+#include "Base/precomp.h"
+
 #include "GameData/Enums/{enum_name}.generated.h"
 
 template <>
-std::string get_enum_name<{enum_name}>()
+StringId get_enum_name<{enum_name}>()
 {{
-	return "{enum_name}";
+	return STR_TO_ID("{enum_name}");
 }}
 
 template <>
-std::string enum_to_string({enum_name} value)
+StringId enum_to_string({enum_name} value)
 {{
 	switch(value)
 	{{
 		{enum_to_string_case}
 	}}
-	return "";
+	return StringId();
 }}
 
 template <>
-{enum_name} string_to_enum(const std::string& value)
+{enum_name} string_to_enum(StringId value)
 {{
 	{string_to_enum_case}
 	return static_cast<{enum_name}>(0);
@@ -32,7 +34,7 @@ std::vector<{enum_name}> get_all_enum_values()
 }}
 
 template <>
-std::vector<std::string> get_all_enum_value_names<{enum_name}>()
+std::vector<StringId> get_all_enum_value_names<{enum_name}>()
 {{
 	return {{
 		{enum_value_string}

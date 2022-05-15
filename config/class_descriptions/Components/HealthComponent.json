@@ -1,0 +1,11 @@
+{
+	"component": "health",
+	"description": "Component that stores information abount entity's health",
+	"attributes": [
+		{
+			"name": "healthValue",
+			"type": "float",
+			"default": " = 0.0f"
+		}
+	]
+}

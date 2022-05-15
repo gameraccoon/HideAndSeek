@@ -2,24 +2,27 @@
 
 #include <memory>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
-#include "HAL/Base/ResourceManager.h"
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
 /**
  * System that loads and distributes resources
  */
-class ResourceStreamingSystem : public System
+class ResourceStreamingSystem : public RaccoonEcs::System
 {
 public:
-	ResourceStreamingSystem(WorldHolder& worldHolder, HAL::ResourceManager* resourceManager);
+	ResourceStreamingSystem(
+		WorldHolder& worldHolder,
+		ResourceManager& resourceManager) noexcept;
 	~ResourceStreamingSystem() override = default;
 
 	void update() override;
+	static std::string GetSystemId() { return "ResourceStreamingSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;
-	HAL::ResourceManager* mResourceManager;
+	ResourceManager& mResourceManager;
 };

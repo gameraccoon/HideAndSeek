@@ -1,79 +1,73 @@
+#include "Base/precomp.h"
+
 #include "AutoTests/Tests/CollidingCircularUnits/TestCase.h"
 
 #include <memory>
 
 #include "HAL/Base/Engine.h"
 
-#include "GameData/Components/SpriteCreatorComponent.generated.h"
+#include "GameData/Spatial/SpatialWorldData.h"
+
 #include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/SpriteCreatorComponent.generated.h"
 #include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
 
-#include "GameLogic/Systems/RenderSystem.h"
-#include "GameLogic/Systems/CollisionSystem.h"
-#include "GameLogic/Systems/ResourceStreamingSystem.h"
-#include "GameLogic/Systems/MovementSystem.h"
+#include "GameLogic/Systems/CameraSystem.h"
 #include "GameLogic/Systems/CharacterStateSystem.h"
-
-#include "GameLogic/ComponentsRegistration.h"
+#include "GameLogic/Systems/CollisionSystem.h"
+#include "GameLogic/Systems/InputSystem.h"
+#include "GameLogic/Systems/MovementSystem.h"
+#include "GameLogic/Systems/RenderSystem.h"
+#include "GameLogic/Systems/ResourceStreamingSystem.h"
 
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestCircularUnitsSystem.h"
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestUnitsCountControlSystem.h"
 
-void CollidingCircularUnitsTestCase::start(ArgumentsParser& /*arguments*/)
+void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 {
-	getResourceManager()->loadAtlasesData("resources/atlas/atlas-list.json");
+	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 
-	mSystemsManager.registerSystem<TestUnitsCountControlSystem>(mWorldHolder);
-	mSystemsManager.registerSystem<TestCircularUnitsSystem>(mWorldHolder);
-	mSystemsManager.registerSystem<CharacterStateSystem>(mWorldHolder);
-	mSystemsManager.registerSystem<MovementSystem>(mWorldHolder, mTime);
-	mSystemsManager.registerSystem<CollisionSystem>(mWorldHolder);
-	mSystemsManager.registerSystem<ResourceStreamingSystem>(mWorldHolder, getResourceManager());
-	mSystemsManager.registerSystem<RenderSystem>(mWorldHolder, getEngine(), getResourceManager());
+	getGameLogicSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData(), getTime());
+	getGameLogicSystemsManager().registerSystem<TestUnitsCountControlSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<TestCircularUnitsSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
+	getGameLogicSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getTime(), getResourceManager(), getThreadPool());
 
-	ComponentsRegistration::RegisterComponents(mComponentFactory);
+	Vector2D playerPos{ZERO_VECTOR};
 
-	mWorldHolder.world = &mWorld;
-	mWorldHolder.gameData = &mGameData;
+	EntityView playerEntity = getWorldHolder().getWorld().createTrackedSpatialEntity(STR_TO_ID("ControlledEntity"), SpatialWorldData::GetCellForPos(playerPos));
 
-	Entity playerEntity = mWorld.getEntityManager().addEntity();
 	{
-		TransformComponent* transform = mWorld.getEntityManager().addComponent<TransformComponent>(playerEntity);
-		transform->setLocation(Vector2D(0.0f, 0.0f));
+		TransformComponent* transform = playerEntity.addComponent<TransformComponent>();
+		transform->setLocation(playerPos);
 	}
 	{
-		SpriteCreatorComponent* sprite = mWorld.getEntityManager().addComponent<SpriteCreatorComponent>(playerEntity);
+		SpriteCreatorComponent* sprite = playerEntity.addComponent<SpriteCreatorComponent>();
 		SpriteDescription spriteDesc;
 		spriteDesc.params.size = Vector2D(30.0f, 30.0f);
 		spriteDesc.path = "resources/textures/hero.png";
 		sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
 	}
 	{
-		CollisionComponent* collision = mWorld.getEntityManager().addComponent<CollisionComponent>(playerEntity);
+		CollisionComponent* collision = playerEntity.addComponent<CollisionComponent>();
 		Hull& hull = collision->getGeometryRef();
 		hull.type = HullType::Circular;
 		hull.setRadius(15.0f);
 	}
+	playerEntity.addComponent<MovementComponent>();
 
-	mWorld.setPlayerControlledEntity(playerEntity);
-	mWorld.setMainCamera(playerEntity);
+	Vector2D cameraPos{ZERO_VECTOR};
+	EntityView camera = getWorldHolder().getWorld().createTrackedSpatialEntity(STR_TO_ID("CameraEntity"), SpatialWorldData::GetCellForPos(cameraPos));
 
-	mWorld.getWorldComponents().addComponent<StateMachineComponent>();
-
-	// start the main loop
-	getEngine()->start(this);
-}
-
-void CollidingCircularUnitsTestCase::update(float)
-{
-	if (ticksCount == 100)
 	{
-		getEngine()->quit();
+		TransformComponent* transform = camera.addComponent<TransformComponent>();
+		transform->setLocation(cameraPos);
 	}
-
-	constexpr float fixedDt = 0.16f;
-	mTime.update(fixedDt);
-	mSystemsManager.update();
-	++ticksCount;
+	camera.addComponent<MovementComponent>();
 }

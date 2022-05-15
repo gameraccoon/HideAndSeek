@@ -3,33 +3,33 @@
 #include <QPushButton>
 #include <QSpacerItem>
 
-#include <Debug/Assert.h>
-
 #include "componentregistration.h"
+
+#include "src/editorutils/componentreference.h"
 
 void ComponentContentFactory::registerComponents()
 {
 	ComponentRegistration::RegisterToEditFactory(mFactories);
 }
 
-void ComponentContentFactory::replaceEditContent(QLayout* layout, Entity entity, const BaseComponent* component, EditorCommandsStack& commandStack, World* world)
+void ComponentContentFactory::replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, TypedComponent componentData, EditorCommandsStack& commandStack, World* world)
 {
-	auto it = mFactories.find(component->getComponentTypeName());
+	auto it = mFactories.find(componentData.typeId);
 
 	QWidget* newContent = nullptr;
 	if (it != mFactories.end())
 	{
 		mCurrentEdit = it->second->getEditData();
-		newContent = new QWidget();
-		QVBoxLayout* innerLayout = new QVBoxLayout();
-		mCurrentEdit->fillContent(innerLayout, entity, component, commandStack, world);
+		newContent = HS_NEW QWidget();
+		QVBoxLayout* innerLayout = HS_NEW QVBoxLayout();
+		mCurrentEdit->fillContent(innerLayout, sourceReference, componentData.component, commandStack, world);
 		innerLayout->addStretch();
 		newContent->setLayout(innerLayout);
 	}
 	else
 	{
 		mCurrentEdit = nullptr;
-		Assert(false, "ComponentEditFactory not registered for component type '%s'", component->getComponentTypeName().c_str());
+		ReportError("ComponentEditFactory not registered for component type '%s'", componentData.typeId);
 	}
 
 	if (newContent != nullptr && mContentWidget == nullptr)

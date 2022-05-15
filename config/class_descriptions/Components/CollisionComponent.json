@@ -1,31 +1,18 @@
 {
 	"component": "collision",
-	"description": "Component that stores information and logic about position and movement",
+	"description": "Component that stores information and logic about object collidable geometry",
 	"attributes": [
 		{
 			"name": "geometry",
 			"type": "Hull",
-			"includes": ["\"GameData/Core/Hull.h\""],
+			"includes": ["\"GameData/Geometry/Hull.h\""],
 			"flags": ["get_by_ref"]
-		},
-		{
-			"name": "isBoundingBoxDirty",
-			"type": "bool",
-			"default": " = true",
-			"flags": ["transient"]
 		},
 		{
 			"name": "boundingBox",
 			"type": "BoundingBox",
 			"default": " = BoundingBox(Vector2D(0.0f, 0.0f), Vector2D(0.0f, 0.0f))",
-			"includes": ["\"GameData/Core/BoundingBox.h\""],
-			"flags": ["transient", "get_by_ref"]
-		},
-		{
-			"name": "originalBoundingBox",
-			"type": "BoundingBox",
-			"default": " = BoundingBox(Vector2D(0.0f, 0.0f), Vector2D(0.0f, 0.0f))",
-			"includes": ["\"GameData/Core/BoundingBox.h\""],
+			"includes": ["\"GameData/Geometry/BoundingBox.h\""],
 			"flags": ["transient", "get_by_ref"]
 		}
 	]

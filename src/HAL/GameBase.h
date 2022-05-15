@@ -2,23 +2,24 @@
 
 #include "IGame.h"
 
-#include "Base/ResourceManager.h"
 #include "HAL/EngineFwd.h"
+
+class ResourceManager;
 
 namespace HAL
 {
 	class GameBase : public IGame
 	{
 	public:
-		GameBase(int windowWidth, int windowHeight);
-		~GameBase();
+		GameBase(Engine* engine, ResourceManager& resourceManager);
+		~GameBase() override;
 
 	protected:
-		Engine* getEngine() { return mEngine.get(); }
-		ResourceManager* getResourceManager() { return mResourceManager.get(); }
+		Engine* getEngine();
+		ResourceManager& getResourceManager();
 
 	private:
-		std::unique_ptr<Engine> mEngine;
-		std::unique_ptr<ResourceManager> mResourceManager;
+		Engine* mEngine;
+		ResourceManager& mResourceManager;
 	};
 }

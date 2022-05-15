@@ -1,0 +1,14 @@
+{
+	"component": "gameplayInput",
+	"description": "Component that stores gameplay-specific input information",
+	"attributes": [
+		{
+			"name": "currentFrameState",
+			"type": "GameplayInput::FrameState",
+			"includes": [
+				"\"GameData/Input/GameplayInput.h\""
+			],
+			"flags": ["get_by_ref", "transient"]
+		}
+	]
+}

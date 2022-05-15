@@ -1,4 +1,4 @@
-#include "../typeseditconstructor.h"
+#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
 #include <string>
 
@@ -7,8 +7,6 @@
 #include <QDoubleValidator>
 #include <QCheckBox>
 #include <QHBoxLayout>
-
-#include "GameData/Core/Rotator.h"
 
 namespace TypesEditConstructor
 {
@@ -20,7 +18,7 @@ namespace TypesEditConstructor
 	{
 		FillLabel(layout, label);
 
-		QHBoxLayout *innerLayout = new QHBoxLayout;
+		QHBoxLayout *innerLayout = HS_NEW QHBoxLayout;
 
 		Edit<Rotator>::Ptr edit = std::make_shared<Edit<Rotator>>(initialValue);
 		Edit<Rotator>::WeakPtr editWeakPtr = edit;
@@ -36,7 +34,7 @@ namespace TypesEditConstructor
 		edit->addChild(editAngle);
 
 		innerLayout->addStretch();
-		QWidget* container = new QWidget();
+		QWidget* container = HS_NEW QWidget();
 		container->setLayout(innerLayout);
 		layout->addWidget(container);
 		return edit;

@@ -1,4 +1,4 @@
-#include "../typeseditconstructor.h"
+#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
 #include <string>
 
@@ -7,8 +7,6 @@
 #include <QDoubleValidator>
 #include <QCheckBox>
 #include <QHBoxLayout>
-
-#include "GameData/Resources/SpriteDescription.h"
 
 namespace TypesEditConstructor
 {
@@ -20,8 +18,8 @@ namespace TypesEditConstructor
 		Edit<SpriteDescription>::Ptr edit = std::make_shared<Edit<SpriteDescription>>(initialValue);
 		Edit<SpriteDescription>::WeakPtr editWeakPtr = edit;
 		{
-			Edit<std::string>::Ptr editPath = FillEdit<std::string>::Call(layout, "path", initialValue.path);
-			editPath->bindOnChange([editWeakPtr](const std::string& /*oldValue*/, const std::string& newValue, bool)
+			Edit<ResourcePath>::Ptr editPath = FillEdit<ResourcePath>::Call(layout, "path", initialValue.path);
+			editPath->bindOnChange([editWeakPtr](const ResourcePath& /*oldValue*/, const ResourcePath& newValue, bool)
 			{
 				if (Edit<SpriteDescription>::Ptr edit = editWeakPtr.lock())
 				{
@@ -33,31 +31,17 @@ namespace TypesEditConstructor
 			edit->addChild(editPath);
 		}
 		{
-			Edit<Vector2D>::Ptr editAnchor = FillEdit<Vector2D>::Call(layout, "anchor", initialValue.params.anchor);
-			editAnchor->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool)
+			Edit<SpriteParams>::Ptr editAnchor = FillEdit<SpriteParams>::Call(layout, "anchor", initialValue.params);
+			editAnchor->bindOnChange([editWeakPtr](const SpriteParams& /*oldValue*/, const SpriteParams& newValue, bool)
 			{
 				if (Edit<SpriteDescription>::Ptr edit = editWeakPtr.lock())
 				{
 					SpriteDescription animDescription = edit->getPreviousValue();
-					animDescription.params.anchor = newValue;
+					animDescription.params = newValue;
 					edit->transmitValueChange(animDescription);
 				}
 			});
 			edit->addChild(editAnchor);
-		}
-
-		{
-			Edit<Vector2D>::Ptr editSize = FillEdit<Vector2D>::Call(layout, "size", initialValue.params.size);
-			editSize->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool)
-			{
-				if (Edit<SpriteDescription>::Ptr edit = editWeakPtr.lock())
-				{
-					SpriteDescription animDescription = edit->getPreviousValue();
-					animDescription.params.size = newValue;
-					edit->transmitValueChange(animDescription);
-				}
-			});
-			edit->addChild(editSize);
 		}
 
 		return edit;

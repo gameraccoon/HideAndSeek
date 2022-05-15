@@ -14,7 +14,14 @@ namespace HAL
 		{
 		public:
 			explicit GlContext(Window& window);
+
+			GlContext(const GlContext&) = delete;
+			GlContext operator=(const GlContext&) = delete;
+			GlContext(GlContext&&) = delete;
+			GlContext operator=(GlContext&&) = delete;
+
 			~GlContext();
+
 			SDL_GLContext getRawGLContext();
 
 		private:

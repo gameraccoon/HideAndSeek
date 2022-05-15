@@ -3,8 +3,12 @@
 #include <QString>
 #include <QWidget>
 
-#include "ECS/Delegates.h"
-#include "ECS/Entity.h"
+#include <raccoon-ecs/delegates.h>
+#include <raccoon-ecs/entity.h>
+
+#include "GameData/Spatial/SpatialEntity.h"
+
+#include "src/editorutils/entityreference.h"
 
 class MainWindow;
 
@@ -32,15 +36,13 @@ public:
 
 private:
 	void onWorldUpdated();
-	void onEntityChangedEvent(OptionalEntity entity);
+	void onEntityChangedEvent(const std::optional<EntityReference>& entity);
 	void updateContent();
 	void onCurrentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
 	void showContextMenu(const QPoint& pos);
 	void removeSelectedEntity();
 	void createPrefabRequested();
 	void createPrefab(const QString& prefabName);
-	void onAddComponentToEntityRequested();
-	void addComponentToEntity(const QString& typeName);
 	void bindEvents();
 	void unbindEvents();
 
@@ -48,8 +50,8 @@ private:
 	MainWindow* mMainWindow;
 	ads::CDockManager* mDockManager;
 
-	Delegates::Handle mOnEntityAddedHandle;
-	Delegates::Handle mOnEntityRemovedHandle;
-	Delegates::Handle mOnWorldChangedHandle;
-	Delegates::Handle mOnSelectedEntityChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnEntityAddedHandle;
+	RaccoonEcs::Delegates::Handle mOnEntityRemovedHandle;
+	RaccoonEcs::Delegates::Handle mOnWorldChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnSelectedEntityChangedHandle;
 };

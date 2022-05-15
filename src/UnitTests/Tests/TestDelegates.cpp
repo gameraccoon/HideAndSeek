@@ -1,18 +1,21 @@
+#include "Base/precomp.h"
+
 #include <gtest/gtest.h>
 
-#include "ECS/Delegates.h"
+#include <raccoon-ecs/delegates.h>
 
 
 TEST(Delegates, SingleCast)
 {
-	SinglecastDelegate<int> delegate;
+	RaccoonEcs::SinglecastDelegate<int> delegate;
 
 	int testVal = 1;
 
 	delegate.callSafe(2);
 	ASSERT_THROW(delegate.callUnsafe(2), std::exception);
 
-	delegate.assign([&testVal](int test){
+	delegate.assign([&testVal](int test)
+	{
 		testVal = test;
 	});
 
@@ -38,14 +41,15 @@ TEST(Delegates, SingleCast)
 
 TEST(Delegates, MultiCast)
 {
-	MulticastDelegate<int> delegate;
+	RaccoonEcs::MulticastDelegate<int> delegate;
 
 	int testVal1 = 1;
 	int testVal2 = 1;
 
 	delegate.broadcast(2);
 
-	Delegates::Handle handle = delegate.bind([&testVal1](int test){
+	RaccoonEcs::Delegates::Handle handle = delegate.bind([&testVal1](int test)
+	{
 		testVal1 += test;
 	});
 	delegate.broadcast(3);
@@ -53,7 +57,8 @@ TEST(Delegates, MultiCast)
 	ASSERT_EQ(4, testVal1);
 	ASSERT_EQ(1, testVal2);
 
-	delegate.bind([&testVal2](int test){
+	delegate.bind([&testVal2](int test)
+	{
 		testVal2 += test;
 	});
 

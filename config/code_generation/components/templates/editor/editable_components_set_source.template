@@ -1,0 +1,15 @@
+#include "Base/precomp.h"
+
+#include "editablecomponentsset.h"
+
+{component_includes}
+
+namespace Editor
+{{
+	std::unordered_set<StringId> getEditableComponents()
+	{{
+		std::unordered_set<StringId> result;
+		{editor/component_editable_item}
+		return result;
+	}}
+}}

@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/SharedManagers/TimeData.h"
@@ -10,16 +10,14 @@
 /**
  * System that process characters and objects movement
  */
-class MovementSystem : public System
+class MovementSystem : public RaccoonEcs::System
 {
 public:
-	typedef std::unordered_map<int, bool> KeyStatesMap;
-
-public:
-	MovementSystem(WorldHolder& worldHolder, const TimeData& timeData);
+	MovementSystem(WorldHolder& worldHolder, const TimeData& timeData) noexcept;
 	~MovementSystem() override = default;
 
 	void update() override;
+	static std::string GetSystemId() { return "MovementSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;

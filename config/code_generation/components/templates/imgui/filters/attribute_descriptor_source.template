@@ -1,0 +1,40 @@
+#include "Base/precomp.h"
+
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptors/{class_name}{attribute_name_capital}PropertyDescriptor.generated.h"
+
+#include <raccoon-ecs/entity_manager.h>
+
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/FilterRegistration/FilterRegistration.h"
+
+#include "GameData/Components/{class_name}.generated.h"
+
+namespace ImguiPropertyFiltration
+{{
+	{class_name}{attribute_name_capital}PropertyDescriptor::{class_name}{attribute_name_capital}PropertyDescriptor()
+		: AbstractPropertyDescriptor("{class_name}.{attribute_name}")
+	{{}}
+
+	std::shared_ptr<{class_name}{attribute_name_capital}PropertyDescriptor> {class_name}{attribute_name_capital}PropertyDescriptor::Create()
+	{{
+		auto result = std::make_shared<{class_name}{attribute_name_capital}PropertyDescriptor>();
+		RegisterFilterFactories<{attribute_type}>(result->mFilterFactories, result);
+		return result;
+	}}
+
+	std::any {class_name}{attribute_name_capital}PropertyDescriptor::getPropertyValue(EntityManager& entityManager, Entity entity)
+	{{
+		if (auto [{component_name}] = entityManager.getEntityComponents<{class_name}>(entity); {component_name} != nullptr)
+		{{
+			return {component_name}->get{attribute_name_capital}();
+		}}
+		else
+		{{
+			return nullptr;
+		}}
+	}}
+
+	StringId {class_name}{attribute_name_capital}PropertyDescriptor::getComponentType() const
+	{{
+		return {class_name}::GetTypeId();
+	}}
+}} // namespace ImguiPropertyFiltration

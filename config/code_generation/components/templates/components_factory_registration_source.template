@@ -1,0 +1,13 @@
+#include "Base/precomp.h"
+
+#include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
+
+{component_includes}
+
+namespace ComponentsRegistration
+{{
+	void RegisterComponents(ComponentFactory& componentFactory)
+	{{
+		{component_factory_register}
+	}}
+}}

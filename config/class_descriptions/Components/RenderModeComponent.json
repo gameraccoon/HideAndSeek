@@ -6,38 +6,49 @@
 			"name": "isDrawLightsEnabled",
 			"type": "bool",
 			"default": " = true",
-			"flags": ["transient"]
+			"flags": ["transient", "get_by_ref"]
+		},
+		{
+			"name": "isDrawBackgroundEnabled",
+			"type": "bool",
+			"default": " = true",
+			"flags": ["transient", "get_by_ref"]
 		},
 		{
 			"name": "isDrawVisibleEntitiesEnabled",
 			"type": "bool",
 			"default": " = true",
-			"flags": ["transient"]
-		},
-		{
-			"name": "isDrawDebugFpsEnabled",
-			"type": "bool",
-			"default": " = false",
-			"flags": ["transient"]
+			"flags": ["transient", "get_by_ref"]
 		},
 		{
 			"name": "isDrawDebugCollisionsEnabled",
 			"type": "bool",
 			"default": " = false",
-			"flags": ["transient"]
+			"flags": ["transient", "get_by_ref"]
 		},
 		{
 			"name": "isDrawDebugAiDataEnabled",
 			"type": "bool",
 			"default": " = false",
-			"flags": ["transient"]
+			"flags": ["transient", "get_by_ref"]
 		},
 		{
 			"name": "isDrawDebugCharacterInfoEnabled",
 			"type": "bool",
 			"default": " = false",
-			"flags": ["transient"]
+			"flags": ["transient", "get_by_ref"]
+		},
+		{
+			"name": "isDrawDebugPrimitivesEnabled",
+			"type": "bool",
+			"default": " = false",
+			"flags": ["transient", "get_by_ref"]
+		},
+		{
+			"name": "isDrawDebugCellInfoEnabled",
+			"type": "bool",
+			"default": " = false",
+			"flags": ["transient", "get_by_ref"]
 		}
 	]
 }
-

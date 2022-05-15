@@ -1,0 +1,15 @@
+{
+	"component": "animationClipCreator",
+	"description": "Component that creates static animation clips",
+	"attributes": [
+		{
+			"name": "descriptions",
+			"type": "std::vector<AnimationClipDescription>",
+			"includes": [
+				"<vector>",
+				"\"GameData/Resources/AnimationClipDescription.h\""
+			],
+			"flags": ["get_by_ref"]
+		}
+	]
+}

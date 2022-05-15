@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.3)
-set(CMAKE_CXX_STANDARD 17)
+cmake_minimum_required(VERSION 3.16)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -9,7 +9,12 @@ project(${APP_NAME})
 set(EXECUTABLE_NAME Game)
 
 # parameters
-option(DEBUG_MODE "Debug?" ON)
+option(DEBUG_CHECKS "Enable debug checks and assertions" ON)
+option(ENABLE_SCOPED_PROFILER "Enable pfofiler that records time of execution of scopes across threads" OFF)
+option(MEMLEAK_DETECTION "Enable memory leaks detection code (slow)" OFF)
+option(MEMLEAK_REDEFINE_NEW "Redefine default new (provide more detailed info but can conflict with some libs)" OFF)
+option(CONCURRENT_ACCESS_DETECTION "Enable concurrent access detection" ON)
+option(IMGUI_ENABLED "Enable imgui in the build" ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -20,7 +25,6 @@ set(GAME_BIN_DIR ${GAME_BASE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${GAME_BIN_DIR})
 set(GAME_SRC_DIR ${GAME_BASE_DIR}/src)
 set(EXTERNALS_DIR ${GAME_BASE_DIR}/external)
-set(INTERMEDIATES_DIR ${GAME_BASE_DIR}/build/game)
 set(BIN_PLATFORM "x64")
 
 file (STRINGS "${GAME_BASE_DIR}/VersionInfo" EXECUTABLE_VERSION)
@@ -30,13 +34,28 @@ project(${APP_NAME} VERSION ${EXECUTABLE_VERSION})
 file(MAKE_DIRECTORY ${GAME_BIN_DIR})
 
 # definitions
-if(DEBUG_MODE)
-	set(CMAKE_BUILD_TYPE DEBUG)
-	add_definitions(-D_DEBUG)
-	add_definitions(-DDEBUG)
-else(DEBUG_MODE)
-	set(CMAKE_BUILD_TYPE RELEASE)
-endif(DEBUG_MODE)
+if(DEBUG_CHECKS)
+	add_definitions(-DDEBUG_CHECKS -DRACCOON_ECS_DEBUG_CHECKS_ENABLED)
+endif(DEBUG_CHECKS)
+
+if(ENABLE_SCOPED_PROFILER)
+	add_definitions(-DENABLE_SCOPED_PROFILER)
+endif(ENABLE_SCOPED_PROFILER)
+
+if(MEMLEAK_DETECTION)
+	add_definitions(-DDETECT_MEMORY_LEAKS)
+	if(MEMLEAK_REDEFINE_NEW)
+		add_definitions(-DREDEFINE_NEW)
+	endif()
+endif()
+
+if(IMGUI_ENABLED)
+	add_definitions(-DIMGUI_ENABLED)
+endif()
+
+if(CONCURRENT_ACCESS_DETECTION)
+	add_definitions(-DCONCURRENT_ACCESS_DETECTION)
+endif(CONCURRENT_ACCESS_DETECTION)
 
 add_definitions(-DGLEW_NO_GLU)
 add_definitions(-DGLM_FORCE_RADIANS)
@@ -44,26 +63,34 @@ add_definitions(-DGLM_FORCE_RADIANS)
 # compiler parameters
 if (MSVC)
 	if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
-	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++17")
+		string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 	endif()
+	set(PROJECT_CXX_FLAGS /W4 /std:c++latest /wd4996)
+	set(EXTERNALS_CXX_FLAGS /W0 /std:c++latest /wd4996 /wd4458)
+	set(EXTERNALS_C_FLAGS /W0)
+
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -DDEBUG")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}")
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Werror -std=c++17")
+	set(PROJECT_CXX_FLAGS -std=c++2a -Wall -Wextra -pedantic -Werror)
+	set(EXTERNALS_CXX_FLAGS -std=c++2a)
+	set(EXTERNALS_C_FLAGS "")
+
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
 endif()
 
 # code generation
 execute_process(
-	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/scripts/build/code_generate.py ${GAME_BASE_DIR}
+	COMMAND ${PYTHON_EXECUTABLE} "${GAME_BASE_DIR}/scripts/build/code_generate.py" WORKING_DIRECTORY "${GAME_BASE_DIR}"
 )
 
+# requirements
+find_package(PythonInterp 3.5 REQUIRED)
 if (NOT WIN32)
-    find_package(SDL2 REQUIRED)
-    find_package(SDL2_image REQUIRED)
-    include_directories(${SDL2_INCLUDE_DIR})
+	find_package(SDL2 REQUIRED)
+	find_package(SDL2_image REQUIRED)
+	include_directories(${SDL2_INCLUDE_DIR})
 endif()
 
 include_directories(include)
@@ -72,6 +99,7 @@ include_directories(
 	${EXTERNALS_DIR}/include
 	${EXTERNALS_DIR}/include/sdl
 	${EXTERNALS_DIR}/sources
+	${EXTERNALS_DIR}/sources/soa-sort/include
 	${GAME_SRC_DIR}
 )
 
@@ -83,51 +111,59 @@ link_directories(
 function(add_folder_as_library folder_path name)
 	file(GLOB_RECURSE TEMP_SRC RELATIVE "" FOLLOW_SYMLINKS "${folder_path}/*")
 	add_library(${name} ${TEMP_SRC})
+	target_precompile_headers(${name} PRIVATE "${GAME_SRC_DIR}/Base/precomp.h")
+	set_target_properties(${name} PROPERTIES UNITY_BUILD ON)
+	target_compile_options(${name} PRIVATE ${PROJECT_CXX_FLAGS})
 endfunction()
 
-add_folder_as_library(${GAME_SRC_DIR}/Debug Debug)
-add_folder_as_library(${GAME_SRC_DIR}/ECS Ecs)
+add_folder_as_library(${GAME_SRC_DIR}/Base Base)
 add_folder_as_library(${GAME_SRC_DIR}/GameData GameData)
-add_folder_as_library(${GAME_SRC_DIR}/GameLogic GameLogic)
 add_folder_as_library(${GAME_SRC_DIR}/Utils Utils)
 add_folder_as_library(${GAME_SRC_DIR}/HAL Hal)
-
-add_library(SDL_FontCache ${EXTERNALS_DIR}/sources/SDL_FontCache/SDL_FontCache.c)
+add_folder_as_library(${GAME_SRC_DIR}/GameLogic GameLogic)
 
 file(GLOB_RECURSE APP_SRC RELATIVE "" FOLLOW_SYMLINKS "${GAME_SRC_DIR}/GameMain/*")
 add_executable(${APP_NAME} "${APP_SRC}")
+target_compile_options(${APP_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
 
-# Detour
-option(RECASTNAVIGATION_STATIC "Build static libraries for detour" ON)
-add_subdirectory(${EXTERNALS_DIR}/sources/recastnavigation/Detour
-	${INTERMEDIATES_DIR}/external/Detour
-	EXCLUDE_FROM_ALL)
-link_directories(${INTERMEDIATES_DIR}/external/Detour)
-add_dependencies(${APP_NAME} Detour)
-include_directories(${EXTERNALS_DIR}/sources/recastnavigation/Detour/Include)
+# configure VS specific project parameters
+if (MSVC)
+	set_target_properties(${APP_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${GAME_BIN_DIR}")
+	set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
+endif()
 
 # Polypartition
 add_library(Polypartition EXCLUDE_FROM_ALL ${EXTERNALS_DIR}/sources/polypartition/src/polypartition.cpp)
 add_dependencies(${APP_NAME} Polypartition)
 include_directories(${EXTERNALS_DIR}/sources/polypartition/include)
+target_compile_options(Polypartition PRIVATE ${EXTERNALS_CXX_FLAGS})
+
+# ImGui
+add_library(Imgui EXCLUDE_FROM_ALL
+	${EXTERNALS_DIR}/sources/imgui/imgui.cpp
+	${EXTERNALS_DIR}/sources/imgui/imgui_demo.cpp
+	${EXTERNALS_DIR}/sources/imgui/imgui_draw.cpp
+	${EXTERNALS_DIR}/sources/imgui/imgui_widgets.cpp
+	${EXTERNALS_DIR}/sources/imgui/examples/imgui_impl_opengl2.cpp
+	${EXTERNALS_DIR}/sources/imgui/examples/imgui_impl_sdl.cpp
+)
+add_dependencies(${APP_NAME} Imgui)
+include_directories(${EXTERNALS_DIR}/sources/imgui)
+target_compile_options(Imgui PRIVATE ${EXTERNALS_CXX_FLAGS})
 
 set(GENERAL_PROJECT_LIBS
-#	liblua52
-
-    GameLogic
+	GameLogic
 	Hal
 	Utils
 	GameData
-	Ecs
-	Debug
-	Detour
+	Base
+
 	Polypartition
+	Imgui
 
 	SDL2
 	SDL2_image
 	SDL2_mixer
-	SDL_FontCache
-	SDL2_ttf
 	SDL2main
 )
 
@@ -171,6 +207,8 @@ set(UNITTESTS_SRC
 )
 include_directories(${EXTERNALS_DIR}/sources/googletest)
 add_executable(${UNITTESTS_NAME} ${UNITTESTS_SRC})
+target_compile_definitions(${UNITTESTS_NAME}  PRIVATE -DRACCOON_ECS_TOOLMODE)
+target_compile_options(${UNITTESTS_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
 target_link_libraries(${UNITTESTS_NAME}
 	${GENERAL_PROJECT_LIBS}
 )
@@ -179,12 +217,16 @@ target_link_libraries(${UNITTESTS_NAME}
 set(AUTOTESTS_NAME AutoTests)
 file(GLOB_RECURSE AUTOTESTS_SRC RELATIVE "" FOLLOW_SYMLINKS "${GAME_SRC_DIR}/AutoTests/*")
 add_executable(${AUTOTESTS_NAME} ${AUTOTESTS_SRC})
+target_compile_options(${AUTOTESTS_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
+set_target_properties(${AUTOTESTS_NAME} PROPERTIES UNITY_BUILD ON)
 target_link_libraries(${AUTOTESTS_NAME}
 	${GENERAL_PROJECT_LIBS}
 )
 
 # symlink resources dir
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/resources" "${GAME_BIN_DIR}/resources")
+if(NOT EXISTS "${GAME_BIN_DIR}/resources")
+	execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/resources" "${GAME_BIN_DIR}/resources")
+endif()
 
 if (WIN32)
 	# copy dlls
@@ -193,3 +235,11 @@ if (WIN32)
 	)
 	file(COPY ${WIN32_DLLS} DESTINATION ${GAME_BIN_DIR})
 endif()
+
+# pre-compile additional code generation
+add_custom_target(
+	AdditionalCodeGeneration
+	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/scripts/build/precompile_code_generate.py ${GAME_BASE_DIR}
+	COMMENT "C++ pre-compile additional code generation"
+)
+add_dependencies(Base AdditionalCodeGeneration)

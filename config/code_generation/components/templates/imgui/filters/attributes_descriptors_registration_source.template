@@ -1,0 +1,29 @@
+#include "Base/precomp.h"
+
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptorsRegistration.h"
+
+{imgui/filters/attribute_descriptor_includes}
+
+namespace ImguiPropertyFiltration
+{{
+	namespace PropertyDescriptorsRegistration
+	{{
+		template<typename T>
+		void RegisterIfHasFactories(DescriptionsRawData& data, std::vector<std::string>&& searchStrings)
+		{{
+			if (auto descriptor = T::Create(); descriptor->hasFactories())
+			{{
+				data.emplace_back(std::move(searchStrings), std::move(descriptor));
+			}}
+		}}
+
+		DescriptionsRawData GetDescriptions()
+		{{
+			DescriptionsRawData result;
+
+			{imgui/filters/attribute_descriptor_registration}
+
+			return result;
+		}}
+	}}
+}} // namespace ImguiPropertyFiltration

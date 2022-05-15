@@ -1,15 +1,22 @@
+#include "Base/precomp.h"
+
 #include "GameData/GameData.h"
+#include "GameData/Serialization/Json/ComponentSetHolder.h"
 
 #include <nlohmann/json.hpp>
 
-nlohmann::json GameData::toJson(const ComponentFactory& componentFactory) const
+GameData::GameData(const ComponentFactory& componentFactory)
+	: mGameComponents(componentFactory)
+{}
+
+nlohmann::json GameData::toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder) const
 {
 	return nlohmann::json{
-		{"game_components", mGameComponents.toJson(componentFactory)}
+		{"game_components", Json::SerializeComponentSetHolder(mGameComponents, jsonSerializerHolder)}
 	};
 }
 
-void GameData::fromJson(const nlohmann::json& json, const ComponentFactory& componentFactory)
+void GameData::fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
-	mGameComponents.fromJson(json.at("game_components"), componentFactory);
+	Json::DeserializeComponentSetHolder(mGameComponents, json.at("game_components"), jsonSerializerHolder);
 }

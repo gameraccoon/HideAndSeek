@@ -1,0 +1,9 @@
+#pragma once
+
+#include "GameLogic/Imgui/ComponentInspector/AbstractComponentImguiWidget.h"
+
+class {class_name}ImguiWidget : public AbstractComponentImguiWidget
+{{
+public:
+	void update(void* component);
+}};

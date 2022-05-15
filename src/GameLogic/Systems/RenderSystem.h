@@ -3,37 +3,42 @@
 #include <memory>
 #include <vector>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
-#include "HAL/Base/ResourceManager.h"
-#include "HAL/EngineFwd.h"
+#include "Utils/ResourceManagement/ResourceManager.h"
+#include "Utils/Multithreading/ThreadPool.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
+#include "GameLogic/SharedManagers/TimeData.h"
 
-class Vector2D;
+struct RenderData;
 
 /**
  * System that handles rendering of world objects
  */
-class RenderSystem : public System
+class RenderSystem : public RaccoonEcs::System
 {
 public:
-	typedef std::unordered_map<int, bool> KeyStatesMap;
+	RenderSystem(
+		WorldHolder& worldHolder,
+		const TimeData& timeData,
+		ResourceManager& resourceManager,
+		ThreadPool& threadPool) noexcept;
 
-public:
-	RenderSystem(WorldHolder& worldHolder, HAL::Engine* engine, HAL::ResourceManager* resourceManager);
 	~RenderSystem() override = default;
 
 	void update() override;
+	static std::string GetSystemId() { return "RenderSystem"; }
 
 private:
-	void drawVisibilityPolygon(const Graphics::Sprite& lightSprite, const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift);
-	static Vector2D GetPlayerSightPosition(World* world);
-	void drawLights(World* world, const Vector2D& drawShift, const Vector2D& maxFov);
+	static void DrawVisibilityPolygon(RenderData& renderData, ResourceHandle lightSpriteHandle, const std::vector<Vector2D>& polygon, const Vector2D& fovSize, const Vector2D& drawShift);
+	void drawBackground(RenderData& renderData, World& world, Vector2D drawShift, Vector2D windowSize);
+	void drawLights(RenderData& renderData, class SpatialEntityManager& managerGroup, std::vector<class WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize);
 
 private:
 	WorldHolder& mWorldHolder;
-	HAL::Engine* mEngine;
-	HAL::ResourceManager* mResourceManager;
+	const TimeData& mTime;
+	ResourceManager& mResourceManager;
+	ThreadPool& mThreadPool;
 	ResourceHandle mLightSpriteHandle;
 };

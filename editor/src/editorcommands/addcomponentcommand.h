@@ -1,25 +1,24 @@
 #pragma once
 
+#include <raccoon-ecs/entity.h>
+#include <raccoon-ecs/component_factory.h>
+
 #include "editorcommand.h"
 
-#include "ECS/Entity.h"
-#include "ECS/ComponentFactory.h"
-
-#include <QString>
+#include "src/editorutils/componentreference.h"
 
 class World;
 
 class AddComponentCommand : public EditorCommand
 {
 public:
-	AddComponentCommand(Entity mEntity, const QString& typeName, ComponentFactory* factory);
+	AddComponentCommand(const ComponentSourceReference& source, StringId typeName, const ComponentFactory& factory);
 
-	bool doCommand(World* world) override;
-	bool undoCommand(World* world) override;
-	EffectType getEffectType() override;
+	void doCommand(World* world) override;
+	void undoCommand(World* world) override;
 
 private:
-	Entity mEntity;
-	QString mComponentTypeName;
-	ComponentFactory* mComponentFactory;
+	ComponentSourceReference mSource;
+	StringId mComponentTypeName;
+	const ComponentFactory& mComponentFactory;
 };

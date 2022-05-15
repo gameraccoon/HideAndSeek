@@ -2,12 +2,13 @@
 
 #include <vector>
 
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Time/GameplayTimestamp.h"
 
 class TravelPath
 {
 public:
-	std::vector<Vector2D>& getSmoothPathRef() { return mSmoothPath; }
-private:
-	std::vector<Vector2D> mSmoothPath;
+	std::vector<Vector2D> smoothPath;
+	Vector2D targetPos{ ZERO_VECTOR };
+	GameplayTimestamp updateTimestamp{0};
 };

@@ -8,10 +8,11 @@ class ArgumentsParser
 public:
 	ArgumentsParser(int argc, char **argv, const std::string& argumentSwitch = "--");
 
-	bool hasArgument(const std::string& argument) const;
-	std::string getArgumentValue(const std::string& argument, const std::string& defaultValue = "") const;
+	[[nodiscard]] bool hasArgument(const std::string& argument) const;
+	[[nodiscard]] std::string getArgumentValue(const std::string& argument, const std::string& defaultValue = "") const;
+	[[nodiscard]] int getIntArgumentValue(const std::string& argument, int defaultValue = 0) const;
 
 private:
-	std::vector <std::string> mTokens;
+	std::vector<std::string> mTokens;
 	const std::string mArgumentSwitch;
 };

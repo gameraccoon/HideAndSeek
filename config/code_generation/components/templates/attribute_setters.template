@@ -1,0 +1,2 @@
+void set{attribute_name_capital}(const {attribute_type}& new{attribute_name_capital}) {{ m{attribute_name_capital} = new{attribute_name_capital}; }}
+	void set{attribute_name_capital}({attribute_type}&& new{attribute_name_capital}) {{ m{attribute_name_capital} = std::move(new{attribute_name_capital}); }}{delim_endl}{delim_endl}{delim_tab}

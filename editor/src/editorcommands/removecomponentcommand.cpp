@@ -2,60 +2,56 @@
 
 #include <QtWidgets/qcombobox.h>
 
-#include "Debug/Assert.h"
-#include "ECS/ComponentFactory.h"
 #include "GameData/World.h"
 
-RemoveComponentCommand::RemoveComponentCommand(Entity entity, const QString& typeName, ComponentFactory* factory)
-	: mEntity(entity)
+#include "src/editorutils/componentreferenceutils.h"
+
+RemoveComponentCommand::RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const Json::ComponentSerializationHolder& jsonSerializerHolder, const ComponentFactory& componentFactory)
+	: EditorCommand(EffectBitset(EffectType::Components))
+	, mSource(source)
 	, mComponentTypeName(typeName)
-	, mComponentFactory(factory)
+	, mComponentSerializerHolder(jsonSerializerHolder)
+	, mComponentFactory(componentFactory)
 {
 }
 
-bool RemoveComponentCommand::doCommand(World* world)
+void RemoveComponentCommand::doCommand(World* world)
 {
-	std::string typeName = mComponentTypeName.toStdString();
-
 	if (mSerializedComponent.empty())
 	{
-		std::vector<BaseComponent*> components = world->getEntityManager().getAllEntityComponents(mEntity);
+		std::vector<TypedComponent> components = Utils::GetComponents(mSource, world);
 
-		auto it = std::find_if(components.begin(), components.end(), [&typeName](BaseComponent* component)
+		auto it = std::find_if(components.begin(), components.end(), [typeName = mComponentTypeName](const TypedComponent& component)
 		{
-			return component->getComponentTypeName() == typeName;
+			return component.typeId == typeName;
 		});
 
 		if (it == components.end())
 		{
-			return false;
+			return;
 		}
 
-		(*it)->toJson(mSerializedComponent);
+		const Json::ComponentSerializer* jsonSerializer = mComponentSerializerHolder.getComponentSerializerFromClassName(mComponentTypeName);
+		jsonSerializer->toJson(mSerializedComponent, it->component);
 	}
 
-	world->getEntityManager().removeComponent(
-		mEntity,
-		mComponentFactory->getTypeIDFromString(typeName).value()
+	Utils::RemoveComponent(
+		mSource,
+		mComponentTypeName,
+		world
 	);
-	return false;
 }
 
-bool RemoveComponentCommand::undoCommand(World* world)
+void RemoveComponentCommand::undoCommand(World* world)
 {
-	BaseComponent* component = mComponentFactory->createComponent(mComponentTypeName.toStdString());
+	void* component = mComponentFactory.createComponent(mComponentTypeName);
 
-	component->fromJson(mSerializedComponent);
+	const Json::ComponentSerializer* jsonSerializer = mComponentSerializerHolder.getComponentSerializerFromClassName(mComponentTypeName);
+	jsonSerializer->fromJson(mSerializedComponent, component);
 
-	world->getEntityManager().addComponent(
-		mEntity,
-		component,
-		mComponentFactory->getTypeIDFromString(mComponentTypeName.toStdString()).value()
+	Utils::AddComponent(
+		mSource,
+		TypedComponent(mComponentTypeName, component),
+		world
 	);
-	return false;
-}
-
-EditorCommand::EffectType RemoveComponentCommand::getEffectType()
-{
-	return EffectType::Components;
 }

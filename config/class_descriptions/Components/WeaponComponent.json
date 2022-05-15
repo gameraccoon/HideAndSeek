@@ -1,0 +1,30 @@
+{
+	"component": "weapon",
+	"description": "Component that stores information about equipped weapon",
+	"attributes": [
+		{
+			"name": "shotPeriod",
+			"type": "float",
+			"default": " = 0.0f"
+		},
+		{
+			"name": "shotDistance",
+			"type": "float",
+			"default": " = 0.0f",
+			"flags": ["defaulted"]
+		},
+		{
+			"name": "damageValue",
+			"type": "float",
+			"default": " = 0.0f",
+			"flags": ["defaulted"]
+		},
+		{
+			"name": "shotFinishTimestamp",
+			"type": "GameplayTimestamp",
+			"default": "{0}",
+			"includes": ["\"GameData/Time/GameplayTimestamp.h\""],
+			"flags": ["transient"]
+		}
+	]
+}

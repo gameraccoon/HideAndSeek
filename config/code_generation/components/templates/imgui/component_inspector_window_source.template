@@ -1,0 +1,16 @@
+#include "Base/precomp.h"
+
+#include "GameLogic/Imgui/ComponentInspector/ComponentWidgets/{class_name}ImguiWidget.generated.h"
+
+#include "GameData/Components/{class_name}.generated.h"
+
+#include "imgui/imgui.h"
+
+#include "GameLogic/Imgui/ComponentInspector/DataInspectorWidgets/TypesInspector.h"
+
+void {class_name}ImguiWidget::update(void* component)
+{{
+	MAYBE_UNUSED {class_name}* {component_name} = static_cast<{class_name}*>(component);
+
+	{imgui/attributes_inspection}
+}}

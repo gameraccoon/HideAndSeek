@@ -1,0 +1,10 @@
+{
+	"clips" : [
+		["idle", "resources/animations/character/handgun_idle.json"],
+		["move", "resources/animations/character/handgun_move.json"],
+		["reload", "resources/animations/character/handgun_reload.json"],
+		["shoot", "resources/animations/character/handgun_shoot.json"]
+	],
+	"stateMachineID" : "handgun",
+	"defaultState": "idle"
+}

@@ -1,9 +1,18 @@
 #include "mainwindow.h"
+
 #include <QApplication>
+#include <raccoon-ecs/error_handling.h>
+
+#include "Base/Debug/Assert.h"
+#include "Base/Random/Random.h"
 
 int main(int argc, char *argv[])
 {
-	std::srand(static_cast<unsigned int>(time(nullptr)));
+	Random::gGlobalGenerator = std::mt19937(time(nullptr));
+
+#ifdef RACCOON_ECS_DEBUG_CHECKS_ENABLED
+	RaccoonEcs::gErrorHandler = [](const std::string& error) { ReportFatalError(error); };
+#endif // RACCOON_ECS_DEBUG_CHECKS_ENABLED
 
 	QApplication a(argc, argv);
 	MainWindow w;

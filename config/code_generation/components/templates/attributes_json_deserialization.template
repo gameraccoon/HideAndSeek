@@ -1,1 +1,0 @@
-json.at("{attribute_name}").get_to(out{component_name_capital}.m{attribute_name_capital});{delim_endl}{delim_tab}

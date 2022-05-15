@@ -1,12 +1,20 @@
 {
 	"component": "navMesh",
 	"description": "Component that stores part of NavMesh",
+	"flags": ["transient"],
 	"attributes": [
 		{
 			"name": "navMesh",
 			"type": "NavMesh",
 			"includes": ["\"GameData/AI/NavMesh.h\""],
-			"flags": ["transient", "get_by_ref"]
+			"flags": ["transient", "nocopyable", "get_by_ref"]
+		},
+		{
+			"name": "updateTimestamp",
+			"type": "GameplayTimestamp",
+			"default": "{0}",
+			"includes": ["\"GameData/Time/GameplayTimestamp.h\""],
+			"flags": ["transient"]
 		}
 	]
 }

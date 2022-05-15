@@ -58,6 +58,7 @@
     <property name="title">
      <string>Entity</string>
     </property>
+    <addaction name="actionCreate_Spatial"/>
     <addaction name="actionCreate"/>
     <addaction name="separator"/>
     <addaction name="actionNew_Prefab_Library"/>
@@ -69,16 +70,22 @@
     <property name="title">
      <string>Window</string>
     </property>
-    <addaction name="actionWorld_Settings"/>
     <addaction name="actionEntities_List"/>
     <addaction name="actionComponents_List"/>
     <addaction name="actionComponent_Properties"/>
     <addaction name="actionPrefabs"/>
     <addaction name="actionTransform_Editor"/>
    </widget>
+   <widget class="QMenu" name="menuWorld">
+    <property name="title">
+     <string>Components</string>
+    </property>
+    <addaction name="actionEdit_Components"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuEntity"/>
+   <addaction name="menuWorld"/>
    <addaction name="menuWindow"/>
    <addaction name="menuRun"/>
   </widget>
@@ -111,6 +118,9 @@
    </property>
   </action>
   <action name="actionSave_World_As">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Save World As...</string>
    </property>
@@ -157,7 +167,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Create</string>
+    <string>Create Bound To World</string>
    </property>
   </action>
   <action name="actionEntities_List">
@@ -173,11 +183,6 @@
   <action name="actionComponent_Properties">
    <property name="text">
     <string>Component Attributes</string>
-   </property>
-  </action>
-  <action name="actionWorld_Settings">
-   <property name="text">
-    <string>World Properties</string>
    </property>
   </action>
   <action name="actionLoad_Prefab_Library">
@@ -208,6 +213,19 @@
   <action name="actionTransform_Editor">
    <property name="text">
     <string>Transform Editor</string>
+   </property>
+  </action>
+  <action name="actionCreate_Spatial">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Create Spatial</string>
+   </property>
+  </action>
+  <action name="actionEdit_Components">
+   <property name="text">
+    <string>Edit World Components</string>
    </property>
   </action>
  </widget>

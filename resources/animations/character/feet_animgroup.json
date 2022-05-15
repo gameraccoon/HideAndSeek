@@ -1,0 +1,11 @@
+{
+	"clips" : [
+		["idle", "resources/animations/character/feet_idle.json"],
+		["run", "resources/animations/character/feet_run.json"],
+		["strafeleft", "resources/animations/character/feet_strafe_left.json"],
+		["straferight", "resources/animations/character/feet_strafe_right.json"],
+		["walk", "resources/animations/character/feet_walk.json"]
+	],
+	"stateMachineID" : "feet",
+	"defaultState": "idle"
+}

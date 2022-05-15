@@ -11,10 +11,7 @@
 #include <QAction>
 #include <QInputDialog>
 
-#include <Debug/Log.h>
-
-#include "src/editorcommands/removeentitycommand.h"
-#include "src/editorcommands/addcomponentcommand.h"
+#include "src/editorcommands/removeentitiescommand.h"
 
 #include "src/toolboxes/PrefabListToolbox.h"
 
@@ -28,8 +25,8 @@ EntitiesListToolbox::EntitiesListToolbox(MainWindow* mainWindow, ads::CDockManag
 	: mMainWindow(mainWindow)
 	, mDockManager(dockManager)
 {
-	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{bindEvents(); updateContent();});
-	mOnSelectedEntityChangedHandle = mMainWindow->OnSelectedEntityChanged.bind([this](OptionalEntity entity){onEntityChangedEvent(entity);});
+	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{ bindEvents(); updateContent(); });
+	mOnSelectedEntityChangedHandle = mMainWindow->OnSelectedEntityChanged.bind([this](const auto& entityRef){ onEntityChangedEvent(entityRef); });
 }
 
 EntitiesListToolbox::~EntitiesListToolbox()
@@ -53,21 +50,21 @@ void EntitiesListToolbox::show()
 		}
 	}
 
-	QWidget* containerWidget = new QWidget();
-	ads::CDockWidget* dockWidget = new ads::CDockWidget(QString("Entities List"));
+	QWidget* containerWidget = HS_NEW QWidget();
+	ads::CDockWidget* dockWidget = HS_NEW ads::CDockWidget(QString("Entities List"));
 	dockWidget->setObjectName(ToolboxName);
 	dockWidget->setWidget(containerWidget);
 	dockWidget->setToggleViewActionMode(ads::CDockWidget::ActionModeShow);
 	dockWidget->setIcon(mMainWindow->style()->standardIcon(QStyle::SP_DialogOpenButton));
-	dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, false);
-	dockWidget->setFeature(ads::CDockWidget::DockWidgetMovable, false);
+	dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+	dockWidget->setFeature(ads::CDockWidget::DockWidgetMovable, true);
 	mDockManager->addDockWidget(ads::RightDockWidgetArea, dockWidget);
 
 	containerWidget->setObjectName(ContainerName);
 
-	QVBoxLayout* layout = new QVBoxLayout();
+	QVBoxLayout* layout = HS_NEW QVBoxLayout();
 	containerWidget->setLayout(layout);
-	QListWidget* entityList = new QListWidget();
+	QListWidget* entityList = HS_NEW QListWidget();
 	layout->addWidget(entityList);
 	entityList->setObjectName(ListName);
 	entityList->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -83,9 +80,9 @@ void EntitiesListToolbox::onWorldUpdated()
 	bindEvents();
 }
 
-void EntitiesListToolbox::onEntityChangedEvent(OptionalEntity entity)
+void EntitiesListToolbox::onEntityChangedEvent(const std::optional<EntityReference>& entity)
 {
-	if (!entity.isValid())
+	if (!entity.has_value())
 	{
 		return;
 	}
@@ -96,7 +93,7 @@ void EntitiesListToolbox::onEntityChangedEvent(OptionalEntity entity)
 		return;
 	}
 
-	QString text = QString::number(entity.mId);
+	QString text = QString::number(entity->entity.getId());
 	int i = 0;
 	while (QListWidgetItem* item = entitiesList->item(i))
 	{
@@ -119,17 +116,16 @@ void EntitiesListToolbox::updateContent()
 		return;
 	}
 
-	QStringList entitiesStringList;
 	const auto& entities = currentWorld->getEntityManager().getEntities();
-	for (auto& entity : entities)
-	{
-		entitiesStringList.append(QString::number(entity.first));
-	}
-
 	if (QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName))
 	{
-		entitiesList->clear();
-		entitiesList->addItems(entitiesStringList);
+		for (Entity entity : entities)
+		{
+			QListWidgetItem* newItem = HS_NEW QListWidgetItem(QString::number(entity.getId()));
+			newItem->setData(0, static_cast<unsigned long long>(entity.getId()));
+			newItem->setData(1, false);
+			entitiesList->addItem(newItem);
+		}
 	}
 }
 
@@ -137,11 +133,19 @@ void EntitiesListToolbox::onCurrentItemChanged(QListWidgetItem* current, QListWi
 {
 	if (current)
 	{
-		mMainWindow->OnSelectedEntityChanged.broadcast(Entity(current->text().toUInt()));
+		Entity::EntityId entityID = current->data(0).toUInt();
+		EntityReference reference{Entity(entityID)};
+
+		if (current->data(1).toBool())
+		{
+			CellPos cellPos{current->data(2).toInt(), current->data(3).toInt()};
+			reference.cellPos = cellPos;
+		}
+		mMainWindow->OnSelectedEntityChanged.broadcast(reference);
 	}
 	else
 	{
-		mMainWindow->OnSelectedEntityChanged.broadcast(OptionalEntity());
+		mMainWindow->OnSelectedEntityChanged.broadcast(std::nullopt);
 	}
 }
 
@@ -160,10 +164,6 @@ void EntitiesListToolbox::showContextMenu(const QPoint& pos)
 
 	QMenu contextMenu(tr("Context menu"), this);
 
-	QAction actionAddComponent("Add Component", this);
-	connect(&actionAddComponent, &QAction::triggered, this, &EntitiesListToolbox::onAddComponentToEntityRequested);
-	contextMenu.addAction(&actionAddComponent);
-
 	QAction actionRemove("Remove Entity", this);
 	connect(&actionRemove, &QAction::triggered, this, &EntitiesListToolbox::removeSelectedEntity);
 	contextMenu.addAction(&actionRemove);
@@ -177,7 +177,7 @@ void EntitiesListToolbox::showContextMenu(const QPoint& pos)
 
 void EntitiesListToolbox::removeSelectedEntity()
 {
-	QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
+	/*QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
 	if (entitiesList == nullptr)
 	{
 		return;
@@ -195,16 +195,16 @@ void EntitiesListToolbox::removeSelectedEntity()
 		return;
 	}
 
-	mMainWindow->getCommandStack().executeNewCommand<RemoveEntityCommand>(
+	mMainWindow->getCommandStack().executeNewCommand<RemoveEntitiesCommand>(
 		currentWorld,
-		Entity(currentItem->text().toUInt()),
-		&mMainWindow->getComponentFactory()
-	);
+		{ Entity(currentItem->text().toUInt()) },
+		mMainWindow->getComponentSerializationHolder()
+	);*/
 }
 
 void EntitiesListToolbox::createPrefabRequested()
 {
-	QInputDialog* dialog = new QInputDialog();
+	QInputDialog* dialog = HS_NEW QInputDialog();
 	dialog->setLabelText("Choose a name for the prefab:");
 	dialog->setCancelButtonText("Cancel");
 	connect(dialog, &QInputDialog::textValueSelected, this, &EntitiesListToolbox::createPrefab);
@@ -235,56 +235,13 @@ void EntitiesListToolbox::createPrefab(const QString& prefabName)
 	prefabToolbox->createPrefabFromEntity(prefabName, Entity(currentItem->text().toUInt()));
 }
 
-void EntitiesListToolbox::onAddComponentToEntityRequested()
-{
-	QInputDialog* dialog = new QInputDialog();
-	dialog->setLabelText("Select Component Type:");
-	dialog->setCancelButtonText("Cancel");
-	dialog->setComboBoxEditable(false);
-	QStringList items;
-	mMainWindow->getComponentFactory().forEachComponentType([&items](std::type_index, const std::string& name)
-	{
-		items.append(QString::fromStdString(name));
-	});
-	dialog->setComboBoxItems(items);
-	connect(dialog, &QInputDialog::textValueSelected, this, &EntitiesListToolbox::addComponentToEntity);
-	dialog->show();
-}
-
-void EntitiesListToolbox::addComponentToEntity(const QString& typeName)
-{
-	QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
-	if (entitiesList == nullptr)
-	{
-		return;
-	}
-
-	QListWidgetItem* currentItem = entitiesList->currentItem();
-	if (currentItem == nullptr)
-	{
-		return;
-	}
-
-	World* currentWorld = mMainWindow->getCurrentWorld();
-	if (currentWorld == nullptr)
-	{
-		return;
-	}
-
-	mMainWindow->getCommandStack().executeNewCommand<AddComponentCommand>(
-		currentWorld,
-		Entity(currentItem->text().toUInt()),
-		typeName,
-		&mMainWindow->getComponentFactory()
-	);
-}
-
 void EntitiesListToolbox::bindEvents()
 {
 	if (World* currentWorld = mMainWindow->getCurrentWorld())
 	{
-		mOnEntityAddedHandle = currentWorld->getEntityManager().OnEntityAdded.bind([this]{updateContent();});
-		mOnEntityRemovedHandle = currentWorld->getEntityManager().OnEntityRemoved.bind([this]{updateContent();});
+		EntityManager& worldEntityManager = currentWorld->getEntityManager();
+		mOnEntityAddedHandle = worldEntityManager.onEntityAdded.bind([this]{updateContent();});
+		mOnEntityRemovedHandle = worldEntityManager.onEntityRemoved.bind([this]{updateContent();});
 	}
 }
 
@@ -292,7 +249,8 @@ void EntitiesListToolbox::unbindEvents()
 {
 	if (World* currentWorld = mMainWindow->getCurrentWorld())
 	{
-		currentWorld->getEntityManager().OnEntityAdded.unbind(mOnEntityAddedHandle);
-		currentWorld->getEntityManager().OnEntityRemoved.unbind(mOnEntityRemovedHandle);
+		EntityManager& worldEntityManager = currentWorld->getEntityManager();
+		worldEntityManager.onEntityAdded.unbind(mOnEntityAddedHandle);
+		worldEntityManager.onEntityRemoved.unbind(mOnEntityRemovedHandle);
 	}
 }

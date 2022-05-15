@@ -1,4 +1,4 @@
-#include "../typeseditconstructor.h"
+#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
 #include <string>
 
@@ -8,8 +8,6 @@
 #include <QCheckBox>
 #include <QHBoxLayout>
 
-#include "GameData/Core/Vector2D.h"
-
 namespace TypesEditConstructor
 {
 	template<>
@@ -17,7 +15,7 @@ namespace TypesEditConstructor
 	{
 		FillLabel(layout, label);
 
-		QHBoxLayout *innerLayout = new QHBoxLayout;
+		QHBoxLayout *innerLayout = HS_NEW QHBoxLayout;
 
 		Edit<Vector2D>::Ptr edit = std::make_shared<Edit<Vector2D>>(initialValue);
 		Edit<Vector2D>::WeakPtr editWeakPtr = edit;
@@ -43,7 +41,7 @@ namespace TypesEditConstructor
 		edit->addChild(editY);
 
 		innerLayout->addStretch();
-		QWidget* container = new QWidget();
+		QWidget* container = HS_NEW QWidget();
 		container->setLayout(innerLayout);
 		layout->addWidget(container);
 		return edit;

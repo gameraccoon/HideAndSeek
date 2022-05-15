@@ -1,0 +1,1 @@
+RegisterIfHasFactories<{class_name}{attribute_name_capital}PropertyDescriptor>(result, std::vector<std::string>{{"{component_tolower}component.{attribute_tolower}", "{component_tolower}.{attribute_tolower}"}});{delim_endl}{delim_tab}{delim_tab}{delim_tab}

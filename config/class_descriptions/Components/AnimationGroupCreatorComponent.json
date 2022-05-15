@@ -1,0 +1,33 @@
+{
+	"component": "animationGroupCreator",
+	"description": "Component that creates groups of animation clips",
+	"attributes": [
+		{
+			"name": "animationGroups",
+			"type": "std::vector<ResourcePath>",
+			"includes": [
+				"<vector>",
+				"\"Base/Types/String/Path.h\""
+			],
+			"flags": ["get_by_ref"]
+		},
+		{
+			"name": "clipParams",
+			"type": "std::vector<AnimationClipParams>",
+			"includes": [
+				"<vector>",
+				"\"GameData/Resources/AnimationClipParams.h\""
+			],
+			"flags": ["get_by_ref"]
+		},
+		{
+			"name": "spriteParams",
+			"type": "std::vector<SpriteParams>",
+			"includes": [
+				"<vector>",
+				"\"GameData/Resources/SpriteParams.h\""
+			],
+			"flags": ["get_by_ref"]
+		}
+	]
+}

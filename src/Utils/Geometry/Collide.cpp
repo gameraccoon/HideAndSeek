@@ -1,3 +1,5 @@
+#include "Base/precomp.h"
+
 #include "Utils/Geometry/Collide.h"
 
 #include <stdlib.h>
@@ -7,12 +9,11 @@
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 
+#include "Base/Math/Float.h"
+
 namespace Collide
 {
-	float SignedArea(const Vector2D &a, const Vector2D &b, const Vector2D &c)
-	{
-		return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-	}
+	static constexpr float EPS = 1E-4f;
 
 	enum class ResistDir
 	{
@@ -27,9 +28,9 @@ namespace Collide
 		if (hull1.type == HullType::Circular && hull2.type == HullType::Circular)
 		{
 			float dist = (center2 - center1).qSize() - (hull1.getQRadius() + hull2.getQRadius() + 2.0f * hull1.getRadius() * hull2.getRadius());
-			if (dist <= 0.0f)
+			if (Math::IsLessWithEpsilon(dist, 0.0f))
 			{
-				outResist = (center2 - center1) - (center2 - center1).ort() * (hull1.getRadius() + hull2.getRadius());
+				outResist = (center2 - center1) - (center2 - center1).unit() * (hull1.getRadius() + hull2.getRadius());
 				return true;
 			}
 			return false;
@@ -57,11 +58,11 @@ namespace Collide
 			const Border *nearestBorder = nullptr;
 			float nearestBorderQDistance = std::numeric_limits<float>::max();
 			ResistDir nearestBorderResistDir = ResistDir::Normal;
-			for (auto &border : rHull->borders)
+			for (auto& border : rHull->borders)
 			{
 				Vector2D borderA = *rCenter + border.getA();
 
-				float qDistance = DotProduct(border.getNormal(), borderA - *cCenter);
+				float qDistance = Vector2D::DotProduct(border.getNormal(), borderA - *cCenter);
 				qDistance*=qDistance;
 
 				if (qDistance < nearestBorderQDistance)
@@ -76,7 +77,7 @@ namespace Collide
 					if (distA < distB)
 					{
 						// check if we outside the section
-						if (DotProduct(*cCenter - borderA, border.getB() - border.getA()) < 0)
+						if (Vector2D::DotProduct(*cCenter - borderA, border.getB() - border.getA()) < 0)
 						{
 							qDistance = distA;
 							resistDir = ResistDir::PointA;
@@ -84,7 +85,7 @@ namespace Collide
 					}
 					else
 					{
-						if (DotProduct(*cCenter - borderB, border.getA() - border.getB()) < 0)
+						if (Vector2D::DotProduct(*cCenter - borderB, border.getA() - border.getB()) < 0)
 						{
 							qDistance = distB;
 							resistDir = ResistDir::PointB;
@@ -129,13 +130,13 @@ namespace Collide
 			case ResistDir::PointA:
 			{
 				Vector2D diffA = (*cCenter - *rCenter - nearestBorder->getA());
-				resist = diffA - diffA.ort() * cHull->getRadius();
+				resist = diffA - diffA.unit() * cHull->getRadius();
 			}
 				break;
 			case ResistDir::PointB:
 			{
 				Vector2D diffB = (*cCenter - *rCenter - nearestBorder->getB());
-				resist = diffB - diffB.ort() * cHull->getRadius();
+				resist = diffB - diffB.unit() * cHull->getRadius();
 				break;
 			}
 			default:
@@ -160,16 +161,13 @@ namespace Collide
 	}
 
 	bool DoCollide(const CollisionComponent* collisionA, const Vector2D& locationA,
-				   const CollisionComponent* collisionB, const Vector2D& locationB, Vector2D& outResist)
+		const CollisionComponent* collisionB, const Vector2D& locationB, Vector2D& outResist)
 	{
 		// get AABB of the actors
-		const BoundingBox& box = collisionA->getBoundingBox();
-		const BoundingBox& ourBox = collisionB->getBoundingBox();
+		const BoundingBox box = collisionA->getBoundingBox() + locationA;
+		const BoundingBox ourBox = collisionB->getBoundingBox() + locationB;
 		// if the actor's AABB intersects with the Man's AABB (in new Man location)
-		if ((box.minX < ourBox.maxX
-			&& ourBox.minX < box.maxX)
-			&& (box.minY < ourBox.maxY
-			&& ourBox.minY < box.maxY))
+		if (AreAABBsIntersect(box, ourBox))
 		{
 			return IsCollideGeometry(collisionA->getGeometry(), collisionB->getGeometry(),
 				locationA, locationB, outResist);
@@ -177,14 +175,14 @@ namespace Collide
 		return false;
 	}
 
-	void UpdateOriginalBoundingBox(CollisionComponent* collision)
+	void UpdateBoundingBox(CollisionComponent* collision)
 	{
 		const Hull& geometry = collision->getGeometry();
 
 		if (geometry.type == HullType::Circular)
 		{
 			float radius = geometry.getRadius();
-			collision->setOriginalBoundingBox(BoundingBox(Vector2D(-radius, -radius), Vector2D(radius, radius)));
+			collision->setBoundingBox(BoundingBox(Vector2D(-radius, -radius), Vector2D(radius, radius)));
 		}
 		else
 		{
@@ -216,8 +214,173 @@ namespace Collide
 				}
 			}
 
-			collision->setOriginalBoundingBox(BoundingBox(Vector2D(minX, minY), Vector2D(maxX, maxY)));
+			collision->setBoundingBox(BoundingBox(Vector2D(minX, minY), Vector2D(maxX, maxY)));
 		}
 	}
 
+	static int GetCohenCode(const BoundingBox& box, const Vector2D& dot)
+	{
+		constexpr int leftBit = 0;
+		constexpr int rightBit = 1;
+		constexpr int topBit = 2;
+		constexpr int bottomBit = 3;
+
+		return (
+			((dot.x < box.minX) << leftBit)
+			|
+			((dot.x > box.maxX) << rightBit)
+			|
+			((dot.y < box.minY) << topBit)
+			|
+			((dot.y > box.maxY) << bottomBit)
+		);
+	}
+
+	bool AreAABBsIntersect(const BoundingBox& boxA, const BoundingBox& boxB)
+	{
+		return (boxA.minX < boxB.maxX && boxA.maxX > boxB.minX)
+			&& (boxA.minY < boxB.maxY && boxA.maxY > boxB.minY);
+	}
+
+	bool AreAABBsIntersectInclusive(const BoundingBox& boxA, const BoundingBox& boxB)
+	{
+		return (boxA.minX <= boxB.maxX && boxA.maxX >= boxB.minX)
+			&& (boxA.minY <= boxB.maxY && boxA.maxY >= boxB.minY);
+	}
+
+	bool AreLinesIntersect(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2)
+	{
+		return (
+			// check that points B1 and B2 on the different sides of A1 A2 line
+			Collide::SignedArea(a1, a2, b1) * Collide::SignedArea(a1, a2, b2) <= 0.0f
+			&&
+			// check that points A1 and A2 on the different sides of B1 B2 line
+			Collide::SignedArea(b1, b2, a1) * Collide::SignedArea(b1, b2, a2) <= 0.0f
+		);
+	}
+
+	bool AreLinesParallel(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2)
+	{
+		Vector2D diffA = a2 - a1;
+		Vector2D diffB = b2 - b1;
+		if (diffA.y == 0 || diffB.y == 0)
+		{
+			if (diffA.x == 0 || diffB.x == 0)
+			{
+				return false;
+			}
+			return Math::AreEqualWithEpsilon(diffA.y/diffA.x, diffB.y/diffB.x);
+		}
+		else
+		{
+			return Math::AreEqualWithEpsilon(diffA.x/diffA.y, diffB.x/diffB.y);
+		}
+	}
+
+	bool IsLineIntersectAABB(const BoundingBox& box, const Vector2D& start, const Vector2D& finish)
+	{
+		// get Cohen's code for start point
+		int codeA = GetCohenCode(box, start);
+		// get Cohen's code for end point
+		int codeB = GetCohenCode(box, finish);
+
+		// if the points on the same side of BB
+		if ((codeA & codeB) != 0)
+		{
+			return false;
+		}
+
+		// one point is in BB another is out BB
+		if ((codeA == 0 || codeB == 0) && (codeA | codeB) != 0)
+		{
+			return true;
+		}
+
+		// points on opposite sides of BB // 0011 or 1100
+		if ((codeA | codeB) == 3 || (codeA | codeB) == 12)
+		{
+			return true;
+		}
+
+		float l = box.minX;
+		float t = box.minY;
+		float r = box.maxX;
+		float b = box.maxY;
+
+		float x1 = start.x;
+		float y1 = start.y;
+		float x2 = finish.x;
+		float y2 = finish.y;
+
+		// ToDo: optimize it for axis-aligned borders
+		if (AreLinesIntersect(Vector2D(l, t), Vector2D(l, b), Vector2D(x1, y1), Vector2D(x2, y2))
+			||
+			AreLinesIntersect(Vector2D(r, t), Vector2D(r, b), Vector2D(x1, y1), Vector2D(x2, y2))
+			||
+			AreLinesIntersect(Vector2D(l, t), Vector2D(r, t), Vector2D(x1, y1), Vector2D(x2, y2))
+			||
+			AreLinesIntersect(Vector2D(l, b), Vector2D(r, b), Vector2D(x1, y1), Vector2D(x2, y2)))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	static float Det(const float a, const float b, const float c, const float d)
+	{
+		return a * d - b * c;
+	}
+
+	Vector2D GetPointIntersect2Lines(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2)
+	{
+		float da1 = a1.y - a2.y;
+		float db1 = a2.x - a1.x;
+		float dc1 = -da1 * a1.x - db1 * a1.y;
+		float da2 = b1.y - b2.y;
+		float db2 = b2.x - b1.x;
+		float dc2 = -da2 * b1.x - db2 * b1.y;
+
+		float zn = Det(da1, db1, da2, db2);
+
+		// if lines are not parallel
+		if (zn < -EPS || zn > EPS)
+		{
+			float x = -Det(dc1, db1, dc2, db2) / zn;
+			float y = -Det(da1, dc1, da2, dc2) / zn;
+
+			return Vector2D(x, y);
+		}
+
+		// if lines not intersected
+		return ZERO_VECTOR;
+	}
+
+	float DistanceToLineSegmentSq(Vector2D lineA, Vector2D lineB, Vector2D point)
+	{
+		const float segmentLengthSq = (lineB - lineA).qSize();
+		if (segmentLengthSq == 0.0f) return (point - lineA).qSize();
+		const float t = std::clamp(Vector2D::DotProduct(point - lineA, lineB - lineA) / segmentLengthSq, 0.0f, 1.0f);
+		const Vector2D projection = lineA + t * (lineB - lineA);
+		return (point - projection).qSize();
+	}
+
+	float FindDistanceToConvexHullSq(const std::vector<Vector2D>& hull, Vector2D point)
+	{
+		float minDist = std::numeric_limits<float>::max();
+
+		const size_t hullSize = hull.size();
+		FOR_EACH_BORDER(hullSize,
+		{
+			const float dist = DistanceToLineSegmentSq(hull[i], hull[j], point);
+			if (dist < minDist)
+			{
+				minDist = dist;
+			}
+		})
+
+		return minDist;
+	}
 }

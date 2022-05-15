@@ -1,18 +1,18 @@
 #pragma once
 
+#include <raccoon-ecs/entity.h>
+
 #include "editorcommand.h"
-#include "ECS/Entity.h"
 
 class World;
 
 class AddEntityCommand : public EditorCommand
 {
 public:
-	AddEntityCommand(Entity mEntity);
+	AddEntityCommand(Entity entity);
 
-	bool doCommand(World* world) override;
-	bool undoCommand(World* world) override;
-	EffectType getEffectType() override;
+	void doCommand(World* world) override;
+	void undoCommand(World* world) override;
 
 private:
 	Entity mEntity;

@@ -1,19 +1,16 @@
 #pragma once
 
+#include "GameData/Time/GameplayTimestamp.h"
+
 class TimeData
 {
 public:
-	TimeData();
-	void update(float dt);
+	void fixedUpdate(float dt, u32 updatesCount = 1);
 
 public:
-	static constexpr int cycleLength = 3600;
-	static constexpr int cycleLengthMax = 14400;
-	static_assert (cycleLengthMax % cycleLength == 0, "cycleLengthMax should be dividable by cycleLength");
-	static constexpr int parallelCyclesCount = cycleLengthMax / cycleLength;
-
-	float dt = 0.0f;
-	int currentCycle = 0;
-	int cyclesPassed = 0;
-	float cycleTime[parallelCyclesCount];
+	float lastUpdateDt = 0.0f;
+	float lastFixedUpdateDt = 0.0f;
+	GameplayTimestamp lastFixedUpdateTimestamp{0};
+	u32 lastFixedUpdateIndex = 0;
+	int countFixedTimeUpdatesThisFrame = 1;
 };

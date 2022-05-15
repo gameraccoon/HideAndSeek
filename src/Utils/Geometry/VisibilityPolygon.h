@@ -2,62 +2,51 @@
 
 #include <vector>
 
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Geometry/Border.h"
 
-class CollisionComponent;
-class TransformComponent;
+class LightBlockingGeometryComponent;
 
 /**
  * Class that calculates visibility polygons
  *
- * Don't try to use one class in separate threads, instead use one instance per thread
+ * Don't try to use a single instance in multiple threads, instead use one instance per thread
  */
 class VisibilityPolygonCalculator
 {
 public:
+	struct AngledBorder
+	{
+		AngledBorder(const Vector2D& posA, const Vector2D& posB)
+			: coords(posA, posB)
+			, angleA(posA.rotation().getValue())
+			, angleB(posB.rotation().getValue())
+		{}
+
+		SimpleBorder coords;
+		float angleA;
+		float angleB;
+	};
+
+public:
 	VisibilityPolygonCalculator() = default;
 
 	// returns reference to the calculated polygon
-	void calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<std::tuple<CollisionComponent*, TransformComponent*>>& components, const Vector2D& sourcePos, const Vector2D& polygonMaxSize);
+	void calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<const LightBlockingGeometryComponent*>& components, Vector2D sourcePos, Vector2D polygonMaxSize);
 
 	// copying objects of this class has a little sense and usually indicates a poor use
 	VisibilityPolygonCalculator(VisibilityPolygonCalculator const&) = delete;
 	VisibilityPolygonCalculator& operator=(VisibilityPolygonCalculator const&) = delete;
 
 private:
-	struct SimpleBorder
-	{
-		SimpleBorder(Vector2D a, Vector2D b) : a(a), b(b) {}
-		Vector2D a;
-		Vector2D b;
-	};
-
-	enum class PointSide
-	{
-		Left, // the point is free from the left (counter-clockwise) side
-		Right, // the point is free from the right (clockwise) side
-		InBetween // the point is connecting two borders that are facing the light source
-	};
-
-	struct AngledPoint
-	{
-		AngledPoint(Vector2D coords, float angle, PointSide side) : coords(coords), angle(angle), side(side) {}
-		Vector2D coords;
-		float angle;
-		PointSide side;
-	};
-
 	// caches that can be reused
 	struct Caches
 	{
-		std::vector<Vector2D> hullPoints;
-		std::vector<SimpleBorder> borders;
-		std::vector<AngledPoint> pointsToTrace;
+		std::vector<AngledBorder> bordersToTrace;
 	};
 
 private:
-	static void AddPotentiallyVisiblePoint(bool isVisible, bool isPreviousVisible, const Vector2D& a, std::vector<AngledPoint>& pointsToTrace);
-	static bool LessPointAngle(const AngledPoint& a, const AngledPoint& b);
+	[[nodiscard]] std::tuple<size_t, Vector2D> getNextClosestBorderFromCandidates(const std::vector<size_t>& potentialContinuations, const AngledBorder& closestBorder, float maxExtent) const;
 
 private:
 	Caches mCaches;

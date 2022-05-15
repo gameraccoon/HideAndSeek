@@ -1,2 +1,2 @@
 case {enum_name}::{enum_value}:
-			return "{enum_value}";{delim_endl}{delim_tab}{delim_tab}
+			return STR_TO_ID("{enum_value}");{delim_endl}{delim_tab}{delim_tab}

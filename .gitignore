@@ -6,6 +6,10 @@ cmake_install.cmake
 # generated binaries
 *.exe
 
+# optional level data
+*.lbg.json
+*.pbg.json
+
 # vs files
 *.user
 *.sdf
@@ -24,6 +28,9 @@ cmake_install.cmake
 *.generated.cpp
 *.generated.h
 
+# jetbrains ide files
+.idea/
+
 # other
 *.log
 log.txt
@@ -36,3 +43,4 @@ log.txt
 /bin
 /build
 __pycache__
+/cmake-build-*

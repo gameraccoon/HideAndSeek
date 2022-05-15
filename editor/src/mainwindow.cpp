@@ -2,21 +2,24 @@
 #include "ui_mainwindow.h"
 
 #include "src/componenteditcontent/componentcontentfactory.h"
-#include "src/componenteditcontent/componentregistration.h"
 
 #include "src/editorcommands/addentitycommand.h"
+#include "src/editorcommands/addspatialentitycommand.h"
+#include "src/editorutils/worldsaveutils.h"
 
 #include "DockManager.h"
 #include "DockWidget.h"
 #include "DockAreaWidget.h"
 
+#include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
+#include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 #include "GameData/World.h"
+
 #include "Utils/World/GameDataLoader.h"
 
 #include "toolboxes/ComponentAttributesToolbox.h"
 #include "toolboxes/ComponentsListToolbox.h"
 #include "toolboxes/EntitiesListToolbox.h"
-#include "toolboxes/WorldPropertiesToolbox.h"
 #include "toolboxes/PrefabListToolbox.h"
 #include "toolboxes/TransformEditorToolbox.h"
 
@@ -25,7 +28,7 @@
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
-	, ui(new Ui::mainwindow)
+	, ui(HS_NEW Ui::mainwindow)
 {
 	ui->setupUi(this);
 
@@ -38,6 +41,8 @@ MainWindow::MainWindow(QWidget* parent)
 	fillWindowContent();
 
 	initActions();
+
+	bindEvents();
 }
 
 MainWindow::~MainWindow()
@@ -47,16 +52,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::registerFactories()
 {
-	ComponentRegistration::RegisterComponentFactory(mComponentFactory);
+	ComponentsRegistration::RegisterComponents(mComponentFactory);
+	ComponentsRegistration::RegisterJsonSerializers(mComponentSerializationHolder);
 	mComponentContentFactory.registerComponents();
 }
 
 void MainWindow::initCommandStack()
 {
-	mCommandStack.bindFunctionToCommandChange([this](EditorCommand::EffectType effect, bool originalCall, bool forceUpdateLayout)
+	mCommandStack.bindFunctionToCommandChange([this](EditorCommand::EffectBitset effects, bool originalCall)
 	{
 		this->updateUndoRedo();
-		OnCommandEffectApplied.broadcast(effect, originalCall, forceUpdateLayout);
+		OnCommandEffectApplied.broadcast(effects, originalCall);
 	});
 
 	updateUndoRedo();
@@ -65,27 +71,27 @@ void MainWindow::initCommandStack()
 void MainWindow::initToolboxes()
 {
 	mDockManager = std::make_unique<ads::CDockManager>(this);
-	mEntitiesListToolbox = std::make_unique<EntitiesListToolbox>(this, mDockManager.get());
-	mComponentAttributesToolbox = std::make_unique<ComponentAttributesToolbox>(this, mDockManager.get());
-	mComponentsListToolbox = std::make_unique<ComponentsListToolbox>(this, mDockManager.get());
-	mWorldPropertiesToolbox = std::make_unique<WorldPropertiesToolbox>(this, mDockManager.get());
-	mPrefabListToolbox = std::make_unique<PrefabListToolbox>(this, mDockManager.get());
 	mTransformEditorToolbox = std::make_unique<TransformEditorToolbox>(this, mDockManager.get());
+	mComponentsListToolbox = std::make_unique<ComponentsListToolbox>(this, mDockManager.get());
+	mComponentAttributesToolbox = std::make_unique<ComponentAttributesToolbox>(this, mDockManager.get());
+	mEntitiesListToolbox = std::make_unique<EntitiesListToolbox>(this, mDockManager.get());
+	mPrefabListToolbox = std::make_unique<PrefabListToolbox>(this, mDockManager.get());
 }
 
 void MainWindow::fillWindowContent()
 {
-	mEntitiesListToolbox->show();
+	mTransformEditorToolbox->show();
 	mComponentsListToolbox->show();
 	mComponentAttributesToolbox->show();
-	mTransformEditorToolbox->show();
 }
 
 void MainWindow::createWorld()
 {
-	mCurrentWorld = std::make_unique<World>();
+	mCurrentWorld = std::make_unique<World>(mComponentFactory, mEntityGenerator);
 	mCommandStack.clear();
 	ui->actionRun_Game->setEnabled(true);
+	ui->actionSave_World->setEnabled(true);
+	ui->actionSave_World_As->setEnabled(true);
 }
 
 void MainWindow::updateUndoRedo()
@@ -101,6 +107,26 @@ void MainWindow::initActions()
 	connect(ui->actionLoad_Prefab_Library, &QAction::triggered, this, &MainWindow::actionLoadPrefabLibraryTriggered);
 	connect(ui->actionSave_Prefab_Library, &QAction::triggered, this, &MainWindow::actionSavePrefabLibraryTriggered);
 	connect(ui->actionSave_Prefab_Library_As, &QAction::triggered, this, &MainWindow::actionSavePrefabLibraryAsTriggered);
+}
+
+void MainWindow::bindEvents()
+{
+	// on selected entity change broadcast selected component source change automatically
+	OnSelectedEntityChanged.bind([this](const std::optional<EntityReference>& ref)
+	{
+		if (ref.has_value())
+		{
+			ComponentSourceReference componentSourceReference;
+			componentSourceReference.entity = ref->entity;
+			componentSourceReference.cellPos = ref->cellPos;
+			componentSourceReference.isWorld = true;
+			OnSelectedComponentSourceChanged.broadcast(componentSourceReference);
+		}
+		else
+		{
+			OnSelectedComponentSourceChanged.broadcast(std::nullopt);
+		}
+	});
 }
 
 void MainWindow::actionPrefabsTriggered()
@@ -148,8 +174,8 @@ void MainWindow::on_actionNew_World_triggered()
 {
 	createWorld();
 	mOpenedWorldPath.clear();
-	ui->actionSave_World->setEnabled(false);
 	ui->actionCreate->setEnabled(true);
+	ui->actionCreate_Spatial->setEnabled(true);
 
 	OnWorldChanged.broadcast();
 }
@@ -165,10 +191,10 @@ void MainWindow::on_actionOpen_World_triggered()
 	}
 
 	createWorld();
-	GameDataLoader::LoadWorld(*mCurrentWorld.get(), fileName, mComponentFactory);
+	GameDataLoader::LoadWorld(*mCurrentWorld.get(), fileName, mComponentSerializationHolder);
 	mOpenedWorldPath = fileName;
-	ui->actionSave_World->setEnabled(true);
 	ui->actionCreate->setEnabled(true);
+	ui->actionCreate_Spatial->setEnabled(true);
 
 	OnWorldChanged.broadcast();
 }
@@ -183,9 +209,8 @@ void MainWindow::on_actionSave_World_As_triggered()
 		return;
 	}
 
-	GameDataLoader::SaveWorld(*mCurrentWorld.get(), fileName, mComponentFactory);
+	Utils::SaveWorld(*mCurrentWorld.get(), fileName, mComponentSerializationHolder);
 	mOpenedWorldPath = fileName;
-	ui->actionSave_World->setEnabled(true);
 }
 
 void MainWindow::on_actionSave_World_triggered()
@@ -195,7 +220,13 @@ void MainWindow::on_actionSave_World_triggered()
 		return;
 	}
 
-	GameDataLoader::SaveWorld(*mCurrentWorld.get(), mOpenedWorldPath, mComponentFactory);
+	if (mOpenedWorldPath.empty())
+	{
+		on_actionSave_World_As_triggered();
+		return;
+	}
+
+	Utils::SaveWorld(*mCurrentWorld.get(), mOpenedWorldPath, mComponentSerializationHolder);
 }
 
 void MainWindow::on_actionRun_Game_triggered()
@@ -205,7 +236,7 @@ void MainWindow::on_actionRun_Game_triggered()
 		QDir().mkdir("./tmp");
 	}
 	static std::string tempWorldName = "./tmp/temp-editor-world.json";
-	GameDataLoader::SaveWorld(*mCurrentWorld.get(), tempWorldName, mComponentFactory);
+	Utils::SaveWorld(*mCurrentWorld.get(), tempWorldName, mComponentSerializationHolder);
 	QProcess::startDetached("./GameMain", {"--world", QString::fromStdString(tempWorldName)});
 }
 
@@ -229,7 +260,8 @@ void MainWindow::on_actionCreate_triggered()
 {
 	if (mCurrentWorld)
 	{
-		mCommandStack.executeNewCommand<AddEntityCommand>(mCurrentWorld.get(), mCurrentWorld->getEntityManager().getNonExistentEntity());
+		EntityManager& worldEntityManager = mCurrentWorld->getEntityManager();
+		mCommandStack.executeNewCommand<AddEntityCommand>(mCurrentWorld.get(), worldEntityManager.generateNewEntityUnsafe());
 	}
 }
 
@@ -248,12 +280,29 @@ void MainWindow::on_actionComponent_Properties_triggered()
 	mComponentAttributesToolbox->show();
 }
 
-void MainWindow::on_actionWorld_Settings_triggered()
-{
-	mWorldPropertiesToolbox->show();
-}
-
 void MainWindow::on_actionTransform_Editor_triggered()
 {
 	mTransformEditorToolbox->show();
+}
+
+void MainWindow::on_actionEdit_Components_triggered()
+{
+	ComponentSourceReference source;
+	source.isWorld = true;
+	OnSelectedComponentSourceChanged.broadcast(source);
+}
+
+void MainWindow::on_actionCreate_Spatial_triggered()
+{
+	if (mCurrentWorld)
+	{
+		EntityManager& worldEntityManager = mCurrentWorld->getEntityManager();
+		SpatialEntity entity{worldEntityManager.generateNewEntityUnsafe(), CellPos(0, 0)};
+		Vector2D location{ZERO_VECTOR};
+		if (mTransformEditorToolbox->isShown())
+		{
+			 std::tie(entity.cell, location) = mTransformEditorToolbox->getWidgetCenterWorldPosition();
+		}
+		mCommandStack.executeNewCommand<AddSpatialEntityCommand>(mCurrentWorld.get(), entity, location);
+	}
 }

@@ -1,264 +1,277 @@
+#include "Base/precomp.h"
+
 #include "Utils/Geometry/VisibilityPolygon.h"
 
 #include <algorithm>
+#include <ranges>
 
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
+#include "Base/Math/Float.h"
 
-#include "Utils/Math.h"
-#include "Utils/Geometry/RayTrace.h"
+#include "GameData/Components/LightBlockingGeometryComponent.generated.h"
+#include "GameData/Spatial/SpatialWorldData.h"
+
 #include "Utils/Geometry/Collide.h"
 
-static float CalcClockwiseDirection(const Vector2D &a, const Vector2D &b)
+static float CalcClockwiseDirection(const Vector2D& a, const Vector2D& b)
 {
 	return a.x * (b.y - a.y) - a.y * (b.x - a.x);
 }
 
-bool VisibilityPolygonCalculator::LessPointAngle(const AngledPoint& a, const AngledPoint& b)
+static bool LessPointAngle(const VisibilityPolygonCalculator::AngledBorder& a, const VisibilityPolygonCalculator::AngledBorder& b)
 {
-	return a.angle < b.angle;
+	return a.angleA < b.angleA;
 }
 
 static bool NormalizePoint(Vector2D& point, const Vector2D& pair, float left, float right, float top, float bottom)
 {
 	if (point.x < left)
 	{
-		point = pair + abs((left - pair.x)/(point.x - pair.x)) * (point-pair);
+		point = pair + std::fabs((left - pair.x)/(point.x - pair.x)) * (point-pair);
 		return true;
 	}
 	else if (point.x > right)
 	{
-		point = pair + abs((pair.x - right)/(pair.x - point.x)) * (point-pair);
+		point = pair + std::fabs((pair.x - right)/(pair.x - point.x)) * (point-pair);
 		return true;
 	}
 
 	if (point.y < top)
 	{
-		point = pair + abs((top - pair.y)/(point.y - pair.y)) * (point-pair);
+		point = pair + std::fabs((top - pair.y)/(point.y - pair.y)) * (point-pair);
 		return true;
 	}
 	else if (point.y > bottom)
 	{
-		point = pair + abs((pair.y - bottom)/(pair.y - point.y)) * (point-pair);
+		point = pair + std::fabs((pair.y - bottom)/(pair.y - point.y)) * (point-pair);
 		return true;
 	}
 	return false;
 }
 
-void VisibilityPolygonCalculator::AddPotentiallyVisiblePoint(bool isVisible, bool isPreviousVisible, const Vector2D& a, std::vector<AngledPoint>& pointsToTrace)
+static void FilterOutPotentialContinuations(std::vector<size_t>& outPotentialContinuations, std::vector<VisibilityPolygonCalculator::AngledBorder>& boardersToTrace, float maxAngle)
 {
-	if (isVisible)
-	{
-		if (isPreviousVisible)
+	// filter out the continuations that are not longer stick out of the end of the closest border
+	std::erase_if(
+		outPotentialContinuations,
+		[&boardersToTrace, maxAngle](size_t idx)
 		{
-			pointsToTrace.emplace_back(a, a.rotation().getValue(), PointSide::InBetween);
+			return (Rotator::NormalizeRawAngle(maxAngle - boardersToTrace[idx].angleB) >= 0.0f);
 		}
-		else
-		{
-			pointsToTrace.emplace_back(a, a.rotation().getValue(), PointSide::Right);
-		}
-	}
-	else
-	{
-		if (isPreviousVisible)
-		{
-			pointsToTrace.emplace_back(a, a.rotation().getValue(), PointSide::Left);
-		}
-	}
+	);
 }
 
-void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<std::tuple<CollisionComponent*, TransformComponent*>>& components, const Vector2D& sourcePos, const Vector2D& polygonMaxSize)
+std::tuple<size_t, Vector2D> VisibilityPolygonCalculator::getNextClosestBorderFromCandidates(const std::vector<size_t>& potentialContinuations, const AngledBorder& closestBorder, float maxExtent) const
+{
+	float closestBorderQDist = std::numeric_limits<float>::max();
+	Vector2D closestIntersectionPoint{};
+	size_t closestBorderIdx;
+	Vector2D raytraceCoordinate = closestBorder.coords.b.unit() * (maxExtent + 10.0f);
+	for (size_t idx : potentialContinuations)
+	{
+		const AngledBorder& potentialContinuation = mCaches.bordersToTrace[idx];
+		Vector2D intersectionPoint = Collide::GetPointIntersect2Lines(potentialContinuation.coords.a, potentialContinuation.coords.b, ZERO_VECTOR, raytraceCoordinate);
+		float intersectionQDist = intersectionPoint.qSize();
+		if (intersectionQDist < closestBorderQDist)
+		{
+			closestBorderQDist = intersectionQDist;
+			closestBorderIdx = idx;
+			closestIntersectionPoint = intersectionPoint;
+		}
+	}
+	return std::make_tuple(closestBorderIdx, closestIntersectionPoint);
+}
+
+void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<const LightBlockingGeometryComponent*>& components, Vector2D sourcePos, Vector2D polygonMaxSize)
 {
 	outVisibilityPolygon.clear();
 
-	mCaches.borders.clear();
-	mCaches.borders.reserve(components.size() * 4 + 4);
-	mCaches.pointsToTrace.clear();
-	mCaches.pointsToTrace.reserve(components.size() * 4 + 4);
+	mCaches.bordersToTrace.clear();
+	mCaches.bordersToTrace.reserve(components.size() * 4 + 4);
+
+	const float maxExtent = std::max(polygonMaxSize.x, polygonMaxSize.y);
 
 	// populate the borders of visible area
-	float left = -polygonMaxSize.x * 0.5f;
-	float right = polygonMaxSize.x * 0.5f;
-	float top = -polygonMaxSize.y * 0.5f;
-	float bottom = polygonMaxSize.y * 0.5f;
-	Vector2D leftTop(left, top);
-	Vector2D rightTop(right, top);
-	Vector2D rightBottom(right, bottom);
-	Vector2D leftBottom(left, bottom);
-	mCaches.pointsToTrace.emplace_back(leftTop, leftTop.rotation().getValue(), PointSide::InBetween);
-	mCaches.pointsToTrace.emplace_back(rightTop, rightTop.rotation().getValue(), PointSide::InBetween);
-	mCaches.pointsToTrace.emplace_back(rightBottom, rightBottom.rotation().getValue(), PointSide::InBetween);
-	mCaches.pointsToTrace.emplace_back(leftBottom, leftBottom.rotation().getValue(), PointSide::InBetween);
-	mCaches.borders.emplace_back(leftTop, rightTop);
-	mCaches.borders.emplace_back(rightTop, rightBottom);
-	mCaches.borders.emplace_back(rightBottom, leftBottom);
-	mCaches.borders.emplace_back(leftBottom, leftTop);
+	const float left = -polygonMaxSize.x * 0.5f;
+	const float right = polygonMaxSize.x * 0.5f;
+	const float top = -polygonMaxSize.y * 0.5f;
+	const float bottom = polygonMaxSize.y * 0.5f;
+	const Vector2D leftTop(left, top);
+	const Vector2D rightTop(right, top);
+	const Vector2D rightBottom(right, bottom);
+	const Vector2D leftBottom(left, bottom);
+	const Vector2D startTrace(left * 1.1f, 0.0f);
+	mCaches.bordersToTrace.emplace_back(leftTop, rightTop);
+	mCaches.bordersToTrace.emplace_back(rightTop, rightBottom);
+	mCaches.bordersToTrace.emplace_back(rightBottom, leftBottom);
+	mCaches.bordersToTrace.emplace_back(leftBottom, leftTop);
 
-	// find borders that facing the light source and their points
-	for (const auto& [collision, transform] : components)
+	// find borders that facing the light source and their points inside the limits
+	for (const LightBlockingGeometryComponent* lightBlockingGeometry : components)
 	{
-		Vector2D shift = transform->getLocation() - sourcePos;
-		const Hull& hull = collision->getGeometry();
-		bool isPreviousVisible = false;
-		bool isNotFirst = false;
-		bool isFirstVisible = false;
-		// copy to be able to modify
-		mCaches.hullPoints.resize(hull.points.size());
-		std::copy(hull.points.begin(), hull.points.end(), mCaches.hullPoints.begin());
-		//outCaches.hullPoints = hull.points;
-		size_t hullSize = hull.points.size();
-		for (size_t i = 0; i < hullSize; ++i)
+		for (SimpleBorder border : lightBlockingGeometry->getBorders())
 		{
-			size_t j = (i < hullSize - 1) ? (i+1) : 0;
-			Vector2D a = mCaches.hullPoints[i] + shift;
-			Vector2D b = mCaches.hullPoints[j] + shift;
+			border.a -= sourcePos;
+			border.b -= sourcePos;
+
 			// keep only borders inside the draw area and facing the light source
-			bool isVisible = ((a.x > left && a.x < right && a.y > top && a.y < bottom)
-							  || (b.x > left && b.x < right && b.y > top && b.y < bottom)
-							  ) && CalcClockwiseDirection(a, b) < 0.0f;
+			bool isVisible = (
+				(border.a.x > left && border.a.x < right && border.a.y > top && border.a.y < bottom)
+				|| (border.b.x > left && border.b.x < right && border.b.y > top && border.b.y < bottom)
+			) && CalcClockwiseDirection(border.a, border.b) < 0.0f;
 
 			if (isVisible)
 			{
-				if (NormalizePoint(a, b, left, right, top, bottom))
-				{
-					mCaches.hullPoints[i] = a - shift;
-				}
-				if (NormalizePoint(b, a, left, right, top, bottom))
-				{
-					mCaches.hullPoints[j] = b - shift;
-				}
-				mCaches.borders.emplace_back(b, a);
-			}
+				NormalizePoint(border.a, border.b, left, right, top, bottom);
+				NormalizePoint(border.b, border.a, left, right, top, bottom);
 
-			if (isNotFirst)
-			{
-				AddPotentiallyVisiblePoint(isVisible, isPreviousVisible, a, mCaches.pointsToTrace);
+				// revert border points so they go clockwise
+				mCaches.bordersToTrace.emplace_back(border.b, border.a);
 			}
-			else
-			{
-				isFirstVisible = isVisible;
-				isNotFirst = true;
-			}
-			isPreviousVisible = isVisible;
-		}
-
-		if (mCaches.hullPoints.size() > 1)
-		{
-			Vector2D a = mCaches.hullPoints[0] + shift;
-			AddPotentiallyVisiblePoint(isFirstVisible, isPreviousVisible, a, mCaches.pointsToTrace);
 		}
 	}
 
-	if (mCaches.borders.size() == 0)
+	if (mCaches.bordersToTrace.empty())
 	{
 		return;
 	}
 
-	// sort points that we can iterate over them in clockwise order
-	std::sort(mCaches.pointsToTrace.begin(), mCaches.pointsToTrace.end(), LessPointAngle);
+	// sort the borders so we can iterate over them in clockwise order
+	std::ranges::sort(mCaches.bordersToTrace, LessPointAngle);
 
-	// fix a corner case with two or more points have exact same angles
-	for (size_t i = 1; i < mCaches.pointsToTrace.size();)
+	size_t closestBorderIdx = 0;
+	std::vector<size_t> potentialContinuations;
+
+	// preparation loop
 	{
-		const AngledPoint& item = mCaches.pointsToTrace[i];
-		const AngledPoint& previousItem = mCaches.pointsToTrace[i - 1];
-		// the problem is present only if the angles are exactly equal
-		if (item.angle != previousItem.angle)
+		float closestBorderQDist = std::numeric_limits<float>::max();
+		for (size_t i = 1; i < mCaches.bordersToTrace.size(); ++i)
 		{
-			++i;
-		}
-		else
-		{
-			if (item.coords.qSize() > previousItem.coords.qSize())
+			const AngledBorder& item = mCaches.bordersToTrace[i];
+			const AngledBorder& previousItem = mCaches.bordersToTrace[i - 1];
+
+			size_t processedItemIdx = i;
+
+			// fix a corner case with two or more points have the exact same angle
+			// the problem is present only if the angles are exactly equal (not nearly equal)
+			if (item.angleA == previousItem.angleA)
 			{
-				if (previousItem.side == PointSide::InBetween)
+				// if the next border is closer than the previous one, swap them
+				if (item.coords.a.qSize() < previousItem.coords.a.qSize())
 				{
-					mCaches.pointsToTrace.erase(mCaches.pointsToTrace.begin() + static_cast<int>(i));
-				}
-				else
-				{
-					if (previousItem.side == PointSide::Left)
-					{
-						std::iter_swap(mCaches.pointsToTrace.begin() + static_cast<int>(i), mCaches.pointsToTrace.begin() + static_cast<int>(i - 1));
-					}
-					++i;
+					std::iter_swap(mCaches.bordersToTrace.begin() + static_cast<int>(i), mCaches.bordersToTrace.begin() + static_cast<int>(i - 1));
+					processedItemIdx = i - 1;
 				}
 			}
-			else
+
+			// find the closest border for the zero angle and potential next borders
+			const AngledBorder& processedItem = mCaches.bordersToTrace[processedItemIdx];
+			if (Collide::AreLinesIntersect(processedItem.coords.a, processedItem.coords.b, ZERO_VECTOR, startTrace))
 			{
-				if (item.side == PointSide::InBetween)
+				float intersectionQDist = Collide::GetPointIntersect2Lines(processedItem.coords.a, processedItem.coords.b, ZERO_VECTOR, startTrace).qSize();
+				if (intersectionQDist < closestBorderQDist)
 				{
-					mCaches.pointsToTrace.erase(mCaches.pointsToTrace.begin() + static_cast<int>(i - 1));
+					closestBorderQDist = intersectionQDist;
+					closestBorderIdx = processedItemIdx;
 				}
-				else
-				{
-					if (previousItem.side == PointSide::Right)
-					{
-						std::iter_swap(mCaches.pointsToTrace.begin() + static_cast<int>(i), mCaches.pointsToTrace.begin() + static_cast<int>(i - 1));
-					}
-					++i;
-				}
+				potentialContinuations.push_back(processedItemIdx);
 			}
 		}
 	}
 
+	FilterOutPotentialContinuations(potentialContinuations, mCaches.bordersToTrace, mCaches.bordersToTrace[closestBorderIdx].angleB);
+
 	// calculate visibility polygon
-	Vector2D nearestPoint;
-	for (AngledPoint& point : mCaches.pointsToTrace)
+	for (size_t i = 0, iSize = mCaches.bordersToTrace.size(); i < iSize; ++i)
 	{
-		nearestPoint = point.coords;
-		bool notFound = true;
-		bool needToSkip = false;
-		for (SimpleBorder& border : mCaches.borders)
+		AngledBorder& border = mCaches.bordersToTrace[i];
+		AngledBorder& closestBorder = mCaches.bordersToTrace[closestBorderIdx];
+
+		// if this border is outside of the angles of the closest border
+		if (Rotator::NormalizeRawAngle(closestBorder.angleB - border.angleA) <= 0.0f)
 		{
-			if (CalcClockwiseDirection(border.a, point.coords) > 0.0f
-				&&
-				CalcClockwiseDirection(point.coords, border.b) > 0.0f)
+			// if this border is a continuation of the closest border
+			if (closestBorder.coords.b.isNearlyEqualTo(border.coords.a))
 			{
-				if (Collide::SignedArea(border.a, border.b, point.coords) < 0.0f)
+				outVisibilityPolygon.push_back(border.coords.a);
+				closestBorderIdx = i;
+			}
+			else
+			{
+				outVisibilityPolygon.push_back(closestBorder.coords.b);
+				if (!potentialContinuations.empty())
 				{
-					// this point is hidden behind some obstacle
-					needToSkip = true;
-					break;
-				}
+					// find the best candidate to cast the shadow to
+					Vector2D closestIntersectionPoint;
+					std::tie(closestBorderIdx, closestIntersectionPoint) = getNextClosestBorderFromCandidates(
+						potentialContinuations, closestBorder, maxExtent);
 
-				if (point.side == PointSide::InBetween)
-				{
-					// don't trace through in-between points
-					continue;
+					outVisibilityPolygon.push_back(closestIntersectionPoint);
 				}
-
-				Vector2D intersectPoint = RayTrace::GetPointIntersect2Lines(border.a, border.b, ZERO_VECTOR, point.coords);
-				if (notFound || intersectPoint.qSize() < nearestPoint.qSize())
+				else
 				{
-					nearestPoint = intersectPoint;
-					notFound = false;
+					// special case when the new border has the same begin angle as the old one
+					// but they end/begin are not on the same point
+					// use this border as continuation
+					closestBorderIdx = i;
+					outVisibilityPolygon.push_back(border.coords.a);
 				}
 			}
-		}
 
-		if (needToSkip)
-		{
+			FilterOutPotentialContinuations(potentialContinuations, mCaches.bordersToTrace, mCaches.bordersToTrace[closestBorderIdx].angleB);
+
+			// process this point again if we jumped to some other border
+			if (closestBorderIdx != i)
+			{
+				--i;
+			}
 			continue;
 		}
 
-		// add point (and optionally its casted shadow) to the polygon
-		if (nearestPoint != point.coords)
+		// if the first point is behind the closest border
+		if (Collide::SignedArea(closestBorder.coords.a, closestBorder.coords.b, border.coords.a) < 0.0f)
 		{
-			if (point.side == PointSide::Left)
+			// if its end sticks out of the end of the closest border
+			if (Rotator::NormalizeRawAngle(closestBorder.angleB - border.angleB) < 0.0f)
 			{
-				outVisibilityPolygon.push_back(nearestPoint);
-				outVisibilityPolygon.push_back(point.coords);
+				potentialContinuations.push_back(i);
 			}
-			else if (point.side == PointSide::Right)
-			{
-				outVisibilityPolygon.push_back(point.coords);
-				outVisibilityPolygon.push_back(nearestPoint);
-			}
+			continue;
 		}
-		else
+
+		// if the first point is closer than the closest border
+		// calculate the intersection point to cast the shadow
+		Vector2D intersectPoint = Collide::GetPointIntersect2Lines(closestBorder.coords.a, closestBorder.coords.b, ZERO_VECTOR, border.coords.a);
+
+		if (!intersectPoint.isNearlyEqualTo(border.coords.a))
 		{
-			outVisibilityPolygon.push_back(point.coords);
+			outVisibilityPolygon.push_back(intersectPoint);
 		}
+		outVisibilityPolygon.push_back(border.coords.a);
+
+		// the old "closest" border can still stick out of our new "closest" border
+		// so keep it in the list (will be filtered later if its end is not really sticking out)
+		potentialContinuations.push_back(closestBorderIdx);
+
+		closestBorderIdx = i;
+
+		FilterOutPotentialContinuations(potentialContinuations, mCaches.bordersToTrace, mCaches.bordersToTrace[closestBorderIdx].angleB);
+	}
+
+	// process the potential continuations that have left
+	Vector2D closestIntersectionPoint;
+	while (!potentialContinuations.empty())
+	{
+		// if this border goes to the beginning of the, it means we're done with the polygon
+		if (Rotator::NormalizeRawAngle(Rotator::MinValue - mCaches.bordersToTrace[closestBorderIdx].angleB) < 0.0f)
+		{
+			break;
+		}
+
+		AngledBorder& closestBorder = mCaches.bordersToTrace[closestBorderIdx];
+		outVisibilityPolygon.push_back(closestBorder.coords.b);
+		std::tie(closestBorderIdx, closestIntersectionPoint) = getNextClosestBorderFromCandidates(
+			potentialContinuations, closestBorder, maxExtent);
+		outVisibilityPolygon.push_back(closestIntersectionPoint);
+		FilterOutPotentialContinuations(potentialContinuations, mCaches.bordersToTrace, mCaches.bordersToTrace[closestBorderIdx].angleB);
 	}
 }

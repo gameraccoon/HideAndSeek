@@ -1,9 +1,15 @@
 [submodule "editor/Qt-Advanced-Docking-System"]
 	path = editor/Qt-Advanced-Docking-System
 	url = git@github.com:gameraccoon/Qt-Advanced-Docking-System.git
-[submodule "external/sources/recastnavigation"]
-	path = external/sources/recastnavigation
-	url = git@github.com:recastnavigation/recastnavigation.git
-[submodule "external/sources/SDL_FontCache"]
-	path = external/sources/SDL_FontCache
-	url = https://github.com/grimfang4/SDL_FontCache.git
+[submodule "external/sources/imgui"]
+	path = external/sources/imgui
+	url = git@github.com:ocornut/imgui.git
+[submodule "external/sources/soa-sort"]
+	path = external/sources/soa-sort
+	url = git@github.com:gameraccoon/soa-sort.git
+[submodule "external/include/raccoon-ecs"]
+	path = external/include/raccoon-ecs
+	url = git@github.com:gameraccoon/raccoon-ecs.git
+[submodule "external/sources/cameron314/concurrentqueue"]
+	path = external/include/cameron314/concurrentqueue
+	url = git@github.com:gameraccoon/concurrentqueue.git

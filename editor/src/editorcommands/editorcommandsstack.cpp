@@ -1,36 +1,40 @@
 #include "editorcommandsstack.h"
 
 
-bool EditorCommandsStack::undo(World* world)
+void EditorCommandsStack::undo(World* world)
 {
 	if (haveSomethingToUndo())
 	{
-		bool forceUpdateLayout = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->undoCommand(world);
-		EditorCommand::EffectType effect = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffectType();
+		mCommands[static_cast<size_t>(mCurrentHeadIndex)]->undoCommand(world);
+		EditorCommand::EffectBitset effects = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffects();
 		--mCurrentHeadIndex;
+
+		mLastExecutedCommandIdx = mCurrentHeadIndex;
+		mIsLastExecutedUndo = true;
 
 		if (mChangeHandler)
 		{
-			mChangeHandler(effect, false, forceUpdateLayout);
+			mChangeHandler(effects, false);
 		}
 	}
-	return false;
 }
 
-bool EditorCommandsStack::redo(World* world)
+void EditorCommandsStack::redo(World* world)
 {
 	if (haveSomethingToRedo())
 	{
 		++mCurrentHeadIndex;
-		bool forceUpdateLayout = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->doCommand(world);
-		EditorCommand::EffectType effect = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffectType();
+		mCommands[static_cast<size_t>(mCurrentHeadIndex)]->doCommand(world);
+		EditorCommand::EffectBitset effects = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffects();
+
+		mLastExecutedCommandIdx = mCurrentHeadIndex;
+		mIsLastExecutedUndo = false;
 
 		if (mChangeHandler)
 		{
-			mChangeHandler(effect, false, forceUpdateLayout);
+			mChangeHandler(effects, false);
 		}
 	}
-	return false;
 }
 
 bool EditorCommandsStack::haveSomethingToUndo() const
@@ -54,6 +58,23 @@ void EditorCommandsStack::bindFunctionToCommandChange(OnChangeFn handler)
 	mChangeHandler = handler;
 }
 
+std::weak_ptr<const EditorCommand> EditorCommandsStack::getLastExecutedCommand() const
+{
+	if (mLastExecutedCommandIdx >= 0 && mLastExecutedCommandIdx < static_cast<int>(mCommands.size()))
+	{
+		return mCommands[mLastExecutedCommandIdx];
+	}
+	else
+	{
+		return std::weak_ptr<const EditorCommand>();
+	}
+}
+
+bool EditorCommandsStack::isLastExecutedUndo() const
+{
+	return mIsLastExecutedUndo;
+}
+
 void EditorCommandsStack::clearOldCommands()
 {
 	mCommands.erase(mCommands.begin(), mCommands.begin() + mClearLag);
@@ -66,6 +87,6 @@ void EditorCommandsStack::clearOldCommands()
 
 	if (mChangeHandler)
 	{
-		mChangeHandler(EditorCommand::EffectType::CommandsStack, false, false);
+		mChangeHandler(EditorCommand::EffectBitset(EditorCommand::EffectType::CommandStack), false);
 	}
 }

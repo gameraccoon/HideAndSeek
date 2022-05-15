@@ -7,12 +7,9 @@
 
 #include "abstracteditfactory.h"
 
-class ComponentFactory;
-
 namespace ComponentRegistration
 {
-	void RegisterToEditFactory(std::map<std::string, std::unique_ptr<AbstractEditFactory>>& factories);
-	void RegisterComponentFactory(ComponentFactory& factory);
+	void RegisterToEditFactory(std::map<StringId, std::unique_ptr<AbstractEditFactory>>& factories);
 }
 
 #endif // COMPONENTREGISTRATION_H

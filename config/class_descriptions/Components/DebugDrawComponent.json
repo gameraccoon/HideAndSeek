@@ -1,0 +1,24 @@
+{
+	"component": "debugDraw",
+	"description": "Component that stores information about debug primitives that should be drawn",
+	"attributes": [
+		{
+			"name": "worldPoints",
+			"type": "std::vector<DebugDrawWorldPoint>",
+			"includes": ["\"GameData/Debug/DebugDrawPrimitives.h\"", "<vector>"],
+			"flags": ["transient", "get_by_ref"]
+		},
+		{
+			"name": "screenPoints",
+			"type": "std::vector<DebugDrawScreenPoint>",
+			"includes": ["\"GameData/Debug/DebugDrawPrimitives.h\"", "<vector>"],
+			"flags": ["transient", "get_by_ref"]
+		},
+		{
+			"name": "worldLineSegments",
+			"type": "std::vector<DebugDrawWorldLineSegment>",
+			"includes": ["\"GameData/Debug/DebugDrawPrimitives.h\"", "<vector>"],
+			"flags": ["transient", "get_by_ref"]
+		}
+	]
+}

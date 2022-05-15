@@ -1,2 +1,2 @@
-if (value == "{enum_value}")
+if (value == STR_TO_ID("{enum_value}"))
 		return {enum_name}::{enum_value};{delim_endl}{delim_tab}

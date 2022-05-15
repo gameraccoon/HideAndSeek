@@ -1,0 +1,13 @@
+#include "Base/precomp.h"
+
+#include "GameLogic/Imgui/ComponentInspector/ComponentWidgetsRegistration.h"
+
+{imgui/component_inspector_window_includes}
+
+namespace ComponentWidgetsRegistration
+{{
+	void RegisterInspectWidgets(std::map<StringId, std::unique_ptr<AbstractComponentImguiWidget>>& componentInspectWidgets)
+	{{
+		{imgui/component_inspector_window_register}
+	}}
+}}

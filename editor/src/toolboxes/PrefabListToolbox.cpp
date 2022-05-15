@@ -15,10 +15,10 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#include "ECS/ComponentFactory.h"
-#include "Debug/Log.h"
+#include <raccoon-ecs/component_factory.h>
 
-#include "src/editorcommands/removeentitycommand.h"
+#include "GameData/Serialization/Json/EntityManager.h"
+
 #include "src/editorcommands/addcomponentcommand.h"
 
 const QString PrefabListToolbox::WidgetName = "Prefabs";
@@ -51,8 +51,8 @@ void PrefabListToolbox::show()
 		}
 	}
 
-	QWidget* containerWidget = new QWidget();
-	ads::CDockWidget* dockWidget = new ads::CDockWidget(QString("Prefabs Library"));
+	QWidget* containerWidget = HS_NEW QWidget();
+	ads::CDockWidget* dockWidget = HS_NEW ads::CDockWidget(QString("Prefabs Library"));
 	dockWidget->setObjectName(ToolboxName);
 	dockWidget->setWidget(containerWidget);
 	dockWidget->setToggleViewActionMode(ads::CDockWidget::ActionModeShow);
@@ -61,9 +61,9 @@ void PrefabListToolbox::show()
 
 	containerWidget->setObjectName(ContainerName);
 
-	QVBoxLayout* layout = new QVBoxLayout();
+	QVBoxLayout* layout = HS_NEW QVBoxLayout();
 	containerWidget->setLayout(layout);
-	QListWidget* entityList = new QListWidget();
+	QListWidget* entityList = HS_NEW QListWidget();
 	layout->addWidget(entityList);
 	entityList->setObjectName(ListName);
 	entityList->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -111,19 +111,22 @@ void PrefabListToolbox::saveToFile(QString filePath)
 		filePath = mLastOpenFilePath;
 	}
 
-	try {
+	try
+	{
 		std::ofstream mapFile(filePath.toStdString());
 
 		nlohmann::json content{
 			{"prefabs", mPrefabs}
 		};
 		mapFile << std::setw(4) << content << std::endl;
-	} catch (const std::exception& e) {
+	}
+	catch (const std::exception& e)
+	{
 		LogError("Can't save level to file '%s': %s", filePath.toStdString().c_str(), e.what());
 	}
 }
 
-void PrefabListToolbox::createPrefabFromEntity(const QString &prefabName, Entity entity)
+void PrefabListToolbox::createPrefabFromEntity(const QString& prefabName, Entity entity)
 {
 	auto it = std::find_if(mPrefabs.begin(), mPrefabs.end(), [prefabName](const PrefabData& prefabData)
 	{
@@ -143,9 +146,12 @@ void PrefabListToolbox::createPrefabFromEntity(const QString &prefabName, Entity
 		return;
 	}
 
+	const auto& jsonSerializationHolder = mMainWindow->getComponentSerializationHolder();
+
 	PrefabData prefabData;
 	prefabData.name = prefabName;
-	currentWorld->getEntityManager().getPrefabFromEntity(prefabData.data, entity);
+	EntityManager& worldEntityManager = currentWorld->getEntityManager();
+	Json::GetPrefabFromEntity(worldEntityManager, prefabData.data, entity, jsonSerializationHolder);
 	mPrefabs.push_back(prefabData);
 	updateContent();
 }
@@ -259,7 +265,9 @@ void PrefabListToolbox::createInstance()
 		return;
 	}
 
-	currentWorld->getEntityManager().createPrefabInstance(it->data, mMainWindow->getComponentFactory());
+	EntityManager& worldEntityManager = currentWorld->getEntityManager();
+
+	Json::CreatePrefabInstance(worldEntityManager, it->data, mMainWindow->getComponentSerializationHolder());
 }
 
 void to_json(nlohmann::json& outJson, const PrefabListToolbox::PrefabData& data)

@@ -1,7 +1,10 @@
+#include "Base/precomp.h"
+
 #include <gtest/gtest.h>
 
 #include "sdl/SDL.h"
-#include "Debug/Assert.h"
+
+#include "UnitTests/TestAssertHelper.h"
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;
@@ -13,42 +16,27 @@ using ::testing::TestPartResult;
 using ::testing::UnitTest;
 using ::testing::Environment;
 
-namespace testing
-{
-	namespace internal
-	{
-		enum GTestColor
-		{
-			COLOR_DEFAULT,
-			COLOR_RED,
-			COLOR_GREEN,
-			COLOR_YELLOW
-		};
-
-		extern void ColoredPrintf(GTestColor color, const char* fmt, ...);
-	}
-}
-
 class SGTestingEnvironment : public Environment
 {
 public:
 
-	virtual void SetUp() override;
-	virtual void TearDown() override;
+	void SetUp() override;
+	void TearDown() override;
 };
 
 class TestInfoLogger : public EmptyTestEventListener
 {
 	// Called before a test starts
-	virtual void OnTestStart(const TestInfo& test_info);
+	void OnTestStart(const TestInfo& test_info) override;
 	// Called after a failed assertion or a SUCCEED() invocation
-	virtual void OnTestPartResult(const TestPartResult& test_part_result);
+	void OnTestPartResult(const TestPartResult& test_part_result) override;
 	// Called after a test ends
-	virtual void OnTestEnd(const TestInfo& test_info);
+	void OnTestEnd(const TestInfo& test_info) override;
 };
 
 void SGTestingEnvironment::SetUp()
 {
+	EnableFailOnAssert();
 }
 
 void SGTestingEnvironment::TearDown()
@@ -56,9 +44,9 @@ void SGTestingEnvironment::TearDown()
 }
 
 // Called before a test starts.
-void TestInfoLogger::OnTestStart(const TestInfo& test_info)
+void TestInfoLogger::OnTestStart(const TestInfo& /*test_info*/)
 {
-	LogInfo("======= Test %s.%s starting.", test_info.test_case_name(), test_info.name());
+//	LogInfo("======= Test %s.%s starting.", test_info.test_case_name(), test_info.name());
 }
 
 // Called after a failed assertion or a SUCCEED() invocation.
@@ -73,19 +61,20 @@ void TestInfoLogger::OnTestPartResult(const TestPartResult& test_part_result)
 // Called after a test ends.
 void TestInfoLogger::OnTestEnd(const TestInfo& /*test_info*/)
 {
-	//LogInfo("======= Test %s.%s ending.", test_info.test_case_name(), test_info.name());
+//	LogInfo("======= Test %s.%s ending.", test_info.test_case_name(), test_info.name());
+	EnableFailOnAssert();
 }
 
 int main(int argc, char* argv[])
 {
 	InitGoogleTest(&argc, argv);
 
-	AddGlobalTestEnvironment(new SGTestingEnvironment());
+	AddGlobalTestEnvironment(HS_NEW SGTestingEnvironment());
 
 	TestEventListeners& listeners = UnitTest::GetInstance()->listeners();
-	listeners.Append(new TestInfoLogger());
+	listeners.Append(HS_NEW TestInfoLogger());
 
-	int ret_val = RUN_ALL_TESTS();
+	int retVal = RUN_ALL_TESTS();
 
-	return ret_val;
+	return retVal;
 }

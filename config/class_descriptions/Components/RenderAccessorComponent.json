@@ -1,0 +1,14 @@
+{
+	"component": "renderAccessor",
+	"description": "Component that provides access to render-related classes",
+	"flags": ["transient"],
+	"attributes": [
+		{
+			"name": "accessor",
+			"type": "RawPtr<class RenderAccessor>",
+			"default": " = nullptr",
+			"includes": ["\"Base/Types/TemplateAliases.h\""],
+			"flags": ["transient"]
+		}
+	]
+}

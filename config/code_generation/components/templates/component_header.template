@@ -1,30 +1,27 @@
 #pragma once
 
-#include "ECS/Component.h"
-
 {attribute_includes}
 
 /**
  * {component_description}
  */
-class {class_name} : public BaseComponent
+class {class_name}
 {{
 public:
-	{attribute_accessors_decl}
+	{class_name}() noexcept = default;
 
-	{attribute_accessors_ref_decl}
+	{attribute_getters}
+
+	{attribute_getters_ref}
+
+	{attribute_setters}
 
 public:
-	static std::string GetClassName() {{ return "{class_name}"; }}
-
-	virtual void toJson(nlohmann::json& outJson) const override;
-	virtual void fromJson(const nlohmann::json& json) override;
-
-	friend void to_json(nlohmann::json& outJson, const {class_name}& {component_name});
-	friend void from_json(const nlohmann::json& json, {class_name}& out{component_name_capital});
-
-	std::string getComponentTypeName() const override {{ return GetClassName(); }}
+	[[nodiscard]] static constexpr StringId GetTypeId() {{ return STR_TO_ID("{class_name}"); }}
 
 private:
 	{attribute_fields}
+
+	friend class {class_name}JsonSerializer;
+	friend class {class_name}ImguiWidget;
 }};

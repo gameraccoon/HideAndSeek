@@ -1,10 +1,20 @@
+#include "Base/precomp.h"
+
 #include "GameLogic/Systems/AnimationSystem.h"
 
-#include "GameData/Components/RenderComponent.generated.h"
-#include "GameData/Components/AnimationDataComponent.generated.h"
-#include "GameData/World.h"
+#include <algorithm>
 
-AnimationSystem::AnimationSystem(WorldHolder &worldHolder, const TimeData& time)
+#include "GameData/World.h"
+#include "GameData/GameData.h"
+#include "GameData/Components/SpriteRenderComponent.generated.h"
+#include "GameData/Components/AnimationClipsComponent.generated.h"
+#include "GameData/Components/AnimationGroupsComponent.generated.h"
+#include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+
+AnimationSystem::AnimationSystem(
+		WorldHolder& worldHolder,
+		const TimeData& time) noexcept
 	: mWorldHolder(worldHolder)
 	, mTime(time)
 {
@@ -12,12 +22,41 @@ AnimationSystem::AnimationSystem(WorldHolder &worldHolder, const TimeData& time)
 
 void AnimationSystem::update()
 {
-	World* world = mWorldHolder.world;
-	float dt = mTime.dt;
+	SCOPED_PROFILER("AnimationSystem::update");
+	World& world = mWorldHolder.getWorld();
+	GameData& gameData = mWorldHolder.getGameData();
+	float dt = mTime.lastFixedUpdateDt;
 
-	world->getEntityManager().forEachComponentSet<AnimationDataComponent, RenderComponent>([dt](AnimationDataComponent* animationData, RenderComponent* render)
+	const auto [stateMachines] = gameData.getGameComponents().getComponents<const StateMachineComponent>();
+
+	const auto [worldCachedData] = world.getWorldComponents().getComponents<const WorldCachedDataComponent>();
+	Vector2D workingRect = worldCachedData->getScreenSize();
+	Vector2D cameraLocation = worldCachedData->getCameraPos();
+
+	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(cameraLocation, workingRect);
+
+	// update animation clip from FSM
+	spatialManager.forEachComponentSet<AnimationGroupsComponent, AnimationClipsComponent>(
+		[dt, stateMachines](AnimationGroupsComponent* animationGroups, AnimationClipsComponent* animationClips)
 	{
-		std::vector<AnimationData>& animationDatas = animationData->getDatasRef();
+		for (auto& data : animationGroups->getDataRef())
+		{
+			auto smIt = stateMachines->getAnimationSMs().find(data.stateMachineId);
+			Assert(smIt != stateMachines->getAnimationSMs().end(), "State machine not found %s", data.stateMachineId);
+			auto newState = smIt->second.getNextState(animationGroups->getBlackboard(), data.currentState);
+			if (newState != data.currentState)
+			{
+				data.currentState = newState;
+				animationClips->getDatasRef()[data.animationClipIdx].sprites = data.animationClips.find(newState)->second;
+			}
+		}
+	});
+
+	// update animation frame
+	spatialManager.forEachComponentSet<AnimationClipsComponent, SpriteRenderComponent>(
+			[dt](AnimationClipsComponent* animationClips, SpriteRenderComponent* spriteRender)
+	{
+		std::vector<AnimationClip>& animationDatas = animationClips->getDatasRef();
 		for (auto& data : animationDatas)
 		{
 			data.progress += data.params.speed * dt;
@@ -28,8 +67,8 @@ void AnimationSystem::update()
 
 			size_t spriteIdx = 0;
 
-			const auto& ids = render->getSpriteIds();
-			for (size_t i = 0; i < render->getSpriteIds().size(); ++i)
+			const auto& ids = spriteRender->getSpriteIds();
+			for (size_t i = 0; i < spriteRender->getSpriteIds().size(); ++i)
 			{
 				if (ids[i] == data.spriteId)
 				{
@@ -37,7 +76,7 @@ void AnimationSystem::update()
 				}
 			}
 
-			render->getSpriteDatasRef()[spriteIdx].spriteHandle = data.sprites[std::min(static_cast<size_t>(data.sprites.size() * data.progress), data.sprites.size())];
+			spriteRender->getSpriteDatasRef()[spriteIdx].spriteHandle = data.sprites[std::min(static_cast<size_t>(data.sprites.size() * data.progress), data.sprites.size())];
 		}
 	});
 }

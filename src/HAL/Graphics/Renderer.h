@@ -1,12 +1,14 @@
 #pragma once
 
 #include <array>
+#include <vector>
 
 #include <glm/fwd.hpp>
 
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Geometry/Vector2D.h"
 
 #include "HAL/Base/Types.h"
+#include "HAL/EngineFwd.h"
 
 struct SDL_Renderer;
 
@@ -22,39 +24,30 @@ namespace Graphics
 {
 	class Font;
 	class Texture;
+	class Surface;
 
-	struct DrawPoint
+	namespace Render
 	{
-		Vector2D spacePoint;
-		Vector2D texturePoint;
-	};
+		void BindSurface(const Surface& surface);
+		void DrawQuad(const glm::mat4& transform, Vector2D size, QuadUV uv, float alpha = 1.0f);
+		void DrawQuad(Vector2D pos, Vector2D size);
+		void DrawQuad(Vector2D pos, Vector2D size, Vector2D anchor, float rotation, QuadUV uv, float alpha = 1.0f);
+		void DrawFan(const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
+		void DrawStrip(const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
+		void DrawTiledQuad(Vector2D start, Vector2D size, const QuadUV& uv);
+	}
 
 	class Renderer
 	{
 	public:
-		Renderer(HAL::Internal::Window& window);
-		~Renderer();
+		Renderer() = default;
 
-		void clearFrame(Graphics::Color color);
+		Renderer(const Renderer&) = delete;
+		Renderer& operator=(const Renderer&) = delete;
+		Renderer(Renderer&&) = delete;
+		Renderer& operator=(Renderer&&) = delete;
 
-		void render(const Graphics::Texture& texture, Vector2D pos, Vector2D size);
-		void render(const Graphics::Texture& texture, Vector2D pos, Vector2D size, float alpha);
-		void render(const Graphics::Texture& texture, Vector2D pos, Vector2D size, Vector2D ancor, float rotation);
-		void render(const Graphics::Texture& texture, Vector2D pos, Vector2D size, Vector2D ancor, float rotation, float alpha);
-		void render(const Graphics::Texture& texture, Vector2D pos, Vector2D size, Vector2D ancor, float rotation, QuadUV uv);
-		void render(const Graphics::Texture& texture, Vector2D pos, Vector2D size, Vector2D ancor, float rotation, QuadUV uv, float alpha);
-		void renderFan(const Graphics::Texture& texture, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
-		void renderStrip(const Graphics::Texture& texture, const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha);
-
-
-		void renderText(const Font& font, Vector2D pos, Graphics::Color color, const char* text);
+		void renderText(const Font& font, Vector2D pos, Color color, const char* text);
 		std::array<int, 2> getTextSize(const Font& font, const char* text);
-
-		void finalizeFrame();
-
-		SDL_Renderer* getRawRenderer();
-
-	private:
-		SDL_Renderer* mRenderer;
 	};
 }

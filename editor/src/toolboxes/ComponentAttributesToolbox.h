@@ -1,10 +1,14 @@
 #pragma once
 
+#include <optional>
+
 #include <QString>
 #include <QWidget>
 
-#include "ECS/Delegates.h"
+#include <raccoon-ecs/delegates.h>
+
 #include "src/editorcommands/editorcommand.h"
+#include "src/editorutils/componentreference.h"
 
 class MainWindow;
 
@@ -19,6 +23,7 @@ public:
 	ComponentAttributesToolbox(MainWindow* mainWindow, ads::CDockManager* dockManager);
 	~ComponentAttributesToolbox();
 	void show();
+	bool isShown() const;
 
 	static const QString WidgetName;
 	static const QString ToolboxName;
@@ -26,15 +31,15 @@ public:
 	static const QString ContainerContentName;
 
 private:
-	void updateContent(EditorCommand::EffectType effect, bool originalCall, bool forceUpdateLayout);
+	void updateContent(EditorCommand::EffectBitset effects, bool originalCall);
 	void clearContent();
-	void onSelectedComponentChange(const QString& componentTypeName);
+	void onSelectedComponentChange(const std::optional<ComponentReference>& componentReference);
 
 private:
 	MainWindow* mMainWindow;
 	ads::CDockManager* mDockManager;
-	QString mLastSelectedComlonent;
+	std::optional<ComponentReference> mLastSelectedComponent;
 
-	Delegates::Handle mOnComponentChangedHandle;
-	Delegates::Handle mOnCommandEffectHandle;
+	RaccoonEcs::Delegates::Handle mOnComponentChangedHandle;
+	RaccoonEcs::Delegates::Handle mOnCommandEffectHandle;
 };

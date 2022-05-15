@@ -10,16 +10,16 @@ namespace TypesEditConstructor
 	class BaseEdit
 	{
 	public:
-		typedef std::shared_ptr<BaseEdit> Ptr;
+		using Ptr = std::shared_ptr<BaseEdit>;
 	};
 
 	template<typename T>
 	class Edit : public BaseEdit
 	{
 	public:
-		typedef std::shared_ptr<Edit> Ptr;
-		typedef std::weak_ptr<Edit> WeakPtr;
-		typedef std::function<void(const T&, const T&, bool)> OnChangeFn;
+		using Ptr = std::shared_ptr<Edit>;
+		using WeakPtr = std::weak_ptr<Edit>;
+		using OnChangeFn = std::function<void(const T&, const T&, bool)>;
 
 	public:
 		Edit(T initialValue)
@@ -63,7 +63,7 @@ namespace TypesEditConstructor
 	private:
 		T mPrevValue;
 		OnChangeFn mOnChange;
-		QObject* mOwner = new QObject();
+		QObject* mOwner = HS_NEW QObject();
 		std::vector<BaseEdit::Ptr> mChildObjects;
 	};
 }

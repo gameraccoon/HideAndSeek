@@ -1,29 +1,34 @@
 #pragma once
 
-#include <memory>
-
 #include "HAL/EngineFwd.h"
 
-#include "HAL/Base/Resource.h"
+#include "GameData/Resources/Resource.h"
+
 #include "HAL/Base/Types.h"
 
 namespace Graphics
 {
-	class Texture;
+	class Surface;
 
-	class Sprite : public HAL::Resource
+	class Sprite : public Resource
 	{
 	public:
-		Sprite() = default;
-		Sprite(const Graphics::Texture* texture, QuadUV uv);
+		Sprite(const Surface* surface, QuadUV uv);
 
-		const Graphics::Texture* getTexture() const;
+		int getHeight() const;
+		int getWidth() const;
+
+		const Surface* getSurface() const;
 		QuadUV getUV() const { return mUV; }
 
-		virtual bool isValid() const override;
+		bool isValid() const override;
+
+		static std::string GetUniqueId(const std::string& filename);
+		static InitSteps GetInitSteps();
+		DeinitSteps getDeinitSteps() const override;
 
 	private:
-		const Graphics::Texture* mTexture = nullptr;
+		const Surface* mSurface = nullptr;
 		QuadUV mUV;
 	};
 }

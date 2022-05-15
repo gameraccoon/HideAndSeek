@@ -4,8 +4,6 @@
 #include <any>
 #include <typeindex>
 
-#include "Debug/Assert.h"
-
 namespace FSM
 {
 	template <typename KeyType>
@@ -24,7 +22,7 @@ namespace FSM
 			auto it = mValues.find(std::forward<KeyType>(key));
 			if (it != mValues.end())
 			{
-				AssertFatal(it->second.type() == typeid(T), "Wrong blackbord type requested: %s", it->second.type().name());
+				AssertFatal(it->second.type() == typeid(T), "Wrong blackboard type requested: %s", it->second.type().name());
 				return std::any_cast<T>(it->second);
 			}
 
@@ -37,7 +35,7 @@ namespace FSM
 			auto it = mValues.find(std::forward<KeyType>(key));
 			if (it != mValues.end())
 			{
-				AssertFatal(it->second.type() == typeid(T), "Wrong blackbord type requested: %s", it->second.type().name());
+				AssertFatal(it->second.type() == typeid(T), "Wrong blackboard type requested: %s", it->second.type().name());
 				return std::any_cast<T>(it->second);
 			}
 

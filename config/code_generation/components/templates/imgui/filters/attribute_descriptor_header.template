@@ -1,0 +1,17 @@
+#pragma once
+
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/AbstractPropertyDescriptor.h"
+
+namespace ImguiPropertyFiltration
+{{
+	class {class_name}{attribute_name_capital}PropertyDescriptor : public AbstractPropertyDescriptor
+	{{
+	public:
+		{class_name}{attribute_name_capital}PropertyDescriptor();
+
+		[[nodiscard]] static std::shared_ptr<{class_name}{attribute_name_capital}PropertyDescriptor> Create();
+
+		[[nodiscard]] std::any getPropertyValue(EntityManager& entityManager, Entity entity) override;
+		[[nodiscard]] StringId getComponentType() const override;
+	}};
+}}

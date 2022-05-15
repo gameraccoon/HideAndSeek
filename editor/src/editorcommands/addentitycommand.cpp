@@ -2,26 +2,22 @@
 
 #include <QtWidgets/qcombobox.h>
 
-#include <GameData/World.h>
+#include "GameData/World.h"
 
 AddEntityCommand::AddEntityCommand(Entity entity)
-	: mEntity(entity)
+	: EditorCommand(EffectBitset(EffectType::Entities))
+	, mEntity(entity)
 {
 }
 
-bool AddEntityCommand::doCommand(World* world)
+void AddEntityCommand::doCommand(World* world)
 {
-	world->getEntityManager().insertEntityUnsafe(mEntity);
-	return false;
+	EntityManager& worldEntityManager = world->getEntityManager();
+	worldEntityManager.addExistingEntityUnsafe(mEntity);
 }
 
-bool AddEntityCommand::undoCommand(World* world)
+void AddEntityCommand::undoCommand(World* world)
 {
-	world->getEntityManager().removeEntity(mEntity);
-	return false;
-}
-
-EditorCommand::EffectType AddEntityCommand::getEffectType()
-{
-	return EffectType::Entities;
+	EntityManager& worldEntityManager = world->getEntityManager();
+	worldEntityManager.removeEntity(mEntity);
 }

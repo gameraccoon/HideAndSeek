@@ -1,6 +1,6 @@
 {
 	"component": "stateMachine",
-	"description": "Component that stores a state machine",
+	"description": "Component that stores state machines",
 	"attributes": [
 		{
 			"name": "characterSM",
@@ -13,22 +13,11 @@
 			"flags": ["get_by_ref", "transient"]
 		},
 		{
-			"name": "characterAnimationSM",
-			"type": "FSM::StateMachine<CharacterAnimationState, CharacterStateBlackboardKeys>",
+			"name": "animationSMs",
+			"type": "std::map<StringId, FSM::StateMachine<StringId, StringId>>",
 			"includes": [
 				"\"GameData/FSM/StateMachine.h\"",
-				"\"GameData/Enums/CharacterAnimationState.generated.h\"",
-				"\"GameData/Enums/CharacterStateBlackboardKeys.generated.h\""
-			],
-			"flags": ["get_by_ref", "transient"]
-		},
-		{
-			"name": "characterLegsAnimationSM",
-			"type": "FSM::StateMachine<CharacterLegsAnimationState, CharacterStateBlackboardKeys>",
-			"includes": [
-				"\"GameData/FSM/StateMachine.h\"",
-				"\"GameData/Enums/CharacterLegsAnimationState.generated.h\"",
-				"\"GameData/Enums/CharacterStateBlackboardKeys.generated.h\""
+				"<map>"
 			],
 			"flags": ["get_by_ref", "transient"]
 		}

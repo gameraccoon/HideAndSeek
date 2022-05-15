@@ -1,0 +1,1 @@
+jsonSerializerHolder.registerSerializer<{class_name}>(STR_TO_ID("{class_name}"), std::make_unique<{class_name}JsonSerializer>());{delim_endl}{delim_tab}{delim_tab}

@@ -1,158 +1,275 @@
+#include "Base/precomp.h"
+
 #include "GameLogic/Systems/DebugDrawSystem.h"
 
+#include <algorithm>
+
+#include "Base/Random/Random.h"
+#include "Base/Types/TemplateHelpers.h"
+
+#include "GameData/World.h"
+#include "GameData/GameData.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/NavMeshComponent.generated.h"
 #include "GameData/Components/RenderModeComponent.generated.h"
 #include "GameData/Components/AiControllerComponent.generated.h"
-#include "GameData/World.h"
-#include "GameData/GameData.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/DebugDrawComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "Utils/Geometry/VisibilityPolygon.h"
 
-#include "HAL/Base/Engine.h"
-#include "HAL/Base/Math.h"
-#include "HAL/Graphics/Renderer.h"
+#include "HAL/Graphics/Font.h"
+#include "HAL/Graphics/Sprite.h"
 
-#include <glm/gtc/matrix_transform.hpp>
+#include "GameLogic/Render/RenderAccessor.h"
 
-#include <DetourNavMesh.h>
-
-
-DebugDrawSystem::DebugDrawSystem(WorldHolder& worldHolder, HAL::Engine* engine, HAL::ResourceManager* resourceManager)
+DebugDrawSystem::DebugDrawSystem(
+		WorldHolder& worldHolder,
+		const TimeData& timeData,
+		ResourceManager& resourceManager) noexcept
 	: mWorldHolder(worldHolder)
-	, mEngine(engine)
+	, mTime(timeData)
 	, mResourceManager(resourceManager)
 {
-	mCollisionSpriteHandle = resourceManager->lockSprite("resources/textures/collision.png");
-	mNavmeshSpriteHandle = resourceManager->lockSprite("resources/textures/testTexture.png");
+}
+
+template<typename T>
+void RemoveOldDrawElement(std::vector<T>& vector, GameplayTimestamp now)
+{
+	std::erase_if(
+		vector,
+		[now](const T& val){ return val.isLifeTimeExceeded(now); }
+	);
+}
+
+static void DrawPath(RenderData& renderData, const std::vector<Vector2D>& path, const ResourceHandle& navMeshSprite, Vector2D drawShift)
+{
+	if (path.size() > 1)
+	{
+		StripRenderData& stripData = TemplateHelpers::EmplaceVariant<StripRenderData>(renderData.layers);
+
+		stripData.points.reserve(path.size() * 2);
+		stripData.spriteHandle = navMeshSprite;
+		stripData.drawShift = drawShift;
+		stripData.alpha = 0.5f;
+
+		{
+			float u1 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float v1 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float u2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float v2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+
+			Vector2D normal = (path[1] - path[0]).normal() * 3;
+
+			stripData.points.push_back(Graphics::DrawPoint{path[0] + normal, {u1, v1}});
+			stripData.points.push_back(Graphics::DrawPoint{path[0] - normal, {u2, v2}});
+		}
+
+		for (size_t i = 1; i < path.size(); ++i)
+		{
+			float u1 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float v1 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float u2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+			float v2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+
+			Vector2D normal = (path[i] - path[i-1]).normal() * 3;
+
+			stripData.points.push_back(Graphics::DrawPoint{path[i] + normal, {u1, v1}});
+			stripData.points.push_back(Graphics::DrawPoint{path[i] - normal, {u2, v2}});
+		}
+	}
 }
 
 void DebugDrawSystem::update()
 {
-	World* world = mWorldHolder.world;
-	GameData* gameData = mWorldHolder.gameData;
-	Graphics::Renderer* renderer = mEngine->getRenderer();
+	SCOPED_PROFILER("DebugDrawSystem::update");
+	World& world = mWorldHolder.getWorld();
+	GameData& gameData = mWorldHolder.getGameData();
 
-	static const Vector2D maxFov(500.0f, 500.0f);
+	auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
+	const Vector2D workingRect = worldCachedData->getScreenSize();
+	const Vector2D cameraLocation = worldCachedData->getCameraPos();
+	const CellPos cameraCell = worldCachedData->getCameraCellPos();
 
-	OptionalEntity mainCamera = world->getMainCamera();
-	if (!mainCamera.isValid())
+	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(cameraLocation, workingRect);
+
+	auto [renderMode] = gameData.getGameComponents().getComponents<const RenderModeComponent>();
+
+	const Vector2D screenHalfSize = workingRect * 0.5f;
+	const Vector2D drawShift = screenHalfSize - cameraLocation;
+
+	RenderAccessor* renderAccessor = nullptr;
+	if (auto [renderAccessorCmp] = gameData.getGameComponents().getComponents<RenderAccessorComponent>(); renderAccessorCmp != nullptr)
+	{
+		renderAccessor = renderAccessorCmp->getAccessor();
+	}
+
+	if (renderAccessor == nullptr)
 	{
 		return;
 	}
 
-	auto [cameraTransformComponent] = world->getEntityManager().getEntityComponents<TransformComponent>(mainCamera.getEntity());
-	if (cameraTransformComponent == nullptr)
+	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
+
+	if (renderMode && renderMode->getIsDrawDebugCellInfoEnabled())
 	{
-		return;
+		std::vector<WorldCell*> cellsAround = world.getSpatialData().getCellsAround(cameraLocation, screenHalfSize*2.0f);
+
+		for (WorldCell* cell : cellsAround)
+		{
+			CellPos cellPos = cell->getPos();
+			Vector2D location = SpatialWorldData::GetRelativeLocation(cameraCell, cellPos, drawShift);
+			QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+			quadData.position = location;
+			quadData.size = SpatialWorldData::CellSizeVector;
+			quadData.spriteHandle = mCollisionSpriteHandle;
+
+			TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
+			textData.color = {255, 255, 255, 255};
+			textData.fontHandle = mFontHandle;
+			textData.pos = SpatialWorldData::CellSizeVector*0.5 + SpatialWorldData::GetCellRealDistance(cellPos - cameraCell) - cameraLocation + screenHalfSize;
+			textData.text = FormatString("(%d, %d)", cellPos.x, cellPos.y);
+		}
 	}
 
-	Vector2D cameraLocation = cameraTransformComponent->getLocation();
-	Vector2D mouseScreenPos(mEngine->getMouseX(), mEngine->getMouseY());
-	Vector2D screenHalfSize = Vector2D(static_cast<float>(mEngine->getWidth()), static_cast<float>(mEngine->getHeight())) * 0.5f;
-
-	Vector2D drawShift = screenHalfSize - cameraLocation + (screenHalfSize - mouseScreenPos) * 0.5;
-
-	auto [renderMode] = gameData->getGameComponents().getComponents<RenderModeComponent>();
 	if (renderMode && renderMode->getIsDrawDebugCollisionsEnabled())
 	{
-		const Graphics::Sprite& collisionSprite = mResourceManager->getResource<Graphics::Sprite>(mCollisionSpriteHandle);
-		Graphics::QuadUV quadUV = collisionSprite.getUV();
-		world->getEntityManager().forEachComponentSet<CollisionComponent>([&collisionSprite, &quadUV, drawShift, renderer](CollisionComponent* collisionComponent)
+		spatialManager.forEachComponentSet<const CollisionComponent, const TransformComponent>(
+			[&renderData, &collisionSpriteHandle = mCollisionSpriteHandle, drawShift](const CollisionComponent* collision, const TransformComponent* transform)
 		{
-			renderer->render(*collisionSprite.getTexture(),
-				Vector2D(collisionComponent->getBoundingBox().minX + drawShift.x, collisionComponent->getBoundingBox().minY + drawShift.y),
-				Vector2D(collisionComponent->getBoundingBox().maxX-collisionComponent->getBoundingBox().minX,
-						 collisionComponent->getBoundingBox().maxY-collisionComponent->getBoundingBox().minY),
-				ZERO_VECTOR,
-				0.0f,
-				quadUV);
-			return true;
+			const Vector2D location = transform->getLocation() + drawShift;
+			QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+			quadData.position = Vector2D(collision->getBoundingBox().minX + location.x, collision->getBoundingBox().minY + location.y);
+			quadData.rotation = 0.0f;
+			quadData.size = Vector2D(collision->getBoundingBox().maxX-collision->getBoundingBox().minX,
+				collision->getBoundingBox().maxY-collision->getBoundingBox().minY);
+			quadData.spriteHandle = collisionSpriteHandle;
+			quadData.anchor = ZERO_VECTOR;
 		});
 	}
 
 	if (renderMode && renderMode->getIsDrawDebugAiDataEnabled())
 	{
-		const Graphics::Sprite& navMeshSprite = mResourceManager->getResource<Graphics::Sprite>(mNavmeshSpriteHandle);
-		Graphics::QuadUV quadUV = navMeshSprite.getUV();
-		auto [navMeshComponent] = world->getWorldComponents().getComponents<NavMeshComponent>();
+		auto [navMeshComponent] = world.getWorldComponents().getComponents<NavMeshComponent>();
 
 		if (navMeshComponent)
 		{
-			if (const dtNavMesh* navmesh = navMeshComponent->getNavMeshRef().getMesh())
+			const NavMesh& navMesh = navMeshComponent->getNavMesh();
+			const NavMesh::Geometry& navMeshGeometry = navMesh.geometry;
+			for (size_t k = 0; k < navMeshGeometry.polygonsCount; ++k)
 			{
-				int maxTiles = navmesh->getMaxTiles();
-				for (int i = 0; i < maxTiles; ++i)
+				PolygonRenderData& polygon = TemplateHelpers::EmplaceVariant<PolygonRenderData>(renderData->layers);
+				polygon.points.reserve(navMeshGeometry.verticesPerPoly);
+				for (size_t j = 0; j < navMeshGeometry.verticesPerPoly; ++j)
 				{
-					if (const dtMeshTile* tile = navmesh->getTile(i); tile && tile->header)
-					{
-						std::vector<std::array<Vector2D, 3>> points;
-						for (int i = 0; i < tile->header->polyCount; ++i)
-						{
-							const auto& poly = tile->polys[i];
-							std::vector<Graphics::DrawPoint> drawablePolygon;
-							drawablePolygon.reserve(3);
-							for (int j = 0; j < poly.vertCount; ++j)
-							{
-								float u = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
-								float v = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
+					float u = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
+					float v = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
-								float x = tile->verts[poly.verts[j] * 3];
-								float y = tile->verts[poly.verts[j] * 3 + 2];
-								drawablePolygon.push_back(Graphics::DrawPoint{Vector2D(x, y), Graphics::QuadLerp(quadUV, u, v)});
-							}
-							glm::mat4 transform(1.0f);
-							transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
-							renderer->renderFan(*navMeshSprite.getTexture(), drawablePolygon, transform, 0.3f);
-						}
-					}
+					Vector2D pos = navMeshGeometry.vertices[navMeshGeometry.indexes[k*navMeshGeometry.verticesPerPoly + j]];
+					polygon.points.push_back(Graphics::DrawPoint{pos, {u, v}});
 				}
+
+				polygon.spriteHandle = mNavmeshSpriteHandle;
+				polygon.alpha = 0.3f;
+				polygon.drawShift = drawShift;
 			}
 		}
 
-		world->getEntityManager().forEachComponentSet<AiControllerComponent>([drawShift, &quadUV, &navMeshSprite, renderer](AiControllerComponent* aiController)
+		spatialManager.forEachComponentSet<const AiControllerComponent>(
+			[&navMeshSpriteHandle = mNavmeshSpriteHandle, &renderData, drawShift](const AiControllerComponent* aiController)
 		{
-			std::vector<Vector2D>& path = aiController->getPathRef().getSmoothPathRef();
-			if (path.size() > 1)
-			{
-				std::vector<Graphics::DrawPoint> drawablePolygon;
-				drawablePolygon.reserve(path.size() * 2);
-
-				{
-					float u1 = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
-					float v1 = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
-					float u2 = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
-					float v2 = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
-
-					Vector2D normal = (path[1] - path[0]).normal() * 3;
-
-					drawablePolygon.push_back(Graphics::DrawPoint{path[0] + normal, Graphics::QuadLerp(quadUV, u1, v1)});
-					drawablePolygon.push_back(Graphics::DrawPoint{path[0] - normal, Graphics::QuadLerp(quadUV, u2, v2)});
-				}
-
-				for (size_t i = 1; i < path.size(); ++i)
-				{
-					float u1 = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
-					float v1 = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
-					float u2 = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
-					float v2 = static_cast<float>(std::rand() * 1.0f / RAND_MAX);
-
-					Vector2D normal = (path[i] - path[i-1]).normal() * 3;
-
-					drawablePolygon.push_back(Graphics::DrawPoint{path[i] + normal, Graphics::QuadLerp(quadUV, u1, v1)});
-					drawablePolygon.push_back(Graphics::DrawPoint{path[i] - normal, Graphics::QuadLerp(quadUV, u2, v2)});
-				}
-
-				glm::mat4 transform(1.0f);
-				transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
-				renderer->renderStrip(*navMeshSprite.getTexture(), drawablePolygon, transform, 0.5f);
-			}
+			DrawPath(*renderData, aiController->getPath().smoothPath, navMeshSpriteHandle, drawShift);
 		});
+	}
+
+	if (renderMode && renderMode->getIsDrawDebugPrimitivesEnabled())
+	{
+		auto [debugDraw] = gameData.getGameComponents().getComponents<const DebugDrawComponent>();
+		if (debugDraw != nullptr)
+		{
+			Vector2D pointSize(6, 6);
+			for (const auto& screenPoint : debugDraw->getScreenPoints())
+			{
+				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+				quadData.position = screenPoint.screenPos;
+				quadData.size = pointSize;
+				quadData.spriteHandle = mPointTextureHandle;
+				if (!screenPoint.name.empty())
+				{
+					TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
+					textData.color = {255, 255, 255, 255};
+					textData.fontHandle = mFontHandle;
+					textData.pos = screenPoint.screenPos;
+					textData.text = screenPoint.name;
+				}
+			}
+
+			for (const auto& worldPoint : debugDraw->getWorldPoints())
+			{
+				Vector2D screenPos = worldPoint.pos - cameraLocation + screenHalfSize;
+
+				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+				quadData.position = screenPos;
+				quadData.rotation = 0.0f;
+				quadData.size = pointSize;
+				quadData.spriteHandle = mPointTextureHandle;
+				if (!worldPoint.name.empty())
+				{
+					TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
+					textData.color = {255, 255, 255, 255};
+					textData.fontHandle = mFontHandle;
+					textData.pos = screenPos;
+					textData.text = worldPoint.name;
+				}
+			}
+
+			for (const auto& worldLineSegment : debugDraw->getWorldLineSegments())
+			{
+				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+				Vector2D screenPosStart = worldLineSegment.startPos - cameraLocation + screenHalfSize;
+				Vector2D screenPosEnd = worldLineSegment.endPos - cameraLocation + screenHalfSize;
+				Vector2D diff = screenPosEnd - screenPosStart;
+				quadData.position = (screenPosStart + screenPosEnd) * 0.5f;
+				quadData.rotation = diff.rotation().getValue();
+				quadData.size = {diff.size(), pointSize.y};
+				quadData.spriteHandle = mLineTextureHandle;
+			}
+		}
 	}
 
 	if (renderMode && renderMode->getIsDrawDebugCharacterInfoEnabled())
 	{
-
+		spatialManager.forEachComponentSet<const CharacterStateComponent, const TransformComponent>(
+			[&renderData, fontHandle = mFontHandle, drawShift](const CharacterStateComponent* characterState, const TransformComponent* transform)
+		{
+			TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
+			textData.color = {255, 255, 255, 255};
+			textData.fontHandle = fontHandle;
+			textData.pos = transform->getLocation() + drawShift;
+			textData.text = ID_TO_STR(enum_to_string(characterState->getState()));
+		});
 	}
+
+	auto [debugDraw] = gameData.getGameComponents().getComponents<DebugDrawComponent>();
+	if (debugDraw != nullptr)
+	{
+		RemoveOldDrawElement(debugDraw->getWorldPointsRef(), mTime.lastFixedUpdateTimestamp);
+		RemoveOldDrawElement(debugDraw->getScreenPointsRef(), mTime.lastFixedUpdateTimestamp);
+		RemoveOldDrawElement(debugDraw->getWorldLineSegmentsRef(), mTime.lastFixedUpdateTimestamp);
+	}
+
+	renderAccessor->submitData(std::move(renderData));
+}
+
+void DebugDrawSystem::init()
+{
+	SCOPED_PROFILER("DebugDrawSystem::initResources");
+	mCollisionSpriteHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/collision.png"));
+	mNavmeshSpriteHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/testTexture.png"));
+	mPointTextureHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/collision.png"));
+	mLineTextureHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/testTexture.png"));
+	mFontHandle = mResourceManager.lockResource<Graphics::Font>("resources/fonts/prstart.ttf", 16);
 }

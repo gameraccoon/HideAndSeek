@@ -1,35 +1,23 @@
 #pragma once
 
-#include "ECS/SystemsManager.h"
-#include "ECS/ComponentFactory.h"
+#include <raccoon-ecs/systems_manager.h>
+#include <raccoon-ecs/component_factory.h>
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"
 
 #include "Utils/Application/ArgumentsParser.h"
 
-#include "HAL/GameBase.h"
-
 #include "GameLogic/SharedManagers/TimeData.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-class CollidingCircularUnitsTestCase : public HAL::GameBase
+#include "AutoTests/BaseTestCase.h"
+
+class CollidingCircularUnitsTestCase : public BaseTestCase
 {
 public:
-	using HAL::GameBase::GameBase;
+	using BaseTestCase::BaseTestCase;
 
-	void start(ArgumentsParser& arguments);
-	void update(float dt) override;
-	void initResources() override {}
-	void setKeyboardKeyState(int, bool) override {}
-	void setMouseKeyState(int, bool) override {}
-
-private:
-	WorldHolder mWorldHolder;
-	World mWorld;
-	GameData mGameData;
-	TimeData mTime;
-	SystemsManager mSystemsManager;
-	ComponentFactory mComponentFactory;
-	int ticksCount = 0;
+protected:
+	void initTestCase(const ArgumentsParser& arguments) override;
 };

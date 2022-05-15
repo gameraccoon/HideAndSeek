@@ -1,36 +1,31 @@
+#include "Base/precomp.h"
+
 #include "Change{class_name}{attribute_name_capital}Command.generated.h"
 
 #include "GameData/Components/{class_name}.generated.h"
 
-Change{class_name}{attribute_name_capital}Command::Change{class_name}{attribute_name_capital}Command(Entity entity, const {attribute_type}& old{attribute_name_capital}, const {attribute_type}& new{attribute_name_capital}, bool needToUpdateLayout)
-	: mEntity(entity)
+#include "src/editorutils/componentreferenceutils.h"
+
+Change{class_name}{attribute_name_capital}Command::Change{class_name}{attribute_name_capital}Command(const ComponentSourceReference& source, const {attribute_type}& old{attribute_name_capital}, const {attribute_type}& new{attribute_name_capital}, bool needToUpdateLayout)
+	: EditorCommand(needToUpdateLayout ? EffectBitset(EffectType::ComponentAttributes) : EffectBitset(EffectType::ComponentAttributes, EffectType::SkipLayoutUpdate))
+	, mComponentSource(source)
 	, mOld{attribute_name_capital}(old{attribute_name_capital})
 	, mNew{attribute_name_capital}(new{attribute_name_capital})
-	, mNeedToUpdateLayout(needToUpdateLayout)
 {{
 }}
 
-bool Change{class_name}{attribute_name_capital}Command::doCommand(World* world)
+void Change{class_name}{attribute_name_capital}Command::doCommand(World* world)
 {{
-	auto [component] = world->getEntityManager().getEntityComponents<{class_name}>(mEntity);
-	if (component)
+	if ({class_name}* component = Utils::GetComponent<{class_name}>(mComponentSource, world))
 	{{
 		component->set{attribute_name_capital}(mNew{attribute_name_capital});
 	}}
-	return mNeedToUpdateLayout;
 }}
 
-bool Change{class_name}{attribute_name_capital}Command::undoCommand(World* world)
+void Change{class_name}{attribute_name_capital}Command::undoCommand(World* world)
 {{
-	auto [component] = world->getEntityManager().getEntityComponents<{class_name}>(mEntity);
-	if (component)
+	if ({class_name}* component = Utils::GetComponent<{class_name}>(mComponentSource, world))
 	{{
 		component->set{attribute_name_capital}(mOld{attribute_name_capital});
 	}}
-	return mNeedToUpdateLayout;
-}}
-
-EditorCommand::EffectType Change{class_name}{attribute_name_capital}Command::getEffectType()
-{{
-	return EffectType::ComponentAttributes;
 }}

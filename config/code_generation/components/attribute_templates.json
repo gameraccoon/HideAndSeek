@@ -9,28 +9,53 @@
 		"params": []
 	},
 	{
-		"name": "attribute_accessors_decl",
+		"name": "attribute_getters",
 		"params": [],
 		"blacklist": ["get_by_ref"]
 	},
 	{
-		"name": "attribute_accessors_ref_decl",
+		"name": "attribute_getters_ref",
 		"params": [],
 		"whitelist": ["get_by_ref"]
+	},
+	{
+		"name": "attribute_setters",
+		"params": [],
+		"blacklist": ["nocopyable"]
 	},
 	{
 		"name": "attribute_fields",
 		"params": []
 	},
 	{
-		"name": "attributes_json_serialization",
+		"name": "imgui/attributes_inspection",
+		"params": []
+	},
+	{
+		"name": "imgui/filters/attribute_descriptor_includes",
+		"params": [],
+		"blacklist": ["get_by_ref"]
+	},
+	{
+		"name": "imgui/filters/attribute_descriptor_registration",
+		"params": [],
+		"blacklist": ["get_by_ref"]
+	},
+	{
+		"name": "serialization/json/attributes_json_serialization",
 		"params": [],
 		"blacklist": ["transient"]
 	},
 	{
-		"name": "attributes_json_deserialization",
+		"name": "serialization/json/attributes_json_deserialization",
 		"params": [],
-		"blacklist": ["transient"]
+		"blacklist": ["transient", "defaulted"]
+	},
+	{
+		"name": "serialization/json/attributes_json_deserialization_defaulted",
+		"params": [],
+		"blacklist": ["transient"],
+		"whitelist": ["defaulted"]
 	},
 	{
 		"name": "editor/attribute_edit_fields",
@@ -40,17 +65,17 @@
 	{
 		"name": "editor/attribute_edit_command_includes",
 		"params": [],
-		"blacklist": ["transient"]
+		"blacklist": ["transient", "custom_editor"]
 	},
 	{
 		"name": "editor/attribute_edit_initialization",
 		"params": [],
-		"blacklist": ["transient"]
+		"blacklist": ["transient", "custom_editor"]
 	},
 	{
 		"name": "editor/editable_attribute_includes",
 		"params": ["not_empty", "sort", "remove_duplicates"],
 		"value_to_empty_test": "attribute_includes",
-		"blacklist": ["transient"]
+		"blacklist": ["transient", "custom_editor"]
 	}
 ]

@@ -2,15 +2,21 @@
 
 #include <string>
 
+#include "GameData/EcsDefinitions.h"
+
 class World;
 class GameData;
-class ComponentFactory;
+
+
+namespace Json {
+	class ComponentSerializationHolder;
+}
 
 namespace GameDataLoader
 {
-	void SaveWorld(const World& world, const std::string& levelName, const ComponentFactory& componentFactory);
-	void LoadWorld(World& world, const std::string& levelName, const ComponentFactory& componentFactory);
+	void SaveWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void LoadWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 
-	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const ComponentFactory& componentFactory);
-	void LoadGameData(GameData& gameData, const std::string& gameDataName, const ComponentFactory& componentFactory);
+	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	void LoadGameData(GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder);
 }

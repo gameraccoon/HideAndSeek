@@ -1,0 +1,1 @@
+result.insert({class_name}::GetTypeId());{delim_endl}{delim_tab}{delim_tab}

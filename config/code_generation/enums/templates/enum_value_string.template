@@ -1,1 +1,1 @@
-"{enum_value}"{delim_comma}{delim_endl}{delim_tab}{delim_tab}
+STR_TO_ID("{enum_value}"){delim_comma}{delim_endl}{delim_tab}{delim_tab}

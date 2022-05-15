@@ -1,14 +1,24 @@
-#include "HAL/GameBase.h"
+#include "Base/precomp.h"
 
-#include "HAL/Base/Engine.h"
+#include "HAL/GameBase.h"
 
 namespace HAL
 {
-	GameBase::GameBase(int windowWidth, int windowHeight)
-		: mEngine(new Engine(windowWidth, windowHeight))
-		, mResourceManager(new ResourceManager(mEngine.get()))
+	GameBase::GameBase(Engine* engine, ResourceManager& resourceManager)
+		: mEngine(engine)
+		, mResourceManager(resourceManager)
 	{
 	}
 
 	GameBase::~GameBase() = default;
+
+	Engine* GameBase::getEngine()
+	{
+		return mEngine;
+	}
+
+	ResourceManager& GameBase::getResourceManager()
+	{
+		return mResourceManager;
+	}
 }

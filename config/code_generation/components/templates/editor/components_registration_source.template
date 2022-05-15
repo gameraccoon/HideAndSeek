@@ -1,17 +1,12 @@
-#include "componentregistration.h"
+#include "Base/precomp.h"
 
-#include "ECS/ComponentFactory.h"
+#include "componentregistration.h"
 
 {editor/component_edit_factory_includes}
 
 {component_includes}
 
-void ComponentRegistration::RegisterToEditFactory(std::map<std::string, std::unique_ptr<AbstractEditFactory>>& factories)
+void ComponentRegistration::RegisterToEditFactory(std::map<StringId, std::unique_ptr<AbstractEditFactory>>& factories)
 {{
 	{editor/component_edit_factory_register}
-}}
-
-void ComponentRegistration::RegisterComponentFactory(ComponentFactory& componentFactory)
-{{
-	{editor/component_factory_register}
 }}

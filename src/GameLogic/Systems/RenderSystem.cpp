@@ -1,142 +1,317 @@
+#include "Base/precomp.h"
+
 #include "GameLogic/Systems/RenderSystem.h"
 
 #include <algorithm>
+#include <ranges>
 
-#include "GameData/Components/RenderComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/LightComponent.generated.h"
-#include "GameData/Components/RenderModeComponent.generated.h"
-#include "GameData/Components/AnimationComponent.generated.h"
+#include "Base/Types/TemplateAliases.h"
+#include "Base/Types/TemplateHelpers.h"
+
+#include "GameData/GameData.h"
 #include "GameData/World.h"
+#include "GameData/Components/SpriteRenderComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/LightComponent.generated.h"
+#include "GameData/Components/LightBlockingGeometryComponent.generated.h"
+#include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/BackgroundTextureComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "Utils/Geometry/VisibilityPolygon.h"
 
-#include "HAL/Base/Math.h"
-#include "HAL/Base/Engine.h"
-#include "HAL/Internal/SdlSurface.h"
+#include "GameLogic/Render/RenderAccessor.h"
+
+#include "HAL/Graphics/Sprite.h"
 
 #include <glm/matrix.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-
-RenderSystem::RenderSystem(WorldHolder& worldHolder, HAL::Engine* engine, HAL::ResourceManager* resourceManager)
+RenderSystem::RenderSystem(
+		WorldHolder& worldHolder,
+		const TimeData& timeData,
+		ResourceManager& resourceManager,
+		ThreadPool& threadPool
+	) noexcept
 	: mWorldHolder(worldHolder)
-	, mEngine(engine)
+	, mTime(timeData)
 	, mResourceManager(resourceManager)
+	, mThreadPool(threadPool)
 {
-	mLightSpriteHandle = resourceManager->lockSprite("resources/textures/light.png");
+	mLightSpriteHandle = resourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/light.png"));
 }
 
 void RenderSystem::update()
 {
-	World* world = mWorldHolder.world;
-	Graphics::Renderer* renderer = mEngine->getRenderer();
+	SCOPED_PROFILER("RenderSystem::update");
+	World& world = mWorldHolder.getWorld();
+	GameData& gameData = mWorldHolder.getGameData();
+
+	const auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
+	Vector2D workingRect = worldCachedData->getScreenSize();
+	Vector2D cameraLocation = worldCachedData->getCameraPos();
 
 	static const Vector2D maxFov(500.0f, 500.0f);
 
-	OptionalEntity mainCamera = world->getMainCamera();
-	if (!mainCamera.isValid())
+	const auto [renderMode] = gameData.getGameComponents().getComponents<RenderModeComponent>();
+
+	Vector2D halfWindowSize = workingRect * 0.5f;
+
+	Vector2D drawShift = halfWindowSize - cameraLocation;
+
+	std::vector<WorldCell*> cells = world.getSpatialData().getCellsAround(cameraLocation, workingRect);
+	SpatialEntityManager spatialManager(cells);
+
+	RenderAccessor* renderAccessor = nullptr;
+	if (auto [renderAccessorCmp] = gameData.getGameComponents().getComponents<RenderAccessorComponent>(); renderAccessorCmp != nullptr)
+	{
+		renderAccessor = renderAccessorCmp->getAccessor();
+	}
+
+	if (renderAccessor == nullptr)
 	{
 		return;
 	}
 
-	auto [cameraTransformComponent] = world->getEntityManager().getEntityComponents<TransformComponent>(mainCamera.getEntity());
-	if (cameraTransformComponent == nullptr)
+	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
+
+	if (!renderMode || renderMode->getIsDrawBackgroundEnabled())
 	{
-		return;
+		drawBackground(*renderData, world, drawShift, workingRect);
 	}
-
-	auto [renderMode] = world->getWorldComponents().getComponents<RenderModeComponent>();
-
-	Vector2D cameraLocation = cameraTransformComponent->getLocation();
-	Vector2D mouseScreenPos(mEngine->getMouseX(), mEngine->getMouseY());
-	Vector2D screenHalfSize = Vector2D(static_cast<float>(mEngine->getWidth()), static_cast<float>(mEngine->getHeight())) * 0.5f;
-
-	Vector2D drawShift = screenHalfSize - cameraLocation + (screenHalfSize - mouseScreenPos) * 0.5;
 
 	if (!renderMode || renderMode->getIsDrawLightsEnabled())
 	{
-		drawLights(world, drawShift, maxFov);
+		drawLights(*renderData, spatialManager, cells, cameraLocation, drawShift, maxFov, halfWindowSize);
 	}
 
 	if (!renderMode || renderMode->getIsDrawVisibleEntitiesEnabled())
 	{
-		world->getEntityManager().forEachComponentSet<RenderComponent, TransformComponent>([&drawShift, &resourceManager = mResourceManager, renderer](RenderComponent* render, TransformComponent* transform)
+		SCOPED_PROFILER("draw visible entities");
+		spatialManager.forEachComponentSet<const SpriteRenderComponent, const TransformComponent>(
+			[&drawShift, &renderData](const SpriteRenderComponent* spriteRender, const TransformComponent* transform)
 		{
-			auto location = transform->getLocation() + drawShift;
+			Vector2D location = transform->getLocation() + drawShift;
 			float rotation = transform->getRotation().getValue();
-			for (const auto& data : render->getSpriteDatas())
+			for (const auto& data : spriteRender->getSpriteDatas())
 			{
-				const Graphics::Sprite& spriteData = resourceManager->getResource<Graphics::Sprite>(data.spriteHandle);
-				renderer->render(*spriteData.getTexture(), location, data.params.size, data.params.anchor, rotation, spriteData.getUV(), 1.0f);
+				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+				quadData.spriteHandle = data.spriteHandle;
+				quadData.position = location;
+				quadData.size = data.params.size;
+				quadData.anchor = data.params.anchor;
+				quadData.rotation = rotation;
+				quadData.alpha = 1.0f;
 			}
 		});
 	}
+
+	renderAccessor->submitData(std::move(renderData));
 }
 
-void RenderSystem::drawVisibilityPolygon(const Graphics::Sprite& lightSprite, const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift)
+void RenderSystem::DrawVisibilityPolygon(RenderData& renderData, ResourceHandle lightSpriteHandle, const std::vector<Vector2D>& polygon, const Vector2D& fovSize, const Vector2D& drawShift)
 {
 	if (polygon.size() > 2)
 	{
-		Graphics::QuadUV quadUV = lightSprite.getUV();
+		FanRenderData& lightPolygon = TemplateHelpers::EmplaceVariant<FanRenderData>(renderData.layers);
 
-		std::vector<Graphics::DrawPoint> drawablePolygon;
-		drawablePolygon.reserve(polygon.size() + 2);
-		drawablePolygon.push_back(Graphics::DrawPoint{ZERO_VECTOR, Graphics::QuadLerp(quadUV, 0.5f, 0.5f)});
+		lightPolygon.points.reserve(polygon.size() + 2);
+		lightPolygon.points.push_back(ZERO_VECTOR);
 		for (auto& point : polygon)
 		{
-			drawablePolygon.push_back(Graphics::DrawPoint{point, Graphics::QuadLerp(quadUV, 0.5f-point.x/fowSize.x, 0.5f-point.y/fowSize.y)});
+			lightPolygon.points.push_back(point);
 		}
-		drawablePolygon.push_back(Graphics::DrawPoint{polygon[0], Graphics::QuadLerp(quadUV, 0.5f-polygon[0].x/fowSize.x, 0.5f-polygon[0].y/fowSize.y)});
+		lightPolygon.points.push_back(polygon[0]);
 
-		glm::mat4 transform(1.0f);
-		transform = glm::translate(transform, glm::vec3(drawShift.x, drawShift.y, 0.0f));
-		mEngine->getRenderer()->renderFan(*lightSprite.getTexture(), drawablePolygon, transform, 0.5f);
+		lightPolygon.spriteHandle = lightSpriteHandle;
+		lightPolygon.alpha = 0.5f;
+		lightPolygon.start = drawShift - fovSize;
+		lightPolygon.size = fovSize;
 	}
 }
 
-Vector2D RenderSystem::GetPlayerSightPosition(World* world)
+void RenderSystem::drawBackground(RenderData& renderData, World& world, Vector2D drawShift, Vector2D windowSize)
 {
-	Vector2D result;
-
-	if (OptionalEntity playerEntity = world->getPlayerControlledEntity(); playerEntity.isValid())
+	SCOPED_PROFILER("RenderSystem::drawBackground");
+	auto [backgroundTexture] = world.getWorldComponents().getComponents<BackgroundTextureComponent>();
+	if (backgroundTexture != nullptr)
 	{
-		auto [playerTransform] = world->getEntityManager().getEntityComponents<TransformComponent>(playerEntity.getEntity());
-
-		if (playerTransform != nullptr)
+		if (!backgroundTexture->getSprite().spriteHandle.isValid())
 		{
-			result = playerTransform->getLocation();
+			backgroundTexture->getSpriteRef().spriteHandle = mResourceManager.lockResource<Graphics::Sprite>(backgroundTexture->getSpriteDesc().path);
+			backgroundTexture->getSpriteRef().params = backgroundTexture->getSpriteDesc().params;
+		}
+
+		const SpriteData& spriteData = backgroundTexture->getSpriteRef();
+		const Vector2D spriteSize(spriteData.params.size);
+		const Vector2D tiles(windowSize.x / spriteSize.x, windowSize.y / spriteSize.y);
+		const Vector2D uvShift(-drawShift.x / spriteSize.x, -drawShift.y / spriteSize.y);
+
+		BackgroundRenderData& bgRenderData = TemplateHelpers::EmplaceVariant<BackgroundRenderData>(renderData.layers);
+		bgRenderData.spriteHandle = spriteData.spriteHandle;
+		bgRenderData.start = ZERO_VECTOR;
+		bgRenderData.size = windowSize;
+		bgRenderData.uv = Graphics::QuadUV(uvShift, uvShift + tiles);
+	}
+}
+
+struct VisibilityPolygonCalculationResult
+{
+	std::vector<Vector2D> polygon;
+	Vector2D location;
+	Vector2D size;
+};
+
+using LightBlockingComponents = std::vector<const LightBlockingGeometryComponent*>;
+
+static std::vector<VisibilityPolygonCalculationResult> processVisibilityPolygonsGroup(
+	const TupleVector<LightComponent*, const TransformComponent*>& componentsToProcess,
+	Vector2D maxFov,
+	const LightBlockingComponents& lightBlockingComponents,
+	const GameplayTimestamp& timestamp)
+{
+	SCOPED_PROFILER("processVisibilityPolygonsGroup()");
+
+	std::vector<VisibilityPolygonCalculationResult> calculationResults(componentsToProcess.size());
+	VisibilityPolygonCalculator visibilityPolygonCalculator;
+	for (size_t i = 0; i < componentsToProcess.size(); ++i)
+	{
+		auto [light, transform] = componentsToProcess[i];
+
+		visibilityPolygonCalculator.calculateVisibilityPolygon(light->getCachedVisibilityPolygonRef(), lightBlockingComponents, transform->getLocation(), maxFov * light->getBrightness());
+		light->setUpdateTimestamp(timestamp);
+
+		const std::vector<Vector2D>& visibilityPolygon = light->getCachedVisibilityPolygon();
+
+		calculationResults[i].polygon.resize(visibilityPolygon.size());
+		std::ranges::copy(visibilityPolygon, std::begin(calculationResults[i].polygon));
+		calculationResults[i].location = transform->getLocation();
+		calculationResults[i].size = maxFov * light->getBrightness();
+	}
+	return calculationResults;
+}
+
+static size_t GetJobDivisor(size_t maxThreadsCount)
+{
+	// this algorithm is subject to change
+	// we need to divide work into chunks to pass to different threads
+	// take to consideration that the count of free threads most likely
+	// smaller that threadsCount and can fluctuate over time
+	return maxThreadsCount * 3 - 1;
+}
+
+void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, std::vector<WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize)
+{
+	SCOPED_PROFILER("RenderSystem::drawLights");
+	const GameplayTimestamp timestampNow = mTime.lastFixedUpdateTimestamp;
+
+	// get all the collidable components
+	std::vector<const LightBlockingGeometryComponent*> lightBlockingComponents;
+	lightBlockingComponents.reserve(cells.size());
+	for (WorldCell* cell : cells)
+	{
+		auto [lightBlockingGeometry] = cell->getCellComponents().getComponents<const LightBlockingGeometryComponent>();
+		if ALMOST_ALWAYS(lightBlockingGeometry)
+		{
+			lightBlockingComponents.push_back(lightBlockingGeometry);
 		}
 	}
 
-	return result;
-}
+	// get lights
+	TupleVector<LightComponent*, const TransformComponent*> lightComponentSets;
+	managerGroup.getComponents<LightComponent, const TransformComponent>(lightComponentSets);
 
-void RenderSystem::drawLights(World* world, const Vector2D& drawShift, const Vector2D& maxFov)
-{
-	const Graphics::Sprite& lightSprite = mResourceManager->getResource<Graphics::Sprite>(mLightSpriteHandle);
-	if (!lightSprite.isValid())
+	// determine the borders of the location we're interested in
+	Vector2D emitterPositionBordersLT = playerSightPosition - screenHalfSize - maxFov;
+	Vector2D emitterPositionBordersRB = playerSightPosition + screenHalfSize + maxFov;
+
+	// exclude lights that are too far to be visible
+	std::erase_if(
+		lightComponentSets,
+		[emitterPositionBordersLT, emitterPositionBordersRB](auto& componentSet)
+		{
+			return !std::get<1>(componentSet)->getLocation().isInsideRect(emitterPositionBordersLT, emitterPositionBordersRB);
+		}
+	);
+
+	if (!lightComponentSets.empty())
 	{
-		return;
+		// collect the results from all the threads to one vector
+		std::vector<VisibilityPolygonCalculationResult> allResults;
+		allResults.reserve(lightComponentSets.size());
+
+		// prepare function that will collect the calculated data
+		auto finalizeFn = [&allResults](std::any&& result)
+		{
+			SCOPED_PROFILER("finalizeFn()");
+			std::ranges::move(
+				std::any_cast<std::vector<VisibilityPolygonCalculationResult>&>(result),
+				std::back_inserter(allResults)
+			);
+		};
+
+		// calculate how many threads we need
+		const size_t threadsCount = mThreadPool.getThreadsCount();
+		const size_t minimumComponentsForThread = 3;
+		const size_t componentsToRecalculate = lightComponentSets.size();
+		const size_t chunksCount = std::max(static_cast<size_t>(1), std::min(GetJobDivisor(threadsCount + 1), componentsToRecalculate / minimumComponentsForThread));
+		const size_t chunkSize = componentsToRecalculate / chunksCount;
+
+		std::vector<std::pair<std::function<std::any()>, std::function<void(std::any&&)>>> jobs;
+		jobs.reserve(chunksCount);
+
+		// fill the jobs
+		TupleVector<LightComponent*, const TransformComponent*> oneTaskComponents;
+		oneTaskComponents.reserve(chunkSize);
+		for (size_t i = 0; i < chunksCount; ++i)
+		{
+			std::move(
+				lightComponentSets.begin() + (i * chunkSize),
+				lightComponentSets.begin() + (std::min(lightComponentSets.size(), (i + 1) * chunkSize)),
+				std::back_inserter(oneTaskComponents)
+			);
+
+			jobs.emplace_back(
+				[components = std::move(oneTaskComponents), maxFov, &lightBlockingComponents, timestampNow]()
+				{
+					return processVisibilityPolygonsGroup(components, maxFov, lightBlockingComponents, timestampNow);
+				},
+				finalizeFn
+			);
+			oneTaskComponents.clear();
+		}
+
+		// start heavy calculations
+		mThreadPool.executeTasks(std::move(jobs), 1u);
+		mThreadPool.processAndFinalizeTasks(1u);
+
+		// sort lights in some deterministic order
+		std::ranges::sort(allResults, [](auto& a, auto& b)
+		{
+			return (
+				a.location.x < b.location.x
+				||
+				(a.location.x == b.location.x && a.location.y < b.location.y)
+			);
+		});
+
+		// draw the results on screen
+		for (auto& result : allResults)
+		{
+			DrawVisibilityPolygon(
+				renderData,
+				mLightSpriteHandle,
+				result.polygon,
+				result.size,
+				drawShift + result.location
+			);
+		}
 	}
 
-	const auto collidableComponents = world->getEntityManager().getComponents<CollisionComponent, TransformComponent>();
-	VisibilityPolygonCalculator visibilityPolygonCalculator;
-
-	std::vector<Vector2D> polygon;
 	// draw player visibility polygon
-	Vector2D playerSightPosition = GetPlayerSightPosition(world);
-	visibilityPolygonCalculator.calculateVisibilityPolygon(polygon, collidableComponents, playerSightPosition, maxFov);
-	drawVisibilityPolygon(lightSprite, polygon, maxFov, drawShift + playerSightPosition);
-
-	// ToDo: we calculate visibility polygon for every light source in the each frame to
-	// be able to work with worst-case scenario as long as possible
-	// optimizations such as dirty flag and spatial hash are on the way to be impelemnted
-	// draw light
-	world->getEntityManager().forEachComponentSet<LightComponent, TransformComponent>([&collidableComponents, &visibilityPolygonCalculator, maxFov, &drawShift, &lightSprite, &polygon, this](LightComponent* /*light*/, TransformComponent* transform)
-	{
-		visibilityPolygonCalculator.calculateVisibilityPolygon(polygon, collidableComponents, transform->getLocation(), maxFov);
-		drawVisibilityPolygon(lightSprite, polygon, maxFov, drawShift + transform->getLocation());
-	});
+	VisibilityPolygonCalculator visibilityPolygonCalculator;
+	std::vector<Vector2D> polygon;
+	visibilityPolygonCalculator.calculateVisibilityPolygon(polygon, lightBlockingComponents, playerSightPosition, maxFov);
+	DrawVisibilityPolygon(renderData, mLightSpriteHandle, polygon, maxFov, drawShift + playerSightPosition);
 }

@@ -1,0 +1,1 @@
+ImguiDataInspection::Inspector("{attribute_name}", {component_name}->m{attribute_name_capital});{delim_endl}{delim_tab}

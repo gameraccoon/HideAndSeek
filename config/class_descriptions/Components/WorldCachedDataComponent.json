@@ -1,0 +1,29 @@
+{
+	"component": "worldCachedData",
+	"description": "Component that stores cached information about world",
+	"flags": ["transient"],
+	"attributes": [
+		{
+			"name": "cameraPos",
+			"type": "Vector2D",
+			"default": " = ZERO_VECTOR",
+			"includes": ["\"GameData/Geometry/Vector2D.h\""],
+			"flags": ["transient"]
+		},
+		{
+			"name": "cameraCellPos",
+			"type": "CellPos",
+			"default": "{0, 0}",
+			"includes": ["\"GameData/Spatial/CellPos.h\""],
+			"flags": ["transient"]
+		},
+		{
+			"name": "screenSize",
+			"type": "Vector2D",
+			"default": " = ZERO_VECTOR",
+			"includes": ["\"GameData/Geometry/Vector2D.h\""],
+			"flags": ["transient"]
+		}
+
+	]
+}

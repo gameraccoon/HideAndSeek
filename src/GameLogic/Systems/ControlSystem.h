@@ -2,27 +2,22 @@
 
 #include <unordered_map>
 
-#include "ECS/System.h"
-#include "HAL/Base/Engine.h"
+#include <raccoon-ecs/system.h>
 
-#include "HAL/KeyStatesMap.h"
-
-#include "GameLogic/SharedManagers/WorldHolder.h"
-#include "GameLogic/SharedManagers/TimeData.h"
+class InputData;
+class WorldHolder;
 
 /**
- * System that handles movement controls
+ * System that processes gameplay controls
  */
-class ControlSystem : public System
+class ControlSystem : public RaccoonEcs::System
 {
 public:
-	ControlSystem(WorldHolder& worldHolder, HAL::Engine* engine, HAL::KeyStatesMap* keyStates);
-	~ControlSystem() override = default;
+	ControlSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
+	static std::string GetSystemId() { return "ControlSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;
-	HAL::Engine* mEngine;
-	HAL::KeyStatesMap* mKeyStates;
 };

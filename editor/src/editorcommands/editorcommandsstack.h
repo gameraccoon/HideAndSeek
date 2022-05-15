@@ -1,17 +1,19 @@
-#ifndef EDITORCOMMANDSSTACK_H
-#define EDITORCOMMANDSSTACK_H
+#pragma once
+
+#include <functional>
+
+#include <raccoon-ecs/delegates.h>
 
 #include "editorcommand.h"
-#include <functional>
 
 class EditorCommandsStack
 {
 public:
-	typedef std::function<void(EditorCommand::EffectType, bool, bool)> OnChangeFn;
+	using OnChangeFn = std::function<void(EditorCommand::EffectBitset, bool)>;
 
 public:
 	template<typename T, typename... Args>
-	void executeNewCommand(World* world, Args... args)
+	void executeNewCommand(World* world, Args&&... args)
 	{
 		// clear old redo commands
 		if (haveSomethingToRedo())
@@ -20,9 +22,9 @@ public:
 		}
 
 		// add and activate
-		mCommands.emplace_back(new T(std::forward<Args>(args)...));
-		bool forceUpdateLayout = mCommands.back()->doCommand(world);
-		EditorCommand::EffectType effect = mCommands.back()->getEffectType();
+		mCommands.emplace_back(std::make_shared<T>(std::forward<Args>(args)...));
+		mCommands.back()->doCommand(world);
+		EditorCommand::EffectBitset effects = mCommands.back()->getEffects();
 		++mCurrentHeadIndex;
 
 		// clear old commands if exceed limits
@@ -31,18 +33,24 @@ public:
 			clearOldCommands();
 		}
 
+		mLastExecutedCommandIdx = mCurrentHeadIndex;
+		mIsLastExecutedUndo = false;
+
 		if (mChangeHandler)
 		{
-			mChangeHandler(effect, true, forceUpdateLayout);
+			mChangeHandler(effects, true);
 		}
 	}
 
-	bool undo(World* world);
-	bool redo(World* world);
+	void undo(World* world);
+	void redo(World* world);
 	bool haveSomethingToUndo() const;
 	bool haveSomethingToRedo() const;
 	void clear();
 	void bindFunctionToCommandChange(OnChangeFn handler);
+
+	std::weak_ptr<const EditorCommand> getLastExecutedCommand() const;
+	bool isLastExecutedUndo() const;
 
 private:
 	void clearOldCommands();
@@ -55,7 +63,8 @@ private:
 	static const int mClearLag = 100;
 	OnChangeFn mChangeHandler;
 
-	Delegates::Handle mOnCommandEffectHandle;
-};
+	int mLastExecutedCommandIdx = -1;
+	bool mIsLastExecutedUndo = false;
 
-#endif // EDITORCOMMANDSSTACK_H
+	RaccoonEcs::Delegates::Handle mOnCommandEffectHandle;
+};

@@ -1,0 +1,30 @@
+{
+	"component": "spriteRender",
+	"description": "Component that stores information about sprites that should be rendered",
+	"flags": ["transient"],
+	"attributes": [
+		{
+			"name": "spriteDatas",
+			"type": "std::vector<SpriteData>",
+			"includes": [
+				"\"GameData/Resources/SpriteData.h\"",
+				"<vector>"
+			],
+			"flags": ["transient", "get_by_ref"]
+		},
+		{
+			"name": "spriteIds",
+			"type": "std::vector<int>",
+			"includes": [
+				"<vector>"
+			],
+			"flags": ["transient", "get_by_ref"]
+		},
+		{
+			"name": "maxSpriteId",
+			"type": "int",
+			"default": " = 0",
+			"flags": ["transient"]
+		}
+	]
+}

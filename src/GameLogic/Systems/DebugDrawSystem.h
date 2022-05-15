@@ -3,41 +3,42 @@
 #include <memory>
 #include <vector>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
-#include "HAL/Base/ResourceManager.h"
 #include "HAL/EngineFwd.h"
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
+#include "Utils/ResourceManagement/ResourceManager.h"
 
-class TransformComponent;
-class CollisionComponent;
-class Vector2D;
+#include "GameLogic/SharedManagers/WorldHolder.h"
+#include "GameLogic/SharedManagers/TimeData.h"
 
 /**
  * System that handles rendering of world objects
  */
-class DebugDrawSystem : public System
+class DebugDrawSystem : public RaccoonEcs::System
 {
 public:
-	typedef std::unordered_map<int, bool> KeyStatesMap;
+	using KeyStatesMap = std::unordered_map<int, bool>;
 
 public:
-	DebugDrawSystem(WorldHolder& worldHolder, HAL::Engine* engine, HAL::ResourceManager* resourceManager);
+	DebugDrawSystem(
+		WorldHolder& worldHolder,
+		const TimeData& timeData,
+		ResourceManager& resourceManager) noexcept;
 	~DebugDrawSystem() override = default;
 
 	void update() override;
-
-private:
-	void drawVisibilityPolygon(const std::vector<Vector2D>& polygon, const Vector2D& fowSize, const Vector2D& drawShift);
-	static Vector2D GetPlayerSightPosition(World* world);
-	void drawLights(World* world, const Vector2D& drawShift, const Vector2D& maxFov);
+	void init() override;
+	static std::string GetSystemId() { return "DebugDrawSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;
-	HAL::Engine* mEngine;
-	HAL::ResourceManager* mResourceManager;
+	const TimeData& mTime;
+	ResourceManager& mResourceManager;
 
 	ResourceHandle mCollisionSpriteHandle;
 	ResourceHandle mNavmeshSpriteHandle;
+	ResourceHandle mFontHandle;
+	ResourceHandle mPointTextureHandle;
+	ResourceHandle mLineTextureHandle;
 };

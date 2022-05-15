@@ -1,0 +1,2 @@
+[[nodiscard]] const {attribute_type}& get{attribute_name_capital}() const {{ return m{attribute_name_capital}; }}
+	[[nodiscard]] {attribute_type}& get{attribute_name_capital}Ref() {{ return m{attribute_name_capital}; }}{delim_endl}{delim_endl}{delim_tab}

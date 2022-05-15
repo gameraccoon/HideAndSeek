@@ -6,23 +6,23 @@
 
 #include "editorcommand.h"
 
-#include "ECS/Entity.h"
-#include "GameData/Core/Vector2D.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Spatial/SpatialEntity.h"
 
 class World;
 
 class AddEntityGroupCommand : public EditorCommand
 {
 public:
-	AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, ComponentFactory* factory, const Vector2D& shift);
+	AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, const Json::ComponentSerializationHolder& jsonSerializerHolder, const Vector2D& shift);
 
-	bool doCommand(World* world) override;
-	bool undoCommand(World* world) override;
-	EffectType getEffectType() override;
+	void doCommand(World* world) override;
+	void undoCommand(World* world) override;
 
 private:
 	std::vector<nlohmann::json> mEntities;
-	std::vector<Entity> mCreatedEntities;
-	ComponentFactory* mComponentFactory;
+	std::vector<SpatialEntity> mCreatedEntities;
+	const Json::ComponentSerializationHolder& mSerializationHolder;
 	Vector2D mShift;
 };

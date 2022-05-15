@@ -1,0 +1,22 @@
+{
+	"component": "backgroundTexture",
+	"description": "Component that stores info about texture to render to background",
+	"attributes": [
+		{
+			"name": "spriteDesc",
+			"type": "SpriteDescription",
+			"includes": [
+				"\"GameData/Resources/SpriteDescription.h\""
+			],
+			"flags": ["get_by_ref"]
+		},
+		{
+			"name": "sprite",
+			"type": "SpriteData",
+			"includes": [
+				"\"GameData/Resources/SpriteData.h\""
+			],
+			"flags": ["transient", "get_by_ref"]
+		}
+	]
+}

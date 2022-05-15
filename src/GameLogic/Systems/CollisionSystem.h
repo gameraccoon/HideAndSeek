@@ -2,23 +2,21 @@
 
 #include <unordered_map>
 
-#include "ECS/System.h"
+#include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
 /**
  * System that resolve object collisions
  */
-class CollisionSystem : public System
+class CollisionSystem : public RaccoonEcs::System
 {
 public:
-	typedef std::unordered_map<int, bool> KeyStatesMap;
-
-public:
-	CollisionSystem(WorldHolder& worldHolder);
+	explicit CollisionSystem(WorldHolder& worldHolder) noexcept;
 	~CollisionSystem() override = default;
 
 	void update() override;
+	static std::string GetSystemId() { return "CollisionSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;
