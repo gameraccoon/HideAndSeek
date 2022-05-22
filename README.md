@@ -67,19 +67,42 @@ Game examples that can run for a limited period of frames with fixed dt and RNG 
 - CMake
 - python3
 - a compiler that supports C++20
-- for Linux you need to install SLD2, SDL2_Image, SDL2_mixer and SDL2_ttf (devel and static) using your packet manager
+- for Linux you need to install SLD2, SDL2_Image and SDL2_mixer (devel and static) using your packet manager  
+e.g. for apt: `sudo apt-get install libsdl2-dev libsdl2-2.0-0 libsdl2-image-dev libsdl2-image-2.0-0 libsdl2-mixer-dev libsdl2-mixer-2.0-0`
 
 #### Prerequisites for building the editor
 - git-lfs
 - CMake
 - python3
 - a compiler that supports C++20
-- Qt Creator
+- Qt Creator (Qt 5.5 or higher)
 
 #### Building the game
-For Windows with Visual Studio you can run `scripts/generate_game_vs2019_project.cmd` it will generate the solution for Visual Studio 2019. Path to the generated solution: `build\game\GameMain.sln`
+##### Windows
+For Windows with Visual Studio you can run `scripts\generate_game_vs2019_project.cmd` it will generate the solution for Visual Studio 2019. Path to the generated solution: `build\game\GameMain.sln`
 
+##### Linux
 For all the other cases and platforms just generate the project using CMake with `CMakeLists.txt` in the root folder.
+
+E.g. using make
+```bash
+mkdir -p build/game
+cd build/game
+cmake ../..
+make
+```
+
+After being built, the resulting executables can be found in `bin` folder
 
 #### Building the editor
 Generate the project using CMake with `editor/CMakeLists.txt`
+
+E.g. using make
+```bash
+mkdir -p build/editor
+cd build/editor
+cmake ../../editor
+make
+```
+
+Resulting executable: `bin/Editor`
