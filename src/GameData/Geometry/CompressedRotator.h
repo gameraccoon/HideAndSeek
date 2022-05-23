@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Base/Math/ValueCompression.h"
-
 #include <nlohmann/json_fwd.hpp>
 #include <type_traits>
+
+#include "Base/Debug/Assert.h"
+#include "Base/Math/ValueCompression.h"
 
 #include "GameData/Geometry/Rotator.h"
 

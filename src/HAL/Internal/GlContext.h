@@ -1,7 +1,6 @@
 #pragma once
 
-#include <memory>
-
+#include <cstring> // should be before SDL.h to suppress undifined memcpy error
 #include <sdl/SDL.h>
 
 namespace HAL

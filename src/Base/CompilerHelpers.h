@@ -69,3 +69,15 @@
 #else
 	#define ASSUME(cond)
 #endif
+
+// desable clang diagnostics locally
+#if USED_COMPILER == COMPILER_CLANG
+	#define DISABLE_DIAG_PUSH(diagnostic_name) \
+		_Pragma("clang diagnostic push") \
+		_Pragma("clang diagnostic ignored \"diagnostic_name\"")
+
+	#define DISABLE_DIAG_POP _Pragma("clang diagnostic pop")
+#else
+	#define DISABLE_DIAG_PUSH(diagnostic)
+	#define DISABLE_DIAG_POP
+#endif

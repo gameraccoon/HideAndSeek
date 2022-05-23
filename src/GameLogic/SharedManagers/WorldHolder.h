@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Base/Debug/Assert.h"
+
 class World;
 class GameData;
 

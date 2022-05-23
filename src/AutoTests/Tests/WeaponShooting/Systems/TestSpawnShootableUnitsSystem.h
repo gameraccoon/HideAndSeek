@@ -5,10 +5,11 @@
 #include <raccoon-ecs/system.h>
 
 #include "GameData/EcsDefinitions.h"
-#include "GameData/Geometry/Vector2D.h"
+
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
+struct Vector2D;
 
 class TestSpawnShootableUnitsSystem : public RaccoonEcs::System
 {
@@ -19,9 +20,9 @@ public:
 	static std::string GetSystemId() { return "TestSpawnShootableUnitsSystem"; }
 
 private:
-	void spawnUnit(EntityManager& entityManager, Vector2D pos);
+	void spawnUnit(EntityManager& entityManager, const Vector2D& pos);
 	void spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, class SpatialWorldData& spatialData);
-	void spawnUnits(class SpatialWorldData& spatialData, int count, Vector2D pos);
+	void spawnUnits(class SpatialWorldData& spatialData, int count, const Vector2D& pos);
 
 private:
 	WorldHolder& mWorldHolder;

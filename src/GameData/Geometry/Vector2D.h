@@ -49,8 +49,7 @@ struct Vector2D
 	[[nodiscard]] Vector2D getRotated(Rotator rotation) const;
 
 	// check for exact equality
-	[[nodiscard]] bool operator==(Vector2D other) const noexcept;
-	[[nodiscard]] bool operator!=(Vector2D other) const noexcept;
+	[[nodiscard]] bool operator==(const Vector2D& other) const noexcept = default;
 
 	[[nodiscard]] bool isNearlyEqualTo(Vector2D other) const noexcept;
 	[[nodiscard]] bool isNearlyEqualTo(Vector2D other, float error) const noexcept;
@@ -64,7 +63,6 @@ struct Vector2D
 	Vector2D operator-=(Vector2D right) noexcept;
 
 	[[nodiscard]] Vector2D operator*(float scalar) const noexcept;
-	[[nodiscard]] friend Vector2D operator*(float scalar, Vector2D vector) noexcept;
 	Vector2D operator*=(float scalar) noexcept;
 
 	[[nodiscard]] Vector2D operator/(float scalar) const noexcept;
@@ -81,6 +79,8 @@ struct Vector2D
 	friend void from_json(const nlohmann::json& json, Vector2D& outVector);
 };
 
+[[nodiscard]] Vector2D operator*(float scalar, Vector2D vector) noexcept;
+
 constexpr Vector2D LEFT_DIRECTION(-1.0f, 0.0f);
 constexpr Vector2D RIGHT_DIRECTION(1.0f, 0.0f);
 constexpr Vector2D UP_DIRECTION(0.0f, -1.0f);
@@ -94,6 +94,8 @@ struct Vector2DKey
 	static constexpr float Multiplier = static_cast<float>(1 << PrecisionBin);
 
 	struct Key {
+		Key(long x, long y): x(x), y(y) {}
+
 		long x;
 		long y;
 	};
@@ -116,7 +118,7 @@ struct Vector2DKey
 		return std::memcmp(&key, &other.key, sizeof(Key)) < 0;
 	}
 
-	Vector2D calcRoundedValue() const {
+	[[nodiscard]] Vector2D calcRoundedValue() const {
 		return Vector2D{static_cast<float>(key.x) / Multiplier, static_cast<float>(key.y) / Multiplier};
 	}
 };
@@ -126,10 +128,7 @@ namespace std
 	template <>
 	struct hash<Vector2D>
 	{
-		std::size_t operator()(Vector2D k) const
-		{
-			return hash<float>()(k.x) ^ std::rotl(hash<float>()(k.y), 7);
-		}
+		std::size_t operator()(Vector2D k) const;
 	};
 
 	template <int Precision>

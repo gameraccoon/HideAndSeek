@@ -1,7 +1,8 @@
 #pragma once
 
-#include <type_traits>
 #include <compare>
+#include <functional>
+#include <type_traits>
 
 class ResourceHandle
 {

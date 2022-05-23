@@ -8,6 +8,9 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
+class SpatialWorldData;
+struct Vector2D;
+
 class TestUnitsCountControlSystem : public RaccoonEcs::System
 {
 public:
@@ -17,9 +20,9 @@ public:
 	static std::string GetSystemId() { return "TestUnitsCountControlSystem"; }
 
 private:
-	void SpawnUnit(EntityManager& entityManager, Vector2D pos);
+	void SpawnUnit(EntityManager& entityManager, const Vector2D& pos);
 	void SpawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData);
-	void SpawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos);
+	void SpawnUnits(SpatialWorldData& spatialData, int count, const Vector2D& pos);
 
 private:
 	WorldHolder& mWorldHolder;

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <fstream>
+#include <string>
+
 /**
  * Class that helps to write log messages
  */

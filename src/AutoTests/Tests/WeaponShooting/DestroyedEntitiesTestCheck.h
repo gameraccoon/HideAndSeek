@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Base/Types/String/StringHelpers.h"
+
 #include "AutoTests/TestChecklist.h"
 
 class DestroyedEntitiesTestCheck : public TestCheck

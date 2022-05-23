@@ -1,5 +1,12 @@
 #pragma once
 
+#include <unordered_map>
+#include <vector>
+
+#include <nlohmann/json_fwd.hpp>
+
+#include "Base/Types/String/StringId.h"
+
 namespace Json
 {
 	class ComponentSerializer

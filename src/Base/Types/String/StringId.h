@@ -1,5 +1,14 @@
 #pragma once
 
+#include <compare>
+#include <string>
+#include <unordered_map>
+
+#include "Base/Types/BasicTypes.h"
+
+#include <fnv1a/hash_fnv1a_constexpr.h>
+#include <nlohmann/json_fwd.hpp>
+
 /**
  * String type used for technical identifiers that
  * don't need to be presented to the player in any form
@@ -12,42 +21,15 @@ public:
 	friend struct std::hash<StringId>;
 	friend class StringIdManager;
 
-	using KeyType = uint64_t;
+	using KeyType = u64;
 
 public:
 	constexpr StringId() = default;
 
-	[[nodiscard]] bool isValid() const noexcept { return mHash != InvalidValue; }
+	[[nodiscard]] constexpr bool isValid() const noexcept { return mHash != InvalidValue; }
 
-	[[nodiscard]] bool operator ==(const StringId& other) const noexcept
-	{
-		return mHash == other.mHash;
-	}
-
-	[[nodiscard]] bool operator !=(const StringId& other) const noexcept
-	{
-		return mHash != other.mHash;
-	}
-
-	[[nodiscard]] bool operator <(const StringId& other) const noexcept
-	{
-		return mHash < other.mHash;
-	}
-
-	[[nodiscard]] bool operator >(const StringId& other) const noexcept
-	{
-		return mHash > other.mHash;
-	}
-
-	[[nodiscard]] bool operator <=(const StringId& other) const noexcept
-	{
-		return mHash <= other.mHash;
-	}
-
-	[[nodiscard]] bool operator >=(const StringId& other) const noexcept
-	{
-		return mHash >= other.mHash;
-	}
+	// compare only hashes
+	[[nodiscard]] constexpr std::strong_ordering operator<=>(const StringId& other) const noexcept = default;
 
 private:
 	constexpr explicit StringId(KeyType hash) noexcept
@@ -56,7 +38,7 @@ private:
 	}
 
 private:
-	static const KeyType InvalidValue = 0;
+	static constexpr KeyType InvalidValue = 0;
 	KeyType mHash = InvalidValue;
 };
 

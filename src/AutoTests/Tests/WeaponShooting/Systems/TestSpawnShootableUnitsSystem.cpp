@@ -19,7 +19,7 @@ TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(WorldHolder& worldH
 {
 }
 
-void TestSpawnShootableUnitsSystem::spawnUnit(EntityManager& entityManager, Vector2D pos)
+void TestSpawnShootableUnitsSystem::spawnUnit(EntityManager& entityManager, const Vector2D& pos)
 {
 	Entity entity = entityManager.addEntity();
 	{
@@ -53,7 +53,7 @@ void TestSpawnShootableUnitsSystem::spawnJitteredUnit(const Vector2D& pos, const
 	spawnUnit(spatialData.getOrCreateCell(cellPos).getEntityManager(), newPos);
 }
 
-void TestSpawnShootableUnitsSystem::spawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos)
+void TestSpawnShootableUnitsSystem::spawnUnits(SpatialWorldData& spatialData, int count, const Vector2D& pos)
 {
 	int n = static_cast<int>(std::sqrt(count));
 	int m = count / n;

@@ -8,8 +8,8 @@
 #include <condition_variable>
 
 #include "Base/Types/String/Path.h"
-
 #include "Base/Debug/ConcurrentAccessDetector.h"
+#include "Base/Profile/ScopedProfiler.h"
 
 #include "GameData/Resources/ResourceHandle.h"
 #include "GameData/Resources/Resource.h"

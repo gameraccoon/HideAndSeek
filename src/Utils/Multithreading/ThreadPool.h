@@ -1,6 +1,7 @@
 #pragma once
 
 #include <any>
+#include <array>
 #include <condition_variable>
 #include <functional>
 #include <list>
@@ -8,6 +9,8 @@
 #include <vector>
 
 #include <cameron314/concurrentqueue/concurrentqueue.h>
+
+#include "Base/Debug/Assert.h"
 
 class ThreadPool
 {
@@ -130,7 +133,7 @@ public:
 
 	void processAndFinalizeTasks(size_t finalizationGroupId = 0)
 	{
-		std::vector<Finalizer> finalizersToExecute(24);
+		std::array<Finalizer, 24> finalizersToExecute;
 		Task currentTask;
 
 		std::unique_lock lock(mDataMutex);
@@ -176,6 +179,14 @@ private:
 
 	struct Finalizer
 	{
+		Finalizer() = default;
+
+		template<typename Fn, typename Any>
+		Finalizer(Fn&& fn, Any&& result)
+			: fn(std::forward<Fn>(fn))
+			, result(std::forward<Any>(result))
+		{}
+
 		FinalizeFn fn;
 		std::any result;
 	};
@@ -252,7 +263,7 @@ private:
 
 	void finalizeTaskForGroup(FinalizerGroup& finalizerGroup)
 	{
-		std::vector<Finalizer> finalizersToExecute(24);
+		std::array<Finalizer, 24> finalizersToExecute;
 
 		while(finalizerGroup.tasksNotFinalizedCount.load(std::memory_order::acquire) > 0)
 		{
@@ -264,17 +275,14 @@ private:
 		}
 	}
 
-	void finalizeReadyTasks(std::vector<Finalizer>& finalizersToExecute, size_t size)
+	void finalizeReadyTasks(std::array<Finalizer, 24>& finalizersToExecute, size_t size)
 	{
-		if (!finalizersToExecute.empty())
+		for (size_t i = 0; i < size; ++i)
 		{
-			for (size_t i = 0; i < size; ++i)
+			Finalizer& finalizer = finalizersToExecute[i];
+			if (finalizer.fn)
 			{
-				Finalizer& finalizer = finalizersToExecute[i];
-				if (finalizer.fn)
-				{
-					finalizer.fn(std::move(finalizer.result));
-				}
+				finalizer.fn(std::move(finalizer.result));
 			}
 		}
 	}

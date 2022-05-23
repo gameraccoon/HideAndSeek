@@ -1,5 +1,13 @@
 #pragma once
 
+#include <exception>
+#include <functional>
+#include <string>
+
+#include "Base/Debug/Log.h"
+#include "Base/CompilerHelpers.h"
+#include "Base/Types/String/StringHelpers.h"
+
 // to be able to change behavior for tests
 inline std::function<void()> gGlobalAssertHandler = [](){};
 inline std::function<void()> gGlobalFatalAssertHandler = [](){ std::terminate(); };

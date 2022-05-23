@@ -6,6 +6,12 @@
 
 #include "Base/Math/Float.h"
 
+Rotator::Rotator(float angle) noexcept
+	: mValue(angle)
+{
+	normalize();
+}
+
 bool Rotator::isNearlyEqualTo(Rotator other) const noexcept
 {
 	float difference = this->getValue() - other.getValue();
@@ -46,6 +52,24 @@ Rotator Rotator::operator-=(Rotator right) noexcept
 	normalize();
 
 	return *this;
+}
+
+float Rotator::NormalizeRawAngle(float rawAngle)
+{
+	while (rawAngle <= -PI)
+	{
+		rawAngle += 2 * PI;
+	}
+	while (rawAngle > PI)
+	{
+		rawAngle -= 2 * PI;
+	}
+	return rawAngle;
+}
+
+void Rotator::normalize() noexcept
+{
+	mValue = NormalizeRawAngle(mValue);
 }
 
 void to_json(nlohmann::json& outJson, const Rotator& rotator)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cinttypes>
+#include <cstdint>
 
 // don't use these in your code
 using raw_s8 = int8_t;

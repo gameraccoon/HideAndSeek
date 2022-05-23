@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+
+#include "Base/Types/String/StringId.h"
+
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 

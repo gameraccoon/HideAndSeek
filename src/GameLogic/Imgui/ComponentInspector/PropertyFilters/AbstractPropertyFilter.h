@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "Base/Types/TemplateAliases.h"
+#include "Base/Debug/Assert.h"
 
 #include "GameData/Spatial/WorldCell.h"
 

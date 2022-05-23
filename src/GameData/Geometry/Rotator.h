@@ -22,11 +22,7 @@ public:
 	// leaves inner data uninitialized
 	explicit Rotator() = default;
 
-	explicit constexpr Rotator(float angle) noexcept
-		: mValue(angle)
-	{
-		normalize();
-	}
+	explicit Rotator(float angle) noexcept;
 
 	[[nodiscard]] bool isNearlyEqualTo(Rotator other) const noexcept;
 
@@ -43,24 +39,10 @@ public:
 	friend void to_json(nlohmann::json& outJson, const Rotator& rotator);
 	friend void from_json(const nlohmann::json& json, Rotator& outRotator);
 
-	static constexpr float NormalizeRawAngle(float rawAngle)
-	{
-		while (rawAngle <= -PI)
-		{
-			rawAngle += 2 * PI;
-		}
-		while (rawAngle > PI)
-		{
-			rawAngle -= 2 * PI;
-		}
-		return rawAngle;
-	}
+	static float NormalizeRawAngle(float rawAngle);
 
 private:
-	constexpr void normalize() noexcept
-	{
-		mValue = NormalizeRawAngle(mValue);
-	}
+	void normalize() noexcept;
 
 private:
 	float mValue;

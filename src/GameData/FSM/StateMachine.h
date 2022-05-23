@@ -4,6 +4,9 @@
 #include <map>
 #include <memory>
 
+#include "Base/Debug/Assert.h"
+#include "Base/CompilerHelpers.h"
+
 #include "GameData/FSM/Blackboard.h"
 #include "GameData/FSM/Link.h"
 

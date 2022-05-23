@@ -2,6 +2,7 @@
 
 #include <any>
 #include <functional>
+#include <memory>
 #include <string>
 
 #include "GameData/FSM/Blackboard.h"

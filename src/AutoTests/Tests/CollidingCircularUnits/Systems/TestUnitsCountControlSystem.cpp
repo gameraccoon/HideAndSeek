@@ -18,7 +18,7 @@ TestUnitsCountControlSystem::TestUnitsCountControlSystem(WorldHolder& worldHolde
 {
 }
 
-void TestUnitsCountControlSystem::SpawnUnit(EntityManager& entityManager, Vector2D pos)
+void TestUnitsCountControlSystem::SpawnUnit(EntityManager& entityManager, const Vector2D& pos)
 {
 	Entity entity = entityManager.addEntity();
 	{
@@ -54,7 +54,7 @@ void TestUnitsCountControlSystem::SpawnJitteredUnit(const Vector2D& pos, const V
 	SpawnUnit(spatialData.getOrCreateCell(cellPos).getEntityManager(), newPos);
 }
 
-void TestUnitsCountControlSystem::SpawnUnits(SpatialWorldData& spatialData, int count, Vector2D pos)
+void TestUnitsCountControlSystem::SpawnUnits(SpatialWorldData& spatialData, int count, const Vector2D& pos)
 {
 	int n = static_cast<int>(std::sqrt(count));
 	int m = count / n;

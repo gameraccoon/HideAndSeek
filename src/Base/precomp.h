@@ -5,8 +5,8 @@
 #include <type_traits>
 #include <unordered_map>
 
-#include <nlohmann/json_fwd.hpp>
 #include <fnv1a/hash_fnv1a_constexpr.h>
+#include <nlohmann/json_fwd.hpp>
 
 #include "Base/CompilerHelpers.h"
 #include "Base/Debug/MemoryLeakDetection.h"

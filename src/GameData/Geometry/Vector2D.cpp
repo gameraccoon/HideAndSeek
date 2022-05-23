@@ -96,16 +96,6 @@ Vector2D Vector2D::operator-() const noexcept
 	return Vector2D(-x, -y);
 }
 
-bool Vector2D::operator==(Vector2D other) const noexcept
-{
-	return x == other.x && y == other.y;
-}
-
-bool Vector2D::operator!=(Vector2D other) const noexcept
-{
-	return !(*this == other);
-}
-
 bool Vector2D::isNearlyEqualTo(Vector2D other) const noexcept
 {
 	return (std::fabs(x - other.x) + std::fabs(y - other.y)) <= VECTOR_ERROR;
@@ -145,11 +135,6 @@ Vector2D Vector2D::operator-=(Vector2D right) noexcept
 Vector2D Vector2D::operator*(float scalar) const noexcept
 {
 	return Vector2D(x * scalar, y * scalar);
-}
-
-Vector2D operator*(float scalar, Vector2D vector) noexcept
-{
-	return Vector2D(scalar * vector.x, scalar * vector.y);
 }
 
 Vector2D Vector2D::operator*=(float scalar) noexcept
@@ -202,6 +187,11 @@ float Vector2D::InvLerp(Vector2D left, Vector2D right, Vector2D point)
 	}
 }
 
+Vector2D operator*(float scalar, Vector2D vector) noexcept
+{
+	return Vector2D(scalar * vector.x, scalar * vector.y);
+}
+
 void to_json(nlohmann::json& outJson, const Vector2D& vector)
 {
 	outJson = nlohmann::json{{"x", vector.x}, {"y", vector.y}};
@@ -213,7 +203,16 @@ void from_json(const nlohmann::json& json, Vector2D& outVector)
 	json.at("y").get_to(outVector.y);
 }
 
+std::size_t std::hash<Vector2D>::operator()(Vector2D k) const
+{
+	return hash<float>()(k.x) ^ std::rotl(hash<float>()(k.y), 7);
+}
+
 static_assert(sizeof(Vector2D) == sizeof(int)*2, "Vector2D is too big");
 static_assert(std::is_trivial<Vector2D>(), "Vector2D should be trivial type");
 static_assert(std::is_standard_layout<Vector2D>(), "Vector2D should have standard layout");
 static_assert(std::is_trivially_copyable<Vector2D>(), "Vector2D should be trivially copyable");
+
+static_assert(std::is_trivially_copyable<Vector2DKey<>>(), "Vector2DKey<> should be trivially copyable");
+static_assert(std::is_standard_layout<Vector2DKey<>>(), "Vector2DKey<> should have standard layout");
+static_assert(std::is_trivially_copyable<Vector2DKey<>>(), "Vector2DKey<> should be trivially copyable");

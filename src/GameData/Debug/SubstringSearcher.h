@@ -1,6 +1,8 @@
 #pragma once
 
+#include <string>
 #include <string_view>
+#include <vector>
 
 template<typename T>
 class SubstringSearcher

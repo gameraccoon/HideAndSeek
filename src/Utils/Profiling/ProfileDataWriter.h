@@ -6,6 +6,8 @@
 #include <vector>
 #include <chrono>
 
+#include "Base/Profile/ScopedProfiler.h"
+
 class ProfileDataWriter
 {
 public:

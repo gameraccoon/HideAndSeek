@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <raccoon-ecs/system.h>
 
 class WorldHolder;

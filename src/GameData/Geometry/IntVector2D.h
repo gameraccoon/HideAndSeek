@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math.h>
 #include <nlohmann/json_fwd.hpp>
 
 struct IntVector2D
@@ -14,7 +15,6 @@ struct IntVector2D
 
 	[[nodiscard]] bool isZeroLength() const { return x == 0 && y == 0; }
 
-	// check for exact equality
 	[[nodiscard]] bool operator==(IntVector2D other) const { return x == other.x && y == other.y; }
 
 	[[nodiscard]] IntVector2D operator*(int scalar) const { return IntVector2D(x * scalar, y * scalar); }
@@ -28,7 +28,7 @@ namespace std
 	{
 		std::size_t operator()(IntVector2D k) const
 		{
-			return hash<int>()(k.x) ^ (hash<int>()(k.y) << 1);
+			return hash<int>()(k.x) ^ std::rotl(hash<int>()(k.y), 7);
 		}
 	};
 }
