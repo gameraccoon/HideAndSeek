@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #include "Utils/Multithreading/ThreadPool.h"
 
 TEST(ThreadPool, CreateAndDestroyEmpty)
