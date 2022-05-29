@@ -4,22 +4,19 @@
 
 #include "Base/Types/TemplateHelpers.h"
 
+#include "GameData/Components/RenderAccessorComponent.generated.h"
 #include "GameData/Components/StateMachineComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
-#include "GameData/Components/RenderAccessorComponent.generated.h"
-#include "GameLogic/Render/RenderAccessor.h"
 
 #include "Utils/Application/ArgumentsParser.h"
 #include "Utils/Multithreading/ThreadPool.h"
-#include "Utils/ResourceManagement/ResourceManager.h"
-
-#ifdef ENABLE_SCOPED_PROFILER
 #include "Utils/Profiling/ProfileDataWriter.h"
-#endif // ENABLE_SCOPED_PROFILER
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 #include "HAL/Base/Engine.h"
 
 #include "GameLogic/Initialization/StateMachines.h"
+#include "GameLogic/Render/RenderAccessor.h"
 
 Game::Game(HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool)
 	: HAL::GameBase(engine, resourceManager)
