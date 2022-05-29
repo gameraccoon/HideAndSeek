@@ -42,16 +42,13 @@ void ImguiSystem::update()
 		return;
 	}
 
-	RenderAccessor* renderAccessor = nullptr;
-	if (auto [renderAccessorCmp] = gameData.getGameComponents().getComponents<RenderAccessorComponent>(); renderAccessorCmp != nullptr)
-	{
-		renderAccessor = renderAccessorCmp->getAccessor();
-	}
-
-	if (renderAccessor == nullptr)
+	auto [renderAccessorCmp] = gameData.getGameComponents().getComponents<RenderAccessorComponent>();
+	if (renderAccessorCmp == nullptr || !renderAccessorCmp->getAccessor().has_value())
 	{
 		return;
 	}
+
+	RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
 
 	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
 	SynchroneousRenderData& syncData = TemplateHelpers::EmplaceVariant<SynchroneousRenderData>(renderData->layers);
@@ -82,7 +79,7 @@ void ImguiSystem::update()
 	// have a owning copy of the data before moving render data to the render thread
 	std::shared_ptr<SyncRenderSharedData> sharedData = syncData.sharedData;
 
-	renderAccessor->submitData(std::move(renderData));
+	renderAccessor.submitData(std::move(renderData));
 
 	// wait until we finish rendering
 	std::unique_lock lock(sharedData->isFinishedMutex);

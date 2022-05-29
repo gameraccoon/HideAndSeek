@@ -5,10 +5,12 @@
 	"attributes": [
 		{
 			"name": "accessor",
-			"type": "RawPtr<class RenderAccessor>",
-			"default": " = nullptr",
-			"includes": ["\"Base/Types/TemplateAliases.h\""],
-			"flags": ["transient"]
+			"type": "std::optional<class RenderAccessorGameRef>",
+			"includes": [
+				"\"GameData/Render/RenderAccessorGameRef.h\"",
+				"<optional>"
+			],
+			"flags": ["get_by_ref"]
 		}
 	]
 }

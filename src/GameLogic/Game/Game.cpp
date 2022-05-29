@@ -11,6 +11,7 @@
 
 #include "Utils/Application/ArgumentsParser.h"
 #include "Utils/Multithreading/ThreadPool.h"
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 #ifdef ENABLE_SCOPED_PROFILER
 #include "Utils/Profiling/ProfileDataWriter.h"
@@ -94,12 +95,14 @@ void Game::dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates)
 
 	mDebugBehavior.postInnerUpdate(*this);
 
-	RenderAccessorComponent* renderAccessorComponent = getGameData().getGameComponents().getOrAddComponent<RenderAccessorComponent>();
-	if (RenderAccessor* renderAccessor = renderAccessorComponent->getAccessor())
 	{
-		std::unique_ptr<RenderData> renderCommands = std::make_unique<RenderData>();
-		TemplateHelpers::EmplaceVariant<SwapBuffersCommand>(renderCommands->layers);
-		renderAccessor->submitData(std::move(renderCommands));
+		auto [renderAccessorComponent] = getGameData().getGameComponents().getComponents<RenderAccessorComponent>();
+		if (renderAccessorComponent != nullptr && renderAccessorComponent->getAccessor().has_value())
+		{
+			std::unique_ptr<RenderData> renderCommands = std::make_unique<RenderData>();
+			TemplateHelpers::EmplaceVariant<FinalizeFrameCommand>(renderCommands->layers);
+			renderAccessorComponent->getAccessorRef()->submitData(std::move(renderCommands));
+		}
 	}
 
 #ifdef ENABLE_SCOPED_PROFILER

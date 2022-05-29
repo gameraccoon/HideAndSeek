@@ -15,6 +15,7 @@
 #include "HAL/Base/Engine.h"
 
 #include "Utils/World/GameDataLoader.h"
+#include "Utils/Application/ArgumentsParser.h"
 
 #include "GameLogic/Systems/AiSystem.h"
 #include "GameLogic/Systems/AnimationSystem.h"
@@ -40,7 +41,7 @@
 
 #include "GameLogic/Initialization/StateMachines.h"
 
-void HapGame::preStart(ArgumentsParser& arguments, RenderAccessor& renderAccessor)
+void HapGame::preStart(ArgumentsParser& arguments, const RenderAccessorGameRef& renderAccessor)
 {
 	SCOPED_PROFILER("HapGame::start");
 
@@ -53,7 +54,7 @@ void HapGame::preStart(ArgumentsParser& arguments, RenderAccessor& renderAccesso
 	GameDataLoader::LoadGameData(getGameData(), arguments.getArgumentValue("gameData", "gameData"), getComponentSerializers());
 
 	RenderAccessorComponent* renderAccessorComponent = getGameData().getGameComponents().getOrAddComponent<RenderAccessorComponent>();
-	renderAccessorComponent->setAccessor(&renderAccessor);
+	renderAccessorComponent->setAccessor(renderAccessor);
 
 	Game::preStart(arguments);
 }

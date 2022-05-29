@@ -63,16 +63,13 @@ void RenderSystem::update()
 	std::vector<WorldCell*> cells = world.getSpatialData().getCellsAround(cameraLocation, workingRect);
 	SpatialEntityManager spatialManager(cells);
 
-	RenderAccessor* renderAccessor = nullptr;
-	if (auto [renderAccessorCmp] = gameData.getGameComponents().getComponents<RenderAccessorComponent>(); renderAccessorCmp != nullptr)
-	{
-		renderAccessor = renderAccessorCmp->getAccessor();
-	}
-
-	if (renderAccessor == nullptr)
+	auto [renderAccessorCmp] = gameData.getGameComponents().getComponents<RenderAccessorComponent>();
+	if (renderAccessorCmp == nullptr || !renderAccessorCmp->getAccessor().has_value())
 	{
 		return;
 	}
+
+	RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
 
 	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
 
@@ -107,7 +104,7 @@ void RenderSystem::update()
 		});
 	}
 
-	renderAccessor->submitData(std::move(renderData));
+	renderAccessor.submitData(std::move(renderData));
 }
 
 void RenderSystem::DrawVisibilityPolygon(RenderData& renderData, ResourceHandle lightSpriteHandle, const std::vector<Vector2D>& polygon, const Vector2D& fovSize, const Vector2D& drawShift)

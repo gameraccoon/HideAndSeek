@@ -10,7 +10,7 @@
 
 #include "HAL/Base/Engine.h"
 
-TestChecklist BaseTestCase::start(const ArgumentsParser& arguments, RenderAccessor& renderAccessor)
+TestChecklist BaseTestCase::start(const ArgumentsParser& arguments, RenderAccessorGameRef renderAccessor)
 {
 	mOneFrame = arguments.hasArgument("one-frame");
 
@@ -18,7 +18,7 @@ TestChecklist BaseTestCase::start(const ArgumentsParser& arguments, RenderAccess
 	ComponentsRegistration::RegisterJsonSerializers(getComponentSerializers());
 
 	RenderAccessorComponent* renderAccessorComponent = getGameData().getGameComponents().getOrAddComponent<RenderAccessorComponent>();
-	renderAccessorComponent->setAccessor(&renderAccessor);
+	renderAccessorComponent->setAccessor(renderAccessor);
 
 	initTestCase(arguments);
 

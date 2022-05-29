@@ -5,17 +5,15 @@
 #include <mutex>
 #include <variant>
 #include <vector>
+#include <functional>
 
-#ifdef ENABLE_SCOPED_PROFILER
-#include <array>
-#include <chrono>
-#endif // ENABLE_SCOPED_PROFILER
+#include "Base/Profile/ScopedProfiler.h"
 
 #include "GameData/Geometry/Vector2D.h"
+#include "GameData/Resources/ResourceHandle.h"
+#include "GameData/Render/RenderAccessorGameRef.h"
 
 #include "HAL/Base/Types.h"
-
-#include "Utils/ResourceManagement/ResourceManager.h"
 
 struct BackgroundRenderData
 {
@@ -44,38 +42,45 @@ struct QuadRenderData
 	float alpha = 1.0f;
 };
 
-struct StripRenderData {
+struct StripRenderData
+{
 	std::vector<Graphics::DrawPoint> points;
 	ResourceHandle spriteHandle;
 	Vector2D drawShift;
 	float alpha = 1.0f;
 };
 
-struct PolygonRenderData {
+struct PolygonRenderData
+{
 	std::vector<Graphics::DrawPoint> points;
 	ResourceHandle spriteHandle;
 	Vector2D drawShift;
 	float alpha = 1.0f;
 };
 
-struct TextRenderData {
+struct TextRenderData
+{
 	std::string text;
 	Vector2D pos;
 	ResourceHandle fontHandle;
 	Graphics::Color color;
 };
 
-struct SyncRenderSharedData {
+struct SyncRenderSharedData
+{
 	std::condition_variable onFinished;
 	std::mutex isFinishedMutex;
 	bool isFinised = false;
 };
-struct SynchroneousRenderData {
+
+struct SynchroneousRenderData
+{
 	std::shared_ptr<SyncRenderSharedData> sharedData;
 	std::function<void()> renderThreadFn;
 };
 
-struct SwapBuffersCommand {
+struct FinalizeFrameCommand
+{
 };
 
 struct RenderData
@@ -88,7 +93,7 @@ struct RenderData
 		PolygonRenderData,
 		TextRenderData,
 		SynchroneousRenderData,
-		SwapBuffersCommand
+		FinalizeFrameCommand
 	>;
 
 	RenderData() = default;
@@ -98,9 +103,10 @@ struct RenderData
 	{}
 
 	std::vector<Layer> layers;
+	int gameInstanceIndex = 0;
 };
 
-class RenderAccessor
+class RenderAccessor : public IRenderAccessor
 {
 	friend class RenderThreadManager;
 
@@ -112,8 +118,7 @@ public:
 	RenderAccessor(RenderAccessor&&) = delete;
 	RenderAccessor& operator=(RenderAccessor&&) = delete;
 
-	void submitData(std::unique_ptr<RenderData>&& newData);
-
+	void submitData(std::unique_ptr<RenderData>&& newData, int gameInstanceIndex) override;
 
 #ifdef ENABLE_SCOPED_PROFILER
 	ScopedProfilerThreadData::Records consumeScopedProfilerRecordsUnsafe();

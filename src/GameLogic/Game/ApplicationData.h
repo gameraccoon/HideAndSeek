@@ -3,6 +3,7 @@
 #include "HAL/Base/Engine.h"
 
 #include "Utils/Multithreading/ThreadPool.h"
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/Render/RenderThreadManager.h"
 

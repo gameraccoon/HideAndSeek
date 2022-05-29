@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 		applicationData.renderThread.startThread(applicationData.resourceManager, engine, [&engine]{ engine.acquireRenderContext(); });
 
 		std::unique_ptr<BaseTestCase> testCase = caseIt->second(&engine, applicationData.resourceManager, applicationData.threadPool);
-		TestChecklist checklist = testCase->start(arguments, applicationData.renderThread.getAccessor());
+		TestChecklist checklist = testCase->start(arguments, RenderAccessorGameRef(applicationData.renderThread.getAccessor(), 0));
 		bool isSuccessful = ValidateChecklist(checklist);
 
 		applicationData.shutdownThreads(); // this call waits for the threads to be joined

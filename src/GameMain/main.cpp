@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 	applicationData.renderThread.startThread(applicationData.resourceManager, engine, [&engine]{ engine.acquireRenderContext(); });
 
 	HapGame game(&engine, applicationData.resourceManager, applicationData.threadPool);
-	game.preStart(arguments, applicationData.renderThread.getAccessor());
+	game.preStart(arguments, RenderAccessorGameRef(applicationData.renderThread.getAccessor(), 0));
 	game.start(); // this call waits until the game is being shut down
 	game.onGameShutdown();
 

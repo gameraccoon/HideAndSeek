@@ -3,8 +3,10 @@
 #include "GameLogic/Render/RenderAccessor.h"
 
 
-void RenderAccessor::submitData(std::unique_ptr<RenderData>&& newData)
+void RenderAccessor::submitData(std::unique_ptr<RenderData>&& newData, int gameInstanceIndex)
 {
+	newData->gameInstanceIndex = gameInstanceIndex;
+
 	{
 		std::lock_guard l(dataMutex);
 		dataToTransfer.push_back(std::move(newData));

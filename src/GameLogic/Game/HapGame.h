@@ -8,14 +8,14 @@
 #include "GameLogic/Imgui/ImguiDebugData.h"
 #endif
 
-class RenderAccessor;
+class RenderAccessorGameRef;
 
 class HapGame : public Game
 {
 public:
 	using Game::Game;
 
-	void preStart(ArgumentsParser& arguments, RenderAccessor& renderAccessor);
+	void preStart(ArgumentsParser& arguments, const RenderAccessorGameRef& renderAccessor);
 	void initResources() override;
 
 	void quitGame() override { mShouldQuit = true; }

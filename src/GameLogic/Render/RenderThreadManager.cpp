@@ -2,10 +2,12 @@
 
 #include "GameLogic/Render/RenderThreadManager.h"
 
-#include <glew/glew.h>
-#include <glm/matrix.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <SDL_video.h>
+#include <algorithm>
+#include <bitset>
+#include <glew/glew.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/matrix.hpp>
 
 #include "Base/Types/ComplexTypes/VectorUtils.h"
 
@@ -16,58 +18,19 @@
 
 #include "Utils/ResourceManagement/ResourceManager.h"
 
-RenderThreadManager::~RenderThreadManager()
-{
-	shutdownThread();
-}
-
-void RenderThreadManager::startThread(ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn)
-{
-	mRenderThread = std::make_unique<std::thread>(
-		[&renderAccessor = mRenderAccessor, &resourceManager, &engine, threadInitializeFn]
-		{
-			if (threadInitializeFn)
-			{
-				threadInitializeFn();
-			}
-
-			// prepare the buffer to render the first frame
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			RenderThreadManager::RenderThreadFunction(renderAccessor, resourceManager, engine);
-		}
-	);
-}
-
-void RenderThreadManager::shutdownThread()
-{
-	{
-		std::lock_guard l(mRenderAccessor.dataMutex);
-		mRenderAccessor.shutdownRequested = true;
-	}
-	mRenderAccessor.notifyRenderThread.notify_all();
-	if (mRenderThread)
-	{
-		mRenderThread->join();
-		mRenderThread = nullptr;
-	}
-}
-
-void RenderThreadManager::testRunMainThread(RenderAccessor& renderAccessor, ResourceManager& resourceManager, HAL::Engine& engine)
-{
-	resourceManager.runThreadTasks(Resource::Thread::Render);
-	ConsumeAndRenderQueue(std::move(renderAccessor.dataToTransfer), resourceManager, engine);
-}
-
 namespace RenderThreadManagerInternal
 {
+	static int gTotalGameInstancesCount = 1;
+	static unsigned int gGameInstancesLeftBitset = (1u << gTotalGameInstancesCount) - 1u;
+
 	class RenderVisitor
 	{
 	public:
-		RenderVisitor(ResourceManager& resourceManager, HAL::Engine& engine, const Graphics::Surface*& lastSurface)
+		RenderVisitor(ResourceManager& resourceManager, HAL::Engine& engine, const Graphics::Surface*& lastSurface, int gameInstanceIdx)
 			: mResourceManager(resourceManager)
 			, mEngine(engine)
 			, mLastSurface(lastSurface)
+			, mGameInstanceIdx(gameInstanceIdx)
 		{}
 
 		void operator()(BackgroundRenderData&& bgData)
@@ -208,9 +171,17 @@ namespace RenderThreadManagerInternal
 			syncRenderData.sharedData->onFinished.notify_one();
 		}
 
-		void operator()(const SwapBuffersCommand&)
+		void operator()(const FinalizeFrameCommand&)
 		{
 			SCOPED_PROFILER("RenderVisitor->SwapBuffersCommand");
+
+			// wait for all the instances before swapping buffers
+			gGameInstancesLeftBitset &= ~(1u << mGameInstanceIdx);
+			if (gGameInstancesLeftBitset != 0)
+			{
+				return;
+			}
+			gGameInstancesLeftBitset = (1u << gTotalGameInstancesCount) - 1u;
 
 			SDL_GL_SwapWindow(mEngine.getRawWindow());
 			glClear(GL_COLOR_BUFFER_BIT);
@@ -230,12 +201,161 @@ namespace RenderThreadManagerInternal
 		ResourceManager& mResourceManager;
 		HAL::Engine& mEngine;
 		const Graphics::Surface*& mLastSurface;
+		const int mGameInstanceIdx;
 	};
+
+	using DataPtr = std::unique_ptr<RenderData>;
+	using FrameData = std::vector<DataPtr>;
+	using InstanceFrames = std::vector<FrameData>;
+	using DataToRender = std::vector<InstanceFrames>;
+
+	static void PopulateFrameData(DataToRender& outData, std::vector<DataPtr>& inDataToTrasfer)
+	{
+		SCOPED_PROFILER("PopulateFrameData");
+
+		outData.resize(gTotalGameInstancesCount);
+		for (DataPtr& operationsBulk : inDataToTrasfer)
+		{
+			if (!operationsBulk->layers.empty())
+			{
+				InstanceFrames& instanceData = outData[operationsBulk->gameInstanceIndex];
+
+				if (instanceData.empty())
+				{
+					instanceData.emplace_back();
+				}
+
+				const bool containsFinalization = std::any_of(operationsBulk->layers.begin(), operationsBulk->layers.end(), [](const RenderData::Layer& layer)
+				{
+					return std::holds_alternative<FinalizeFrameCommand>(layer);
+				});
+
+				instanceData.back().push_back(std::move(operationsBulk));
+
+				if (containsFinalization)
+				{
+					// always have a frame after finalization
+					// even if it's empty
+					instanceData.emplace_back();
+				}
+			}
+		}
+	}
+
+	static void ProcessRenderQueue(DataToRender& dataToRender, ResourceManager& resourceManager, HAL::Engine& engine)
+	{
+		SCOPED_PROFILER("ProcessRenderQueue");
+
+		for (const InstanceFrames& frames : dataToRender)
+		{
+			if (frames.size() < 2)
+			{
+				// too early to continue if at least one game instance doesn't have two frames
+				// (we keep one frame after finalization, even if it's empty)
+				return;
+			}
+		}
+
+		const Graphics::Surface* lastSurface = nullptr;
+
+		// only render the frame before the last
+		for (const InstanceFrames& frames : dataToRender)
+		{
+			const FrameData& lastCompleteFrame = frames[frames.size() - 2];
+			for (const DataPtr& renderData : lastCompleteFrame)
+			{
+				for (RenderData::Layer& layer : renderData->layers)
+				{
+					std::visit(RenderVisitor{resourceManager, engine, lastSurface, renderData->gameInstanceIndex}, std::move(layer));
+				}
+			}
+		}
+
+#ifdef DEBUG_CHECKS
+		for (size_t i = 0; i < dataToRender.size(); ++i)
+		{
+			const InstanceFrames& frames = dataToRender[i];
+			if (frames.size() > 2)
+			{
+				LogWarning("Render frame skipped. Count: %d Game instance: %u", frames.size() - 2, i);
+			}
+		}
+#endif
+
+		// remove all frames before the last
+		for (InstanceFrames& frames : dataToRender)
+		{
+			frames.erase(frames.begin(), frames.begin() + (frames.size() - 1));
+		}
+	}
+}
+
+RenderThreadManager::~RenderThreadManager()
+{
+	shutdownThread();
+}
+
+void RenderThreadManager::startThread(ResourceManager& resourceManager, HAL::Engine& engine, std::function<void()>&& threadInitializeFn)
+{
+	mRenderThread = std::make_unique<std::thread>(
+		[&renderAccessor = mRenderAccessor, &resourceManager, &engine, threadInitializeFn]
+		{
+			if (threadInitializeFn)
+			{
+				threadInitializeFn();
+			}
+
+			// prepare the buffer to render the first frame
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			RenderThreadFunction(renderAccessor, resourceManager, engine);
+		}
+	);
+}
+
+void RenderThreadManager::shutdownThread()
+{
+	{
+		std::lock_guard l(mRenderAccessor.dataMutex);
+		mRenderAccessor.shutdownRequested = true;
+	}
+	mRenderAccessor.notifyRenderThread.notify_all();
+	if (mRenderThread)
+	{
+		mRenderThread->join();
+		mRenderThread = nullptr;
+	}
+}
+
+void RenderThreadManager::testRunMainThread(RenderAccessor& renderAccessor, ResourceManager& resourceManager, HAL::Engine& engine)
+{
+	using namespace RenderThreadManagerInternal;
+
+	DataToRender dataToRender;
+	PopulateFrameData(dataToRender, renderAccessor.dataToTransfer);
+	resourceManager.runThreadTasks(Resource::Thread::Render);
+	ProcessRenderQueue(dataToRender, resourceManager, engine);
+}
+
+void RenderThreadManager::setAmountOfRenderedGameInstances(int instancesCount)
+{
+	using namespace RenderThreadManagerInternal;
+
+	if (gTotalGameInstancesCount != instancesCount)
+	{
+		if (gGameInstancesLeftBitset == (1u << gTotalGameInstancesCount) - 1)
+		{
+			gGameInstancesLeftBitset = (1u << instancesCount) - 1;
+		}
+	}
+	gTotalGameInstancesCount = instancesCount;
 }
 
 void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, ResourceManager& resourceManager, HAL::Engine& engine)
 {
-	std::vector<std::unique_ptr<RenderData>> dataToRender;
+	using namespace RenderThreadManagerInternal;
+
+	DataToRender dataToRender;
 	while(true)
 	{
 		{
@@ -249,63 +369,15 @@ void RenderThreadManager::RenderThreadFunction(RenderAccessor& renderAccessor, R
 				break;
 			}
 
-			VectorUtils::AppendToVector(dataToRender, std::move(renderAccessor.dataToTransfer));
+			PopulateFrameData(dataToRender, renderAccessor.dataToTransfer);
 			renderAccessor.dataToTransfer.clear();
 		}
 
 		resourceManager.runThreadTasks(Resource::Thread::Render);
-		ConsumeAndRenderQueue(std::move(dataToRender), resourceManager, engine);
+		ProcessRenderQueue(dataToRender, resourceManager, engine);
 	}
 
 #ifdef ENABLE_SCOPED_PROFILER
 	renderAccessor.scopedProfilerRecords = gtlScopedProfilerData.getAllRecords();
 #endif // ENABLE_SCOPED_PROFILER
-}
-
-void RenderThreadManager::ConsumeAndRenderQueue(RenderDataVector&& dataToRender, ResourceManager& resourceManager, HAL::Engine& engine)
-{
-	SCOPED_PROFILER("RenderThreadManager::ConsumeAndRenderQueue");
-	using namespace RenderThreadManagerInternal;
-
-	size_t firstSwap = 0;
-	size_t lastSwap = 0;
-	bool hasMetSwap = false;
-	for (size_t i = 0; i < dataToRender.size(); ++i)
-	{
-		RenderData* renderData = dataToRender[i].get();
-		for (RenderData::Layer& layer : renderData->layers)
-		{
-			if (std::holds_alternative<SwapBuffersCommand>(layer))
-			{
-				if (!hasMetSwap)
-				{
-					hasMetSwap = true;
-					firstSwap = i;
-				}
-				else
-				{
-					// skipped a render frame
-					// probably need to log it somewhere for analysis
-					ReportError("render frame skipped");
-				}
-				lastSwap = i;
-			}
-		}
-	}
-
-	for (size_t i = 0; i < dataToRender.size(); ++i)
-	{
-		if (firstSwap <= i && i < lastSwap)
-		{
-			continue;
-		}
-
-		RenderData* renderData = dataToRender[i].get();
-		const Graphics::Surface* lastSurface = nullptr;
-		for (RenderData::Layer& layer : renderData->layers)
-		{
-			std::visit(RenderVisitor{resourceManager, engine, lastSurface}, std::move(layer));
-		}
-	}
-	dataToRender.clear();
 }

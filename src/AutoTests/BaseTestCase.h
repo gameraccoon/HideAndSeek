@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GameData/Render/RenderAccessorGameRef.h"
+
 #include "GameLogic/Game/Game.h"
 
 #include "AutoTests/TestChecklist.h"
@@ -12,7 +14,7 @@ class BaseTestCase : public Game
 public:
 	using Game::Game;
 
-	TestChecklist start(const ArgumentsParser& arguments, RenderAccessor& renderAccessor);
+	TestChecklist start(const ArgumentsParser& arguments, RenderAccessorGameRef renderAccessor);
 	void fixedTimeUpdate(float dt) final;
 
 	bool shouldQuitGame() const override { return mShouldQuit; }
