@@ -2,27 +2,24 @@
 
 #include "GameLogic/Systems/AiSystem.h"
 
-#include "GameData/World.h"
-#include "GameData/GameData.h"
-#include "GameData/Components/NavMeshComponent.generated.h"
 #include "GameData/Components/AiControllerComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/PathBlockingGeometryComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/DebugDrawComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/NavMeshComponent.generated.h"
+#include "GameData/Components/PathBlockingGeometryComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
 #include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/GameData.h"
+#include "GameData/World.h"
 
 #include "Utils/AI/NavMeshGenerator.h"
 #include "Utils/AI/PathFinding.h"
 
-AiSystem::AiSystem(
-		WorldHolder& worldHolder,
-		const TimeData& timeData
-	) noexcept
+AiSystem::AiSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
-	, mTime(timeData)
 {
 }
 
@@ -30,7 +27,9 @@ void AiSystem::update()
 {
 	SCOPED_PROFILER("AiSystem::update");
 	World& world = mWorldHolder.getWorld();
-	const GameplayTimestamp timestampNow = mTime.lastFixedUpdateTimestamp;
+
+	const auto [time] = world.getWorldComponents().getComponents<TimeComponent>();
+	const GameplayTimestamp timestampNow = time->getValue().lastFixedUpdateTimestamp;
 
 	NavMeshComponent* navMeshComponent = world.getWorldComponents().getOrAddComponent<NavMeshComponent>();
 

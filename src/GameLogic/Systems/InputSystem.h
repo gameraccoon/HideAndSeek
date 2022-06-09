@@ -4,7 +4,6 @@
 #include <raccoon-ecs/system.h>
 
 class WorldHolder;
-class TimeData;
 
 namespace HAL
 {
@@ -17,7 +16,7 @@ namespace HAL
 class InputSystem : public RaccoonEcs::System
 {
 public:
-	InputSystem(WorldHolder& worldHolder, const HAL::InputControllersData& inputData, const TimeData& timeData) noexcept;
+	InputSystem(WorldHolder& worldHolder, const HAL::InputControllersData& inputData) noexcept;
 
 	void update() override;
 	static std::string GetSystemId() { return "InputSystem"; }
@@ -29,5 +28,4 @@ private:
 private:
 	WorldHolder& mWorldHolder;
 	const HAL::InputControllersData& mInputData;
-	const TimeData& mTime;
 };

@@ -4,19 +4,17 @@
 
 #include <algorithm>
 
-#include "GameData/World.h"
-#include "GameData/GameData.h"
-#include "GameData/Components/SpriteRenderComponent.generated.h"
 #include "GameData/Components/AnimationClipsComponent.generated.h"
 #include "GameData/Components/AnimationGroupsComponent.generated.h"
+#include "GameData/Components/SpriteRenderComponent.generated.h"
 #include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/GameData.h"
+#include "GameData/World.h"
 
-AnimationSystem::AnimationSystem(
-		WorldHolder& worldHolder,
-		const TimeData& time) noexcept
+AnimationSystem::AnimationSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
-	, mTime(time)
 {
 }
 
@@ -25,7 +23,9 @@ void AnimationSystem::update()
 	SCOPED_PROFILER("AnimationSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
-	float dt = mTime.lastFixedUpdateDt;
+
+	const auto [time] = world.getWorldComponents().getComponents<const TimeComponent>();
+	float dt = time->getValue().lastFixedUpdateDt;
 
 	const auto [stateMachines] = gameData.getGameComponents().getComponents<const StateMachineComponent>();
 

@@ -6,19 +6,17 @@
 
 #include "GameData/Enums/MoveDirection4.generated.h"
 
-#include "GameData/World.h"
-#include "GameData/GameData.h"
-#include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/StateMachineComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/AnimationGroupsComponent.generated.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
+#include "GameData/GameData.h"
+#include "GameData/World.h"
 
 
-CharacterStateSystem::CharacterStateSystem(
-		WorldHolder& worldHolder,
-		const TimeData& timeData) noexcept
+CharacterStateSystem::CharacterStateSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
-	, mTime(timeData)
 {
 }
 
@@ -37,7 +35,9 @@ void CharacterStateSystem::update()
 	SCOPED_PROFILER("CharacterStateSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
-	float dt = mTime.lastFixedUpdateDt;
+
+	const auto [time] = world.getWorldComponents().getComponents<const TimeComponent>();
+	const float dt = time->getValue().lastFixedUpdateDt;
 
 	auto [stateMachine] = gameData.getGameComponents().getComponents<StateMachineComponent>();
 

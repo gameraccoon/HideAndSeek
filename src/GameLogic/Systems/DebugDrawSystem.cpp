@@ -7,17 +7,18 @@
 #include "Base/Random/Random.h"
 #include "Base/Types/TemplateHelpers.h"
 
-#include "GameData/World.h"
-#include "GameData/GameData.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/NavMeshComponent.generated.h"
-#include "GameData/Components/RenderModeComponent.generated.h"
 #include "GameData/Components/AiControllerComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/DebugDrawComponent.generated.h"
+#include "GameData/Components/NavMeshComponent.generated.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
+#include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
+#include "GameData/GameData.h"
+#include "GameData/World.h"
 
 #include "Utils/Geometry/VisibilityPolygon.h"
 
@@ -28,10 +29,8 @@
 
 DebugDrawSystem::DebugDrawSystem(
 		WorldHolder& worldHolder,
-		const TimeData& timeData,
 		ResourceManager& resourceManager) noexcept
 	: mWorldHolder(worldHolder)
-	, mTime(timeData)
 	, mResourceManager(resourceManager)
 {
 }
@@ -88,6 +87,9 @@ void DebugDrawSystem::update()
 	SCOPED_PROFILER("DebugDrawSystem::update");
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
+
+	const auto [time] = world.getWorldComponents().getComponents<const TimeComponent>();
+	const TimeData& timeValue = time->getValue();
 
 	auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
 	const Vector2D workingRect = worldCachedData->getScreenSize();
@@ -253,9 +255,9 @@ void DebugDrawSystem::update()
 	auto [debugDraw] = gameData.getGameComponents().getComponents<DebugDrawComponent>();
 	if (debugDraw != nullptr)
 	{
-		RemoveOldDrawElement(debugDraw->getWorldPointsRef(), mTime.lastFixedUpdateTimestamp);
-		RemoveOldDrawElement(debugDraw->getScreenPointsRef(), mTime.lastFixedUpdateTimestamp);
-		RemoveOldDrawElement(debugDraw->getWorldLineSegmentsRef(), mTime.lastFixedUpdateTimestamp);
+		RemoveOldDrawElement(debugDraw->getWorldPointsRef(), timeValue.lastFixedUpdateTimestamp);
+		RemoveOldDrawElement(debugDraw->getScreenPointsRef(), timeValue.lastFixedUpdateTimestamp);
+		RemoveOldDrawElement(debugDraw->getWorldLineSegmentsRef(), timeValue.lastFixedUpdateTimestamp);
 	}
 
 	renderAccessor.submitData(std::move(renderData));

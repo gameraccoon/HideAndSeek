@@ -12,12 +12,7 @@
 #include "HAL/InputControllersData.h"
 
 #include "GameLogic/Debug/DebugGameBehavior.h"
-#include "GameLogic/SharedManagers/TimeData.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
-
-#ifdef IMGUI_ENABLED
-#include "GameLogic/Imgui/ImguiDebugData.h"
-#endif
 
 class ArgumentsParser;
 class ThreadPool;
@@ -43,7 +38,6 @@ protected:
 	RaccoonEcs::SystemsManager& getGameLogicSystemsManager() { return mGameLogicSystemsManager; }
 	RaccoonEcs::SystemsManager& getPostFrameSystemsManager() { return mPostFrameSystemsManager; }
 	HAL::InputControllersData& getInputData() { return mInputControllersData; }
-	const TimeData& getTime() const { return mTime; }
 	ThreadPool& getThreadPool() { return mThreadPool; }
 	GameData& getGameData() { return mGameData; }
 	Json::ComponentSerializationHolder& getComponentSerializers() { return mComponentSerializers; }
@@ -65,17 +59,12 @@ private:
 	RaccoonEcs::SystemsManager mGameLogicSystemsManager;
 	RaccoonEcs::SystemsManager mPostFrameSystemsManager;
 	Json::ComponentSerializationHolder mComponentSerializers;
-	TimeData mTime;
 
 #ifdef ENABLE_SCOPED_PROFILER
 	std::string mFrameDurationsOutputPath = "./frame_times.csv";
 	std::vector<double> mFrameDurations;
 	std::chrono::time_point<std::chrono::steady_clock> mFrameBeginTime;
 #endif // ENABLE_SCOPED_PROFILER
-
-#ifdef IMGUI_ENABLED
-	ImguiDebugData mImguiDebugData{mWorldHolder, mTime, mComponentFactory, {}};
-#endif // IMGUI_ENABLED
 
 	DebugGameBehavior mDebugBehavior;
 	friend DebugGameBehavior;

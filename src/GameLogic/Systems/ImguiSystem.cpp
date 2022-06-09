@@ -7,14 +7,16 @@
 #include "imgui/imgui.h"
 #include "imgui/examples/imgui_impl_sdl.h"
 #include "imgui/examples/imgui_impl_opengl2.h"
+
 #include <SDL.h>
 #include <SDL_opengl.h>
 
 #include "Base/Types/TemplateHelpers.h"
 
-#include "GameData/GameData.h"
 #include "GameData/Components/ImguiComponent.generated.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
+#include "GameData/World.h"
 
 #include "HAL/Base/Engine.h"
 
@@ -47,6 +49,9 @@ void ImguiSystem::update()
 	{
 		return;
 	}
+
+	const auto [time] = mDebugData.worldHolder.getWorld().getWorldComponents().getComponents<const TimeComponent>();
+	mDebugData.time = time->getValue();
 
 	RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
 

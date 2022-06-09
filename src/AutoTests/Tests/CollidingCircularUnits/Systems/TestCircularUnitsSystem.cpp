@@ -2,26 +2,26 @@
 
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestCircularUnitsSystem.h"
 
-#include "GameData/World.h"
-#include "GameData/Components/NavMeshComponent.generated.h"
 #include "GameData/Components/AiControllerComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/NavMeshComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/World.h"
 
 
-TestCircularUnitsSystem::TestCircularUnitsSystem(
-		WorldHolder& worldHolder,
-		const TimeData& time) noexcept
+TestCircularUnitsSystem::TestCircularUnitsSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
-	, mTime(time)
 {
 }
 
 void TestCircularUnitsSystem::update()
 {
 	World& world = mWorldHolder.getWorld();
-	float dt = mTime.lastFixedUpdateDt;
+
+	const auto [time] = world.getWorldComponents().getComponents<TimeComponent>();
+	const float dt = time->getValue().lastFixedUpdateDt;
 
 	std::optional<std::pair<EntityView, CellPos>> playerEntity = world.getTrackedSpatialEntity(STR_TO_ID("ControlledEntity"));
 	if (!playerEntity.has_value())

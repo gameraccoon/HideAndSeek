@@ -1,8 +1,6 @@
 #include "Base/precomp.h"
 
-#include "GameLogic/SharedManagers/TimeData.h"
-
-#include <cmath>
+#include "GameData/Time/TimeData.h"
 
 void TimeData::fixedUpdate(float deltaTime, u32 updatesCount)
 {

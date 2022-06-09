@@ -8,16 +8,17 @@
 #include "Base/Types/TemplateAliases.h"
 #include "Base/Types/TemplateHelpers.h"
 
+#include "GameData/Components/BackgroundTextureComponent.generated.h"
+#include "GameData/Components/LightBlockingGeometryComponent.generated.h"
+#include "GameData/Components/LightComponent.generated.h"
+#include "GameData/Components/RenderAccessorComponent.generated.h"
+#include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/Components/SpriteRenderComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/WorldCachedDataComponent.generated.h"
 #include "GameData/GameData.h"
 #include "GameData/World.h"
-#include "GameData/Components/SpriteRenderComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/LightComponent.generated.h"
-#include "GameData/Components/LightBlockingGeometryComponent.generated.h"
-#include "GameData/Components/RenderModeComponent.generated.h"
-#include "GameData/Components/WorldCachedDataComponent.generated.h"
-#include "GameData/Components/BackgroundTextureComponent.generated.h"
-#include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "Utils/Geometry/VisibilityPolygon.h"
 
@@ -30,12 +31,10 @@
 
 RenderSystem::RenderSystem(
 		WorldHolder& worldHolder,
-		const TimeData& timeData,
 		ResourceManager& resourceManager,
 		ThreadPool& threadPool
 	) noexcept
 	: mWorldHolder(worldHolder)
-	, mTime(timeData)
 	, mResourceManager(resourceManager)
 	, mThreadPool(threadPool)
 {
@@ -55,6 +54,7 @@ void RenderSystem::update()
 	static const Vector2D maxFov(500.0f, 500.0f);
 
 	const auto [renderMode] = gameData.getGameComponents().getComponents<RenderModeComponent>();
+	const auto [time] = world.getWorldComponents().getComponents<TimeComponent>();
 
 	Vector2D halfWindowSize = workingRect * 0.5f;
 
@@ -80,7 +80,8 @@ void RenderSystem::update()
 
 	if (!renderMode || renderMode->getIsDrawLightsEnabled())
 	{
-		drawLights(*renderData, spatialManager, cells, cameraLocation, drawShift, maxFov, halfWindowSize);
+		const GameplayTimestamp timestampNow = time->getValue().lastFixedUpdateTimestamp;
+		drawLights(*renderData, spatialManager, cells, cameraLocation, drawShift, maxFov, halfWindowSize, timestampNow);
 	}
 
 	if (!renderMode || renderMode->getIsDrawVisibleEntitiesEnabled())
@@ -198,10 +199,9 @@ static size_t GetJobDivisor(size_t maxThreadsCount)
 	return maxThreadsCount * 3 - 1;
 }
 
-void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, std::vector<WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize)
+void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, std::vector<WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize, const GameplayTimestamp& timestampNow)
 {
 	SCOPED_PROFILER("RenderSystem::drawLights");
-	const GameplayTimestamp timestampNow = mTime.lastFixedUpdateTimestamp;
 
 	// get all the collidable components
 	std::vector<const LightBlockingGeometryComponent*> lightBlockingComponents;

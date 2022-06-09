@@ -5,7 +5,6 @@
 #include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
-#include "GameLogic/SharedManagers/TimeData.h"
 
 /**
  * System that calculates AI
@@ -13,10 +12,7 @@
 class AiSystem : public RaccoonEcs::System
 {
 public:
-	AiSystem(
-		WorldHolder& worldHolder,
-		const TimeData& timeData
-	) noexcept;
+	AiSystem(WorldHolder& worldHolder) noexcept;
 
 	~AiSystem() override = default;
 
@@ -25,5 +21,4 @@ public:
 
 private:
 	WorldHolder& mWorldHolder;
-	const TimeData& mTime;
 };

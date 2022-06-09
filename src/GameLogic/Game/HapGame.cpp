@@ -61,19 +61,19 @@ void HapGame::initSystems()
 
 	AssertFatal(getEngine(), "HapGame was created without Engine, we are going to crash");
 
-	getPreFrameSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData(), getTime());
+	getPreFrameSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData());
 	getGameLogicSystemsManager().registerSystem<ControlSystem>(getWorldHolder());
-	getGameLogicSystemsManager().registerSystem<AiSystem>(getWorldHolder(), getTime());
-	getGameLogicSystemsManager().registerSystem<WeaponSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<AiSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<WeaponSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<DeadEntitiesDestructionSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<CollisionSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<CameraSystem>(getWorldHolder());
-	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder(), getTime());
-	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder(), getTime());
-	getGameLogicSystemsManager().registerSystem<AnimationSystem>(getWorldHolder(), getTime());
+	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder());
+	getGameLogicSystemsManager().registerSystem<AnimationSystem>(getWorldHolder());
 	getPostFrameSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
-	getPostFrameSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getTime(), getResourceManager(), getThreadPool());
-	getPostFrameSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getTime(), getResourceManager());
+	getPostFrameSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getResourceManager(), getThreadPool());
+	getPostFrameSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getResourceManager());
 
 #ifdef IMGUI_ENABLED
 	getPostFrameSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, *getEngine());

@@ -8,7 +8,6 @@
 
 #include "Utils/Application/ArgumentsParser.h"
 
-#include "GameLogic/SharedManagers/TimeData.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
 #include "AutoTests/BaseTestCase.h"

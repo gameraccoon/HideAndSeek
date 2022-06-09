@@ -4,16 +4,12 @@
 #include <raccoon-ecs/system.h>
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
-#include "GameLogic/SharedManagers/TimeData.h"
 
 
 class TestShootingControlSystem : public RaccoonEcs::System
 {
 public:
-	TestShootingControlSystem(
-		WorldHolder& worldHolder,
-		const TimeData& time
-	) noexcept;
+	TestShootingControlSystem(WorldHolder& worldHolder) noexcept;
 
 	~TestShootingControlSystem() override = default;
 
@@ -22,5 +18,4 @@ public:
 
 private:
 	WorldHolder& mWorldHolder;
-	const TimeData& mTime;
 };

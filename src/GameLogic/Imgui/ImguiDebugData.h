@@ -3,14 +3,14 @@
 #include <vector>
 
 #include "GameData/EcsDefinitions.h"
+#include "GameData/Time/TimeData.h"
 
 class WorldHolder;
-class TimeData;
 
 struct ImguiDebugData
 {
 	WorldHolder& worldHolder;
-	const TimeData& time;
 	ComponentFactory& componentFactory;
 	std::vector<std::string> systemNames;
+	TimeData time;
 };

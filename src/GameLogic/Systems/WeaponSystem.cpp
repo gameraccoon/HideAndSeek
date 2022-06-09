@@ -2,24 +2,22 @@
 
 #include "GameLogic/Systems/WeaponSystem.h"
 
-#include "GameData/World.h"
+#include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/DeathComponent.generated.h"
+#include "GameData/Components/HealthComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Components/WeaponComponent.generated.h"
 #include "GameData/GameData.h"
 #include "GameData/Spatial/SpatialEntity.h"
-#include "GameData/Components/WeaponComponent.generated.h"
-#include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/HealthComponent.generated.h"
-#include "GameData/Components/DeathComponent.generated.h"
+#include "GameData/World.h"
 
 #include "Utils/Geometry/RayTrace.h"
 
 
-WeaponSystem::WeaponSystem(
-		WorldHolder& worldHolder,
-		const TimeData& timeData) noexcept
+WeaponSystem::WeaponSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
-	, mTime(timeData)
 {
 }
 
@@ -48,7 +46,9 @@ void WeaponSystem::update()
 {
 	SCOPED_PROFILER("WeaponSystem::update");
 	World& world = mWorldHolder.getWorld();
-	GameplayTimestamp currentTime = mTime.lastFixedUpdateTimestamp;
+
+	const auto [time] = world.getWorldComponents().getComponents<TimeComponent>();
+	GameplayTimestamp currentTime = time->getValue().lastFixedUpdateTimestamp;
 
 	std::vector<ShotInfo> shotsToMake;
 	world.getSpatialData().getAllCellManagers().forEachSpatialComponentSetWithEntity<WeaponComponent, CharacterStateComponent>(

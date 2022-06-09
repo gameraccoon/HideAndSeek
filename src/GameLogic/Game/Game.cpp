@@ -6,6 +6,7 @@
 
 #include "GameData/Components/RenderAccessorComponent.generated.h"
 #include "GameData/Components/StateMachineComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 
 #include "Utils/Application/ArgumentsParser.h"
@@ -34,6 +35,7 @@ void Game::preStart(const ArgumentsParser& arguments)
 	StateMachines::RegisterStateMachines(sm);
 
 	mWorld.getWorldComponents().addComponent<WorldCachedDataComponent>();
+	mWorld.getWorldComponents().addComponent<TimeComponent>();
 }
 
 void Game::start()
@@ -56,8 +58,9 @@ void Game::dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates)
 	mFrameBeginTime = std::chrono::steady_clock::now();
 #endif // ENABLE_SCOPED_PROFILER
 
-	mTime.lastUpdateDt = dt;
-	mTime.countFixedTimeUpdatesThisFrame = plannedFixedTimeUpdates;
+	auto [time] = mWorld.getWorldComponents().getComponents<TimeComponent>();
+	time->getValueRef().lastUpdateDt = dt;
+	time->getValueRef().countFixedTimeUpdatesThisFrame = plannedFixedTimeUpdates;
 
 	if (HAL::Engine* engine = getEngine())
 	{
@@ -73,7 +76,8 @@ void Game::fixedTimeUpdate(float dt)
 {
 	SCOPED_PROFILER("Game::fixedTimeUpdate");
 
-	mTime.fixedUpdate(dt);
+	auto [time] = mWorld.getWorldComponents().getComponents<TimeComponent>();
+	time->getValueRef().fixedUpdate(dt);
 	mGameLogicSystemsManager.update();
 	mInputControllersData.resetLastFrameStates();
 }
@@ -82,8 +86,9 @@ void Game::dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates)
 {
 	SCOPED_PROFILER("Game::dynamicTimePostFrameUpdate");
 
-	mTime.lastUpdateDt = dt;
-	mTime.countFixedTimeUpdatesThisFrame = processedFixedTimeUpdates;
+	auto [time] = mWorld.getWorldComponents().getComponents<TimeComponent>();
+	time->getValueRef().lastUpdateDt = dt;
+	time->getValueRef().countFixedTimeUpdatesThisFrame = processedFixedTimeUpdates;
 
 	mPostFrameSystemsManager.update();
 

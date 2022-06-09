@@ -2,22 +2,19 @@
 
 #include "AutoTests/Tests/WeaponShooting/Systems/TestShootingControlSystem.h"
 
+#include "GameData/Components/CharacterStateComponent.generated.h"
 #include "GameData/Components/HealthComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/WeaponComponent.generated.h"
-#include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
 
 #include <limits>
 
 #include "GameData/World.h"
 
 
-TestShootingControlSystem::TestShootingControlSystem(
-		WorldHolder& worldHolder,
-		const TimeData& time) noexcept
+TestShootingControlSystem::TestShootingControlSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
-	, mTime(time)
 {
 }
 

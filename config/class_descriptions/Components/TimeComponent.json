@@ -1,0 +1,12 @@
+{
+	"component": "time",
+	"description": "Component that stores world information about time",
+	"attributes": [
+		{
+			"name": "value",
+			"type": "TimeData",
+			"includes": ["\"GameData/Time/TimeData.h\""],
+			"flags": ["get_by_ref", "transient"]
+		}
+	]
+}
