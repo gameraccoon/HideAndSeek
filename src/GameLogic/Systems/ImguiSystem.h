@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <vector>
+#include <mutex>
 
 #include <raccoon-ecs/system.h>
 
@@ -37,6 +38,8 @@ private:
 	ImguiDebugData& mDebugData;
 
 	ImguiMainMenu mImguiMainMenu;
+
+	std::mutex mRenderDataMutex;
 };
 
 #endif // IMGUI_ENABLED

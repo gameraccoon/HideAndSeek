@@ -16,6 +16,7 @@
 #include "GameData/Components/ImguiComponent.generated.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
 #include "GameData/Components/TimeComponent.generated.h"
+#include "GameData/GameData.h"
 #include "GameData/World.h"
 
 #include "HAL/Base/Engine.h"
@@ -34,6 +35,7 @@ ImguiSystem::ImguiSystem(
 void ImguiSystem::update()
 {
 	SCOPED_PROFILER("ImguiSystem::update");
+
 	GameData& gameData = mDebugData.worldHolder.getGameData();
 
 	// check if we need to render imgui
@@ -50,15 +52,12 @@ void ImguiSystem::update()
 		return;
 	}
 
-	const auto [time] = mDebugData.worldHolder.getWorld().getWorldComponents().getComponents<const TimeComponent>();
-	mDebugData.time = time->getValue();
+	{
+		std::lock_guard l(mRenderDataMutex);
 
-	RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
+		const auto [time] = mDebugData.worldHolder.getWorld().getWorldComponents().getComponents<const TimeComponent>();
+		mDebugData.time = time->getValue();
 
-	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
-	SynchroneousRenderData& syncData = TemplateHelpers::EmplaceVariant<SynchroneousRenderData>(renderData->layers);
-
-	syncData.renderThreadFn = [this] {
 		for (SDL_Event& sdlEvent : mEngine.getLastFrameEvents())
 		{
 			ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
@@ -72,23 +71,23 @@ void ImguiSystem::update()
 		// update the window hierarchy
 		mImguiMainMenu.update(mDebugData);
 
-		// rendering imgui to the viewport
+		// prepare data for rendering to the viewport
 		ImGui::Render();
+	}
 
+	// schedule rendering on the render thread
+	RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
+	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
+	CustomRenderFunction& syncData = TemplateHelpers::EmplaceVariant<CustomRenderFunction>(renderData->layers);
+	syncData.renderThreadFn = [&mutex = mRenderDataMutex]
+	{
+		std::lock_guard l(mutex);
+		ImGui_ImplOpenGL2_NewFrame();
 		ImGuiIO& io = ImGui::GetIO();
 		glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
 		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 	};
-	syncData.sharedData = std::make_shared<SyncRenderSharedData>();
-
-	// have a owning copy of the data before moving render data to the render thread
-	std::shared_ptr<SyncRenderSharedData> sharedData = syncData.sharedData;
-
 	renderAccessor.submitData(std::move(renderData));
-
-	// wait until we finish rendering
-	std::unique_lock lock(sharedData->isFinishedMutex);
-	sharedData->onFinished.wait(lock, [&sharedData]{ return sharedData->isFinised; });
 }
 
 void ImguiSystem::init()

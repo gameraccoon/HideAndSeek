@@ -159,16 +159,11 @@ namespace RenderThreadManagerInternal
 			// need an implimentation when text rendering is fixed
 		}
 
-		void operator()(const SynchroneousRenderData& syncRenderData)
+		void operator()(const CustomRenderFunction& renderFunction)
 		{
-			SCOPED_PROFILER("RenderVisitor->SynchroneousRenderData");
+			SCOPED_PROFILER("RenderVisitor->CustomRenderFunction");
 
-			syncRenderData.renderThreadFn();
-
-			syncRenderData.sharedData->isFinishedMutex.lock();
-			syncRenderData.sharedData->isFinised = true;
-			syncRenderData.sharedData->isFinishedMutex.unlock();
-			syncRenderData.sharedData->onFinished.notify_one();
+			renderFunction.renderThreadFn();
 		}
 
 		void operator()(const FinalizeFrameCommand&)

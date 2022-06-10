@@ -66,16 +66,8 @@ struct TextRenderData
 	Graphics::Color color;
 };
 
-struct SyncRenderSharedData
+struct CustomRenderFunction
 {
-	std::condition_variable onFinished;
-	std::mutex isFinishedMutex;
-	bool isFinised = false;
-};
-
-struct SynchroneousRenderData
-{
-	std::shared_ptr<SyncRenderSharedData> sharedData;
 	std::function<void()> renderThreadFn;
 };
 
@@ -92,7 +84,7 @@ struct RenderData
 		StripRenderData,
 		PolygonRenderData,
 		TextRenderData,
-		SynchroneousRenderData,
+		CustomRenderFunction,
 		FinalizeFrameCommand
 	>;
 
