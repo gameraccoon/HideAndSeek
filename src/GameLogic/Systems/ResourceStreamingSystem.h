@@ -4,9 +4,8 @@
 
 #include <raccoon-ecs/system.h>
 
-#include "Utils/ResourceManagement/ResourceManager.h"
-
-#include "GameLogic/SharedManagers/WorldHolder.h"
+class ResourceManager;
+class WorldHolder;
 
 /**
  * System that loads and distributes resources
@@ -17,10 +16,8 @@ public:
 	ResourceStreamingSystem(
 		WorldHolder& worldHolder,
 		ResourceManager& resourceManager) noexcept;
-	~ResourceStreamingSystem() override = default;
 
 	void update() override;
-	static std::string GetSystemId() { return "ResourceStreamingSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;

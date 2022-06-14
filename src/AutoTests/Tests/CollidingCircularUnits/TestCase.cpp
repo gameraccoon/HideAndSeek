@@ -4,15 +4,16 @@
 
 #include <memory>
 
-#include "HAL/Base/Engine.h"
-
-#include "GameData/Spatial/SpatialWorldData.h"
-
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/SpriteCreatorComponent.generated.h"
 #include "GameData/Components/StateMachineComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Spatial/SpatialWorldData.h"
+
+#include "Utils/ResourceManagement/ResourceManager.h"
+
+#include "HAL/Base/Engine.h"
 
 #include "GameLogic/Systems/CameraSystem.h"
 #include "GameLogic/Systems/CharacterStateSystem.h"

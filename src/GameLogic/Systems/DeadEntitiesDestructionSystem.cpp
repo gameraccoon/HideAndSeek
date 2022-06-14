@@ -8,6 +8,8 @@
 #include "GameData/GameData.h"
 #include "GameData/Components/DeathComponent.generated.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
 DeadEntitiesDestructionSystem::DeadEntitiesDestructionSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {

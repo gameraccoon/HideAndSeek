@@ -13,6 +13,9 @@
 #include "GameData/Components/AiControllerComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
+
 TestUnitsCountControlSystem::TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {

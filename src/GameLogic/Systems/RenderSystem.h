@@ -1,17 +1,18 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 
 #include <raccoon-ecs/system.h>
 
-#include "Utils/ResourceManagement/ResourceManager.h"
-#include "Utils/Multithreading/ThreadPool.h"
+#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Resources/ResourceHandle.h"
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
-
-struct RenderData;
 class GameplayTimestamp;
+class ResourceManager;
+class ThreadPool;
+class World;
+class WorldHolder;
+struct RenderData;
 
 /**
  * System that handles rendering of world objects
@@ -24,10 +25,7 @@ public:
 		ResourceManager& resourceManager,
 		ThreadPool& threadPool) noexcept;
 
-	~RenderSystem() override = default;
-
 	void update() override;
-	static std::string GetSystemId() { return "RenderSystem"; }
 
 private:
 	static void DrawVisibilityPolygon(RenderData& renderData, ResourceHandle lightSpriteHandle, const std::vector<Vector2D>& polygon, const Vector2D& fovSize, const Vector2D& drawShift);

@@ -1,10 +1,8 @@
 #pragma once
 
-#include <unordered_map>
-
 #include <raccoon-ecs/system.h>
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
+class WorldHolder;
 
 /**
  * System that resolve object collisions
@@ -12,11 +10,9 @@
 class CollisionSystem : public RaccoonEcs::System
 {
 public:
-	explicit CollisionSystem(WorldHolder& worldHolder) noexcept;
-	~CollisionSystem() override = default;
+	CollisionSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
-	static std::string GetSystemId() { return "CollisionSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;

@@ -21,7 +21,9 @@
 
 #include "HAL/Base/Engine.h"
 
+#include "GameLogic/Imgui/ImguiDebugData.h"
 #include "GameLogic/Render/RenderAccessor.h"
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 
 ImguiSystem::ImguiSystem(

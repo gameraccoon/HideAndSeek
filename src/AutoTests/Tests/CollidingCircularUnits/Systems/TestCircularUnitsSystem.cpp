@@ -10,6 +10,8 @@
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/World.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
 
 TestCircularUnitsSystem::TestCircularUnitsSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)

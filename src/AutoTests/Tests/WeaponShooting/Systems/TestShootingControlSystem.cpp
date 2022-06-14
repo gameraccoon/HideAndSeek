@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#include <limits>
+
 #include "AutoTests/Tests/WeaponShooting/Systems/TestShootingControlSystem.h"
 
 #include "GameData/Components/CharacterStateComponent.generated.h"
@@ -7,10 +9,9 @@
 #include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/WeaponComponent.generated.h"
-
-#include <limits>
-
 #include "GameData/World.h"
+
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 
 TestShootingControlSystem::TestShootingControlSystem(WorldHolder& worldHolder) noexcept

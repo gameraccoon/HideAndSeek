@@ -11,6 +11,8 @@
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/World.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
 
 MovementSystem::MovementSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)

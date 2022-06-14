@@ -21,13 +21,13 @@
 #include "GameData/World.h"
 
 #include "Utils/Geometry/VisibilityPolygon.h"
-
-#include "GameLogic/Render/RenderAccessor.h"
+#include "Utils/Multithreading/ThreadPool.h"
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 #include "HAL/Graphics/Sprite.h"
 
-#include <glm/matrix.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "GameLogic/Render/RenderAccessor.h"
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 RenderSystem::RenderSystem(
 		WorldHolder& worldHolder,

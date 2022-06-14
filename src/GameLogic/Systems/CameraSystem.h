@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
-
 #include <raccoon-ecs/system.h>
 
 class WorldHolder;
@@ -16,7 +13,6 @@ public:
 	CameraSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
-	static std::string GetSystemId() { return "CameraSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;

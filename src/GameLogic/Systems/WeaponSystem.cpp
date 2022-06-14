@@ -15,6 +15,8 @@
 
 #include "Utils/Geometry/RayTrace.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
 
 WeaponSystem::WeaponSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)

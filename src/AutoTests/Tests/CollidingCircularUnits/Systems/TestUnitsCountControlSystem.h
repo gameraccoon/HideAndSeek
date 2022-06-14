@@ -1,13 +1,10 @@
 #pragma once
 
-#include <unordered_map>
-
 #include <raccoon-ecs/system.h>
 
 #include "GameData/EcsDefinitions.h"
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
-
+class WorldHolder;
 class SpatialWorldData;
 struct Vector2D;
 
@@ -17,7 +14,6 @@ public:
 	TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
-	static std::string GetSystemId() { return "TestUnitsCountControlSystem"; }
 
 private:
 	void SpawnUnit(EntityManager& entityManager, const Vector2D& pos);

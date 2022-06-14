@@ -2,6 +2,8 @@
 
 #include "HAL/GameBase.h"
 
+#include "Utils/ResourceManagement/ResourceManager.h"
+
 namespace HAL
 {
 	GameBase::GameBase(Engine* engine, ResourceManager& resourceManager)

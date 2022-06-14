@@ -1,10 +1,7 @@
 #pragma once
 
-#include <string>
-
 #include <raccoon-ecs/system.h>
 
-class InputData;
 class WorldHolder;
 
 /**
@@ -16,7 +13,6 @@ public:
 	ControlSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
-	static std::string GetSystemId() { return "ControlSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;

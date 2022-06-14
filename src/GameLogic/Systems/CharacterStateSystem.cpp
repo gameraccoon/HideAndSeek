@@ -14,6 +14,7 @@
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 CharacterStateSystem::CharacterStateSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)

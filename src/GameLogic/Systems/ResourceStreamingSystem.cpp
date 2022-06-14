@@ -12,8 +12,11 @@
 #include "GameData/Components/SpriteRenderComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 
+#include "Utils/ResourceManagement/ResourceManager.h"
+
 #include "HAL/Graphics/Sprite.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/Resources/SpriteAnimationClip.h"
 #include "GameLogic/Resources/AnimationGroup.h"
 

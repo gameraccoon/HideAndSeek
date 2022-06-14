@@ -10,6 +10,7 @@
 #include "Utils/Geometry/Collide.h"
 
 #include "GameLogic/Systems/CollisionSystem.h"
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 
 CollisionSystem::CollisionSystem(WorldHolder& worldHolder) noexcept

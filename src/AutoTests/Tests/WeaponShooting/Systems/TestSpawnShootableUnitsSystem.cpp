@@ -13,6 +13,8 @@
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/HealthComponent.generated.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
 
 TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)

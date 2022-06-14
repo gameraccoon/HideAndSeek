@@ -4,7 +4,12 @@
 
 #include "Base/Random/Random.h"
 
+#include "GameData/Components/DeathComponent.generated.h"
 #include "GameData/World.h"
+
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
+#include "AutoTests/Tests/WeaponShooting/DestroyedEntitiesTestCheck.h"
 
 TestDestroyedEntitiesRegistrationSystem::TestDestroyedEntitiesRegistrationSystem(
 		WorldHolder& worldHolder,

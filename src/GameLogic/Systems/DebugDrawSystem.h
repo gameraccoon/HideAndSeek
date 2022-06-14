@@ -23,11 +23,9 @@ public:
 	DebugDrawSystem(
 		WorldHolder& worldHolder,
 		ResourceManager& resourceManager) noexcept;
-	~DebugDrawSystem() override = default;
 
 	void update() override;
 	void init() override;
-	static std::string GetSystemId() { return "DebugDrawSystem"; }
 
 private:
 	WorldHolder& mWorldHolder;

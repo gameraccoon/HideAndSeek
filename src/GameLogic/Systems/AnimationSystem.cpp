@@ -13,6 +13,8 @@
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
 AnimationSystem::AnimationSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {

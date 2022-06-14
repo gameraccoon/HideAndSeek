@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <raccoon-ecs/system.h>
 
 class WorldHolder;
@@ -19,7 +18,6 @@ public:
 	InputSystem(WorldHolder& worldHolder, const HAL::InputControllersData& inputData) noexcept;
 
 	void update() override;
-	static std::string GetSystemId() { return "InputSystem"; }
 
 private:
 	void processGameplayInput();

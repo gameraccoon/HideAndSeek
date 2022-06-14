@@ -1,28 +1,24 @@
 #pragma once
 
-#include <unordered_map>
-
 #include <raccoon-ecs/system.h>
 
 #include "GameData/EcsDefinitions.h"
 
-
-#include "GameLogic/SharedManagers/WorldHolder.h"
-
+class SpatialWorldData;
+class WorldHolder;
 struct Vector2D;
 
 class TestSpawnShootableUnitsSystem : public RaccoonEcs::System
 {
 public:
-	explicit TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept;
+	TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
-	static std::string GetSystemId() { return "TestSpawnShootableUnitsSystem"; }
 
 private:
 	void spawnUnit(EntityManager& entityManager, const Vector2D& pos);
-	void spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, class SpatialWorldData& spatialData);
-	void spawnUnits(class SpatialWorldData& spatialData, int count, const Vector2D& pos);
+	void spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData);
+	void spawnUnits(SpatialWorldData& spatialData, int count, const Vector2D& pos);
 
 private:
 	WorldHolder& mWorldHolder;

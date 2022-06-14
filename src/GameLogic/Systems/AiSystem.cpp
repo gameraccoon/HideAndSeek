@@ -18,6 +18,8 @@
 #include "Utils/AI/NavMeshGenerator.h"
 #include "Utils/AI/PathFinding.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
 AiSystem::AiSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
