@@ -10,27 +10,27 @@ TEST(BasicTypesSerialization, WriteNumber_Size)
 	std::vector<std::byte> stream;
 	stream.reserve(8);
 
-	Serialization::WriteNumber<u8>(stream, 5);
+	Serialization::WriteNumberNarrowCast<u8>(stream, 5u);
 	EXPECT_EQ(static_cast<size_t>(1), stream.size());
 	stream.clear();
 
-	Serialization::WriteNumber<u16>(stream, 5);
+	Serialization::WriteNumberNarrowCast<u16>(stream, 5u);
 	EXPECT_EQ(static_cast<size_t>(2), stream.size());
 	stream.clear();
 
-	Serialization::WriteNumber<u32>(stream, 5);
+	Serialization::WriteNumberNarrowCast<u32>(stream, 5u);
 	EXPECT_EQ(static_cast<size_t>(4), stream.size());
 	stream.clear();
 
-	Serialization::WriteNumber<u64>(stream, 5);
+	Serialization::WriteNumberWideCast<u64>(stream, 5u);
 	EXPECT_EQ(static_cast<size_t>(8), stream.size());
 	stream.clear();
 
-	Serialization::WriteNumber<f32>(stream, 5);
+	Serialization::WriteNumberNarrowCast<f32>(stream, 5.0f);
 	EXPECT_EQ(static_cast<size_t>(4), stream.size());
 	stream.clear();
 
-	Serialization::WriteNumber<f64>(stream, 5);
+	Serialization::WriteNumber<f64>(stream, 5.0);
 	EXPECT_EQ(static_cast<size_t>(8), stream.size());
 	stream.clear();
 }
@@ -39,16 +39,27 @@ TEST(BasicTypesSerialization, WriteNumber_ReadNumber)
 {
 	std::vector<std::byte> stream;
 
-	Serialization::WriteNumber<s8>(stream, -4);
-	Serialization::WriteNumber<s16>(stream, -3);
-	Serialization::WriteNumber<s32>(stream, -2);
-	Serialization::WriteNumber<s64>(stream, -1);
-	Serialization::WriteNumber<u8>(stream, 1);
-	Serialization::WriteNumber<u16>(stream, 2);
-	Serialization::WriteNumber<u32>(stream, 3);
-	Serialization::WriteNumber<u64>(stream, 4);
-	Serialization::WriteNumber<f32>(stream, -5.0f);
-	Serialization::WriteNumber<f64>(stream, 6.0);
+	const s8 testSignedInt8 = -4;
+	const s16 testSignedInt16 = -3;
+	const s32 testSignedInt32 = -2;
+	const s64 testSignedInt64 = -1;
+	const u8 testUnsignedInt8 = 1u;
+	const u16 testUnsignedInt16 = 2u;
+	const u32 testUnsignedInt32 = 3u;
+	const u64 testUnsignedInt64 = 4u;
+	const f32 testFloat32 = -5.0f;
+	const f64 testFloat64 = 6.0;
+
+	Serialization::WriteNumber<s8>(stream, testSignedInt8);
+	Serialization::WriteNumber<s16>(stream, testSignedInt16);
+	Serialization::WriteNumber<s32>(stream, testSignedInt32);
+	Serialization::WriteNumber<s64>(stream, testSignedInt64);
+	Serialization::WriteNumber<u8>(stream, testUnsignedInt8);
+	Serialization::WriteNumber<u16>(stream, testUnsignedInt16);
+	Serialization::WriteNumber<u32>(stream, testUnsignedInt32);
+	Serialization::WriteNumber<u64>(stream, testUnsignedInt64);
+	Serialization::WriteNumber<f32>(stream, testFloat32);
+	Serialization::WriteNumber<f64>(stream, testFloat64);
 	EXPECT_EQ(size_t(1+2+4+8+1+2+4+8+4+8), stream.size());
 
 	size_t cursorPos = 0;
