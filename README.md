@@ -89,7 +89,7 @@ e.g. for apt: `sudo apt-get install libsdl2-dev libsdl2-2.0-0 libsdl2-image-dev 
 
 #### Prerequisites for building the editor
 - git with git-lfs
-- CMake (see minimal supported version in [CMakeLists.txt](https://github.com/gameraccoon/hide-and-seek/blob/develop/CMakeLists.txt#L1=))
+- CMake (see minimal supported version in [editor/CMakeLists.txt](https://github.com/gameraccoon/hide-and-seek/blob/develop/editor/CMakeLists.txt#L1=))
 - python3
 - gcc 11 (or higher)
 - Qt Creator (Qt 5.5 or higher)
