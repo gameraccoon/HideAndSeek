@@ -4,65 +4,65 @@ Made with **C++**
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/gameraccoon/hide-and-seek/blob/develop/License.txt)
 
-### Intent
+## Intent
 This is an educational project that doesn't have any applications to real-world problems, but it can still be used as a source of inspiration (or as a copypaste source).
 
 This project was made in my free time for fun and to test some approaches. So don't expect much.
 
-#### Features
-##### Fully ECS-based code
+## Features
+### Fully ECS-based code
 ECS pattern has been chosen here **not** for performance reasons, but to get better maintainability and increase testability of gameplay code. ECS makes these goals easier to be achieved.
 
 There's a very [trivial implementation of ECS](https://github.com/gameraccoon/raccoon-ecs) used, but the profiler tells that it is fine.
 
-##### 2D dynamic lights
+### 2D dynamic lights
 Lights with shadows that are being calculated at runtime (several can be calculated in parallel).
 
-##### Non-intrusive auto-tests and unit-tests
+### Non-intrusive auto-tests and unit-tests
 External code for testing game logic that doesn't require changes to the tested code in order to write new tests.
 
-##### External editor
+### External editor
 Editor for most of the data with Undo/Redo support, and with a simple 2D editor for levels. It is compiled as a separate executable and requires minimal changes to the gameplay code to support new features (most likely only serialization-deserialization).
 
-### Modules
+## Modules
 The game is divided into several modules. Modules of lower levels can't depend on modules of higher levels.
 
 There's no split between game and engine in the folder structure, rather the game is made with minimum dependencies between core features, so you can remove part of the code of the features (systems => utility code => components) that you don't need in the new project while keeping the game compilable and working. A good example is [tank-game](https://github.com/gameraccoon/tank-game), a multiplayer game based on this project.
 
-#### Base
+### Base
 Project-agnostic code that can be used in any other module:
 - project-wide type aliases
 - logging and debug assertions
 - macros (for compiler specific features support)
 - custom string types (hashed strings, localizable strings, resource paths)
 
-#### GameData
+### GameData
 Contains gameplay related data that will be stored in components
 - ECS Components (code-generated from jsons) and data for them
 - some utilty classes that don't have gameplay-specific code: Vector2D, FSM, ...
 
-#### Utils
+### Utils
 Gameplay specific code and utilities code
 - alghorithm implementations: graph search, collision detection, save-load, ...
 - game initialization and debug code support
 
-#### HAL
+### HAL
 Hardware Abstraction Layer
 
 Project-agmostic high-level interfaces to input, graphic libraries, sound libraries, ...
 
-#### GameLogic
+### GameLogic
 Contains gameplay code and code that glue everything into a game
 - the code of ECS Systems
 - game initialization and the game loop
 
-#### UnitTests
+### UnitTests
 Executable with unit-tests
 
-#### AutoTests
+### AutoTests
 Game examples that can run for a limited period of frames with fixed dt and RNG seeds that be used for performance measurement. Or autotests that checks some mechanics sanity
 
-#### External code
+### External code
 External libraries can be found in `external` folder.
 
 * SDL2 with glew and glm
@@ -77,9 +77,9 @@ External libraries can be found in `external` folder.
 * [Stephan Brumme FNV1a hash](https://create.stephan-brumme.com/fnv-hash/) + [ruby0x1/hash_fnv1a.h](https://gist.github.com/ruby0x1/81308642d0325fd386237cfa3b44785c)
 
 
-### Getting and building (Windows/Linux)
+## Getting and building (Windows/Linux)
 
-#### Prerequisites for building the game
+### Prerequisites for building the game
 - git with git-lfs
 - CMake (see minimal supported version in [CMakeLists.txt](https://github.com/gameraccoon/hide-and-seek/blob/develop/CMakeLists.txt#L1=))
 - python3
@@ -87,25 +87,25 @@ External libraries can be found in `external` folder.
 - for Linux you need to install SLD2, SDL2_Image and SDL2_mixer (devel and static) using your packet manager  
 e.g. for apt: `sudo apt-get install libsdl2-dev libsdl2-2.0-0 libsdl2-image-dev libsdl2-image-2.0-0 libsdl2-mixer-dev libsdl2-mixer-2.0-0`
 
-#### Prerequisites for building the editor
+### Prerequisites for building the editor
 - git with git-lfs
 - CMake (see minimal supported version in [editor/CMakeLists.txt](https://github.com/gameraccoon/hide-and-seek/blob/develop/editor/CMakeLists.txt#L1=))
 - python3
 - gcc 11 (or higher)
 - Qt Creator (Qt 5.5 or higher)
 
-#### Getting the code
+### Getting the code
 With SSH  
 `git clone --recursive git@github.com:gameraccoon/hide-and-seek.git`
 
 With HTTPS  
 `git clone --recursive https://github.com/gameraccoon/hide-and-seek.git`
 
-#### Building the game
-##### Windows
+### Building the game
+#### Windows
 For Windows with Visual Studio you can run `scripts\generate_game_vs2020_project.cmd` it will generate the solution for Visual Studio 2022. Path to the generated solution: `build\game\GameMain.sln`
 
-##### Linux
+#### Linux
 For all the other cases and platforms just generate the project using CMake with `CMakeLists.txt` in the root folder.
 
 E.g. using make
@@ -118,7 +118,7 @@ make
 
 After being built, the resulting executables can be found in `bin` folder
 
-#### Building the editor
+### Building the editor
 Generate the project using CMake with `editor/CMakeLists.txt`. Windows build of the editor is not tested, only Linux build is confirmed to be working.
 
 E.g. using make
