@@ -2,10 +2,6 @@
 
 #include "GameData/Geometry/Vector2D.h"
 
-#include "Base/Math/Float.h"
-
-#include <cmath>
-
 #include <nlohmann/json.hpp>
 
 static const float VECTOR_ERROR = 0.0001f;

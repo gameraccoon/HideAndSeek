@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bit>
 #include <cmath>
 #include <cstring>
 
@@ -48,7 +49,7 @@ struct Vector2D
 	/** Get a copy of this vector rotated about origin */
 	[[nodiscard]] Vector2D getRotated(Rotator rotation) const;
 
-	// check for exact equality
+	/** check for exact equality */
 	[[nodiscard]] bool operator==(const Vector2D& other) const noexcept = default;
 
 	[[nodiscard]] bool isNearlyEqualTo(Vector2D other) const noexcept;

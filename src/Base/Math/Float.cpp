@@ -2,8 +2,6 @@
 
 #include "Base/Math/Float.h"
 
-#include <memory.h>
-
 namespace Math
 {
 #ifdef DEBUG_CHECKS
@@ -29,7 +27,7 @@ namespace Math
 #ifdef DEBUG_CHECKS
 		CheckFloatsCanBeCompared(a, b, epsilon);
 #endif // DEBUG_CHECKS
-		return fabs(a - b) < epsilon;
+		return std::fabs(a - b) < epsilon;
 	}
 
 	bool IsGreaterWithEpsilon(float a, float b, float epsilon)
@@ -69,6 +67,6 @@ namespace Math
 #ifdef DEBUG_CHECKS
 		Assert(std::isfinite(v), "Comparison with NaN or Inf is not allowed");
 #endif // DEBUG_CHECKS
-		return fabs(v) < epsilon;
+		return std::fabs(v) < epsilon;
 	}
 }

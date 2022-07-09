@@ -1,6 +1,6 @@
 #pragma once
 
-#include <numeric>
+#include <limits>
 #include <nlohmann/json_fwd.hpp>
 
 #include "Base/Types/BasicTypes.h"

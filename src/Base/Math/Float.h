@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cmath>
+#include <limits>
+
 #include "Base/CompilerHelpers.h"
 
 // delete this code when C++20 is fully supported
