@@ -42,16 +42,16 @@ void AiSystem::update()
 		return;
 	}
 
-	TupleVector<const CollisionComponent*, const TransformComponent*> collisions;
-	world.getSpatialData().getAllCellManagers().getComponents<const CollisionComponent, const TransformComponent>(collisions);
+	TupleVector<const MovementComponent*, const CollisionComponent*> collisions;
+	world.getSpatialData().getAllCellManagers().getComponents<const MovementComponent, const CollisionComponent>(collisions);
 
 	bool needUpdate = !navMeshComponent->getNavMesh().geometry.isCalculated;
 	if (!needUpdate)
 	{
-		needUpdate = std::any_of(std::begin(collisions), std::end(collisions), [lastUpdateTimestamp = navMeshComponent->getUpdateTimestamp()](const std::tuple<const CollisionComponent*, const TransformComponent*>& set)
+		needUpdate = std::any_of(std::begin(collisions), std::end(collisions), [lastUpdateTimestamp = navMeshComponent->getUpdateTimestamp()](const std::tuple<const MovementComponent*, const CollisionComponent*>& set)
 		{
-			GameplayTimestamp objectUpdateTimestamp = std::get<1>(set)->getUpdateTimestamp();
-			return objectUpdateTimestamp > lastUpdateTimestamp && std::get<0>(set)->getGeometry().type == HullType::Angular;
+			GameplayTimestamp objectUpdateTimestamp = std::get<0>(set)->getUpdateTimestamp();
+			return objectUpdateTimestamp > lastUpdateTimestamp && std::get<1>(set)->getGeometry().type == HullType::Angular;
 		});
 	}
 
@@ -86,9 +86,9 @@ void AiSystem::update()
 
 	const NavMesh& navMesh = navMeshComponent->getNavMesh();
 
-	world.getSpatialData().getAllCellManagers().forEachComponentSet<AiControllerComponent, const TransformComponent, MovementComponent, CharacterStateComponent>(
+	world.getSpatialData().getAllCellManagers().forEachComponentSet<AiControllerComponent, CharacterStateComponent, MovementComponent, const TransformComponent>(
 		[targetLocation, &navMesh, timestampNow, navmeshUpdateTimestamp, debugDraw]
-			(AiControllerComponent* aiController, const TransformComponent* transform, MovementComponent* movement, CharacterStateComponent* characterState)
+			(AiControllerComponent* aiController, CharacterStateComponent* characterState, MovementComponent* movement, const TransformComponent* transform)
 	{
 		SCOPED_PROFILER("AiSystem::update update one character");
 		Vector2D currentLocation = transform->getLocation();

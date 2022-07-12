@@ -39,6 +39,13 @@
 			"type": "Vector2D",
 			"default": " = ZERO_VECTOR",
 			"includes": ["\"GameData/Geometry/Vector2D.h\""]
+		},
+		{
+			"name": "updateTimestamp",
+			"type": "GameplayTimestamp",
+			"default": "{0}",
+			"includes": ["\"GameData/Time/GameplayTimestamp.h\""],
+			"flags": ["transient"]
 		}
 	]
 }

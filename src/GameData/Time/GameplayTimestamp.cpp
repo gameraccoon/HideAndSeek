@@ -76,6 +76,12 @@ GameplayTimestamp GameplayTimestamp::getIncreasedByFloatTime(float passedTime) c
 	return GameplayTimestamp(mTimestamp + GetConvertedPassedTime(passedTime));
 }
 
+GameplayTimestamp GameplayTimestamp::getDecreasedByFloatTime(float timeInThePast) const noexcept
+{
+	Assert(isInitialized(), "Timestamp should be initialized before being used");
+	return GameplayTimestamp(mTimestamp - GetConvertedPassedTime(timeInThePast));
+}
+
 void to_json(nlohmann::json& outJson, const GameplayTimestamp timestamp)
 {
 	outJson = nlohmann::json::object({
@@ -89,3 +95,4 @@ void from_json(const nlohmann::json& json, GameplayTimestamp& outTimestamp)
 }
 
 static_assert(std::is_trivially_copyable<GameplayTimestamp>(), "GameplayTimestamp should be trivially copyable");
+static_assert(sizeof(GameplayTimestamp) == 8, "GameplayTimestamp changed its size, is this a mistake?");

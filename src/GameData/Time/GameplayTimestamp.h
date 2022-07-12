@@ -26,6 +26,7 @@ public:
 
 	void increaseByFloatTime(float passedTime) noexcept;
 	[[nodiscard]] GameplayTimestamp getIncreasedByFloatTime(float passedTime) const noexcept;
+	[[nodiscard]] GameplayTimestamp getDecreasedByFloatTime(float timeInThePast) const noexcept;
 
 	friend void to_json(nlohmann::json& outJson, const GameplayTimestamp timestamp);
 	friend void from_json(const nlohmann::json& json, GameplayTimestamp& outTimestamp);

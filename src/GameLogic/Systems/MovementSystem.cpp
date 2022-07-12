@@ -57,14 +57,14 @@ void MovementSystem::update()
 			{
 				transfers.emplace_back(cellPos, entityView);
 			}
-			transform->setUpdateTimestamp(timestampNow);
+			movement->setUpdateTimestamp(timestampNow);
 			movement->setNextStep(ZERO_VECTOR);
 		}
 
 		if (transform->getRotation() != movement->getSightDirection().rotation())
 		{
 			transform->setRotation(movement->getSightDirection().rotation());
-			transform->setUpdateTimestamp(timestampNow);
+			movement->setUpdateTimestamp(timestampNow);
 		}
 	});
 
