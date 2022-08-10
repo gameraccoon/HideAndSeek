@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/AbstractPropertyDescriptor.h"
 
 namespace ImguiPropertyFiltration
@@ -15,3 +17,5 @@ namespace ImguiPropertyFiltration
 		[[nodiscard]] StringId getComponentType() const override;
 	}};
 }}
+
+#endif // IMGUI_ENABLED

@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ImguiRenderModeWindow.h"
 
 #include "imgui/imgui.h"
@@ -32,3 +34,5 @@ void ImguiRenderModeWindow::update(ImguiDebugData& debugData)
 		}
 	}
 }
+
+#endif // IMGUI_ENABLED

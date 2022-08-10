@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/AbstractComponentImguiWidget.h"
 
 class {class_name}ImguiWidget : public AbstractComponentImguiWidget
@@ -7,3 +9,5 @@ class {class_name}ImguiWidget : public AbstractComponentImguiWidget
 public:
 	void update(void* component);
 }};
+
+#endif // IMGUI_ENABLED

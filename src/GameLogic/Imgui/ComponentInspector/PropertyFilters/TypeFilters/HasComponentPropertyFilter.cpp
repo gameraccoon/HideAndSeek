@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/HasComponentPropertyFilter.h"
 
 #include "imgui.h"
@@ -26,3 +28,5 @@ namespace ImguiPropertyFiltration
 		return true;
 	}
 } // namespace ImguiPropertyFiltration
+
+#endif // IMGUI_ENABLED

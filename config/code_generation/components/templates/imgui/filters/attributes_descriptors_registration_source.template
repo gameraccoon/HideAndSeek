@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptorsRegistration.h"
 
 {imgui/filters/attribute_descriptor_includes}
@@ -27,3 +29,5 @@ namespace ImguiPropertyFiltration
 		}}
 	}}
 }} // namespace ImguiPropertyFiltration
+
+#endif // IMGUI_ENABLED

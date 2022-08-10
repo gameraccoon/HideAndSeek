@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/FloatPropertyFilters.h"
 
 #include "imgui.h"
@@ -56,3 +58,5 @@ namespace ImguiPropertyFiltration
 		return val < mMaxValue;
 	}
 }
+
+#endif // IMGUI_ENABLED

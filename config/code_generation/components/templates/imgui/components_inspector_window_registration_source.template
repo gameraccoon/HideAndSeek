@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/ComponentWidgetsRegistration.h"
 
 {imgui/component_inspector_window_includes}
@@ -11,3 +13,5 @@ namespace ComponentWidgetsRegistration
 		{imgui/component_inspector_window_register}
 	}}
 }}
+
+#endif // IMGUI_ENABLED

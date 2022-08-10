@@ -34,26 +34,26 @@ project(${APP_NAME} VERSION ${EXECUTABLE_VERSION})
 file(MAKE_DIRECTORY ${GAME_BIN_DIR})
 
 # definitions
-if(DEBUG_CHECKS)
+if (DEBUG_CHECKS)
 	add_definitions(-DDEBUG_CHECKS -DRACCOON_ECS_DEBUG_CHECKS_ENABLED)
 endif(DEBUG_CHECKS)
 
-if(ENABLE_SCOPED_PROFILER)
+if (ENABLE_SCOPED_PROFILER)
 	add_definitions(-DENABLE_SCOPED_PROFILER)
 endif(ENABLE_SCOPED_PROFILER)
 
-if(MEMLEAK_DETECTION)
+if (MEMLEAK_DETECTION)
 	add_definitions(-DDETECT_MEMORY_LEAKS)
-	if(MEMLEAK_REDEFINE_NEW)
+	if (MEMLEAK_REDEFINE_NEW)
 		add_definitions(-DREDEFINE_NEW)
 	endif()
 endif()
 
-if(IMGUI_ENABLED)
+if (IMGUI_ENABLED)
 	add_definitions(-DIMGUI_ENABLED)
 endif()
 
-if(CONCURRENT_ACCESS_DETECTION)
+if (CONCURRENT_ACCESS_DETECTION)
 	add_definitions(-DCONCURRENT_ACCESS_DETECTION)
 endif(CONCURRENT_ACCESS_DETECTION)
 
@@ -139,17 +139,19 @@ include_directories(${EXTERNALS_DIR}/sources/polypartition/include)
 target_compile_options(Polypartition PRIVATE ${EXTERNALS_CXX_FLAGS})
 
 # ImGui
-add_library(Imgui EXCLUDE_FROM_ALL
-	${EXTERNALS_DIR}/sources/imgui/imgui.cpp
-	${EXTERNALS_DIR}/sources/imgui/imgui_demo.cpp
-	${EXTERNALS_DIR}/sources/imgui/imgui_draw.cpp
-	${EXTERNALS_DIR}/sources/imgui/imgui_widgets.cpp
-	${EXTERNALS_DIR}/sources/imgui/examples/imgui_impl_opengl2.cpp
-	${EXTERNALS_DIR}/sources/imgui/examples/imgui_impl_sdl.cpp
-)
-add_dependencies(${APP_NAME} Imgui)
-include_directories(${EXTERNALS_DIR}/sources/imgui)
-target_compile_options(Imgui PRIVATE ${EXTERNALS_CXX_FLAGS})
+if (IMGUI_ENABLED)
+	add_library(Imgui EXCLUDE_FROM_ALL
+		${EXTERNALS_DIR}/sources/imgui/imgui.cpp
+		${EXTERNALS_DIR}/sources/imgui/imgui_demo.cpp
+		${EXTERNALS_DIR}/sources/imgui/imgui_draw.cpp
+		${EXTERNALS_DIR}/sources/imgui/imgui_widgets.cpp
+		${EXTERNALS_DIR}/sources/imgui/examples/imgui_impl_opengl2.cpp
+		${EXTERNALS_DIR}/sources/imgui/examples/imgui_impl_sdl.cpp
+	)
+	add_dependencies(${APP_NAME} Imgui)
+	include_directories(${EXTERNALS_DIR}/sources/imgui)
+	target_compile_options(Imgui PRIVATE ${EXTERNALS_CXX_FLAGS})
+endif()
 
 set(GENERAL_PROJECT_LIBS
 	GameLogic
@@ -159,13 +161,19 @@ set(GENERAL_PROJECT_LIBS
 	Base
 
 	Polypartition
-	Imgui
 
 	SDL2
 	SDL2_image
 	SDL2_mixer
 	SDL2main
 )
+
+if (IMGUI_ENABLED)
+	set(GENERAL_PROJECT_LIBS
+		${GENERAL_PROJECT_LIBS}
+		Imgui
+	)
+endif()
 
 if (WIN32)
 	set(GENERAL_PROJECT_LIBS
@@ -185,9 +193,7 @@ else()
 	)
 endif()
 
-target_link_libraries(${APP_NAME}
-	${GENERAL_PROJECT_LIBS}
-)
+target_link_libraries(${APP_NAME} ${GENERAL_PROJECT_LIBS})
 
 set_target_properties(${APP_NAME} PROPERTIES
 	VERSION "${EXECUTABLE_VERSION}.${BUILD_NUMBER}"
@@ -207,11 +213,9 @@ set(UNITTESTS_SRC
 )
 include_directories(${EXTERNALS_DIR}/sources/googletest)
 add_executable(${UNITTESTS_NAME} ${UNITTESTS_SRC})
-target_compile_definitions(${UNITTESTS_NAME}  PRIVATE -DRACCOON_ECS_TOOLMODE)
+target_compile_definitions(${UNITTESTS_NAME} PRIVATE -DRACCOON_ECS_TOOLMODE)
 target_compile_options(${UNITTESTS_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
-target_link_libraries(${UNITTESTS_NAME}
-	${GENERAL_PROJECT_LIBS}
-)
+target_link_libraries(${UNITTESTS_NAME} ${GENERAL_PROJECT_LIBS})
 
 # Autotests
 set(AUTOTESTS_NAME AutoTests)
@@ -219,12 +223,10 @@ file(GLOB_RECURSE AUTOTESTS_SRC RELATIVE "" FOLLOW_SYMLINKS "${GAME_SRC_DIR}/Aut
 add_executable(${AUTOTESTS_NAME} ${AUTOTESTS_SRC})
 target_compile_options(${AUTOTESTS_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
 set_target_properties(${AUTOTESTS_NAME} PROPERTIES UNITY_BUILD ON)
-target_link_libraries(${AUTOTESTS_NAME}
-	${GENERAL_PROJECT_LIBS}
-)
+target_link_libraries(${AUTOTESTS_NAME} ${GENERAL_PROJECT_LIBS})
 
 # symlink resources dir
-if(NOT EXISTS "${GAME_BIN_DIR}/resources")
+if (NOT EXISTS "${GAME_BIN_DIR}/resources")
 	execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/resources" "${GAME_BIN_DIR}/resources")
 endif()
 

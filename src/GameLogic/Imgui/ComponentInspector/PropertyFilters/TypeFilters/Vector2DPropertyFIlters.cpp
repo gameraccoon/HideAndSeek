@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/Vector2DPropertyFIlters.h"
 
 #include "imgui.h"
@@ -48,3 +50,5 @@ namespace ImguiPropertyFiltration
 		return mLT.x < val.x && val.x < mRB.x && mLT.y < val.y && val.y < mRB.y;
 	}
 }
+
+#endif // IMGUI_ENABLED

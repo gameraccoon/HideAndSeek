@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ImguiRenderModeWindow.h"
 #include "GameLogic/Imgui/ImguiSystemsTimeReportWindow.h"
 #include "GameLogic/Imgui/ComponentInspector/ImguiComponentInspectorWindow.h"
@@ -15,3 +17,5 @@ private:
 	ImguiSystemsTimeReportWindow mSystemsTimeReportWindow;
 	ImguiComponentInspectorWindow mComponentInspectorWindow;
 };
+
+#endif // IMGUI_ENABLED

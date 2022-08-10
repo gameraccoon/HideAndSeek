@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptors/{class_name}{attribute_name_capital}PropertyDescriptor.generated.h"
 
 #include <raccoon-ecs/entity_manager.h>
@@ -38,3 +40,5 @@ namespace ImguiPropertyFiltration
 		return {class_name}::GetTypeId();
 	}}
 }} // namespace ImguiPropertyFiltration
+
+#endif // IMGUI_ENABLED

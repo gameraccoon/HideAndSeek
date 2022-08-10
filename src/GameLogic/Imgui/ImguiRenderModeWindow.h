@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IMGUI_ENABLED
+
 class ImguiRenderModeWindow
 {
 public:
@@ -7,3 +9,5 @@ public:
 
 	bool isVisible = false;
 };
+
+#endif // IMGUI_ENABLED

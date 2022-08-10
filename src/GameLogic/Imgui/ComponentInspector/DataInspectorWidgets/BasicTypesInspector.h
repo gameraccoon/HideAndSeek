@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IMGUI_ENABLED
+
 #include <vector>
 
 #include "imgui.h"
@@ -50,3 +52,5 @@ namespace ImguiDataInspection
 		}
 	}
 }
+
+#endif // IMGUI_ENABLED

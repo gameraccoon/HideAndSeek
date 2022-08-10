@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/DataInspectorWidgets/BasicTypesInspector.h"
 
 #include <cstring>
@@ -62,3 +64,5 @@ namespace ImguiDataInspection
 		}
 	}
 }
+
+#endif // IMGUI_ENABLED

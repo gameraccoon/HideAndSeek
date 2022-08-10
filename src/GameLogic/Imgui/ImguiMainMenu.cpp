@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ImguiMainMenu.h"
 
 #include "imgui/imgui.h"
@@ -44,3 +46,5 @@ void ImguiMainMenu::update(ImguiDebugData& debugData)
 		ImGui::ShowDemoWindow(&mShowImguiDemoWindow);
 	}
 }
+
+#endif // IMGUI_ENABLED

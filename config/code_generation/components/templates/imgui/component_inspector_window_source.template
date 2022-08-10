@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "GameLogic/Imgui/ComponentInspector/ComponentWidgets/{class_name}ImguiWidget.generated.h"
 
 #include "GameData/Components/{class_name}.generated.h"
@@ -14,3 +16,5 @@ void {class_name}ImguiWidget::update(void* component)
 
 	{imgui/attributes_inspection}
 }}
+
+#endif // IMGUI_ENABLED
