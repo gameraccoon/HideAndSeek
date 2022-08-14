@@ -50,7 +50,7 @@ Gameplay specific code and utilities code
 ### HAL
 Hardware Abstraction Layer
 
-Project-agmostic high-level interfaces to input, graphic libraries, sound libraries, ...
+Project-agnostic high-level interfaces to input, graphic libraries, sound libraries, ...
 
 ### GameLogic
 Contains gameplay code and code that glue everything into a game
