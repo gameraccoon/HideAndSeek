@@ -2,7 +2,8 @@ Simple 2D game
 
 Made with **C++**
 
-[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/gameraccoon/hide-and-seek/blob/develop/License.txt)
+[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/gameraccoon/hide-and-seek/blob/develop/License.txt)  
+[![Windows - build](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-windows.yml/badge.svg)](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-windows.yml) [![Ubuntu - build and run unit-tests](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-ubuntu.yml/badge.svg)](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-ubuntu.yml)
 
 ## Intent
 This is an educational project that doesn't have any applications to real-world problems, but it can still be used as a source of inspiration (or as a copypaste source).
