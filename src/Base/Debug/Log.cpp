@@ -7,15 +7,16 @@
 
 Log::Log()
 {
-	const std::string LOG_FILE = std::string("./logs/").append("log.txt");
+	const std::filesystem::path LOGS_DIR{"./logs"};
+	const std::filesystem::path LOG_FILE = LOGS_DIR / "log.txt";
 
 	namespace fs = std::filesystem;
-	if (!fs::is_directory("./logs") || !fs::exists("./logs"))
+	if (!fs::is_directory(LOGS_DIR) || !fs::exists(LOGS_DIR))
 	{
-		fs::create_directory("logs");
+		fs::create_directory(LOGS_DIR);
 	}
 
-	mLogFileStream = std::ofstream(LOG_FILE, std::ios_base::trunc);
+	mLogFileStream = std::ofstream(LOG_FILE);
 	writeLog("Log file created");
 }
 
