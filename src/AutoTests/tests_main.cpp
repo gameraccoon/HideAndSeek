@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 	auto caseIt = cases.find(arguments.getArgumentValue("case"));
 	if (caseIt != cases.end())
 	{
-		ApplicationData applicationData(arguments.getIntArgumentValue("profile-systems", ApplicationData::DefaultWorkerThreadCount));
+		ApplicationData applicationData(arguments.getIntArgumentValue("threads-count", ApplicationData::DefaultWorkerThreadCount));
 		HAL::Engine engine(800, 600);
 
 		// switch render context to render thread

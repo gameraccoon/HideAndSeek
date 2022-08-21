@@ -13,6 +13,8 @@
 #include "GameLogic/Game/HapGame.h"
 #include "GameLogic/Game/ApplicationData.h"
 
+#include "GameMain/ConsoleCommands.h"
+
 int main(int argc, char** argv)
 {
 	Random::gGlobalGenerator = Random::GlobalGeneratorType(static_cast<unsigned int>(time(nullptr)));
@@ -23,7 +25,12 @@ int main(int argc, char** argv)
 
 	ArgumentsParser arguments(argc, argv);
 
-	ApplicationData applicationData(arguments.getIntArgumentValue("profile-systems", ApplicationData::DefaultWorkerThreadCount));
+	if (ConsoleCommands::TryExecuteQuickConsoleCommands(arguments))
+	{
+		return true;
+	}
+
+	ApplicationData applicationData(arguments.getIntArgumentValue("threads-count", ApplicationData::DefaultWorkerThreadCount));
 	HAL::Engine engine(800, 600);
 
 	// switch render context to render thread

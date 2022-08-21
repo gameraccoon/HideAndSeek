@@ -37,6 +37,6 @@ void DebugGameBehavior::processArguments(const ArgumentsParser& arguments)
 
 	if (arguments.hasArgument("time-limit"))
 	{
-		mFramesBeforeShutdown = std::atoi(arguments.getArgumentValue("time-limit").c_str());
+		mFramesBeforeShutdown = arguments.getIntArgumentValue("time-limit", -1);
 	}
 }
