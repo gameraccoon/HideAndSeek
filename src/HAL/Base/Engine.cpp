@@ -3,7 +3,6 @@
 #include "HAL/Base/Engine.h"
 
 #include <algorithm>
-#include <thread>
 
 #include <glew/glew.h>
 
@@ -11,6 +10,8 @@
 
 #include "Base/Debug/ConcurrentAccessDetector.h"
 
+#include "HAL/Base/GameLoop.h"
+#include "HAL/Graphics/Renderer.h"
 #include "HAL/IGame.h"
 #include "HAL/InputControllersData.h"
 #include "HAL/Internal/GlContext.h"
@@ -33,8 +34,6 @@ namespace HAL
 		Graphics::Renderer mRenderer;
 		IGame* mGame = nullptr;
 		InputControllersData* mInputDataPtr = nullptr;
-		Uint32 mLastTicks = 0;
-		Uint32 mTicksEpoch = 0;
 
 		std::vector<SDL_Event> mLastFrameEvents;
 
@@ -50,12 +49,13 @@ namespace HAL
 
 		void start();
 		void parseEvents();
-		Uint64 getTicks();
 	};
 
 	Engine::Engine(int windowWidth, int windowHeight) noexcept
 		: mPimpl(HS_NEW Impl(windowWidth, windowHeight))
 	{
+		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
+
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 		SDL_GL_SetSwapInterval(0); // vsync off
@@ -78,6 +78,7 @@ namespace HAL
 
 	Engine::~Engine()
 	{
+		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
 		Mix_CloseAudio();
 	}
 
@@ -90,24 +91,21 @@ namespace HAL
 		mPimpl->start();
 	}
 
-	Graphics::Renderer& Engine::getRenderer()
-	{
-		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
-		return mPimpl->mRenderer;
-	}
-
 	Vector2D Engine::getWindowSize() const
 	{
+		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
 		return Vector2D(static_cast<float>(mPimpl->mWindowWidth), static_cast<float>(mPimpl->mWindowHeight));
 	}
 
 	void Engine::releaseRenderContext()
 	{
+		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
 		SDL_GL_MakeCurrent(nullptr, 0);
 	}
 
 	void Engine::acquireRenderContext()
 	{
+		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
 		SDL_GL_MakeCurrent(mPimpl->mWindow.getRawWindow(), mPimpl->mGlContext.getRawGLContext());
 	}
 
@@ -129,80 +127,10 @@ namespace HAL
 		return mPimpl->mLastFrameEvents;
 	}
 
-	Uint64 Engine::Impl::getTicks()
-	{
-		const Uint32 ticks = SDL_GetTicks();
-		if ALMOST_NEVER(ticks < mLastTicks)
-		{
-			Assert(mLastTicks > (1 << 16), "Time wrapped over too big period");
-			++mTicksEpoch;
-		}
-
-		return (static_cast<Uint64>(mTicksEpoch) << 32) + ticks;
-	}
-
 	void Engine::Impl::start()
 	{
 		AssertFatal(mGame, "Game should be set to Engine before calling start()");
-		// we advance the time a bit differently, fixed frame time is advanced in steps
-		Uint64 lastFixedFrameTicks = getTicks();
-		// and real time is update with the exact time passed from last processed frame
-		Uint64 lastRealFrameTicks = getTicks();
-		while (!mGame->shouldQuitGame())
-		{
-			parseEvents();
-
-			Uint64 currentTicks = getTicks();
-
-			// time was adjusted to past or wrapped around type, start counting time to frame from now
-			if (currentTicks < lastFixedFrameTicks || currentTicks < lastRealFrameTicks)
-			{
-				lastFixedFrameTicks = currentTicks;
-				lastRealFrameTicks = currentTicks;
-				continue;
-			}
-
-			int iterations = 0;
-			Uint64 fixedFrameticksLeft = currentTicks - lastFixedFrameTicks;
-			if (fixedFrameticksLeft >= ONE_FIXED_UPDATE_TICKS)
-			{
-				Uint64 passedRealTicks = currentTicks - lastRealFrameTicks;
-				// if we exceeded max frame ticks last frame, that likely mean we were staying on a breakpoint
-				// readjust to normal ticking speed
-				if (fixedFrameticksLeft > MAX_FRAME_TICKS)
-				{
-					LogInfo("Continued from a breakpoint or had a huge lag");
-					fixedFrameticksLeft = ONE_FIXED_UPDATE_TICKS;
-					passedRealTicks = ONE_FIXED_UPDATE_TICKS;
-				}
-
-				const float lastFrameDurationSec = passedRealTicks * ONE_TICK_SECONDS;
-
-				while (fixedFrameticksLeft >= ONE_FIXED_UPDATE_TICKS)
-				{
-					fixedFrameticksLeft -= ONE_FIXED_UPDATE_TICKS;
-					++iterations;
-				}
-
-				mGame->dynamicTimePreFrameUpdate(lastFrameDurationSec, iterations);
-				for (int i = 0; i < iterations; ++i)
-				{
-					mGame->fixedTimeUpdate(ONE_FIXED_UPDATE_SEC);
-				}
-				mGame->dynamicTimePostFrameUpdate(lastFrameDurationSec, iterations);
-
-				lastFixedFrameTicks = currentTicks - fixedFrameticksLeft;
-				lastRealFrameTicks = currentTicks;
-
-				mLastFrameEvents.clear();
-			}
-
-			if (iterations <= 1)
-			{
-				// give some time to other threads while waiting
-				std::this_thread::yield();
-			}
-		}
+		RunGameLoop(*mGame, nullptr, [this]{ parseEvents(); });
 	}
 
 	void Engine::Impl::parseEvents()
