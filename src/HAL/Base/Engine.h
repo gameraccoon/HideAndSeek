@@ -24,7 +24,8 @@ namespace HAL
 
 		~Engine();
 
-		void start(IGame* game, InputControllersData* inputData);
+		void init(IGame* game, InputControllersData* inputData);
+		void start();
 
 		Vector2D getWindowSize() const;
 

@@ -15,7 +15,7 @@ class HapGame : public Game
 public:
 	using Game::Game;
 
-	void preStart(ArgumentsParser& arguments, const RenderAccessorGameRef& renderAccessor);
+	void preStart(const ArgumentsParser& arguments, const RenderAccessorGameRef& renderAccessor);
 	void initResources() override;
 
 	void quitGame() override { mShouldQuit = true; }

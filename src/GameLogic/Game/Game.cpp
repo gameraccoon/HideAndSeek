@@ -38,19 +38,6 @@ void Game::preStart(const ArgumentsParser& arguments)
 	mWorld.getWorldComponents().addComponent<TimeComponent>();
 }
 
-void Game::start()
-{
-	// start the main loop
-	if (HAL::Engine* engine = getEngine())
-	{
-		engine->start(this, &mInputControllersData);
-	}
-	else
-	{
-		ReportFatalError("Trying to start() game with no Engine");
-	}
-}
-
 void Game::dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates)
 {
 	SCOPED_PROFILER("Game::dynamicTimePreFrameUpdate");

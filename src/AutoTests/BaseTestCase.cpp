@@ -22,8 +22,10 @@ TestChecklist BaseTestCase::start(const ArgumentsParser& arguments, RenderAccess
 
 	initTestCase(arguments);
 
+	Game::initResources();
 	Game::preStart(arguments);
-	Game::start();
+	getEngine()->init(this, nullptr);
+	getEngine()->start();
 	Game::onGameShutdown();
 
 	return std::move(mTestChecklist);

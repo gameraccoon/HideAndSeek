@@ -37,7 +37,7 @@
 
 #include "GameLogic/Initialization/StateMachines.h"
 
-void HapGame::preStart(ArgumentsParser& arguments, const RenderAccessorGameRef& renderAccessor)
+void HapGame::preStart(const ArgumentsParser& arguments, const RenderAccessorGameRef& renderAccessor)
 {
 	SCOPED_PROFILER("HapGame::start");
 
@@ -53,6 +53,11 @@ void HapGame::preStart(ArgumentsParser& arguments, const RenderAccessorGameRef& 
 	renderAccessorComponent->setAccessor(renderAccessor);
 
 	Game::preStart(arguments);
+
+	if (HAL::Engine* engine = getEngine())
+	{
+		engine->init(this, &getInputData());
+	}
 }
 
 void HapGame::initSystems()

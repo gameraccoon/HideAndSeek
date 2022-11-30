@@ -82,18 +82,20 @@ namespace HAL
 		Mix_CloseAudio();
 	}
 
-	void Engine::start(IGame* game, InputControllersData* inputData)
+	void Engine::init(IGame* game, InputControllersData* inputData)
 	{
 		mPimpl->mGame = game;
 		mPimpl->mInputDataPtr = inputData;
 		mPimpl->mWindow.show();
-		game->initResources();
+	}
+
+	void Engine::start()
+	{
 		mPimpl->start();
 	}
 
 	Vector2D Engine::getWindowSize() const
 	{
-		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
 		return Vector2D(static_cast<float>(mPimpl->mWindowWidth), static_cast<float>(mPimpl->mWindowHeight));
 	}
 

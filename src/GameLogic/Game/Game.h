@@ -23,7 +23,6 @@ public:
 	Game(HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool);
 
 	void preStart(const ArgumentsParser& arguments);
-	void start();
 	void onGameShutdown();
 
 	void dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates) final;
