@@ -2,6 +2,7 @@
 
 #include "GameMain/ConsoleCommands.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include "Utils/Application/ArgumentsParser.h"
