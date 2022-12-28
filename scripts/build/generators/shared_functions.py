@@ -22,11 +22,11 @@ def replace_content(template_string, data_dictionary):
 def write_file(generated_file_name, content):
     if os.path.isfile(generated_file_name):
         with open(generated_file_name, 'r') as generated_file:
-            if content == generated_file.read():
+            if content + '\n' == generated_file.read():
                 return
 
     with open(generated_file_name, 'w') as generated_file:
-        generated_file.write(content)
+        generated_file.write(content + '\n')
 
 
 def load_json(file_path):
