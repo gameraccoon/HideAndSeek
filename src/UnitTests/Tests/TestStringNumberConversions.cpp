@@ -13,9 +13,9 @@ TEST(StringNumberConversions, ParseInt_CorrectInput)
 	EXPECT_EQ(std::optional<int>(7777), String::ParseInt("7777"));
 	EXPECT_EQ(std::optional<int>(-666), String::ParseInt("-666"));
 	// max 32bit signed int
-	EXPECT_EQ(std::optional<int>(2147483647), String::ParseInt("2147483647"));
+	EXPECT_EQ(std::optional<int>(static_cast<int>(2147483647)), String::ParseInt("2147483647"));
 	// min 32bit signed int
-	EXPECT_EQ(std::optional<int>(-2147483648), String::ParseInt("-2147483648"));
+	EXPECT_EQ(std::optional<int>(static_cast<int>(-2147483648)), String::ParseInt("-2147483648"));
 }
 
 // these may work, but it's better to not rely on them
