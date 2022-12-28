@@ -2,7 +2,7 @@
 
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 
-{component_includes}
+{serialization/json/component_serializable_includes}
 
 {serialization/json/component_json_serializer_includes}
 

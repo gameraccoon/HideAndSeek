@@ -12,6 +12,10 @@
 		"name": "imgui/component_inspector_window_register"
 	},
 	{
+		"name": "serialization/json/component_serializable_includes",
+		"blacklist": ["transient"]
+	},
+	{
 		"name": "serialization/json/component_json_serializer_includes",
 		"blacklist": ["transient"]
 	},
