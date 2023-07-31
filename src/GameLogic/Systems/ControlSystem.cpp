@@ -2,8 +2,8 @@
 
 #include "GameLogic/Systems/ControlSystem.h"
 
-#include <sdl/SDL_keycode.h>
-#include <sdl/SDL_mouse.h>
+#include <SDL_keycode.h>
+#include <SDL_mouse.h>
 
 #include "GameData/World.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"

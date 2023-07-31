@@ -2,8 +2,8 @@
 
 #include "GameLogic/Systems/InputSystem.h"
 
-#include <sdl/SDL_keycode.h>
-#include <sdl/SDL_mouse.h>
+#include <SDL_keycode.h>
+#include <SDL_mouse.h>
 
 #include "GameData/Components/GameplayInputComponent.generated.h"
 #include "GameData/Components/ImguiComponent.generated.h"

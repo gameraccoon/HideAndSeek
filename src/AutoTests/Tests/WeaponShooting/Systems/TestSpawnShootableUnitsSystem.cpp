@@ -4,7 +4,7 @@
 
 #include "Base/Random/Random.h"
 
-#include <sdl/SDL_keycode.h>
+#include <SDL_keycode.h>
 
 #include "GameData/World.h"
 #include "GameData/Spatial/SpatialWorldData.h"

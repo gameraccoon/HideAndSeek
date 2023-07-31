@@ -27,6 +27,11 @@ set(GAME_SRC_DIR ${GAME_BASE_DIR}/src)
 set(EXTERNALS_DIR ${GAME_BASE_DIR}/external)
 set(BIN_PLATFORM "x64")
 
+set(BUILD_SHARED_LIBS FALSE)
+set(SDL_STATIC ON CACHE BOOL "" FORCE)
+set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+set(SDL2IMAGE_INSTALL OFF CACHE BOOL "" FORCE)
+
 file (STRINGS "${GAME_BASE_DIR}/VersionInfo" EXECUTABLE_VERSION)
 file(STRINGS "${GAME_BASE_DIR}/BuildNum" BUILD_NUMBER)
 project(${APP_NAME} VERSION ${EXECUTABLE_VERSION})
@@ -87,17 +92,11 @@ execute_process(
 
 # requirements
 find_package(PythonInterp 3.5 REQUIRED)
-if (NOT WIN32)
-	find_package(SDL2 REQUIRED)
-	find_package(SDL2_image REQUIRED)
-	include_directories(${SDL2_INCLUDE_DIR})
-endif()
 
 include_directories(include)
 
 include_directories(
 	${EXTERNALS_DIR}/include
-	${EXTERNALS_DIR}/include/sdl
 	${EXTERNALS_DIR}/sources
 	${EXTERNALS_DIR}/sources/soa-sort/include
 	${GAME_SRC_DIR}
@@ -132,6 +131,18 @@ if (MSVC)
 	set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
 endif()
 
+# SDL2
+add_subdirectory(${EXTERNALS_DIR}/sources/SDL EXCLUDE_FROM_ALL)
+include_directories(${EXTERNALS_DIR}/sources/SDL/include)
+
+#SDL_image
+add_subdirectory(${EXTERNALS_DIR}/sources/SDL_image EXCLUDE_FROM_ALL)
+include_directories(${EXTERNALS_DIR}/sources/SDL_image)
+
+#SDL_mixer
+add_subdirectory(${EXTERNALS_DIR}/sources/SDL_mixer EXCLUDE_FROM_ALL)
+include_directories(${EXTERNALS_DIR}/sources/SDL_mixer/include)
+
 # Polypartition
 add_library(Polypartition EXCLUDE_FROM_ALL ${EXTERNALS_DIR}/sources/polypartition/src/polypartition.cpp)
 add_dependencies(${APP_NAME} Polypartition)
@@ -162,7 +173,7 @@ set(GENERAL_PROJECT_LIBS
 
 	Polypartition
 
-	SDL2
+	SDL2::SDL2-static
 	SDL2_image
 	SDL2_mixer
 	SDL2main
@@ -178,9 +189,6 @@ endif()
 if (WIN32)
 	set(GENERAL_PROJECT_LIBS
 		${GENERAL_PROJECT_LIBS}
-		glew32
-		glew32s
-		SDL2test
 		opengl32
 	)
 else()
@@ -228,14 +236,6 @@ target_link_libraries(${AUTOTESTS_NAME} ${GENERAL_PROJECT_LIBS})
 # symlink resources dir
 if (NOT EXISTS "${GAME_BIN_DIR}/resources")
 	execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/resources" "${GAME_BIN_DIR}/resources")
-endif()
-
-if (WIN32)
-	# copy dlls
-	file(GLOB WIN32_DLLS
-		"${EXTERNALS_DIR}/dll/${BIN_PLATFORM}/*"
-	)
-	file(COPY ${WIN32_DLLS} DESTINATION ${GAME_BIN_DIR})
 endif()
 
 # pre-compile additional code generation

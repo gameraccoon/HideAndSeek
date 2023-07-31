@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "sdl/SDL.h"
+#include <SDL.h>
 
 #include "UnitTests/TestAssertHelper.h"
 

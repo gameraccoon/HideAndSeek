@@ -85,15 +85,15 @@ External libraries can be found in `external` folder.
 - CMake (see minimal supported version in [CMakeLists.txt](https://github.com/gameraccoon/hide-and-seek/blob/develop/CMakeLists.txt#L1=))
 - python3
 - gcc 11 (or higher) or latest Visual Studio 2022 (VS 2019 may work but it is not automatically tested on CI)
-- for Linux you need to install SLD2, SDL2_Image and SDL2_mixer (devel and static) using your packet manager  
-e.g. for apt: `sudo apt-get install libsdl2-dev libsdl2-2.0-0 libsdl2-image-dev libsdl2-image-2.0-0 libsdl2-mixer-dev libsdl2-mixer-2.0-0`
+- for Linux you need to install sound libraries using your packet manager  
+e.g. for apt: `sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev`
 
 ### Prerequisites for building the editor
 - git with git-lfs
 - CMake (see minimal supported version in [editor/CMakeLists.txt](https://github.com/gameraccoon/hide-and-seek/blob/develop/editor/CMakeLists.txt#L1=))
 - python3
 - gcc 11 (or higher)
-- Qt Creator (Qt 5.5 or higher)
+- qt5 core libraries installed, e.g. for apt: `sudo apt install qtbase5-dev`
 
 ### Getting the code
 With SSH  

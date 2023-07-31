@@ -2,7 +2,7 @@
 
 #include "GameLogic/Systems/MovementSystem.h"
 
-#include <sdl/SDL_keycode.h>
+#include <SDL_keycode.h>
 
 #include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/SpatialTrackComponent.generated.h"

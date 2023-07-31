@@ -41,8 +41,8 @@ jobs:
     - name: Update deb repo links
       run: sudo apt-get update
 
-    - name: Install sdl
-      run: sudo apt-get install libsdl2-2.0-0 libsdl2-dev libsdl2-image-2.0-0 libsdl2-image-dev libsdl2-mixer-2.0-0 libsdl2-mixer-dev libsdl2-ttf-2.0-0 libsdl2-ttf-dev
+    - name: Install dependencies
+      run: sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev
 
     - name: Install GCC
       uses: egor-tensin/setup-gcc@v1

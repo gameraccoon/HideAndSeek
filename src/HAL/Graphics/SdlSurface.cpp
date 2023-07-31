@@ -11,9 +11,9 @@
 #include <stdexcept>
 #include <string>
 #include <glew/glew.h>
-#include <sdl/SDL.h>
-#include <sdl/SDL_surface.h>
-#include <sdl/SDL_image.h>
+#include <SDL.h>
+#include <SDL_surface.h>
+#include <SDL_image.h>
 
 #ifdef CONCURRENT_ACCESS_DETECTION
 namespace HAL

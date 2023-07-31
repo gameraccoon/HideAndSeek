@@ -2,7 +2,7 @@
 
 #include "HAL/Audio/Sound.h"
 
-#include "sdl/SDL_mixer.h"
+#include <SDL_mixer.h>
 
 #include "HAL/Base/Engine.h"
 

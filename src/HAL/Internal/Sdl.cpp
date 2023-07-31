@@ -2,7 +2,7 @@
 
 #include "Sdl.h"
 
-#include <sdl/SDL.h>
+#include <SDL.h>
 #include <stdexcept>
 
 namespace HAL

@@ -13,3 +13,12 @@
 [submodule "external/sources/cameron314/concurrentqueue"]
 	path = external/include/cameron314/concurrentqueue
 	url = git@github.com:gameraccoon/concurrentqueue.git
+[submodule "external/sources/SDL"]
+	path = external/sources/SDL
+	url = git@github.com:gameraccoon/SDL.git
+[submodule "external/sources/SDL_image"]
+	path = external/sources/SDL_image
+	url = git@github.com:gameraccoon/SDL_image.git
+[submodule "external/sources/SDL_mixer"]
+	path = external/sources/SDL_mixer
+	url = git@github.com:gameraccoon/SDL_mixer.git
