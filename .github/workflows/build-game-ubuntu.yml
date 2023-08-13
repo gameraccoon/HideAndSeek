@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - .github/workflows/build-game-ubuntu.yml
-      - cmake/**
       - config/**
       - external/**
       - src/**
