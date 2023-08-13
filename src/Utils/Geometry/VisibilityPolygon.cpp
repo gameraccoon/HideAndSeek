@@ -64,7 +64,7 @@ std::tuple<size_t, Vector2D> VisibilityPolygonCalculator::getNextClosestBorderFr
 {
 	float closestBorderQDist = std::numeric_limits<float>::max();
 	Vector2D closestIntersectionPoint{};
-	size_t closestBorderIdx;
+	size_t closestBorderIdx = 0;
 	Vector2D raytraceCoordinate = closestBorder.coords.b.unit() * (maxExtent + 10.0f);
 	for (size_t idx : potentialContinuations)
 	{
