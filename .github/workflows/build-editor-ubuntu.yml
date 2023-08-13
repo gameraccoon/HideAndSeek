@@ -19,7 +19,8 @@ jobs:
       BUILD_TYPE: ${{matrix.build_type}}
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code with lfs
+      uses: nschloe/action-cached-lfs-checkout@v1
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build/editor
@@ -28,11 +29,6 @@ jobs:
       run: >
         git config --global url."https://github.com/".insteadOf
         git@github.com:
-
-    - name: Update LFS files
-      run: |
-        git lfs install
-        git lfs pull
 
     - name: Checkout submodules
       run: git submodule update --init --recursive
