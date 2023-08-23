@@ -4,3 +4,5 @@
 *.png filter=lfs diff=lfs merge=lfs -text
 *.ico filter=lfs diff=lfs merge=lfs -text
 *.db filter=lfs diff=lfs merge=lfs -text
+*.json text
+.scripter_config.json text eol=lf

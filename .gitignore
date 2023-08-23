@@ -32,6 +32,7 @@ cmake_install.cmake
 .idea/
 
 # other
+/.scripter_config.local.json
 *.log
 log.txt
 *_log.txt
