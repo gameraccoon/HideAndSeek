@@ -1,0 +1,287 @@
+{
+  "version": "0.10.0",
+  "rewritable": {
+    "always_on_top": false,
+    "window_status_reactions": true,
+    "keep_window_size": false,
+    "custom_theme": {
+      "background": [
+        0.25,
+        0.26,
+        0.29
+      ],
+      "text": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "primary": [
+        0.44,
+        0.53,
+        0.855
+      ],
+      "success": [
+        0.31,
+        0.5,
+        0.17
+      ],
+      "danger": [
+        0.5,
+        0.125,
+        0.125
+      ]
+    }
+  },
+  "script_definitions": [
+    {
+      "Preset": {
+        "uid": "32b09b0b-5a00-42f0-97d4-9e02e100745b",
+        "name": "Switch & Prepare",
+        "icon": {
+          "path": "scripts/scripter/icons/preset.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "items": [
+          {
+            "uid": "b5d53eee-8b27-4396-b3a2-8dbb1c71746b",
+            "name": null,
+            "arguments": null,
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          },
+          {
+            "uid": "e119791a-f4c1-4217-8c17-5aa1150452b5",
+            "name": null,
+            "arguments": null,
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          },
+          {
+            "uid": "0ee11768-69ef-4390-9016-5e4dd1dfc00f",
+            "name": null,
+            "arguments": null,
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          },
+          {
+            "uid": "802ce303-567e-41e8-aafc-abfa5e55d3f4",
+            "name": null,
+            "arguments": null,
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          },
+          {
+            "uid": "0a48c3b8-c7c6-46d4-b316-8f8ef4f39cb4",
+            "name": null,
+            "arguments": null,
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          }
+        ]
+      }
+    },
+    {
+      "Preset": {
+        "uid": "007fe372-b89d-4f43-bf54-141dd9e69574",
+        "name": "Pull & Prepare",
+        "icon": {
+          "path": "scripts/scripter/icons/preset.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "items": [
+          {
+            "uid": "0ca50748-c6e8-442c-8c15-5f72211022cb",
+            "name": "Pull",
+            "arguments": "pull",
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          },
+          {
+            "uid": "e119791a-f4c1-4217-8c17-5aa1150452b5",
+            "name": null,
+            "arguments": null,
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          },
+          {
+            "uid": "0ee11768-69ef-4390-9016-5e4dd1dfc00f",
+            "name": null,
+            "arguments": null,
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          },
+          {
+            "uid": "802ce303-567e-41e8-aafc-abfa5e55d3f4",
+            "name": null,
+            "arguments": null,
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          },
+          {
+            "uid": "0a48c3b8-c7c6-46d4-b316-8f8ef4f39cb4",
+            "name": null,
+            "arguments": null,
+            "autorerun_count": null,
+            "ignore_previous_failures": null
+          }
+        ]
+      }
+    },
+    {
+      "Original": {
+        "uid": "b5d53eee-8b27-4396-b3a2-8dbb1c71746b",
+        "name": "Switch Branch",
+        "icon": {
+          "path": "scripts/scripter/icons/git.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "scripts/scripter/linux/switch_branch.sh",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": true,
+        "arguments_hint": "branch_name"
+      }
+    },
+    {
+      "Original": {
+        "uid": "e119791a-f4c1-4217-8c17-5aa1150452b5",
+        "name": "Update Submodules",
+        "icon": {
+          "path": "scripts/scripter/icons/git.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "scripts/scripter/linux/update_submodules.sh",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 5,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
+        "uid": "0ee11768-69ef-4390-9016-5e4dd1dfc00f",
+        "name": "Generate",
+        "icon": {
+          "path": "scripts/scripter/icons/cmake.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "scripts/scripter/linux/generate_cmake_project.sh",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
+        "uid": "802ce303-567e-41e8-aafc-abfa5e55d3f4",
+        "name": "Build",
+        "icon": {
+          "path": "scripts/scripter/icons/cmake.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "scripts/scripter/linux/build_project.sh",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
+        "uid": "0a48c3b8-c7c6-46d4-b316-8f8ef4f39cb4",
+        "name": "Open Clion",
+        "icon": {
+          "path": "scripts/scripter/icons/clion.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "scripts/scripter/linux/open_clion.sh",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
+        "uid": "1614450e-ee7b-4503-8e5b-6c7b6d1bc9cc",
+        "name": "Clean Reset",
+        "icon": {
+          "path": "scripts/scripter/icons/trash.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "scripts/scripter/linux/clean_reset.sh",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
+        "uid": "0ca50748-c6e8-442c-8c15-5f72211022cb",
+        "name": "Custom Git Command",
+        "icon": {
+          "path": "scripts/scripter/icons/git.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "git",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": true,
+        "arguments_hint": "subcommand"
+      }
+    },
+    {
+      "Original": {
+        "uid": "a417d29d-ce2c-440e-b875-084254a5c93e",
+        "name": "Play sound",
+        "icon": {
+          "path": "scripts/scripter/icons/sound.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "rundll32",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "user32.dll, MessageBeep -MB_OK",
+        "autorerun_count": 0,
+        "ignore_previous_failures": true,
+        "requires_arguments": false,
+        "arguments_hint": "leave the arguments alone"
+      }
+    }
+  ],
+  "child_config_path": {
+    "path": ".scripter_config.local.json",
+    "path_type": "WorkingDirRelative"
+  }
+}
