@@ -1,9 +1,9 @@
 #!/bin/bash
 
-python scripts/build/code_generate.py
+python3 scripts/build/code_generate.py
 
-mkdir -p cmake-build-debug
+mkdir -p cmake-build-linux-ninja
 
-pushd cmake-build-debug
-	cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=ninja -G Ninja
+pushd cmake-build-linux-ninja
+	cmake .. --preset linux-ninja
 popd

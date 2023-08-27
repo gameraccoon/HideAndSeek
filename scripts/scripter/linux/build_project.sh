@@ -1,5 +1,3 @@
 #!/bin/bash
 
-pushd cmake-build-debug
-	cmake --build .
-popd
+cmake --build ./cmake-build-linux-ninja --target all
