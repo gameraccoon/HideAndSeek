@@ -4,10 +4,13 @@ on:
   push:
     paths:
       - .github/workflows/build-game-windows.yml
+      - .gitmodules
       - config/**
       - external/**
       - src/**
+      - scripts/**
       - CMakeLists.txt
+      - CMakePresets.json
 jobs:
   build-windows:
     runs-on: windows-2022
@@ -35,10 +38,10 @@ jobs:
 
     - name: Generate project
       shell: cmd
-      working-directory: ${{github.workspace}}/scripts
-      run: generate_game_vs2022_project.cmd
+      working-directory: ${{github.workspace}}
+      run: scripts/scripter/windows/generate_vs_project.cmd
 
     - name: Build
-      working-directory: ${{github.workspace}}/build/game
-      shell: bash
-      run: cmake --build . --config $BUILD_TYPE
+      shell: cmd
+      working-directory: ${{github.workspace}}
+      run: scripts/scripter/windows/build_project.cmd

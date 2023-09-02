@@ -4,10 +4,14 @@ on:
   push:
     paths:
       - .github/workflows/build-editor-ubuntu.yml
+      - .gitmodules
       - config/**
       - external/**
       - src/**
       - editor/**
+      - scripts/**
+      - CMakeLists.txt
+      - CMakePresets.json
 jobs:
   build-ubuntu:
     runs-on: ubuntu-latest
