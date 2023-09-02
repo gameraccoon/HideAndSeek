@@ -4,10 +4,10 @@
 
 #include "GameLogic/Game/Game.h"
 
-#include "AutoTests/TestChecklist.h"
+#include "AutoTests/TestChecks.h"
 
 class RenderAccessor;
-class ArgumentParser;
+class ArgumentsParser;
 
 class BaseTestCase : public Game
 {

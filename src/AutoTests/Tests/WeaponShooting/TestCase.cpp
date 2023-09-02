@@ -36,8 +36,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 {
 	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
 
-	mTestChecklist.checks.emplace("destroyedEntities", std::make_unique<DestroyedEntitiesTestCheck>(100));
-	DestroyedEntitiesTestCheck& destroyedEntitiesTestCheck = *static_cast<DestroyedEntitiesTestCheck*>(mTestChecklist.checks["destroyedEntities"].get());
+	DestroyedEntitiesTestCheck& destroyedEntitiesTestCheck = mTestChecklist.addCheck<DestroyedEntitiesTestCheck>(100);
 
 	getGameLogicSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData());
 	getGameLogicSystemsManager().registerSystem<TestSpawnShootableUnitsSystem>(getWorldHolder());

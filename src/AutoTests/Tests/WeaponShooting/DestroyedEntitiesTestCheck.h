@@ -2,7 +2,7 @@
 
 #include "Base/Types/String/StringHelpers.h"
 
-#include "AutoTests/TestChecklist.h"
+#include "AutoTests/TestChecks.h"
 
 class DestroyedEntitiesTestCheck : public TestCheck
 {
@@ -11,8 +11,9 @@ public:
 		: mExpectedDestroyedEntities(expectedDestroyedEntities)
 	{}
 
-	[[nodiscard]] bool isPassed() const override { return mDestroyedEntities == mExpectedDestroyedEntities; };
-	[[nodiscard]] std::string describe() const override
+	[[nodiscard]] bool wasChecked() const override { return true; }
+	[[nodiscard]] bool hasPassed() const override { return mDestroyedEntities == mExpectedDestroyedEntities; };
+	[[nodiscard]] std::string getErrorMessage() const override
 	{
 		return FormatString("Destroyed entities: %d, expected %d.", mDestroyedEntities, mExpectedDestroyedEntities);
 	}
