@@ -26,7 +26,7 @@
 #include "GameLogic/Systems/ResourceStreamingSystem.h"
 #include "GameLogic/Systems/WeaponSystem.h"
 
-#include "GameLogic/Initialization/StateMachines.h"
+#include "Utils/ResourceManagement/ResourceManager.h"
 
 #include "AutoTests/Tests/WeaponShooting/Systems/TestShootingControlSystem.h"
 #include "AutoTests/Tests/WeaponShooting/Systems/TestSpawnShootableUnitsSystem.h"
