@@ -15,6 +15,7 @@ option(MEMLEAK_DETECTION "Enable memory leaks detection code (slow)" OFF)
 option(MEMLEAK_REDEFINE_NEW "Redefine default new (provide more detailed info but can conflict with some libs)" OFF)
 option(CONCURRENT_ACCESS_DETECTION "Enable concurrent access detection" ON)
 option(IMGUI_ENABLED "Enable imgui in the build" ON)
+option(ENABLE_UNITY_BUILD "Should the sources be built with unity build" ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -111,7 +112,7 @@ function(add_folder_as_library folder_path name)
 	file(GLOB_RECURSE TEMP_SRC RELATIVE "" FOLLOW_SYMLINKS "${folder_path}/*")
 	add_library(${name} ${TEMP_SRC})
 	target_precompile_headers(${name} PRIVATE "${GAME_SRC_DIR}/Base/precomp.h")
-	set_target_properties(${name} PROPERTIES UNITY_BUILD ON)
+	set_target_properties(${name} PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
 	target_compile_options(${name} PRIVATE ${PROJECT_CXX_FLAGS})
 endfunction()
 
@@ -230,7 +231,7 @@ set(AUTOTESTS_NAME AutoTests)
 file(GLOB_RECURSE AUTOTESTS_SRC RELATIVE "" FOLLOW_SYMLINKS "${GAME_SRC_DIR}/AutoTests/*")
 add_executable(${AUTOTESTS_NAME} ${AUTOTESTS_SRC})
 target_compile_options(${AUTOTESTS_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
-set_target_properties(${AUTOTESTS_NAME} PROPERTIES UNITY_BUILD ON)
+set_target_properties(${AUTOTESTS_NAME} PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
 target_link_libraries(${AUTOTESTS_NAME} ${GENERAL_PROJECT_LIBS})
 
 # symlink resources dir
