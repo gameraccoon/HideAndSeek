@@ -259,25 +259,6 @@
         "requires_arguments": true,
         "arguments_hint": "subcommand"
       }
-    },
-    {
-      "Original": {
-        "uid": "a417d29d-ce2c-440e-b875-084254a5c93e",
-        "name": "Play sound",
-        "icon": {
-          "path": "scripts/scripter/icons/sound.png",
-          "path_type": "WorkingDirRelative"
-        },
-        "command": {
-          "path": "rundll32",
-          "path_type": "WorkingDirRelative"
-        },
-        "arguments": "user32.dll, MessageBeep -MB_OK",
-        "autorerun_count": 0,
-        "ignore_previous_failures": true,
-        "requires_arguments": false,
-        "arguments_hint": "leave the arguments alone"
-      }
     }
   ],
   "child_config_path": {
