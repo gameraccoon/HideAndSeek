@@ -4,7 +4,7 @@
 
 #include "GameLogic/Game/Game.h"
 
-#include "AutoTests/TestChecks.h"
+#include "AutoTests/TestCheckList.h"
 
 class RenderAccessor;
 class ArgumentsParser;
