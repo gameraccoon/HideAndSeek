@@ -38,8 +38,9 @@ TEST(ConcurrentAccessDetector, AccessedFromMultipleThreads)
 {
 	DisableFailOnAssert();
 
-	int assertCount = 0;
-	gGlobalAssertHandler = [&assertCount](){ ++assertCount; };
+	static int assertCount;
+	assertCount = 0;
+	gGlobalAssertHandler = [](){ ++assertCount; };
 
 	{
 		ConcurrentAccessDetector detectorInstance;
@@ -62,8 +63,9 @@ TEST(ConcurrentAccessDetector, UnlockableGuard_UnlockedWhenAccessedFromMultipleT
 {
 	DisableFailOnAssert();
 
-	int assertCount = 0;
-	gGlobalAssertHandler = [&assertCount](){ ++assertCount; };
+	static int assertCount;
+	assertCount = 0;
+	gGlobalAssertHandler = [](){ ++assertCount; };
 
 	{
 		ConcurrentAccessDetector detectorInstance;
@@ -88,8 +90,9 @@ TEST(ConcurrentAccessDetector, UnlockableGuard_AccessedFromMultipleThreads)
 {
 	DisableFailOnAssert();
 
-	int assertCount = 0;
-	gGlobalAssertHandler = [&assertCount](){ ++assertCount; };
+	static int assertCount;
+	assertCount = 0;
+	gGlobalAssertHandler = [](){ ++assertCount; };
 
 	{
 		ConcurrentAccessDetector detectorInstance;

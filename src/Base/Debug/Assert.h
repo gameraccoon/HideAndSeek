@@ -1,18 +1,18 @@
 #pragma once
 
-#include <exception>
-#include <functional>
 #include <string>
 
 #include "Base/Debug/Log.h"
 #include "Base/CompilerHelpers.h"
 #include "Base/Types/String/StringHelpers.h"
 
-// to be able to change behavior for tests
-inline std::function<void()> gGlobalAssertHandler = [](){};
-inline std::function<void()> gGlobalFatalAssertHandler = [](){ std::terminate(); };
+using AssertHandlerFn = void(*)();
 
-inline bool gGlobalAllowAssertLogs = true;
+// to be able to fine-tune behavior of the asserts (e.g. for automated tests)
+extern AssertHandlerFn gGlobalAssertHandler;
+extern AssertHandlerFn gGlobalFatalAssertHandler;
+extern bool gGlobalAllowAssertLogs;
+
 template<typename... Args>
 void LogAssertHelper(const char* condition, const char* file, size_t line, const std::string& message, Args... args) noexcept
 {
