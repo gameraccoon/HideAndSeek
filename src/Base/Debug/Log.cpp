@@ -47,11 +47,13 @@ void Log::writeWarning(const std::string& text)
 void Log::writeLog(const std::string& text)
 {
 	writeLine(std::string(" Log: ").append(text));
+	mLogFileStream << std::flush;
 }
 
 void Log::writeInit(const std::string& text)
 {
 	writeLine(std::string(" Init: ").append(text));
+	mLogFileStream << std::flush;
 }
 
 void Log::writeLine(const std::string& text)
