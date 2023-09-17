@@ -4,8 +4,6 @@
 
 #include "Base/Types/String/StringId.h"
 
-#include "UnitTests/TestAssertHelper.h"
-
 TEST(StringId, TestHashingSanity)
 {
 	constexpr StringId valA1 = STR_TO_ID("testA");

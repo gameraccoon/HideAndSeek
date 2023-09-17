@@ -36,12 +36,7 @@ TEST(ConcurrentAccessDetector, SingleThreadedAccess)
 
 TEST(ConcurrentAccessDetector, AccessedFromMultipleThreads)
 {
-	DisableFailOnAssert();
-
-	static int assertCount;
-	assertCount = 0;
-	gGlobalAssertHandler = [](){ ++assertCount; };
-
+	DisableAssertGuard assertGuard;
 	{
 		ConcurrentAccessDetector detectorInstance;
 		{
@@ -54,19 +49,12 @@ TEST(ConcurrentAccessDetector, AccessedFromMultipleThreads)
 			thread.join();
 		}
 	}
-	EXPECT_GT(assertCount, 0);
-
-	EnableFailOnAssert();
+	EXPECT_GT(assertGuard.getTriggeredAssertsCount(), 0);
 }
 
 TEST(ConcurrentAccessDetector, UnlockableGuard_UnlockedWhenAccessedFromMultipleThreads)
 {
-	DisableFailOnAssert();
-
-	static int assertCount;
-	assertCount = 0;
-	gGlobalAssertHandler = [](){ ++assertCount; };
-
+	DisableAssertGuard assertGuard;
 	{
 		ConcurrentAccessDetector detectorInstance;
 		{
@@ -81,19 +69,12 @@ TEST(ConcurrentAccessDetector, UnlockableGuard_UnlockedWhenAccessedFromMultipleT
 			CONCURRENT_ACCESS_DETECTOR_MANUAL_LOCK(detectorMain);
 		}
 	}
-	EXPECT_EQ(assertCount, 0);
-
-	EnableFailOnAssert();
+	EXPECT_EQ(assertGuard.getTriggeredAssertsCount(), 0);
 }
 
 TEST(ConcurrentAccessDetector, UnlockableGuard_AccessedFromMultipleThreads)
 {
-	DisableFailOnAssert();
-
-	static int assertCount;
-	assertCount = 0;
-	gGlobalAssertHandler = [](){ ++assertCount; };
-
+	DisableAssertGuard assertGuard;
 	{
 		ConcurrentAccessDetector detectorInstance;
 		{
@@ -116,8 +97,6 @@ TEST(ConcurrentAccessDetector, UnlockableGuard_AccessedFromMultipleThreads)
 			CONCURRENT_ACCESS_DETECTOR_MANUAL_UNLOCK(detectorMain);
 		}
 	}
-	EXPECT_GE(assertCount, 2);
-
-	EnableFailOnAssert();
+	EXPECT_GE(assertGuard.getTriggeredAssertsCount(), 2);
 }
 #endif
