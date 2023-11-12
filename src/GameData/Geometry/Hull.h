@@ -11,6 +11,8 @@
 class Hull
 {
 public:
+	Hull() = default;
+
 	/** Get the radius */
 	[[nodiscard]] float getRadius() const { return mRadius; }
 	/** Get pre-calculated squared radius */
@@ -31,11 +33,11 @@ public:
 	std::vector<Vector2D> points;
 	/** Borders of hull (calculates from Points) */
 	std::vector<Border> borders;
-	HullType type;
+	HullType type = HullType::Angular;
 
 private:
 	/** Squared radius */
-	float mQRadius;
+	float mQRadius = 0.0f;
 	/** Radius for the circular hull */
-	float mRadius;
+	float mRadius = 0.0f;
 };
