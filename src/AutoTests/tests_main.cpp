@@ -95,6 +95,8 @@ int main(int argc, char** argv)
 		}
 	}
 
+	const bool hasRender = !arguments.hasArgument("no-render");
+
 	Random::gGlobalGenerator = std::mt19937(seed);
 
 #ifdef RACCOON_ECS_DEBUG_CHECKS_ENABLED
@@ -126,13 +128,18 @@ int main(int argc, char** argv)
 		LogInit("Random seed is %u", seed);
 
 		ApplicationData applicationData(arguments.getIntArgumentValue("threads-count").getValueOr(ApplicationData::DefaultWorkerThreadCount));
-		HAL::Engine engine(800, 600);
 
-		// switch render context to render thread
-		engine.releaseRenderContext();
-		applicationData.renderThread.startThread(applicationData.resourceManager, engine, [&engine]{ engine.acquireRenderContext(); });
+		std::unique_ptr<HAL::Engine> engine;
+		if (hasRender)
+		{
+			engine = std::make_unique<HAL::Engine>(800, 600);
 
-		std::unique_ptr<BaseTestCase> testCase = caseIt->second(&engine, applicationData.resourceManager, applicationData.threadPool);
+			// switch render context to render thread
+			engine->releaseRenderContext();
+			applicationData.renderThread.startThread(applicationData.resourceManager, *engine, [&engine]
+			{ engine->acquireRenderContext(); });
+		}
+		std::unique_ptr<BaseTestCase> testCase = caseIt->second(engine.get(), applicationData.resourceManager, applicationData.threadPool);
 		TestChecklist checklist = testCase->start(arguments, RenderAccessorGameRef(applicationData.renderThread.getAccessor(), 0));
 		bool isSuccessful = ValidateChecklist(checklist);
 
