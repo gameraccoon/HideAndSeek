@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 		return true;
 	}
 
-	ApplicationData applicationData(arguments.getIntArgumentValue("threads-count", ApplicationData::DefaultWorkerThreadCount));
+	ApplicationData applicationData(arguments.getIntArgumentValue("threads-count").getValueOr(ApplicationData::DefaultWorkerThreadCount));
 	HAL::Engine engine(800, 600);
 
 	// switch render context to render thread

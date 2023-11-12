@@ -5,7 +5,7 @@
 
 namespace String
 {
-	std::optional<int> ParseInt(const char* str, int base = 10)
+	inline std::optional<int> ParseInt(const char* str, int base = 10)
 	{
 		char *end;
 		errno = 0;
@@ -23,7 +23,7 @@ namespace String
 	}
 
 	// will result in UB if the conversion can't be performed
-	int ParseIntUnsafe(const char* str, int base = 10)
+	inline int ParseIntUnsafe(const char* str, int base = 10)
 	{
 		[[maybe_unused]] char *end;
 		errno = 0;

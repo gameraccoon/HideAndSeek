@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "Base/Random/Random.h"
-#include "Base/Types/String/StringNumberConversion.h"
 
 #include <raccoon-ecs/error_handling.h>
 
@@ -84,14 +83,14 @@ int main(int argc, char** argv)
 	unsigned int seed = std::random_device()();
 	if (arguments.hasArgument("randseed"))
 	{
-		std::string seedStr = arguments.getArgumentValue("randseed");
-		if (std::optional<int> seedOpt = String::ParseInt(seedStr.c_str()); seedOpt.has_value())
+		auto seedValue = arguments.getIntArgumentValue("randseed");
+		if (seedValue.hasValue())
 		{
-			seed = static_cast<unsigned int>(seedOpt.value());
+			seed = static_cast<unsigned int>(seedValue.getValue());
 		}
 		else
 		{
-			std::cout << "Invalid random seed value: " << seedStr << "\n";
+			std::cout << seedValue.getError() << "\n";
 			return 1;
 		}
 	}
@@ -121,12 +120,12 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	auto caseIt = cases.find(arguments.getArgumentValue("case"));
+	auto caseIt = cases.find(arguments.getArgumentValue("case").value());
 	if (caseIt != cases.end())
 	{
 		LogInit("Random seed is %u", seed);
 
-		ApplicationData applicationData(arguments.getIntArgumentValue("threads-count", ApplicationData::DefaultWorkerThreadCount));
+		ApplicationData applicationData(arguments.getIntArgumentValue("threads-count").getValueOr(ApplicationData::DefaultWorkerThreadCount));
 		HAL::Engine engine(800, 600);
 
 		// switch render context to render thread
@@ -146,7 +145,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		std::cout << "Unknown test '" << arguments.getArgumentValue("case") << "'\n";
+		std::cout << "Unknown test '" << arguments.getArgumentValue("case").value() << "'\n";
 		return 1;
 	}
 }

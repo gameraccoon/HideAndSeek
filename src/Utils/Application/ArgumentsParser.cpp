@@ -2,7 +2,18 @@
 
 #include "Utils/Application/ArgumentsParser.h"
 
-#include <algorithm>
+#include "Base/Types/String/StringNumberConversion.h"
+
+#include <format>
+
+ArgumentsParser::ArgumentsParser(int argc, const char** argv, const std::string& argumentSwitch)
+	: mArgumentSwitch(argumentSwitch)
+{
+	for (int i = 1; i < argc; ++i)
+	{
+		mTokens.emplace_back(argv[i]);
+	}
+}
 
 ArgumentsParser::ArgumentsParser(int argc, char** argv, const std::string& argumentSwitch)
 	: mArgumentSwitch(argumentSwitch)
@@ -13,23 +24,27 @@ ArgumentsParser::ArgumentsParser(int argc, char** argv, const std::string& argum
 	}
 }
 
-std::string ArgumentsParser::getArgumentValue(const std::string& argument, const std::string& defaultValue) const
+std::optional<std::string> ArgumentsParser::getArgumentValue(const std::string& argument) const
 {
 	std::vector<std::string>::const_iterator itr = std::find(this->mTokens.begin(), this->mTokens.end(), mArgumentSwitch + argument);
 
 	if (itr != mTokens.end())
 	{
 		++itr;
+
 		if (itr != mTokens.end())
 		{
-			return *itr;
+			if (!itr->starts_with(mArgumentSwitch))
+			{
+				return *itr;
+			}
 		}
 	}
 
-	return defaultValue;
+	return std::nullopt;
 }
 
-int ArgumentsParser::getIntArgumentValue(const std::string& argument, int defaultValue) const
+Result<int, std::string> ArgumentsParser::getIntArgumentValue(const std::string& argument) const
 {
 	std::vector<std::string>::const_iterator itr = std::find(this->mTokens.begin(), this->mTokens.end(), mArgumentSwitch + argument);
 
@@ -38,24 +53,22 @@ int ArgumentsParser::getIntArgumentValue(const std::string& argument, int defaul
 		++itr;
 		if (itr != mTokens.end())
 		{
-			auto beginIt = itr->begin();
-			if (itr->size() > 1u && *beginIt == '-')
+			if (!itr->starts_with(mArgumentSwitch))
 			{
-				++beginIt;
-			}
-
-			if (std::all_of(beginIt, itr->end(), [](char c){ return isdigit(c) != 0; }))
-			{
-				return std::atoi(itr->c_str());
-			}
-			else
-			{
-				ReportFatalError("Argument %s doesn't have integer value, the value is %s", argument.c_str(), itr->c_str());
+				std::optional<int> result = String::ParseInt(itr->data(), 10);
+				if (result.has_value())
+				{
+					return Result<int, std::string>::Ok(result.value());
+				}
+				else
+				{
+					return Result<int, std::string>::Err(std::format("Argument {} expected to have integer value, but the value is '{}'", argument.c_str(), itr->c_str()));
+				}
 			}
 		}
 	}
 
-	return defaultValue;
+	return Result<int, std::string>::Err(std::format("No value was provided for argument {}", argument.c_str()));
 }
 
 bool ArgumentsParser::hasArgument(const std::string& argument) const

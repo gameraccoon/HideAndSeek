@@ -37,6 +37,6 @@ void DebugGameBehavior::processArguments(const ArgumentsParser& arguments)
 
 	if (arguments.hasArgument("time-limit"))
 	{
-		mFramesBeforeShutdown = arguments.getIntArgumentValue("time-limit", -1);
+		mFramesBeforeShutdown = arguments.getIntArgumentValue("time-limit").getValueOr(-1);
 	}
 }
