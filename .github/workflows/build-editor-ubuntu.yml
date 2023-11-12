@@ -46,15 +46,15 @@ jobs:
     - name: Install GCC
       uses: egor-tensin/setup-gcc@v1
       with:
-        version: 11
+        version: 13
         platform: x64
 
     - name: Generate project
       shell: bash
       working-directory: ${{github.workspace}}/build/editor
       env:
-        CC: gcc-11
-        CXX: g++-11
+        CC: gcc-13
+        CXX: g++-13
       run: cmake ${{github.workspace}}/editor -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: Build
