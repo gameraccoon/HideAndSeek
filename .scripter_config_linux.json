@@ -1,9 +1,10 @@
 {
-  "version": "0.10.0",
+  "version": "0.10.5",
   "rewritable": {
     "always_on_top": false,
     "window_status_reactions": true,
     "keep_window_size": false,
+    "enable_script_filtering": true,
     "custom_theme": {
       "background": [
         0.25,
@@ -26,6 +27,16 @@
         0.17
       ],
       "danger": [
+        0.5,
+        0.125,
+        0.125
+      ],
+      "caption_text": [
+        0.44,
+        0.53,
+        0.855
+      ],
+      "error_text": [
         0.5,
         0.125,
         0.125
