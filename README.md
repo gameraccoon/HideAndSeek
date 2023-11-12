@@ -92,7 +92,7 @@ e.g. for apt: `sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfl
 - git with git-lfs
 - CMake (see minimal supported version in [editor/CMakeLists.txt](https://github.com/gameraccoon/hide-and-seek/blob/develop/editor/CMakeLists.txt#L1=))
 - python3
-- gcc 11 (or higher)
+- gcc 13 (or higher)
 - qt5 core libraries installed, e.g. for apt: `sudo apt install qtbase5-dev`
 
 ### Getting the code
