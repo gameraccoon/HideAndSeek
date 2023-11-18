@@ -13,11 +13,18 @@ if len(sys.argv) > 1:
 else:
     working_dir = os.getcwd()
 
-
 configs_dir = path.join(working_dir, "config/code_generation/enums")
 templates_dir = path.join(configs_dir, "templates")
 descriptions_dir = path.join(working_dir, "config/class_descriptions/Enums")
 
+
+delimiter_dictionary = load_json(path.join(configs_dir, "delimiter_dictionary.json"))
+
+empty_delimiter_dictionary = {key: "" for key in delimiter_dictionary.keys()}
+
+attribute_templates = load_json(path.join(configs_dir, "attribute_templates.json"))
+
+files_to_generate = load_json(path.join(configs_dir, "files_to_generate.json"))
 
 def get_base_data_dictionary(data_description):
     return {
@@ -81,30 +88,31 @@ def generate_enum_cpp_file(template_name, destination_dir, file_name_template, f
     if not os.path.exists(destination_dir):
         os.makedirs(destination_dir)
 
-    write_file(path.join(destination_dir, file_name), generated_content)
+    out_file_name = path.join(destination_dir, file_name)
+    write_file(out_file_name, generated_content)
+    return out_file_name
 
 
 def generate_files(file_infos, data_description):
+    generated_files = []
+
     full_data_dict = get_full_data_dictionary(data_description)
     for file_info in file_infos:
-        generate_enum_cpp_file(file_info["template"],
-                                    path.join(working_dir, file_info["output_dir"]),
-                                    file_info["name_template"],
-                                    full_data_dict)
+        out_file_name = generate_enum_cpp_file(file_info["template"],
+            path.join(working_dir, file_info["output_dir"]),
+            file_info["name_template"],
+            full_data_dict)
+
+        generated_files.append(out_file_name)
+
+    return generated_files
 
 
 def generate_all():
+    generated_files = []
+
     for file_name in os.listdir(descriptions_dir):
         enum_data = load_json(path.join(descriptions_dir, file_name))
-        generate_files(files_to_generate, enum_data)
+        generated_files += generate_files(files_to_generate, enum_data)
 
-
-delimiter_dictionary = load_json(path.join(configs_dir, "delimiter_dictionary.json"))
-
-empty_delimiter_dictionary = {key: "" for key in delimiter_dictionary.keys()}
-
-attribute_templates = load_json(path.join(configs_dir, "attribute_templates.json"))
-
-files_to_generate = load_json(path.join(configs_dir, "files_to_generate.json"))
-
-generate_all()
+    return generated_files

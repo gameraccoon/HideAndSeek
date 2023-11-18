@@ -32,6 +32,9 @@ CMakeUserPresets.json
 # jetbrains ide files
 .idea/
 
+# temporary files
+/scripts/temp_data
+
 # other
 /.scripter_config.local.json
 *.log

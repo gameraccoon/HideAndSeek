@@ -21,19 +21,16 @@ templates_dir = path.join(configs_dir, "templates")
 
 string_literal_pattern = r'\WSTR_TO_ID\(\s*"([^"]*)"\s*\)'
 
+delimiter_dictionary = load_json(path.join(configs_dir, "delimiter_dictionary.json"))
 
-def generate_component_cpp_file(template_name, destination_dir, file_name_template, full_data_dictionary):
-    template = read_template(template_name, templates_dir)
-    generated_content = replace_content(template, full_data_dictionary)
-    file_name = replace_content(file_name_template, full_data_dictionary)
+empty_delimiter_dictionary = {key: "" for key in delimiter_dictionary.keys()}
 
-    if not os.path.exists(destination_dir):
-        os.makedirs(destination_dir)
+element_templates = load_json(path.join(configs_dir, "element_templates.json"))
 
-    write_file(path.join(destination_dir, file_name), generated_content)
+files_to_generate = load_json(path.join(configs_dir, "files_to_generate.json"))
 
 
-def generate_component_list_cpp_file(template_name, destination_dir, file_name_template, component_filled_templates):
+def generate_string_ids_cpp_file(template_name, destination_dir, file_name_template, component_filled_templates):
     template = read_template(template_name, templates_dir)
     generated_content = replace_content(template, component_filled_templates)
     file_name = replace_content(file_name_template, component_filled_templates)
@@ -41,25 +38,12 @@ def generate_component_list_cpp_file(template_name, destination_dir, file_name_t
     if not os.path.exists(destination_dir):
         os.makedirs(destination_dir)
 
-    write_file(path.join(destination_dir, file_name), generated_content)
+    out_file_path = path.join(destination_dir, file_name)
+    write_file(out_file_path, generated_content)
+    return out_file_path
 
 
-def generate_files(file_infos, data_description, full_data_dict):
-    for file_info in file_infos:
-        if "flags" in file_info and "list" in file_info["flags"]:
-            pass # generated in another function
-        else:
-            generate_component_cpp_file(file_info["template"],
-                                        path.join(working_dir, file_info["output_dir"]),
-                                        file_info["name_template"],
-                                        full_data_dict)
-
-
-def load_component_data_description(file_path):
-    return load_json(file_path)
-
-
-def generate_component_list_descriptions(components):
+def generate_ids_list_descriptions(components):
     component_filled_templates = {}
     for component_template in element_templates:
         template = read_template(component_template["name"], templates_dir)
@@ -124,23 +108,17 @@ def gather_string_data():
 
 def generate_all():
     components = gather_string_data()
+    generated_files = []
 
-    # generate component lists
-    component_filled_templates = generate_component_list_descriptions(components)
+    # generate file with string ids
+    component_filled_templates = generate_ids_list_descriptions(components)
     for file_info in files_to_generate:
         if "flags" in file_info and "list" in file_info["flags"]:
-            generate_component_list_cpp_file(file_info["template"],
-                                             path.join(working_dir, file_info["output_dir"]),
-                                             file_info["name_template"],
-                                             component_filled_templates)
+            out_file_name = generate_string_ids_cpp_file(file_info["template"],
+                 path.join(working_dir, file_info["output_dir"]),
+                 file_info["name_template"],
+                 component_filled_templates)
 
+            generated_files.append(out_file_name)
 
-delimiter_dictionary = load_json(path.join(configs_dir, "delimiter_dictionary.json"))
-
-empty_delimiter_dictionary = {key: "" for key in delimiter_dictionary.keys()}
-
-element_templates = load_json(path.join(configs_dir, "element_templates.json"))
-
-files_to_generate = load_json(path.join(configs_dir, "files_to_generate.json"))
-
-generate_all()
+    return generated_files
