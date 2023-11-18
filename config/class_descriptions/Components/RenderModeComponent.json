@@ -1,5 +1,4 @@
 {
-	"component": "renderMode",
 	"description": "Component that stores information about the current render mode",
 	"attributes": [
 		{

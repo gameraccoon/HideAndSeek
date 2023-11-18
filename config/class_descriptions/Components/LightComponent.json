@@ -1,5 +1,4 @@
 {
-	"component": "light",
 	"description": "Component that stores information about a light emitter",
 	"attributes": [
 		{

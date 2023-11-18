@@ -1,5 +1,4 @@
 {
-	"component": "animationClipCreator",
 	"description": "Component that creates static animation clips",
 	"attributes": [
 		{

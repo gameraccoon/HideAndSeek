@@ -28,23 +28,9 @@ files_to_generate = load_json(path.join(configs_dir, "files_to_generate.json"))
 
 def get_base_data_dictionary(data_description):
     return {
-        "enum_name": data_description["enum"]["name"],
-        "enum_values": data_description["enum"]["values"]
+        "enum_name": data_description["enum_name"],
+        "enum_values": data_description["values"]
     }
-
-def get_attribute_data_dictionary(attribute):
-    attribute_data_dictionary = {}
-
-    for field_name, field_value in attribute.items():
-        attribute_data_dictionary["attribute_" + field_name] = field_value
-
-    attribute_data_dictionary["attribute_name_capital"] = capitalize(attribute["name"])
-
-    attribute_data_dictionary["attribute_include_full"] = ""
-    if "includes" in attribute:
-        for include in attribute["includes"]:
-            attribute_data_dictionary["attribute_include_full"] += ("#include %s\n" % include)
-    attribute_data_dictionary["attribute_include_full"] = attribute_data_dictionary["attribute_include_full"].rstrip("\n")
 
 
 def append_attributes_data_dictionary(data_dictionary, data_description):
@@ -108,11 +94,16 @@ def generate_files(file_infos, data_description):
     return generated_files
 
 
+def get_enum_name_from_file_name(file_name):
+    return file_name[:-5] if file_name.endswith('.json') else file_name
+
+
 def generate_all():
     generated_files = []
 
     for file_name in os.listdir(descriptions_dir):
         enum_data = load_json(path.join(descriptions_dir, file_name))
+        enum_data["enum_name"] = get_enum_name_from_file_name(file_name)
         generated_files += generate_files(files_to_generate, enum_data)
 
     return generated_files

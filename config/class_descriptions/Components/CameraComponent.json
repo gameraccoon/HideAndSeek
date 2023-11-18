@@ -1,5 +1,4 @@
 {
-	"component": "camera",
 	"description": "Component that contains camera-relating information",
 	"attributes": [
 		{

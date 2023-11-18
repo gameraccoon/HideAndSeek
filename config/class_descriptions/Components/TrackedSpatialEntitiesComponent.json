@@ -1,5 +1,4 @@
 {
-	"component": "trackedSpatialEntities",
 	"description": "Component that stores inormation about spatial entities that we should be able to find regardless their movement around cells",
 	"attributes": [
 		{

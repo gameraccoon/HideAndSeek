@@ -1,5 +1,4 @@
 {
-	"component": "pathBlockingGeometry",
 	"description": "Component for storing path-blocking pieces of geometry",
 	"flags": ["transient"],
 	"attributes": [

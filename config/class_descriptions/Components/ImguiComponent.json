@@ -1,5 +1,4 @@
 {
-	"component": "imgui",
 	"description": "Component that stores information about the current render mode",
 	"flags": ["transient"],
 	"attributes": [

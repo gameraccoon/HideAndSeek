@@ -34,10 +34,10 @@ attribute_optional_fields = load_json(path.join(configs_dir, "attribute_optional
 
 def get_base_data_dictionary(data_description):
     return {
-        "component_name": data_description["component"],
-        "component_name_capital": capitalize(data_description["component"]),
-        "class_name": "%sComponent" % capitalize(data_description["component"]),
-        "component_tolower" : data_description["component"].lower(),
+        "component_name": data_description["component_name"][0].lower() + data_description["component_name"][1:],
+        "component_name_capital": data_description["component_name"],
+        "class_name": "%sComponent" % data_description["component_name"],
+        "component_tolower" : data_description["component_name"].lower(),
         "component_description": data_description["description"],
         "component_flags": data_description["flags"] if ("flags" in data_description) else []
     }
@@ -280,12 +280,19 @@ def generate_attribute_list_descriptions(components):
     return attribute_filled_templates
 
 
+def get_component_name_from_file_name(file_name):
+    name = file_name[:-5] if file_name.endswith('.json') else file_name
+    name = name[:-9] if name.endswith('Component') else name
+    return name
+
+
 def generate_all():
     generated_files = []
     components = []
     raw_components = []
     for file_name in os.listdir(descriptions_dir):
         component = load_component_data_description(path.join(descriptions_dir, file_name))
+        component["component_name"] = get_component_name_from_file_name(file_name)
         full_data_dict = get_full_data_dictionary(component)
         generated_files += generate_files(files_to_generate, component, full_data_dict)
         component["data_dict"] = full_data_dict

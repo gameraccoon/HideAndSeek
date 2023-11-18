@@ -1,5 +1,4 @@
 {
-	"component": "time",
 	"description": "Component that stores world information about time",
 	"attributes": [
 		{

@@ -1,6 +1,5 @@
 {
-	"component": "aiController",
-	"description": "Component that stores inormation about AI",
+	"description": "Component that stores information about AI",
 	"attributes": [
 		{
 			"name": "path",

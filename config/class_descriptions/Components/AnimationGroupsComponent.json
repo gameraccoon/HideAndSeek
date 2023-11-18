@@ -1,5 +1,4 @@
 {
-	"component": "animationGroups",
 	"description": "Component that stores animation groups data",
 	"flags": ["transient"],
 	"attributes": [

@@ -1,5 +1,4 @@
 {
-	"component": "collision",
 	"description": "Component that stores information and logic about object collidable geometry",
 	"attributes": [
 		{

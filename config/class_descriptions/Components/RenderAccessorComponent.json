@@ -1,5 +1,4 @@
 {
-	"component": "renderAccessor",
 	"description": "Component that provides access to render-related classes",
 	"flags": ["transient"],
 	"attributes": [

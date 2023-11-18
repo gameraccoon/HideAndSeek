@@ -1,13 +1,10 @@
 {
-	"enum": {
-		"name": "CharacterState",
-		"values": [
-			"Idle",
-			"Walk",
-			"Shoot",
-			"WalkAndShoot",
-			"Reload",
-			"Run"
-		]
-	}
+	"values": [
+		"Idle",
+		"Walk",
+		"Shoot",
+		"WalkAndShoot",
+		"Reload",
+		"Run"
+	]
 }

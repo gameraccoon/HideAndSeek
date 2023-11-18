@@ -1,5 +1,4 @@
 {
-	"component": "lightBlockingGeometry",
 	"description": "Component for storing light-blocking geometry for a particular cell or an entity",
 	"flags": ["transient"],
 	"attributes": [

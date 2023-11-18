@@ -1,5 +1,4 @@
 {
-	"component": "debugDraw",
 	"description": "Component that stores information about debug primitives that should be drawn",
 	"attributes": [
 		{

@@ -1,5 +1,4 @@
 {
-	"component": "stateMachine",
 	"description": "Component that stores state machines",
 	"attributes": [
 		{

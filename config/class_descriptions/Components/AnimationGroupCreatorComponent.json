@@ -1,5 +1,4 @@
 {
-	"component": "animationGroupCreator",
 	"description": "Component that creates groups of animation clips",
 	"attributes": [
 		{

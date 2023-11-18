@@ -1,5 +1,4 @@
 {
-	"component": "spatialTrack",
 	"description": "Component signals that movement of this entity should be tracked to keep correct global references",
 	"attributes": [
 		{

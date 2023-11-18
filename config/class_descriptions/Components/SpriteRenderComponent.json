@@ -1,5 +1,4 @@
 {
-	"component": "spriteRender",
 	"description": "Component that stores information about sprites that should be rendered",
 	"flags": ["transient"],
 	"attributes": [

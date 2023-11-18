@@ -1,5 +1,4 @@
 {
-	"component": "transform",
 	"description": "Component that stores information about position and movement",
 	"attributes": [
 		{

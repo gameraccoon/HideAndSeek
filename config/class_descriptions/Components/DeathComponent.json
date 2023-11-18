@@ -1,5 +1,4 @@
 {
-	"component": "death",
 	"description": "Component that indicate that the entity was 'killed' and need to be destroyed",
 	"attributes": [
 	]

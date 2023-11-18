@@ -1,9 +1,6 @@
 {
-	"enum": {
-		"name": "HullType",
-		"values": [
-			"Circular",
-			"Angular"
-		]
-	}
+	"values": [
+		"Circular",
+		"Angular"
+	]
 }

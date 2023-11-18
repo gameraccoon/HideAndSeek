@@ -1,9 +1,6 @@
 {
-	"enum": {
-		"name": "ResourceType",
-		"values": [
-			"Sprite",
-			"SpriteAnimation"
-		]
-	}
+	"values": [
+		"Sprite",
+		"SpriteAnimation"
+	]
 }

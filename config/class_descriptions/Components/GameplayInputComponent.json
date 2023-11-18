@@ -1,5 +1,4 @@
 {
-	"component": "gameplayInput",
 	"description": "Component that stores gameplay-specific input information",
 	"attributes": [
 		{

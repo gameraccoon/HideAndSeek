@@ -1,5 +1,4 @@
 {
-	"component": "backgroundTexture",
 	"description": "Component that stores info about texture to render to background",
 	"attributes": [
 		{
