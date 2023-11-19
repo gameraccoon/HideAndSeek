@@ -933,7 +933,7 @@ namespace ShapeOperations
 						break;
 					}
 
-					if ALMOST_NEVER(sortedBorders.empty()) {
+					if (sortedBorders.empty()) [[unlikely]] {
 						ReportError("sortedBorders should not be empty here, the shape was invalid");
 						break;
 					}

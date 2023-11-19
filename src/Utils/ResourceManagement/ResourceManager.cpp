@@ -26,7 +26,7 @@ void ResourceManager::unlockResource(ResourceHandle handle)
 	std::scoped_lock l(mDataMutex);
 	DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 	auto locksCntIt = mStorage.resourceLocksCount.find(handle);
-	if ALMOST_NEVER(locksCntIt == mStorage.resourceLocksCount.end())
+	if (locksCntIt == mStorage.resourceLocksCount.end()) [[unlikely]]
 	{
 		ReportError("Unlocking non-locked resource");
 		return;

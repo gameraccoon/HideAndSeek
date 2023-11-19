@@ -103,7 +103,7 @@ namespace FSM
 				{
 					replaceToChildState(currentState);
 					needToProcess = true;
-					if ALMOST_NEVER(currentState == previousState)
+					if (currentState == previousState) [[unlikely]]
 					{
 						ReportError("FSM cycle detected");
 						return currentState;
@@ -126,7 +126,7 @@ namespace FSM
 						replaceToChildState(currentState);
 						needToProcess = true;
 
-						if ALMOST_NEVER(currentState == previousState)
+						if (currentState == previousState) [[unlikely]]
 						{
 							ReportError("FSM cycle detected");
 							return currentState;

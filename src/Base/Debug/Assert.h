@@ -48,7 +48,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 	#define Assert(cond, ...) \
 	do \
 	{ \
-		if ALMOST_NEVER(static_cast<bool>(cond) == false) \
+		if (static_cast<bool>(cond) == false) [[unlikely]] \
 		{ \
 			LogAssertHelper(STR(cond), __FILE__, __LINE__, ##__VA_ARGS__); \
 			gGlobalAssertHandler(); \
@@ -61,7 +61,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 #ifdef DEBUG_CHECKS
 	#define AssertFatal(cond, ...) \
 	do { \
-		if ALMOST_NEVER(static_cast<bool>(cond) == false) \
+		if (static_cast<bool>(cond) == false) [[unlikely]] \
 		{ \
 			LogAssertHelper(STR(cond), __FILE__, __LINE__, ##__VA_ARGS__); \
 			gGlobalFatalAssertHandler(); \
@@ -80,7 +80,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 
 #define AssertRelease(cond, ...) \
 	do { \
-	if ALMOST_NEVER(static_cast<bool>(cond) == false) \
+	if (static_cast<bool>(cond) == false) [[unlikely]] \
 	{ \
 		LogAssertHelper(STR(cond), __FILE__, __LINE__, ##__VA_ARGS__); \
 		gGlobalAssertHandler(); \

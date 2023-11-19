@@ -209,7 +209,7 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 	for (WorldCell* cell : cells)
 	{
 		auto [lightBlockingGeometry] = cell->getCellComponents().getComponents<const LightBlockingGeometryComponent>();
-		if ALMOST_ALWAYS(lightBlockingGeometry)
+		if (lightBlockingGeometry) [[likely]]
 		{
 			lightBlockingComponents.push_back(lightBlockingGeometry);
 		}

@@ -17,30 +17,6 @@
 	#define USED_COMPILER COMPILER_UNKNOWN
 #endif
 
-// ALMOST_ALWAYS/ALMOST_NEVER (likely/unlikely early support)
-#ifdef __has_cpp_attribute
-	#if __has_cpp_attribute(likely) && !(defined(__GNUC__) && __GNUC__ >= 9 && __GNUC__ < 10)
-		#define ALMOST_ALWAYS(expr) (expr) [[likely]]
-	#endif
-	#if __has_cpp_attribute(unlikely) && !(defined(__GNUC__) && __GNUC__ >= 9 && __GNUC__ < 10)
-		#define ALMOST_NEVER(expr) (expr) [[unlikely]]
-	#endif
-#endif
-#ifndef ALMOST_ALWAYS
-	#if defined(__builtin_expect)
-		#define ALMOST_ALWAYS(expr) (__builtin_expect(static_cast<bool>(expr), 1))
-	#else
-		#define ALMOST_ALWAYS(expr) (expr)
-	#endif
-#endif
-#ifndef ALMOST_NEVER
-	#if defined(__builtin_expect)
-		#define ALMOST_NEVER(expr) (__builtin_expect(static_cast<bool>(expr), 0))
-	#else
-		#define ALMOST_NEVER(expr) (expr)
-	#endif
-#endif
-
 // MAYBE_UNUSED (for suppressing 'variable unused' warning)
 #ifdef __has_cpp_attribute
 	#if __has_cpp_attribute(maybe_unused)
