@@ -4,7 +4,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "Base/Types/String/Path.h"
+#include "Base/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/AnimationClipParams.h"
 #include "GameData/Resources/SpriteParams.h"
@@ -13,7 +13,7 @@ struct AnimationClipDescription
 {
 	AnimationClipParams params;
 	SpriteParams spriteParams;
-	ResourcePath path;
+	RelativeResourcePath path;
 };
 
 inline bool operator ==(const AnimationClipDescription& a, const AnimationClipDescription& b)

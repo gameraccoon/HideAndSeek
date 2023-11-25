@@ -46,8 +46,8 @@ void HapGame::preStart(const ArgumentsParser& arguments, const RenderAccessorGam
 
 	initSystems();
 
-	GameDataLoader::LoadWorld(getWorldHolder().getWorld(), arguments.getArgumentValue("world").value_or("test"), getComponentSerializers());
-	GameDataLoader::LoadGameData(getGameData(), arguments.getArgumentValue("gameData").value_or("gameData"), getComponentSerializers());
+	GameDataLoader::LoadWorld(getWorldHolder().getWorld(), arguments.getExecutablePath(), arguments.getArgumentValue("world").value_or("test"), getComponentSerializers());
+	GameDataLoader::LoadGameData(getGameData(), arguments.getExecutablePath(), arguments.getArgumentValue("gameData").value_or("gameData"), getComponentSerializers());
 
 	RenderAccessorComponent* renderAccessorComponent = getGameData().getGameComponents().getOrAddComponent<RenderAccessorComponent>();
 	renderAccessorComponent->setAccessor(renderAccessor);
@@ -88,6 +88,6 @@ void HapGame::initSystems()
 void HapGame::initResources()
 {
 	SCOPED_PROFILER("HapGame::initResources");
-	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
+	getResourceManager().loadAtlasesData(RelativeResourcePath("resources/atlas/atlas-list.json"));
 	Game::initResources();
 }

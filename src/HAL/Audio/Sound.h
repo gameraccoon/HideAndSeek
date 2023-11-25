@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base/Types/String/Path.h"
+#include "Base/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/Resource.h"
 
@@ -12,7 +12,7 @@ namespace Audio
 	{
 	public:
 		Sound() = default;
-		explicit Sound(const ResourcePath& path);
+		explicit Sound(const AbsoluteResourcePath& path);
 
 		Sound(const Sound&) = delete;
 		Sound& operator=(const Sound&) = delete;

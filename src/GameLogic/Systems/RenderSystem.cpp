@@ -38,7 +38,7 @@ RenderSystem::RenderSystem(
 	, mResourceManager(resourceManager)
 	, mThreadPool(threadPool)
 {
-	mLightSpriteHandle = resourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/light.png"));
+	mLightSpriteHandle = resourceManager.lockResource<Graphics::Sprite>(RelativeResourcePath("resources/textures/light.png"));
 }
 
 void RenderSystem::update()

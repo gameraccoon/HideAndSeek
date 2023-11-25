@@ -19,7 +19,7 @@ namespace Graphics
 		const ResourceHandle& getSprite(float progress) const;
 		const std::vector<ResourceHandle>& getSprites() const;
 
-		static std::string GetUniqueId(const std::string& filename);
+		static std::string GetUniqueId(const RelativeResourcePath& filename);
 		static InitSteps GetInitSteps();
 		DeinitSteps getDeinitSteps() const override;
 

@@ -14,11 +14,29 @@
 ConcurrentAccessDetector ResourceManager::gResourceManagerAccessDetector;
 #endif // CONCURRENT_ACCESS_DETECTION
 
-ResourceManager::ResourceManager() noexcept = default;
+ResourceManager::ResourceManager() noexcept
+	: ResourceManager(std::filesystem::current_path())
+{
+}
+
+ResourceManager::ResourceManager(const std::filesystem::path& resourcesDirectoryPath) noexcept
+	: mResourcesDirectoryPath(resourcesDirectoryPath)
+{
+}
 
 ResourceManager::~ResourceManager()
 {
 	stopLoadingThread();
+}
+
+AbsoluteResourcePath ResourceManager::getAbsoluteResourcePath(const RelativeResourcePath& relativePath) const
+{
+	return AbsoluteResourcePath(mResourcesDirectoryPath, relativePath);
+}
+
+AbsoluteResourcePath ResourceManager::getAbsoluteResourcePath(RelativeResourcePath&& relativePath) const
+{
+	return AbsoluteResourcePath(mResourcesDirectoryPath, std::move(relativePath));
 }
 
 void ResourceManager::unlockResource(ResourceHandle handle)
@@ -68,33 +86,31 @@ void ResourceManager::unlockResource(ResourceHandle handle)
 	}
 }
 
-void ResourceManager::loadAtlasesData(const ResourcePath& listPath)
+void ResourceManager::loadAtlasesData(const RelativeResourcePath& listPath)
 {
 	SCOPED_PROFILER("ResourceManager::loadAtlasesData");
 	std::scoped_lock l(mDataMutex);
 	DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
-	namespace fs = std::filesystem;
-	fs::path listFsPath(static_cast<std::string>(listPath));
 
 	try
 	{
-		std::ifstream listFile(listFsPath);
+		std::ifstream listFile(getAbsoluteResourcePath(listPath).getAbsolutePath());
 		nlohmann::json listJson;
 		listFile >> listJson;
 
 		const auto& atlases = listJson.at("atlases");
 		for (const auto& atlasPath : atlases.items())
 		{
-			loadOneAtlasData(atlasPath.value());
+			loadOneAtlasData(getAbsoluteResourcePath(RelativeResourcePath(atlasPath.value())));
 		}
 	}
 	catch(const nlohmann::detail::exception& e)
 	{
-		LogError("Can't parse atlas list '%s': %s", listPath.c_str(), e.what());
+		LogError("Can't parse atlas list '%s': %s", listPath.getRelativePath().c_str(), e.what());
 	}
 	catch(const std::exception& e)
 	{
-		LogError("Can't open atlas list '%s': %s", listPath.c_str(), e.what());
+		LogError("Can't open atlas list '%s': %s", listPath.getRelativePath().c_str(), e.what());
 	}
 }
 
@@ -121,7 +137,7 @@ void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 
 				loadingData->stepsLeft.pop_front();
 
-				// found a dependecy that need to resolve first
+				// found a dependency that need to resolve first
 				auto it = mLoading.resourcesWaitingDependencies.find(loadingData->handle);
 				if (it != mLoading.resourcesWaitingDependencies.end())
 				{
@@ -197,7 +213,7 @@ void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 	}
 }
 
-const std::unordered_map<ResourcePath, ResourceLoading::ResourceStorage::AtlasFrameData>& ResourceManager::getAtlasFrames() const
+const std::unordered_map<RelativeResourcePath, ResourceLoading::ResourceStorage::AtlasFrameData>& ResourceManager::getAtlasFrames() const
 {
 	DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 	return mStorage.atlasFrames;
@@ -324,21 +340,19 @@ void ResourceManager::startResourceLoading(ResourceLoading::ResourceLoad::Loadin
 	}
 }
 
-void ResourceManager::loadOneAtlasData(const ResourcePath& path)
+void ResourceManager::loadOneAtlasData(const AbsoluteResourcePath& path)
 {
 	DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 	SCOPED_PROFILER("ResourceManager::loadOneAtlasData");
-	namespace fs = std::filesystem;
-	fs::path atlasDescPath(static_cast<std::string>(path));
 
 	try
 	{
-		std::ifstream atlasDescriptionFile(atlasDescPath);
+		std::ifstream atlasDescriptionFile(path.getAbsolutePath());
 		nlohmann::json atlasJson;
 		atlasDescriptionFile >> atlasJson;
 
 		auto meta = atlasJson.at("meta");
-		ResourcePath atlasPath = meta.at("image");
+		RelativeResourcePath atlasPath = meta.at("image");
 		auto sizeJson = meta.at("size");
 		Vector2D atlasSize;
 		sizeJson.at("w").get_to(atlasSize.x);
@@ -348,7 +362,7 @@ void ResourceManager::loadOneAtlasData(const ResourcePath& path)
 		for (const auto& frameDataJson : frames)
 		{
 			ResourceLoading::ResourceStorage::AtlasFrameData frameData;
-			ResourcePath fileName = frameDataJson.at("filename");
+			RelativeResourcePath fileName = frameDataJson.at("filename");
 			auto frame = frameDataJson.at("frame");
 			frameData.atlasPath = atlasPath;
 			float x, y, w, h;
@@ -366,11 +380,11 @@ void ResourceManager::loadOneAtlasData(const ResourcePath& path)
 	}
 	catch(const nlohmann::detail::exception& e)
 	{
-		LogError("Can't parse atlas data '%s': %s", path.c_str(), e.what());
+		LogError("Can't parse atlas data '%s': %s", path.getAbsolutePath().c_str(), e.what());
 	}
 	catch(const std::exception& e)
 	{
-		LogError("Can't open atlas data '%s': %s", path.c_str(), e.what());
+		LogError("Can't open atlas data '%s': %s", path.getAbsolutePath().c_str(), e.what());
 	}
 }
 

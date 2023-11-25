@@ -2,14 +2,14 @@
 
 #include <string>
 
-#include "Base/Types/String/Path.h"
+#include "Base/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/SpriteParams.h"
 
 struct SpriteDescription
 {
 	SpriteParams params;
-	ResourcePath path;
+	RelativeResourcePath path;
 };
 
 inline bool operator ==(const SpriteDescription& a, const SpriteDescription& b)

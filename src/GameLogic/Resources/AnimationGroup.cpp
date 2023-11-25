@@ -1,25 +1,24 @@
 #include "Base/precomp.h"
 
-#include "GameLogic/Resources/AnimationGroup.h"
-
 #include <filesystem>
 
 #include <nlohmann/json.hpp>
 
-#include "Base/Types/String/Path.h"
+#include "Base/Types/String/ResourcePath.h"
 
 #include "HAL/Base/Engine.h"
 #include "HAL/Graphics/SdlSurface.h"
 
-#include "GameLogic/Resources/SpriteAnimationClip.h"
-
 #include "Utils/ResourceManagement/ResourceManager.h"
+
+#include "GameLogic/Resources/AnimationGroup.h"
+#include "GameLogic/Resources/SpriteAnimationClip.h"
 
 namespace Graphics
 {
 	struct AnimGroupData
 	{
-		std::map<StringId, ResourcePath> clips;
+		std::map<StringId, RelativeResourcePath> clips;
 		StringId stateMachineID;
 		StringId defaultState;
 	};
@@ -31,18 +30,16 @@ namespace Graphics
 		StringId defaultState;
 	};
 
-	static AnimGroupData LoadAnimGroupData(const ResourcePath& path)
+	static AnimGroupData LoadAnimGroupData(const AbsoluteResourcePath& path)
 	{
 		SCOPED_PROFILER("ResourceManager::loadAnimGroupData");
-		namespace fs = std::filesystem;
-		fs::path atlasDescPath(static_cast<std::string>(path));
 
 		AnimGroupData result;
-		ResourcePath pathBase;
+		AbsoluteResourcePath pathBase;
 
 		try
 		{
-			std::ifstream animDescriptionFile(atlasDescPath);
+			std::ifstream animDescriptionFile(path.getAbsolutePath());
 			nlohmann::json animJson;
 			animDescriptionFile >> animJson;
 
@@ -52,7 +49,7 @@ namespace Graphics
 		}
 		catch(const std::exception& e)
 		{
-			LogError("Can't open animation group data '%s': %s", path.c_str(), e.what());
+			LogError("Can't open animation group data '%s': %s", path.getAbsolutePath().c_str(), e.what());
 		}
 
 		return result;
@@ -62,7 +59,7 @@ namespace Graphics
 	{
 		SCOPED_PROFILER("CalculateSpriteDependencies");
 
-		const ResourcePath* pathPtr = resource.cast<ResourcePath>();
+		const RelativeResourcePath* pathPtr = resource.cast<RelativeResourcePath>();
 
 		if (!pathPtr)
 		{
@@ -70,9 +67,9 @@ namespace Graphics
 			return {};
 		}
 
-		const ResourcePath& path = *pathPtr;
+		const RelativeResourcePath& path = *pathPtr;
 
-		AnimGroupData animGroupData = LoadAnimGroupData(path);
+		AnimGroupData animGroupData = LoadAnimGroupData(resourceManager.getAbsoluteResourcePath(path));
 
 		AnimGroupLoadData animGroupLoadData;
 		animGroupLoadData.defaultState = animGroupData.defaultState;
@@ -120,9 +117,9 @@ namespace Graphics
 		return mStateMachineId.isValid();
 	}
 
-	std::string AnimationGroup::GetUniqueId(const std::string& filename)
+	std::string AnimationGroup::GetUniqueId(const RelativeResourcePath& filename)
 	{
-		return filename;
+		return filename.getRelativePathStr();
 	}
 
 	Resource::InitSteps AnimationGroup::GetInitSteps()

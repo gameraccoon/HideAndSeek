@@ -57,7 +57,7 @@ public:
 
 	// don't call these functions explicitly
 	// use STR_TO_ID macro as it being parsed by external code preprocessing tools)
-	// see hideandseek/scripts/build/generators/generate_string_ids.py
+	// see scripts/build/generators/generate_string_ids.py
 	static constexpr StringId StringToId(const char* const stringLiteral) noexcept
 	{
 		return StringId(hash_64_fnv1a_const(stringLiteral));

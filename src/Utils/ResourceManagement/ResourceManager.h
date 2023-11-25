@@ -1,24 +1,24 @@
 #pragma once
 
-#include <map>
-#include <unordered_map>
+#include <condition_variable>
 #include <functional>
+#include <map>
 #include <mutex>
 #include <thread>
-#include <condition_variable>
+#include <unordered_map>
 
-#include "Base/Types/String/Path.h"
 #include "Base/Debug/ConcurrentAccessDetector.h"
 #include "Base/Profile/ScopedProfiler.h"
+#include "Base/Types/String/ResourcePath.h"
 
-#include "GameData/Resources/ResourceHandle.h"
 #include "GameData/Resources/Resource.h"
+#include "GameData/Resources/ResourceHandle.h"
 
 #include "HAL/Base/Types.h"
 
 #include "Utils/ResourceManagement/ResourceDependencies.h"
-#include "Utils/ResourceManagement/ResourceStorageData.h"
 #include "Utils/ResourceManagement/ResourceLoadingData.h"
+#include "Utils/ResourceManagement/ResourceStorageData.h"
 
 struct ResourceDependencyType
 {
@@ -41,6 +41,7 @@ class ResourceManager
 {
 public:
 	explicit ResourceManager() noexcept;
+	explicit ResourceManager(const std::filesystem::path& resourcesDirectoryPath) noexcept;
 
 	~ResourceManager();
 
@@ -48,6 +49,9 @@ public:
 	ResourceManager& operator=(const ResourceManager&) = delete;
 	ResourceManager(ResourceManager&&) = delete;
 	ResourceManager& operator=(ResourceManager&&) = delete;
+
+	AbsoluteResourcePath getAbsoluteResourcePath(const RelativeResourcePath& relativePath) const;
+	AbsoluteResourcePath getAbsoluteResourcePath(RelativeResourcePath&& relativePath) const;
 
 	template<typename T, typename... Args>
 	[[nodiscard]] ResourceHandle lockResource(Args&&... args)
@@ -63,15 +67,15 @@ public:
 		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 		std::string id = T::GetUniqueId(args...);
 
-		auto it = mStorage.pathsMap.find(static_cast<ResourcePath>(id));
-		if (it != mStorage.pathsMap.end())
+		auto it = mStorage.idsMap.find(id);
+		if (it != mStorage.idsMap.end())
 		{
 			++mStorage.resourceLocksCount[it->second];
 			return ResourceHandle(it->second);
 		}
 		else
 		{
-			ResourceHandle newHandle = mStorage.createResourceLock(static_cast<ResourcePath>(id));
+			ResourceHandle newHandle = mStorage.createResourceLock(id);
 
 			if constexpr (sizeof...(Args) == 1)
 			{
@@ -105,18 +109,17 @@ public:
 		return it == mStorage.resources.end() ? nullptr : static_cast<T*>(it->second.get());
 	}
 
-	void lockResource(ResourceHandle handle);
 	void unlockResource(ResourceHandle handle);
 
-	void loadAtlasesData(const ResourcePath& listPath);
+	void loadAtlasesData(const RelativeResourcePath& listPath);
 
 	void runThreadTasks(Resource::Thread currentThread);
 
 	void setFirstResourceDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency, ResourceDependencyType::Type type = ResourceDependencyType::LoadAndUnload);
 
-	// for now atlasses are always loaded and don't require dependecy management
-	// if that ever changes, manage atlasses as any other resources and remove this method
-	const std::unordered_map<ResourcePath, ResourceLoading::ResourceStorage::AtlasFrameData>& getAtlasFrames() const;
+	// for now atlases are always loaded and don't require dependency management
+	// if that ever changes, manage atlases as any other resources and remove this method
+	const std::unordered_map<RelativeResourcePath, ResourceLoading::ResourceStorage::AtlasFrameData>& getAtlasFrames() const;
 
 	void startLoadingThread(std::function<void()>&& threadFinalizerFn = nullptr);
 	// this call will wait for the thread to join
@@ -124,7 +127,7 @@ public:
 
 private:
 	void startResourceLoading(ResourceLoading::ResourceLoad::LoadingDataPtr&& loadingGata, Resource::Thread currentThread);
-	void loadOneAtlasData(const ResourcePath& path);
+	void loadOneAtlasData(const AbsoluteResourcePath& path);
 	void finalizeResourceLoading(ResourceHandle handle, Resource::Ptr&& resource);
 
 private:
@@ -137,6 +140,8 @@ private:
 	std::condition_variable_any mNotifyLoadingThread;
 
 	std::recursive_mutex mDataMutex;
+
+	std::filesystem::path mResourcesDirectoryPath;
 
 #ifdef CONCURRENT_ACCESS_DETECTION
 	static ConcurrentAccessDetector gResourceManagerAccessDetector;

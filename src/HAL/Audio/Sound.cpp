@@ -8,8 +8,8 @@
 
 namespace Audio
 {
-	Sound::Sound(const ResourcePath& path)
-		: mSound(Mix_LoadWAV(path.c_str()))
+	Sound::Sound(const AbsoluteResourcePath& path)
+		: mSound(Mix_LoadWAV(path.getAbsolutePath().c_str()))
 	{
 	}
 	

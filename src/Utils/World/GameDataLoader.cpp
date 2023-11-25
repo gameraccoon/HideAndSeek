@@ -177,7 +177,7 @@ namespace GameDataLoader
 		geometryJson["geometry"].get_to(pathBlockingCompontnt->getPolygonsRef());
 	}
 
-	void SaveWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
+	void SaveWorld(World& world, const std::filesystem::path& appFolder, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		SCOPED_PROFILER("SaveWorld");
 
@@ -187,7 +187,7 @@ namespace GameDataLoader
 		// if it's name, we save to maps folder
 		if (levelName.find_first_of("/\\.") == std::string::npos)
 		{
-			levelPath = MAPS_PATH / (levelName + ".json");
+			levelPath = appFolder / MAPS_PATH / (levelName + ".json");
 		}
 		else
 		{
@@ -218,7 +218,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void LoadWorld(World& world, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
+	void LoadWorld(World& world, const std::filesystem::path& appFolder, const std::string& levelName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		SCOPED_PROFILER("LoadWorld");
 
@@ -228,7 +228,7 @@ namespace GameDataLoader
 		// if it is a name, we search the map in the maps folder
 		if (levelName.find_first_of("/\\.") == std::string::npos)
 		{
-			levelPath = MAPS_PATH / (levelName + ".json");
+			levelPath = appFolder / MAPS_PATH / (levelName + ".json");
 		}
 
 		try
@@ -256,7 +256,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void SaveGameData(const GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
+	void SaveGameData(const GameData& gameData, const std::filesystem::path& appFolder, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		namespace fs = std::filesystem;
 		fs::path gameDataPath(gameDataName);
@@ -264,7 +264,7 @@ namespace GameDataLoader
 		// if it's name, we save to maps folder
 		if (gameDataName.find_first_of("/\\.") == std::string::npos)
 		{
-			gameDataPath = GAME_DATA_PATH / (gameDataName + ".json");
+			gameDataPath = appFolder / GAME_DATA_PATH / (gameDataName + ".json");
 		}
 		else
 		{
@@ -287,7 +287,7 @@ namespace GameDataLoader
 		}
 	}
 
-	void LoadGameData(GameData& gameData, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
+	void LoadGameData(GameData& gameData, const std::filesystem::path& appFolder, const std::string& gameDataName, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		namespace fs = std::filesystem;
 		fs::path gameDataPath(gameDataName);
@@ -295,7 +295,7 @@ namespace GameDataLoader
 		// if it's name, we search the map in maps folder
 		if (gameDataName.find_first_of("/\\.") == std::string::npos)
 		{
-			gameDataPath = GAME_DATA_PATH / (gameDataName + ".json");
+			gameDataPath = appFolder / GAME_DATA_PATH / (gameDataName + ".json");
 		}
 
 		try

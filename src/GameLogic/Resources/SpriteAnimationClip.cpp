@@ -1,33 +1,31 @@
 #include "Base/precomp.h"
 
-#include "GameLogic/Resources/SpriteAnimationClip.h"
-
 #include <algorithm>
 #include <filesystem>
 
 #include <nlohmann/json.hpp>
 
-#include "Base/Types/String/Path.h"
-
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "Base/Types/String/ResourcePath.h"
 
 #include "HAL/Graphics/Sprite.h"
 
+#include "Utils/ResourceManagement/ResourceManager.h"
+
+#include "GameLogic/Resources/SpriteAnimationClip.h"
+
 namespace Graphics
 {
-	static std::vector<ResourcePath> LoadSpriteAnimClipData(const ResourcePath& path)
+	static std::vector<RelativeResourcePath> LoadSpriteAnimClipData(const AbsoluteResourcePath& path)
 	{
 		SCOPED_PROFILER("ResourceManager::loadSpriteAnimClipData");
-		namespace fs = std::filesystem;
-		fs::path atlasDescPath(static_cast<std::string>(path));
 
-		std::vector<ResourcePath> result;
-		ResourcePath pathBase;
+		std::vector<RelativeResourcePath> result;
+		RelativeResourcePath pathBase;
 		int framesCount = 0;
 
 		try
 		{
-			std::ifstream animDescriptionFile(atlasDescPath);
+			std::ifstream animDescriptionFile(path.getAbsolutePath());
 			nlohmann::json animJson;
 			animDescriptionFile >> animJson;
 
@@ -36,12 +34,12 @@ namespace Graphics
 		}
 		catch(const std::exception& e)
 		{
-			LogError("Can't open animation data '%s': %s", path.c_str(), e.what());
+			LogError("Can't open animation data '%s': %s", path.getAbsolutePath().c_str(), e.what());
 		}
 
 		for (int i = 0; i < framesCount; ++i)
 		{
-			result.emplace_back(pathBase + std::to_string(i) + ".png");
+			result.emplace_back(pathBase.getRelativePathStr() + std::to_string(i) + ".png");
 		}
 
 		return result;
@@ -51,7 +49,7 @@ namespace Graphics
 	{
 		SCOPED_PROFILER("CreateAnimationClip");
 
-		const ResourcePath* pathPtr = resource.cast<ResourcePath>();
+		const RelativeResourcePath* pathPtr = resource.cast<RelativeResourcePath>();
 
 		if (!pathPtr)
 		{
@@ -59,9 +57,9 @@ namespace Graphics
 			return {};
 		}
 
-		const ResourcePath& path = *pathPtr;
+		const RelativeResourcePath& path = *pathPtr;
 
-		std::vector<ResourcePath> framePaths = LoadSpriteAnimClipData(path);
+		std::vector<RelativeResourcePath> framePaths = LoadSpriteAnimClipData(resourceManager.getAbsoluteResourcePath(path));
 		std::vector<ResourceHandle> frames;
 		for (const auto& animFramePath : framePaths)
 		{
@@ -93,9 +91,9 @@ namespace Graphics
 		return mSprites;
 	}
 
-	std::string SpriteAnimationClip::GetUniqueId(const std::string& filename)
+	std::string SpriteAnimationClip::GetUniqueId(const RelativeResourcePath& filename)
 	{
-		return filename;
+		return filename.getRelativePathStr();
 	}
 
 	Resource::InitSteps SpriteAnimationClip::GetInitSteps()

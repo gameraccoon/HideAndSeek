@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 class ArgumentsParser
 {
@@ -18,7 +19,13 @@ public:
 
 	const std::string& getArgumentSwitch() const { return mArgumentSwitch; }
 
+	std::filesystem::path getExecutablePath() const;
+
+private:
+	static std::filesystem::path getExecutablePath(const char* firstArgument);
+
 private:
 	std::vector<std::string> mTokens;
-	const std::string mArgumentSwitch;
+	std::string mArgumentSwitch;
+	std::filesystem::path mExecutablePath;
 };

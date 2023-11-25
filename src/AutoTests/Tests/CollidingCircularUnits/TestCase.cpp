@@ -28,7 +28,7 @@
 
 void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 {
-	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
+	getResourceManager().loadAtlasesData(RelativeResourcePath("resources/atlas/atlas-list.json"));
 
 	getGameLogicSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData());
 	getGameLogicSystemsManager().registerSystem<TestUnitsCountControlSystem>(getWorldHolder());
@@ -52,7 +52,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 		SpriteCreatorComponent* sprite = playerEntity.addComponent<SpriteCreatorComponent>();
 		SpriteDescription spriteDesc;
 		spriteDesc.params.size = Vector2D(30.0f, 30.0f);
-		spriteDesc.path = "resources/textures/hero.png";
+		spriteDesc.path = RelativeResourcePath("resources/textures/hero.png");
 		sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
 	}
 	{

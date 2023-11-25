@@ -1,12 +1,10 @@
 #include "Base/precomp.h"
 
-#include "Base/Types/String/Path.h"
+#include "Base/Types/String/ResourcePath.h"
 
-#include "HAL/Graphics/Sprite.h"
-
-#include "HAL/Graphics/SdlSurface.h"
 #include "HAL/Base/Types.h"
-#include "HAL/Base/Engine.h"
+#include "HAL/Graphics/SdlSurface.h"
+#include "HAL/Graphics/Sprite.h"
 
 #include "Utils/ResourceManagement/ResourceManager.h"
 
@@ -22,7 +20,7 @@ namespace Graphics
 	{
 		SCOPED_PROFILER("CalculateSpriteDependencies");
 
-		const ResourcePath* pathPtr = resource.cast<ResourcePath>();
+		const RelativeResourcePath* pathPtr = resource.cast<RelativeResourcePath>();
 
 		if (!pathPtr)
 		{
@@ -30,9 +28,9 @@ namespace Graphics
 			return {};
 		}
 
-		const ResourcePath& path = *pathPtr;
+		const RelativeResourcePath& path = *pathPtr;
 
-		std::string surfacePath;
+		RelativeResourcePath surfacePath;
 		Graphics::QuadUV spriteUV;
 		auto it = resourceManager.getAtlasFrames().find(path);
 		if (it != resourceManager.getAtlasFrames().end())
@@ -44,7 +42,7 @@ namespace Graphics
 		{
 			surfacePath = path;
 		}
-		ResourceHandle originalSurfaceHandle = resourceManager.lockResource<Graphics::Surface>(static_cast<ResourcePath>(surfacePath));
+		ResourceHandle originalSurfaceHandle = resourceManager.lockResource<Graphics::Surface>(resourceManager.getAbsoluteResourcePath(surfacePath));
 		resourceManager.setFirstResourceDependOnSecond(handle, originalSurfaceHandle);
 		return UniqueAny::Create<LoadSpriteData>(originalSurfaceHandle, spriteUV);
 	}
@@ -92,9 +90,9 @@ namespace Graphics
 		return mSurface != nullptr;
 	}
 
-	std::string Sprite::GetUniqueId(const std::string& filename)
+	std::string Sprite::GetUniqueId(const RelativeResourcePath& filename)
 	{
-		return std::string("spr-") + filename;
+		return std::string("spr-") + filename.getRelativePathStr();
 	}
 
 	Resource::InitSteps Sprite::GetInitSteps()

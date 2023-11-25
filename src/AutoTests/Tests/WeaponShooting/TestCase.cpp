@@ -34,7 +34,7 @@
 
 void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 {
-	getResourceManager().loadAtlasesData("resources/atlas/atlas-list.json");
+	getResourceManager().loadAtlasesData(RelativeResourcePath("resources/atlas/atlas-list.json"));
 
 	DestroyedEntitiesTestCheck& destroyedEntitiesTestCheck = mTestChecklist.addCheck<DestroyedEntitiesTestCheck>(100);
 
@@ -64,7 +64,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 		SpriteCreatorComponent* sprite = playerEntity.addComponent<SpriteCreatorComponent>();
 		SpriteDescription spriteDesc;
 		spriteDesc.params.size = Vector2D(30.0f, 30.0f);
-		spriteDesc.path = "resources/textures/hero.png";
+		spriteDesc.path = RelativeResourcePath("resources/textures/hero.png");
 		sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
 	}
 	{

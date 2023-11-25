@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base/Types/String/Path.h"
+#include "Base/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/Resource.h"
 
@@ -14,7 +14,7 @@ namespace Graphics
 	public:
 		Font() = default;
 
-		explicit Font(const ResourcePath& path, int fontSize);
+		explicit Font(const AbsoluteResourcePath& path, int fontSize);
 
 		Font(const Font&) = delete;
 		Font& operator=(const Font&) = delete;
@@ -25,7 +25,7 @@ namespace Graphics
 
 		bool isValid() const override;
 
-		static std::string GetUniqueId(const ResourcePath& path, int fontSize);
+		static std::string GetUniqueId(const AbsoluteResourcePath& path, int fontSize);
 
 		FC_Font* getRawFont() const;
 

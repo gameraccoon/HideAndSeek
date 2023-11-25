@@ -1,19 +1,17 @@
 #include "Base/precomp.h"
 
+#include <string>
+
 #include "SdlSurface.h"
+#include <glew/glew.h>
+#include <SDL_image.h>
+#include <SDL_surface.h>
 
 #include "Base/Debug/ConcurrentAccessDetector.h"
 #include "Base/Types/ComplexTypes/UniqueAny.h"
-#include "Base/Types/String/Path.h"
+#include "Base/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/ResourceHandle.h"
-
-#include <stdexcept>
-#include <string>
-#include <glew/glew.h>
-#include <SDL.h>
-#include <SDL_surface.h>
-#include <SDL_image.h>
 
 #ifdef CONCURRENT_ACCESS_DETECTION
 namespace HAL
@@ -28,7 +26,7 @@ namespace Graphics
 	{
 		SCOPED_PROFILER("LoadSurfaceInitStep");
 
-		const ResourcePath* pathPtr = resource.cast<ResourcePath>();
+		const AbsoluteResourcePath* pathPtr = resource.cast<AbsoluteResourcePath>();
 
 		if (!pathPtr)
 		{
@@ -109,8 +107,8 @@ namespace Graphics
 		return {};
 	}
 
-	Surface::Surface(const std::string& filename)
-		: mSurface(IMG_Load(filename.c_str()))
+	Surface::Surface(const AbsoluteResourcePath& filename)
+		: mSurface(IMG_Load(filename.getAbsolutePath().c_str()))
 		, mTextureID(0)
 	{
 		AssertFatal(mSurface, "Unable to load texture %s", filename);
@@ -144,9 +142,9 @@ namespace Graphics
 		return mSurface != nullptr;
 	}
 
-	std::string Surface::GetUniqueId(const std::string& filename)
+	std::string Surface::GetUniqueId(const AbsoluteResourcePath& filename)
 	{
-		return filename;
+		return filename.getAbsolutePathStr();
 	}
 
 	Surface::InitSteps Surface::GetInitSteps()

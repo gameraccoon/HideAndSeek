@@ -8,7 +8,7 @@
 
 namespace Graphics
 {
-	Font::Font(const ResourcePath& /*path*/, int /*fontSize*/)
+	Font::Font(const AbsoluteResourcePath& /*path*/, int /*fontSize*/)
 	{
 		//mFont = FC_CreateFont();
 		//FC_LoadFont(mFont, renderer, path.c_str(), fontSize, FC_MakeColor(0, 0, 0, 255), TTF_STYLE_NORMAL);
@@ -24,9 +24,9 @@ namespace Graphics
 		return mFont != nullptr;
 	}
 
-	std::string Font::GetUniqueId(const ResourcePath& path, int fontSize)
+	std::string Font::GetUniqueId(const AbsoluteResourcePath& path, int fontSize)
 	{
-		return FormatString("%s:%d", path.c_str(), fontSize);
+		return FormatString("%s:%d", path.getAbsolutePath().c_str(), fontSize);
 	}
 
 	FC_Font* Font::getRawFont() const

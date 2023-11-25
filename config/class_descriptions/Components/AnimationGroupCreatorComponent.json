@@ -3,10 +3,10 @@
 	"attributes": [
 		{
 			"name": "animationGroups",
-			"type": "std::vector<ResourcePath>",
+			"type": "std::vector<RelativeResourcePath>",
 			"includes": [
 				"<vector>",
-				"\"Base/Types/String/Path.h\""
+				"\"Base/Types/String/ResourcePath.h\""
 			],
 			"flags": ["get_by_ref"]
 		},

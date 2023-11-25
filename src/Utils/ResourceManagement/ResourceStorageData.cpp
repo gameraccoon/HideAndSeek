@@ -4,11 +4,11 @@
 
 namespace ResourceLoading
 {
-	ResourceHandle ResourceStorage::createResourceLock(const ResourcePath& path)
+	ResourceHandle ResourceStorage::createResourceLock(const std::string& id)
 	{
 		ResourceHandle currentHandle(handleIdx);
-		pathsMap[path] = currentHandle;
-		pathFindMap[currentHandle] = path;
+		idsMap[id] = currentHandle;
+		idFindMap[currentHandle] = id;
 		resourceLocksCount[currentHandle] = 1;
 		++handleIdx;
 		return currentHandle;

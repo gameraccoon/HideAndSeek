@@ -32,7 +32,7 @@ void TestSpawnShootableUnitsSystem::spawnUnit(EntityManager& entityManager, cons
 		SpriteCreatorComponent* sprite = entityManager.addComponent<SpriteCreatorComponent>(entity);
 		SpriteDescription spriteDesc;
 		spriteDesc.params.size = Vector2D(20.0f, 20.0f);
-		spriteDesc.path = "resources/textures/hero.png";
+		spriteDesc.path = RelativeResourcePath("resources/textures/hero.png");
 		sprite->getDescriptionsRef().emplace_back(std::move(spriteDesc));
 	}
 	{

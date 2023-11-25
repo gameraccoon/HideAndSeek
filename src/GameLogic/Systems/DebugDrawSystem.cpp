@@ -266,9 +266,9 @@ void DebugDrawSystem::update()
 void DebugDrawSystem::init()
 {
 	SCOPED_PROFILER("DebugDrawSystem::initResources");
-	mCollisionSpriteHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/collision.png"));
-	mNavmeshSpriteHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/testTexture.png"));
-	mPointTextureHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/collision.png"));
-	mLineTextureHandle = mResourceManager.lockResource<Graphics::Sprite>(ResourcePath("resources/textures/testTexture.png"));
-	mFontHandle = mResourceManager.lockResource<Graphics::Font>("resources/fonts/prstart.ttf", 16);
+	mCollisionSpriteHandle = mResourceManager.lockResource<Graphics::Sprite>(RelativeResourcePath("resources/textures/collision.png"));
+	mNavmeshSpriteHandle = mResourceManager.lockResource<Graphics::Sprite>(RelativeResourcePath("resources/textures/testTexture.png"));
+	mPointTextureHandle = mResourceManager.lockResource<Graphics::Sprite>(RelativeResourcePath("resources/textures/collision.png"));
+	mLineTextureHandle = mResourceManager.lockResource<Graphics::Sprite>(RelativeResourcePath("resources/textures/testTexture.png"));
+	mFontHandle = mResourceManager.lockResource<Graphics::Font>(mResourceManager.getAbsoluteResourcePath(RelativeResourcePath("resources/fonts/prstart.ttf")), 16);
 }
