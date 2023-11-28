@@ -11,6 +11,7 @@ on:
       - scripts/**
       - CMakeLists.txt
       - CMakePresets.json
+  workflow_dispatch:
 jobs:
   build-ubuntu:
     runs-on: ubuntu-latest
