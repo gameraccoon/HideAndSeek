@@ -273,6 +273,25 @@
     },
     {
       "Original": {
+        "uid": "70058ab1-aefb-48d4-9b92-b4751b01dad0",
+        "name": "Start Editor",
+        "icon": {
+          "path": "scripts/scripter/icons/play.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "./bin/Editor",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
         "uid": "43f57be7-2a9d-48ec-b4b9-df75c6836197",
         "name": "Open Editor in Clion",
         "icon": {
