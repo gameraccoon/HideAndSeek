@@ -73,6 +73,6 @@ namespace Utils
 		RefreshLightBlockingGeometry(world);
 		RefreshPathBlockingGeometry(world);
 		world.clearCaches();
-		GameDataLoader::SaveWorld(world, fileName, jsonSerializerHolder);
+		GameDataLoader::SaveWorld(world, ".", fileName, jsonSerializerHolder);
 	}
 }

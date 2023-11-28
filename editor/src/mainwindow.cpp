@@ -191,7 +191,7 @@ void MainWindow::on_actionOpen_World_triggered()
 	}
 
 	createWorld();
-	GameDataLoader::LoadWorld(*mCurrentWorld.get(), fileName, mComponentSerializationHolder);
+	GameDataLoader::LoadWorld(*mCurrentWorld.get(), ".", fileName, mComponentSerializationHolder);
 	mOpenedWorldPath = fileName;
 	ui->actionCreate->setEnabled(true);
 	ui->actionCreate_Spatial->setEnabled(true);

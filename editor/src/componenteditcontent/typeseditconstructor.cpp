@@ -189,21 +189,21 @@ namespace TypesEditConstructor
 	}
 
 	template<>
-	Edit<ResourcePath>::Ptr FillEdit<ResourcePath>::Call(QLayout* layout, const QString& label, const ResourcePath& initialValue)
+	Edit<RelativeResourcePath>::Ptr FillEdit<RelativeResourcePath>::Call(QLayout* layout, const QString& label, const RelativeResourcePath& initialValue)
 	{
 		FillLabel(layout, label);
 
 		QLineEdit* stringEdit = HS_NEW QLineEdit();
-		stringEdit->setText(QString::fromStdString(initialValue));
+		stringEdit->setText(QString::fromStdString(initialValue.getRelativePathStr()));
 
-		Edit<ResourcePath>::Ptr edit = std::make_shared<Edit<ResourcePath>>(initialValue.c_str());
-		Edit<ResourcePath>::WeakPtr editWeakPtr = edit;
+		Edit<RelativeResourcePath>::Ptr edit = std::make_shared<Edit<RelativeResourcePath>>(initialValue);
+		Edit<RelativeResourcePath>::WeakPtr editWeakPtr = edit;
 
 		QObject::connect(stringEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValue)
 		{
-			if (Edit<ResourcePath>::Ptr edit = editWeakPtr.lock())
+			if (Edit<RelativeResourcePath>::Ptr edit = editWeakPtr.lock())
 			{
-				edit->transmitValueChange(static_cast<ResourcePath>(newValue.toStdString()));
+				edit->transmitValueChange(static_cast<RelativeResourcePath>(newValue.toStdString()));
 			}
 		});
 

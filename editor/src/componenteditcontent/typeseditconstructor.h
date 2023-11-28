@@ -5,7 +5,7 @@
 #include <map>
 #include <memory>
 
-#include "Base/Types/String/Path.h"
+#include "Base/Types/String/ResourcePath.h"
 
 #include <QObject>
 #include <QLayout>
@@ -57,7 +57,7 @@ namespace TypesEditConstructor
 	Edit<std::string>::Ptr FillEdit<std::string>::Call(QLayout* layout, const QString& label, const std::string& initialValue);
 
 	template<>
-	Edit<ResourcePath>::Ptr FillEdit<ResourcePath>::Call(QLayout* layout, const QString& label, const ResourcePath& initialValue);
+	Edit<RelativeResourcePath>::Ptr FillEdit<RelativeResourcePath>::Call(QLayout* layout, const QString& label, const RelativeResourcePath& initialValue);
 
 	// partial specilization for enums
 	template<typename T>
