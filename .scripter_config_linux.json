@@ -217,13 +217,70 @@
     {
       "Original": {
         "uid": "0a48c3b8-c7c6-46d4-b316-8f8ef4f39cb4",
-        "name": "Open Clion",
+        "name": "Open in Clion",
         "icon": {
           "path": "scripts/scripter/icons/clion.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
           "path": "scripts/scripter/linux/open_clion.sh",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
+        "uid": "abf27876-bc8e-484f-8863-b1b9810f3c29",
+        "name": "Generate Editor",
+        "icon": {
+          "path": "scripts/scripter/icons/cmake.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "scripts/scripter/linux/generate_editor_cmake_project.sh",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
+        "uid": "71afc78b-7c75-4633-ad28-af248ffe0da4",
+        "name": "Build Editor",
+        "icon": {
+          "path": "scripts/scripter/icons/cmake.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "scripts/scripter/linux/build_editor_project.sh",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
+        "uid": "43f57be7-2a9d-48ec-b4b9-df75c6836197",
+        "name": "Open Editor in Clion",
+        "icon": {
+          "path": "scripts/scripter/icons/clion.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "scripts/scripter/linux/open_editor_clion.sh",
           "path_type": "WorkingDirRelative"
         },
         "arguments": "",
