@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <string>
 
 #include <nlohmann/json_fwd.hpp>
 
@@ -36,7 +37,7 @@ public:
 
 	const std::filesystem::path& getRelativePath() const& noexcept { return mRelativePath; }
 	std::filesystem::path&& getRelativePath() && noexcept { return std::move(mRelativePath); }
-	std::string getRelativePathStr() const { return mRelativePath; }
+	std::string getRelativePathStr() const { return mRelativePath.string(); }
 
 private:
 	std::filesystem::path mRelativePath;

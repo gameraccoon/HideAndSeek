@@ -108,7 +108,7 @@ namespace Graphics
 	}
 
 	Surface::Surface(const AbsoluteResourcePath& filename)
-		: mSurface(IMG_Load(filename.getAbsolutePath().c_str()))
+		: mSurface(IMG_Load(filename.getAbsolutePathStr().c_str()))
 		, mTextureID(0)
 	{
 		AssertFatal(mSurface, "Unable to load texture %s", filename);

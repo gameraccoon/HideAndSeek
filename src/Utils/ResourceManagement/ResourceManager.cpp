@@ -101,7 +101,7 @@ void ResourceManager::loadAtlasesData(const RelativeResourcePath& listPath)
 		const auto& atlases = listJson.at("atlases");
 		for (const auto& atlasPath : atlases.items())
 		{
-			loadOneAtlasData(getAbsoluteResourcePath(RelativeResourcePath(atlasPath.value())));
+			loadOneAtlasData(getAbsoluteResourcePath(RelativeResourcePath(std::string(atlasPath.value()))));
 		}
 	}
 	catch(const nlohmann::detail::exception& e)
