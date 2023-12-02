@@ -9,13 +9,13 @@
  * Bitset that can be used with enum class
 */
 template <typename T>
-class Bitset
+class EnumBitset
 {
 public:
-	Bitset() = default;
+	EnumBitset() = default;
 	// can be implicitly created from T
 	template<typename... Args>
-	explicit Bitset(Args... initialValues) { set(std::forward<Args>(initialValues)...); }
+	explicit EnumBitset(Args... initialValues) { set(std::forward<Args>(initialValues)...); }
 
 	template<typename... Args>
 	void set(Args... flags) { (setInner(std::forward<Args>(flags), true), ...); }

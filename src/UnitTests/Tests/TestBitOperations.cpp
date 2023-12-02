@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/ComplexTypes/Bitset.h"
+#include "Base/Types/ComplexTypes/EnumBitset.h"
 
 TEST(Bitset, Usage)
 {
@@ -12,7 +12,7 @@ TEST(Bitset, Usage)
 	};
 
 	{
-		Bitset<TestEnum> test{TestEnum::One};
+		EnumBitset<TestEnum> test{TestEnum::One};
 		EXPECT_TRUE(test.has(TestEnum::One));
 		EXPECT_FALSE(test.has(TestEnum::Two));
 		EXPECT_FALSE(test.has(TestEnum::Three));
@@ -30,7 +30,7 @@ TEST(Bitset, Usage)
 	}
 
 	{
-		Bitset<TestEnum> test{TestEnum::One, TestEnum::Three};
+		EnumBitset<TestEnum> test{TestEnum::One, TestEnum::Three};
 		EXPECT_TRUE(test.has(TestEnum::One));
 		EXPECT_FALSE(test.has(TestEnum::Two));
 		EXPECT_TRUE(test.has(TestEnum::Three));

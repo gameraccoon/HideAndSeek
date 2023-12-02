@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base/Types/ComplexTypes/Bitset.h"
+#include "Base/Types/ComplexTypes/EnumBitset.h"
 
 #include "GameData/World.h"
 
@@ -19,7 +19,7 @@ public:
 		SkipLayoutUpdate
 	};
 
-	using EffectBitset = Bitset<EffectType>;
+	using EffectBitset = EnumBitset<EffectType>;
 
 public:
 	EditorCommand(EffectBitset effects)
