@@ -4,15 +4,19 @@
 
 #include "Utils/Application/ArgumentsParser.h"
 
-#include "HAL/Base/Engine.h"
-
 #include "GameLogic/Game/Game.h"
+
+DebugGameBehavior::DebugGameBehavior(int instanceIndex)
+	: mDebugRecordedInput(instanceIndex)
+{
+}
 
 void DebugGameBehavior::preInnerUpdate(Game& game)
 {
-	if (mForcedInputData.has_value())
+	const bool shouldQuit = mDebugRecordedInput.processFrameInput(game.mInputControllersData);
+	if (shouldQuit)
 	{
-		game.mInputControllersData = *mForcedInputData;
+		game.quitGame();
 	}
 }
 
@@ -30,10 +34,7 @@ void DebugGameBehavior::postInnerUpdate(Game& game)
 
 void DebugGameBehavior::processArguments(const ArgumentsParser& arguments)
 {
-	if (arguments.hasArgument("disable-input"))
-	{
-		mForcedInputData = HAL::InputControllersData();
-	}
+	mDebugRecordedInput.processArguments(arguments);
 
 	if (arguments.hasArgument("time-limit"))
 	{

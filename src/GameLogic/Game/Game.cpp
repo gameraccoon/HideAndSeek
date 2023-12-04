@@ -22,6 +22,7 @@
 Game::Game(HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool)
 	: HAL::GameBase(engine, resourceManager)
 	, mThreadPool(threadPool)
+	, mDebugBehavior(0)
 {
 }
 

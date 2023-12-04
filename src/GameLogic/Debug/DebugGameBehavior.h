@@ -1,10 +1,6 @@
 #pragma once
 
-#include <optional>
-
-#include "GameData/Input/GameplayInputConstants.h"
-
-#include "HAL/InputControllersData.h"
+#include "GameLogic/Debug/DebugRecordedInput.h"
 
 class Game;
 class ArgumentsParser;
@@ -12,11 +8,14 @@ class ArgumentsParser;
 class DebugGameBehavior
 {
 public:
+	DebugGameBehavior(int instanceIndex);
+
 	void preInnerUpdate(Game& game);
 	void postInnerUpdate(Game& game);
 	void processArguments(const ArgumentsParser& arguments);
 
 private:
-	std::optional<HAL::InputControllersData> mForcedInputData;
+	DebugRecordedInput mDebugRecordedInput;
+
 	int mFramesBeforeShutdown = -1;
 };
