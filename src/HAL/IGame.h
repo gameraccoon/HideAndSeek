@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 namespace HAL
 {
 	class IGame
@@ -13,5 +15,6 @@ namespace HAL
 
 		virtual void quitGame() = 0;
 		virtual bool shouldQuitGame() const = 0;
+		virtual std::chrono::duration<s64, std::micro> getFrameLengthCorrection() const = 0;
 	};
 }

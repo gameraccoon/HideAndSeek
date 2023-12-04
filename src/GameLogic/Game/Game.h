@@ -30,6 +30,8 @@ public:
 	void dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates) final;
 	void initResources() override;
 
+	std::chrono::duration<s64, std::micro> getFrameLengthCorrection() const final { return std::chrono::duration<s64, std::micro>(0); }
+
 protected:
 	ComponentFactory& getComponentFactory() { return mComponentFactory; }
 	WorldHolder& getWorldHolder() { return mWorldHolder; }
