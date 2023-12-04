@@ -4,6 +4,8 @@
 
 #include "GameData/Geometry/Vector2D.h"
 #include "GameData/Input/ControllerState.h"
+#include "GameData/Input/GameplayInputConstants.h"
+#include "GameData/Input/PlayerControllerStates.h"
 
 namespace HAL
 {
@@ -12,10 +14,7 @@ namespace HAL
 	public:
 		void resetLastFrameStates()
 		{
-			for (auto& controllerState : controllerStates)
-			{
-				controllerState.second.clearLastFrameState();
-			}
+			controllerStates.clearLastFrameState();
 		}
 
 	public:

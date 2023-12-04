@@ -1,6 +1,6 @@
 #include "Base/precomp.h"
 
-#include "GameData/Input/GameplayInput.h"
+#include "GameData/Input/GameplayInputFrameState.h"
 
 namespace GameplayInput
 {

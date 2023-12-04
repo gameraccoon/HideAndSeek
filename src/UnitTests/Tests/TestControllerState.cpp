@@ -4,9 +4,14 @@
 
 #include "GameData/Input/ControllerState.h"
 
+namespace ControllerStateTestsInternal
+{
+	using ControllerState = Input::ControllerState<1, 1>;
+}
+
 TEST(ControllerState, ButtonNotPressed)
 {
-	Input::ControllerState state;
+	ControllerStateTestsInternal::ControllerState state;
 	state.updateButtonState(0, false);
 
 	EXPECT_FALSE(state.isButtonJustPressed(0));
@@ -16,7 +21,7 @@ TEST(ControllerState, ButtonNotPressed)
 
 TEST(ControllerState, ButtonPressedThisFrame)
 {
-	Input::ControllerState state;
+	ControllerStateTestsInternal::ControllerState state;
 	state.updateButtonState(0, true);
 
 	EXPECT_TRUE(state.isButtonJustPressed(0));
@@ -26,7 +31,7 @@ TEST(ControllerState, ButtonPressedThisFrame)
 
 TEST(ControllerState, ButtonPressedAndHeld)
 {
-	Input::ControllerState state;
+	ControllerStateTestsInternal::ControllerState state;
 	state.updateButtonState(0, true);
 	state.clearLastFrameState();
 
@@ -37,7 +42,7 @@ TEST(ControllerState, ButtonPressedAndHeld)
 
 TEST(ControllerState, ButtonPressedAndThenReleased)
 {
-	Input::ControllerState state;
+	ControllerStateTestsInternal::ControllerState state;
 	state.updateButtonState(0, true);
 	state.clearLastFrameState();
 	state.updateButtonState(0, false);
@@ -50,7 +55,7 @@ TEST(ControllerState, ButtonPressedAndThenReleased)
 // some platforms can emulate button clicks by sending press and release events at the same time
 TEST(ControllerState, ButtonPressedAndReleasedWithinSameFrame)
 {
-	Input::ControllerState state;
+	ControllerStateTestsInternal::ControllerState state;
 	state.updateButtonState(0, true);
 	state.updateButtonState(0, false);
 
@@ -61,7 +66,7 @@ TEST(ControllerState, ButtonPressedAndReleasedWithinSameFrame)
 
 TEST(ControllerState, ButtonReleasedAndPressedWithinSameFrame)
 {
-	Input::ControllerState state;
+	ControllerStateTestsInternal::ControllerState state;
 	state.updateButtonState(0, true);
 	state.clearLastFrameState();
 	state.updateButtonState(0, false);
@@ -74,7 +79,7 @@ TEST(ControllerState, ButtonReleasedAndPressedWithinSameFrame)
 
 TEST(ControllerState, UpdateAxis)
 {
-	Input::ControllerState state;
+	ControllerStateTestsInternal::ControllerState state;
 	state.updateAxis(0, 0.5f);
 
 	EXPECT_EQ(state.getAxisValue(0), 0.5f);

@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "GameData/Input/GameplayInput.h"
+#include "GameData/Input/GameplayInputFrameState.h"
 
 TEST(GameplayInput, KeyInactive)
 {

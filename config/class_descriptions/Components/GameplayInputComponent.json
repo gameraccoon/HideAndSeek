@@ -5,7 +5,7 @@
 			"name": "currentFrameState",
 			"type": "GameplayInput::FrameState",
 			"includes": [
-				"\"GameData/Input/GameplayInput.h\""
+				"\"GameData/Input/GameplayInputFrameState.h\""
 			],
 			"flags": ["get_by_ref", "transient"]
 		}

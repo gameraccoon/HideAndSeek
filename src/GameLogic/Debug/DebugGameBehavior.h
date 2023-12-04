@@ -2,6 +2,8 @@
 
 #include <optional>
 
+#include "GameData/Input/GameplayInputConstants.h"
+
 #include "HAL/InputControllersData.h"
 
 class Game;

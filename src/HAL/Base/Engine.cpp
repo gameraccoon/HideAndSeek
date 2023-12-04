@@ -13,7 +13,6 @@
 #include "HAL/Base/GameLoop.h"
 #include "HAL/Graphics/Renderer.h"
 #include "HAL/IGame.h"
-#include "HAL/InputControllersData.h"
 #include "HAL/Internal/GlContext.h"
 #include "HAL/Internal/Sdl.h"
 #include "HAL/Internal/SdlWindow.h"
@@ -154,25 +153,25 @@ namespace HAL
 			case SDL_KEYDOWN:
 				if (mInputDataPtr)
 				{
-					mInputDataPtr->controllerStates[Input::ControllerType::Keyboard].updateButtonState(event.key.keysym.sym, true);
+					mInputDataPtr->controllerStates.keyboardState.updateButtonState(event.key.keysym.scancode, true);
 				}
 				break;
 			case SDL_KEYUP:
 				if (mInputDataPtr)
 				{
-					mInputDataPtr->controllerStates[Input::ControllerType::Keyboard].updateButtonState(event.key.keysym.sym, false);
+					mInputDataPtr->controllerStates.keyboardState.updateButtonState(event.key.keysym.scancode, false);
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				if (mInputDataPtr)
 				{
-					mInputDataPtr->controllerStates[Input::ControllerType::Mouse].updateButtonState(event.button.button, true);
+					mInputDataPtr->controllerStates.mouseState.updateButtonState(event.button.button, true);
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
 				if (mInputDataPtr)
 				{
-					mInputDataPtr->controllerStates[Input::ControllerType::Mouse].updateButtonState(event.button.button, false);
+					mInputDataPtr->controllerStates.mouseState.updateButtonState(event.button.button, false);
 				}
 				break;
 			case SDL_MOUSEMOTION:
@@ -183,8 +182,8 @@ namespace HAL
 						(event.motion.x / windowSize.x) * 2.0f - 1.0f,
 						(event.motion.y / windowSize.y) * 2.0f - 1.0f
 					};
-					mInputDataPtr->controllerStates[Input::ControllerType::Mouse].updateAxis(0, mouseRelativePos.x);
-					mInputDataPtr->controllerStates[Input::ControllerType::Mouse].updateAxis(1, mouseRelativePos.y);
+					mInputDataPtr->controllerStates.mouseState.updateAxis(0, mouseRelativePos.x);
+					mInputDataPtr->controllerStates.mouseState.updateAxis(1, mouseRelativePos.y);
 				}
 				break;
 			default:

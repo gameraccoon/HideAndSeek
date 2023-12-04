@@ -3,6 +3,7 @@
 #include <array>
 
 #include "GameData/Time/GameplayTimestamp.h"
+#include "GameData/Input/GameplayInputConstants.h"
 
 namespace GameplayInput
 {
@@ -12,24 +13,6 @@ namespace GameplayInput
 		JustActivated = 1,
 		Active = 2,
 		JustDeactivated = 3,
-	};
-
-	enum class InputAxis
-	{
-		MoveHorizontal = 0,
-		MoveVertical,
-		AimHorizontal,
-		AimVertical,
-		// add new elements above this line
-		Count
-	};
-
-	enum class InputKey
-	{
-		Shoot = 0,
-		Sprint,
-		// add new elements above this line
-		Count
 	};
 
 	class FrameState

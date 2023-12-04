@@ -2,7 +2,9 @@
 
 #include <memory>
 
-#include "GameData/Geometry/Vector2D.h"
+#include "GameData/Input/GameplayInputConstants.h"
+
+#include "HAL/InputControllersData.h"
 
 struct SDL_Window;
 union SDL_Event;
@@ -10,7 +12,6 @@ union SDL_Event;
 namespace HAL
 {
 	class IGame;
-	class InputControllersData;
 
 	class Engine
 	{
@@ -24,7 +25,7 @@ namespace HAL
 
 		~Engine();
 
-		void init(IGame* game, InputControllersData* inputData);
+		void init(IGame* game, InputControllersData* inputControllersData);
 		void start();
 
 		Vector2D getWindowSize() const;

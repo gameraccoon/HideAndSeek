@@ -9,25 +9,23 @@ namespace Input
 	PressSingleButtonKeyBinding::PressSingleButtonKeyBinding(ControllerType controllerType, int button)
 		: mControllerType(controllerType)
 		, mButton(button)
-	{}
+	{
+		AssertFatal(mControllerType < ControllerType::Count, "Invalid controller type specified");
+	}
 
 	GameplayInput::KeyState PressSingleButtonKeyBinding::getState(const PlayerControllerStates& controllerStates) const
 	{
 		using namespace GameplayInput;
 
-		const auto& it = controllerStates.find(mControllerType);
-		if (it == controllerStates.end())
-		{
-			return KeyState::Inactive;
-		}
+		const auto& state = controllerStates.getState(mControllerType);
 
-		if (it->second.isButtonPressed(mButton))
+		if (state.isButtonPressed(mButton))
 		{
-			return it->second.isButtonJustPressed(mButton) ? KeyState::JustActivated : KeyState::Active;
+			return state.isButtonJustPressed(mButton) ? KeyState::JustActivated : KeyState::Active;
 		}
 		else
 		{
-			return it->second.isButtonJustReleased(mButton) ? KeyState::JustDeactivated: KeyState::Inactive;
+			return state.isButtonJustReleased(mButton) ? KeyState::JustDeactivated : KeyState::Inactive;
 		}
 	}
 
@@ -45,11 +43,7 @@ namespace Input
 			return KeyState::Inactive;
 		}
 
-		const auto& it = controllerStates.find(mControllerType);
-		if (it == controllerStates.end())
-		{
-			return KeyState::Inactive;
-		}
+		const auto& state = controllerStates.getState(mControllerType);
 
 		size_t countPressed = 0;
 		// note that some keys can be justPressed and justReleased during the same frame
@@ -61,9 +55,9 @@ namespace Input
 		for (const int button : mButtons)
 		{
 			// none of these three are exclusive
-			const bool isPressed = it->second.isButtonPressed(button);
-			const bool isJustPressed = it->second.isButtonJustPressed(button);
-			const bool isJustReleased = it->second.isButtonJustReleased(button);
+			const bool isPressed = state.isButtonPressed(button);
+			const bool isJustPressed = state.isButtonJustPressed(button);
+			const bool isJustReleased = state.isButtonJustReleased(button);
 
 			// to manage special cases when one button changed state twice in one frame
 			const bool flipFlopDownUp = isJustPressed && isJustReleased && !isPressed;
@@ -102,8 +96,8 @@ namespace Input
 
 	float PositiveButtonAxisBinding::getAxisValue(const PlayerControllerStates& controllerStates) const
 	{
-		const auto& it = controllerStates.find(mControllerType);
-		return (it != controllerStates.end() && it->second.isButtonPressed(mButton)) ? 1.0f : 0.0f;
+		const auto& state = controllerStates.getState(mControllerType);
+		return state.isButtonPressed(mButton) ? 1.0f : 0.0f;
 	}
 
 	NegativeButtonAxisBinding::NegativeButtonAxisBinding(ControllerType controllerType, int button)
@@ -113,8 +107,8 @@ namespace Input
 
 	float NegativeButtonAxisBinding::getAxisValue(const PlayerControllerStates& controllerStates) const
 	{
-		const auto& it = controllerStates.find(mControllerType);
-		return (it != controllerStates.end() && it->second.isButtonPressed(mButton)) ? -1.0f : 0.0f;
+		const auto& state = controllerStates.getState(mControllerType);
+		return state.isButtonPressed(mButton) ? -1.0f : 0.0f;
 	}
 
 	DirectAxisToAxisBinding::DirectAxisToAxisBinding(ControllerType controllerType, int axis)
@@ -124,8 +118,8 @@ namespace Input
 
 	float DirectAxisToAxisBinding::getAxisValue(const PlayerControllerStates& controllerStates) const
 	{
-		const auto& it = controllerStates.find(mControllerType);
-		return (it != controllerStates.end()) ? it->second.getAxisValue(mAxis) : 0.0f;
+		const auto& state = controllerStates.getState(mControllerType);
+		return state.getAxisValue(mAxis);
 	}
 
 	GameplayInput::KeyState InputBindings::GetKeyState(const std::vector<std::unique_ptr<KeyBinding>>& bindings, const PlayerControllerStates& controllerStates)

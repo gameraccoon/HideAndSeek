@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <memory>
 
-#include "GameData/Input/ControllerState.h"
-#include "GameData/Input/GameplayInput.h"
+#include "GameData/Input/GameplayInputFrameState.h"
+#include "GameData/Input/PlayerControllerStates.h"
 
 namespace Input
 {
