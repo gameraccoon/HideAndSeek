@@ -17,13 +17,13 @@ namespace Input
 		static constexpr size_t GamepadButtonCount = 21;
 
 		// supported axes count for each controller type
-		static constexpr size_t KeyboardAxisCount = 0;
-		static constexpr size_t MouseAxisCount = 2;
-		static constexpr size_t GamepadAxisCount = 8;
+		static constexpr size_t KeyboardAxesCount = 0;
+		static constexpr size_t MouseAxesCount = 2;
+		static constexpr size_t GamepadAxesCount = 8;
 
-		using KeyboardState = ControllerState<KeyboardButtonCount, KeyboardAxisCount>;
-		using MouseState = ControllerState<MouseButtonCount, MouseAxisCount>;
-		using GamepadState = ControllerState<GamepadButtonCount, GamepadAxisCount>;
+		using KeyboardState = ControllerState<KeyboardButtonCount, KeyboardAxesCount>;
+		using MouseState = ControllerState<MouseButtonCount, MouseAxesCount>;
+		using GamepadState = ControllerState<GamepadButtonCount, GamepadAxesCount>;
 
 		KeyboardState keyboardState;
 		MouseState mouseState;
