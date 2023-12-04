@@ -4,7 +4,7 @@
 
 #include "Base/Types/ComplexTypes/EnumBitset.h"
 
-TEST(Bitset, Usage)
+TEST(EnumBitset, Usage)
 {
 	enum class TestEnum
 	{
