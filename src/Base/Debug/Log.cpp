@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <filesystem>
 #include <iostream>
+#include <thread>
 
 Log::Log()
 {
@@ -34,37 +35,35 @@ Log& Log::Instance()
 
 void Log::writeError(const std::string& text)
 {
-	writeLine(std::string(" Error: ").append(text));
-	mLogFileStream << std::flush;
+	writeLine("Error: ", text);
 }
 
 void Log::writeWarning(const std::string& text)
 {
-	writeLine(std::string(" Warning: ").append(text));
-	mLogFileStream << std::flush;
+	writeLine("Warning: ", text);
 }
 
 void Log::writeLog(const std::string& text)
 {
-	writeLine(std::string(" Log: ").append(text));
-	mLogFileStream << std::flush;
+	writeLine("Log: ", text);
 }
 
 void Log::writeInit(const std::string& text)
 {
-	writeLine(std::string(" Init: ").append(text));
-	mLogFileStream << std::flush;
+	writeLine("Init: ", text);
 }
 
-void Log::writeLine(const std::string& text)
+void Log::writeLine(const char* logPrefix, const std::string& text)
 {
 	if (mLogFileStream.is_open())
 	{
 		auto now = std::chrono::system_clock::now();
 		auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
-		mLogFileStream << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
-		mLogFileStream << text << "\n";
+		mLogWriteMutex.lock();
+		mLogFileStream << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X [") << std::this_thread::get_id() << "] ";
+		mLogFileStream << logPrefix << text << "\n" << std::flush;
+		mLogWriteMutex.unlock();
 	}
 
 	std::clog << text << "\n";

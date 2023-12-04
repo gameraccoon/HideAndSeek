@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <string>
+#include <mutex>
 
 /**
  * Class that helps to write log messages
@@ -26,10 +27,11 @@ public:
 
 private:
 	/** Write line with timestamp */
-	void writeLine(const std::string& text);
+	void writeLine(const char* logPrefix, const std::string& text);
 
 	/** Filestream that holds the logfile handler */
 	std::ofstream mLogFileStream;
+	std::mutex mLogWriteMutex;
 
 	/* Turn off unusable operations */
 	Log();
