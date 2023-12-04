@@ -19,7 +19,7 @@ public:
 	}
 
 	UniqueAny& operator=(UniqueAny&) = delete;
-	UniqueAny& operator=(UniqueAny&& other) {
+	UniqueAny& operator=(UniqueAny&& other) noexcept {
 		mData = std::move(other.mData);
 		return *this;
 	}
