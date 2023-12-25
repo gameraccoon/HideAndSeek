@@ -37,7 +37,7 @@ public:
 	void paintEvent(QPaintEvent* event) override;
 
 	void onClick(const class QPoint& pos);
-	std::vector<WorldCell*> getCellsOnScreen();
+	SpatialEntityManager::RecordsVector getCellsOnScreen();
 	SpatialEntity getEntityUnderPoint(const QPoint& pos);
 
 	void onCoordinateXChanged(const QString& newValueStr);

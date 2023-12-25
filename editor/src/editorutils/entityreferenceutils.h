@@ -1,6 +1,6 @@
 #pragma once
 
-#include <raccoon-ecs/entity_view.h>
+#include <raccoon-ecs/utils/entity_view.h>
 
 #include "GameData/Spatial/SpatialEntity.h"
 

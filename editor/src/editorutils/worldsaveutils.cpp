@@ -30,8 +30,8 @@ namespace Utils
 	{
 		RemoveCellComponent<LightBlockingGeometryComponent>(world);
 
-		TupleVector<WorldCell*, const CollisionComponent*, const TransformComponent*> components;
-		world.getSpatialData().getAllCellManagers().getSpatialComponents<const CollisionComponent, const TransformComponent>(components);
+		TupleVector<std::reference_wrapper<WorldCell>, const CollisionComponent*, const TransformComponent*> components;
+		world.getSpatialData().getAllCellManagers().getComponentsWithExtraData<const CollisionComponent, const TransformComponent>(components);
 		std::unordered_map<CellPos, std::vector<SimpleBorder>> lightBlockingGeometryPieces;
 		LightBlockingGeometry::CalculateLightGeometry(lightBlockingGeometryPieces, components);
 

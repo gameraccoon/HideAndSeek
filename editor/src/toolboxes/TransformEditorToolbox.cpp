@@ -529,16 +529,17 @@ void TransformEditorWidget::paintEvent(QPaintEvent*)
 
 	int crossSize = static_cast<int>(5.0f * mScale);
 
-	std::vector<WorldCell*> cells = getCellsOnScreen();
-	for (WorldCell* cell : cells)
+	SpatialEntityManager::RecordsVector cells = getCellsOnScreen();
+	for (SpatialEntityManager::Record& record : cells)
 	{
-		cell->getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
-			[&painter, cell, crossSize, this](Entity entity, const TransformComponent* transform)
+		WorldCell& cell = record.extraData;
+		cell.getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
+			[&painter, &cell, crossSize, this](Entity entity, const TransformComponent* transform)
 		{
-			CellPos cellPos = cell->getPos();
+			CellPos cellPos = cell.getPos();
 			Vector2D location = transform->getLocation();
 
-			auto [collision] = cell->getEntityManager().getEntityComponents<const CollisionComponent>(entity);
+			auto [collision] = cell.getEntityManager().getEntityComponents<const CollisionComponent>(entity);
 
 			if (std::find(mSelectedEntities.begin(), mSelectedEntities.end(), SpatialEntity(entity, cellPos)) != mSelectedEntities.end())
 			{
@@ -666,7 +667,7 @@ void TransformEditorWidget::onClick(const QPoint& pos)
 	updateSelectedEntitiesPosition();
 }
 
-std::vector<WorldCell*> TransformEditorWidget::getCellsOnScreen()
+SpatialEntityManager::RecordsVector TransformEditorWidget::getCellsOnScreen()
 {
 	Vector2D screenSizeInWorld = Vector2D(size().width(), size().height()) / mScale;
 	Vector2D screenCenterPos = screenSizeInWorld*0.5f - Vector2D(mPosShift.x(), mPosShift.y());
@@ -681,11 +682,12 @@ SpatialEntity TransformEditorWidget::getEntityUnderPoint(const QPoint& pos)
 
 	if (mWorld)
 	{
-		std::vector<WorldCell*> cells = getCellsOnScreen();
-		for (WorldCell* cell : cells)
+		SpatialEntityManager::RecordsVector cells = getCellsOnScreen();
+		for (SpatialEntityManager::Record& record : cells)
 		{
-			cell->getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
-				[worldPos, cellPos = cell->getPos(), &findResult](Entity entity, const TransformComponent* transform)
+			WorldCell& cell = record.extraData;
+			cell.getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
+				[worldPos, cellPos = cell.getPos(), &findResult](Entity entity, const TransformComponent* transform)
 			{
 				Vector2D location = transform->getLocation();
 				if (location.x - 10 < worldPos.x && location.x + 10 > worldPos.x
@@ -775,11 +777,12 @@ void TransformEditorWidget::addEntitiesInRectToSelection(const Vector2D& start, 
 
 	if (mWorld)
 	{
-		std::vector<WorldCell*> cells = getCellsOnScreen();
-		for (WorldCell* cell : cells)
+		SpatialEntityManager::RecordsVector cells = getCellsOnScreen();
+		for (SpatialEntityManager::Record& record : cells)
 		{
-			cell->getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
-				[this, lt, rd, cellPos = cell->getPos()](Entity entity, const TransformComponent* transform)
+			WorldCell& cell = record.extraData;
+			cell.getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
+				[this, lt, rd, cellPos = cell.getPos()](Entity entity, const TransformComponent* transform)
 			{
 				Vector2D location = transform->getLocation();
 				if (lt.x < location.x && location.x < rd.x && lt.y < location.y && location.y < rd.y)
