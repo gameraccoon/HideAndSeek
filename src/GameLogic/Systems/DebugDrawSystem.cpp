@@ -115,11 +115,11 @@ void DebugDrawSystem::update()
 
 	if (renderMode && renderMode->getIsDrawDebugCellInfoEnabled())
 	{
-		std::vector<WorldCell*> cellsAround = world.getSpatialData().getCellsAround(cameraLocation, screenHalfSize*2.0f);
+		SpatialEntityManager::RecordsVector cellsAround = world.getSpatialData().getCellsAround(cameraLocation, screenHalfSize*2.0f);
 
-		for (WorldCell* cell : cellsAround)
+		for (SpatialEntityManager::Record& record : cellsAround)
 		{
-			CellPos cellPos = cell->getPos();
+			CellPos cellPos = record.extraData.get().getPos();
 			Vector2D location = SpatialWorldData::GetRelativeLocation(cameraCell, cellPos, drawShift);
 			QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
 			quadData.position = location;

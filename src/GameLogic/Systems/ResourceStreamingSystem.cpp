@@ -38,10 +38,10 @@ void ResourceStreamingSystem::update()
 
 	// load sprites
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(worldCachedData->getCameraPos(), workingRect);
-	spatialManager.forEachSpatialComponentSetWithEntity<SpriteCreatorComponent>(
-			[this](WorldCell* cell, Entity entity, SpriteCreatorComponent* spriteCreator)
+	spatialManager.forEachComponentSetWithEntityAndExtraData<SpriteCreatorComponent>(
+			[this](WorldCell& cell, Entity entity, SpriteCreatorComponent* spriteCreator)
 	{
-		EntityView entityView{entity, cell->getEntityManager() };
+		EntityView entityView{entity, cell.getEntityManager() };
 		const auto& descriptions = spriteCreator->getDescriptions();
 		Assert(!descriptions.empty(), "Sprite descriptions should not be empty");
 
@@ -62,10 +62,10 @@ void ResourceStreamingSystem::update()
 	spatialManager.executeScheduledActions();
 
 	// load single animations clips
-	spatialManager.forEachSpatialComponentSetWithEntity<AnimationClipCreatorComponent>(
-			[this](WorldCell* cell, Entity entity, AnimationClipCreatorComponent* animationClipCreator)
+	spatialManager.forEachComponentSetWithEntityAndExtraData<AnimationClipCreatorComponent>(
+			[this](WorldCell& cell, Entity entity, AnimationClipCreatorComponent* animationClipCreator)
 	{
-		EntityView entityView{entity, cell->getEntityManager() };
+		EntityView entityView{entity, cell.getEntityManager() };
 
 		const auto& descriptions = animationClipCreator->getDescriptionsRef();
 		Assert(!descriptions.empty(), "Animation descriptions should not be empty");
@@ -105,10 +105,10 @@ void ResourceStreamingSystem::update()
 	spatialManager.executeScheduledActions();
 
 	// load animation groups
-	spatialManager.forEachSpatialComponentSetWithEntity<AnimationGroupCreatorComponent>(
-			[this](WorldCell* cell, Entity entity, AnimationGroupCreatorComponent* animationGroupCreator)
+	spatialManager.forEachComponentSetWithEntityAndExtraData<AnimationGroupCreatorComponent>(
+			[this](WorldCell& cell, Entity entity, AnimationGroupCreatorComponent* animationGroupCreator)
 	{
-		EntityView entityView{entity, cell->getEntityManager() };
+		EntityView entityView{entity, cell.getEntityManager() };
 
 		AnimationGroupsComponent* animationGroups = entityView.scheduleAddComponent<AnimationGroupsComponent>();
 

@@ -71,7 +71,7 @@ namespace LightBlockingGeometry
 		std::unordered_map<CellPos, CellGeometry> cellGeometry;
 		for (const auto& [cell, collision, transform] : collisionGeometry)
 		{
-			CellGeometry& currentCellGeometry = cellGeometry[cell->getPos()];
+			CellGeometry& currentCellGeometry = cellGeometry[cell.get().getPos()];
 
 			const Vector2D location = transform->getLocation();
 			const Hull& hull = collision->getGeometry();
@@ -79,9 +79,9 @@ namespace LightBlockingGeometry
 			currentCellGeometry.emplace_back(hull.borders, location);
 			const ShapeOperations::MergedGeometry& newGeometry = currentCellGeometry.back();
 
-			const CellPos currentCellPos = cell->getPos();
+			const CellPos currentCellPos = cell.get().getPos();
 
-			const BoundingBox cellAABB = SpatialWorldData::GetCellAABB(cell->getPos());
+			const BoundingBox cellAABB = SpatialWorldData::GetCellAABB(cell.get().getPos());
 
 			const bool intersectsMinX = newGeometry.aabb.minX < cellAABB.minX;
 			const bool intersectsMaxX = newGeometry.aabb.maxX >= cellAABB.maxX;

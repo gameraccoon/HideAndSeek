@@ -18,7 +18,7 @@ public:
 	 * @param rect sizes of the rectangle
 	 * @return pointers to loaded cells meeting the criteria
 	 */
-	std::vector<WorldCell*> getCellsAround(const Vector2D& centerPosition, const Vector2D& rect);
+	SpatialEntityManager::RecordsVector getCellsAround(const Vector2D& centerPosition, const Vector2D& rect);
 	SpatialEntityManager getCellManagersAround(const Vector2D& centerPosition, const Vector2D& rect);
 	WorldCell* getCell(const CellPos& pos);
 	WorldCell& getOrCreateCell(const CellPos& pos);

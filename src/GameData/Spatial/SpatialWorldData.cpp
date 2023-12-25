@@ -17,7 +17,7 @@ SpatialWorldData::SpatialWorldData(const ComponentFactory& componentFactory, Rac
 	, mEntityGenerator(entityGenerator)
 {}
 
-std::vector<WorldCell*> SpatialWorldData::getCellsAround(const Vector2D& centerPosition, const Vector2D& rect)
+SpatialEntityManager::RecordsVector SpatialWorldData::getCellsAround(const Vector2D& centerPosition, const Vector2D& rect)
 {
 	CellPos ltCell = CellPos(
 		static_cast<int>((centerPosition.x - rect.x * 0.5f - MaxObjectSize) / CellSize - 1),
@@ -29,7 +29,7 @@ std::vector<WorldCell*> SpatialWorldData::getCellsAround(const Vector2D& centerP
 		static_cast<int>((centerPosition.y + rect.y * 0.5f + MaxObjectSize) / CellSize)
 	);
 
-	std::vector<WorldCell*> result;
+	SpatialEntityManager::RecordsVector result;
 	result.reserve((rbCell.x - ltCell.x) * (rbCell.y - ltCell.y));
 
 	for (int i = ltCell.x; i <= rbCell.x; ++i)
@@ -39,7 +39,7 @@ std::vector<WorldCell*> SpatialWorldData::getCellsAround(const Vector2D& centerP
 			auto it = mCells.find(CellPos(i, j));
 			if (it != mCells.end())
 			{
-				result.push_back(&it->second);
+				result.emplace_back(it->second.getEntityManager(), it->second);
 			}
 		}
 	}
@@ -75,22 +75,22 @@ WorldCell& SpatialWorldData::getOrCreateCell(const CellPos& pos)
 
 SpatialEntityManager SpatialWorldData::getAllCellManagers()
 {
-	std::vector<WorldCell*> cells;
+	SpatialEntityManager::RecordsVector cells;
 	cells.reserve(mCells.size());
 	for (std::pair<const CellPos, WorldCell>& cell : mCells)
 	{
-		cells.push_back(&cell.second);
+		cells.emplace_back(cell.second.getEntityManager(), cell.second);
 	}
 	return SpatialEntityManager(cells);
 }
 
 ConstSpatialEntityManager SpatialWorldData::getAllCellManagers() const
 {
-	std::vector<const WorldCell*> cells;
+	ConstSpatialEntityManager::RecordsVector cells;
 	cells.reserve(mCells.size());
 	for (const std::pair<const CellPos, WorldCell>& cell : mCells)
 	{
-		cells.push_back(&cell.second);
+		cells.emplace_back(cell.second.getEntityManager(), cell.second);
 	}
 	return ConstSpatialEntityManager(cells);
 }

@@ -2,7 +2,7 @@
 
 #include <thread>
 
-#include <raccoon-ecs/systems_manager.h>
+#include <raccoon-ecs/utils/systems_manager.h>
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"

@@ -60,7 +60,7 @@ void RenderSystem::update()
 
 	Vector2D drawShift = halfWindowSize - cameraLocation;
 
-	std::vector<WorldCell*> cells = world.getSpatialData().getCellsAround(cameraLocation, workingRect);
+	SpatialEntityManager::RecordsVector cells = world.getSpatialData().getCellsAround(cameraLocation, workingRect);
 	SpatialEntityManager spatialManager(cells);
 
 	auto [renderAccessorCmp] = gameData.getGameComponents().getComponents<RenderAccessorComponent>();
@@ -199,16 +199,16 @@ static size_t GetJobDivisor(size_t maxThreadsCount)
 	return maxThreadsCount * 3 - 1;
 }
 
-void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, std::vector<WorldCell*>& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize, const GameplayTimestamp& timestampNow)
+void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, SpatialEntityManager::RecordsVector& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize, const GameplayTimestamp& timestampNow)
 {
 	SCOPED_PROFILER("RenderSystem::drawLights");
 
 	// get all the collidable components
 	std::vector<const LightBlockingGeometryComponent*> lightBlockingComponents;
 	lightBlockingComponents.reserve(cells.size());
-	for (WorldCell* cell : cells)
+	for (SpatialEntityManager::Record& record : cells)
 	{
-		auto [lightBlockingGeometry] = cell->getCellComponents().getComponents<const LightBlockingGeometryComponent>();
+		auto [lightBlockingGeometry] = record.extraData.get().getCellComponents().getComponents<const LightBlockingGeometryComponent>();
 		if (lightBlockingGeometry) [[likely]]
 		{
 			lightBlockingComponents.push_back(lightBlockingGeometry);

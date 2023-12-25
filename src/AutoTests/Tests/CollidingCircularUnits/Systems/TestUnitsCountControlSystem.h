@@ -1,6 +1,6 @@
 #pragma once
 
-#include <raccoon-ecs/system.h>
+#include <raccoon-ecs/utils/system.h>
 
 #include "GameData/EcsDefinitions.h"
 

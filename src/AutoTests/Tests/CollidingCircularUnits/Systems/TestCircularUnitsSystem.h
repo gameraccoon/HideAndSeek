@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <raccoon-ecs/system.h>
+#include <raccoon-ecs/utils/system.h>
 
 class WorldHolder;
 

@@ -20,11 +20,11 @@ void DeadEntitiesDestructionSystem::update()
 	SCOPED_PROFILER("DeadEntitiesDestructionSystem::update");
 	World& world = mWorldHolder.getWorld();
 
-	TupleVector<WorldCell*, Entity, const DeathComponent*> components;
-	world.getSpatialData().getAllCellManagers().getSpatialComponentsWithEntities<const DeathComponent>(components);
+	TupleVector<std::reference_wrapper<WorldCell>, Entity, const DeathComponent*> components;
+	world.getSpatialData().getAllCellManagers().getComponentsWithEntitiesAndExtraData<const DeathComponent>(components);
 
 	for (const auto& componentTuple : components)
 	{
-		std::get<0>(componentTuple)->getEntityManager().removeEntity(std::get<1>(componentTuple));
+		std::get<0>(componentTuple).get().getEntityManager().removeEntity(std::get<1>(componentTuple));
 	}
 }
