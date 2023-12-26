@@ -54,13 +54,13 @@ void WeaponSystem::update()
 
 	std::vector<ShotInfo> shotsToMake;
 	world.getSpatialData().getAllCellManagers().forEachComponentSetWithEntityAndExtraData<WeaponComponent, CharacterStateComponent>(
-		[currentTime, &shotsToMake](WorldCell& cell, Entity entity, WeaponComponent* weapon, CharacterStateComponent* characterState)
+		[currentTime, &shotsToMake](WorldCell& cell, EntityView entityView, WeaponComponent* weapon, CharacterStateComponent* characterState)
 	{
 		if (characterState->getState() == CharacterState::Shoot || characterState->getState() == CharacterState::WalkAndShoot)
 		{
 			if (currentTime > weapon->getShotFinishTimestamp())
 			{
-				ShotInfo shot(entity);
+				ShotInfo shot(entityView.getEntity());
 				shot.instigatorCell = &cell;
 				shot.distance = weapon->getShotDistance();
 				shot.damage = weapon->getDamageValue();

@@ -11,7 +11,7 @@
 #include <raccoon-ecs/utils/entity_view.h>
 
 using EntityManager = RaccoonEcs::EntityManagerImpl<StringId>;
-using EntityView = RaccoonEcs::EntityViewImpl<StringId>;
+using EntityView = RaccoonEcs::EntityViewImpl<EntityManager>;
 using ComponentSetHolder = RaccoonEcs::ComponentSetHolderImpl<StringId>;
 using ComponentFactory = RaccoonEcs::ComponentFactoryImpl<StringId>;
 using TypedComponent = RaccoonEcs::TypedComponentImpl<StringId>;

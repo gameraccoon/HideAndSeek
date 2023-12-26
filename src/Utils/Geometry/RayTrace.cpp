@@ -88,7 +88,7 @@ namespace RayTrace
 
 		// ToDo: choose only potentially intersecting cells
 		world.getSpatialData().getAllCellManagers().forEachComponentSetWithEntityAndExtraData<const CollisionComponent, const TransformComponent>(
-			[&result, &minRayQLength, startPoint, endPoint](WorldCell& cell, Entity entity, const CollisionComponent* collision, const TransformComponent* transform)
+			[&result, &minRayQLength, startPoint, endPoint](WorldCell& cell, EntityView entityView, const CollisionComponent* collision, const TransformComponent* transform)
 		{
 			Vector2D transformedStartPoint = startPoint - transform->getLocation();
 			Vector2D transformedEndPoint = endPoint - transform->getLocation();
@@ -125,7 +125,7 @@ namespace RayTrace
 						{
 							minRayQLength = rayQLength;
 							result.hasHit = true;
-							result.hitEntity.entity = entity;
+							result.hitEntity.entity = entityView.getEntity();
 							result.hitEntity.cell = cell.getPos();
 							result.hitPoint = transform->getLocation() + hitLocation;
 							result.hitBorderNormal = border.getNormal();
@@ -157,7 +157,7 @@ namespace RayTrace
 							{
 								minRayQLength = rayQLength;
 								result.hasHit = true;
-								result.hitEntity.entity = entity;
+								result.hitEntity.entity = entityView.getEntity();
 								result.hitEntity.cell = cell.getPos();
 								result.hitPoint = startPoint + d * t1;
 								result.hitBorderNormal = (result.hitPoint - transform->getLocation()).unit();
