@@ -10,7 +10,10 @@
       "name": "linux-ninja",
       "displayName": "Linux",
       "description": "Default linux build using Ninja generator",
-      "generator": "Ninja"
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     }
   ]
 }
