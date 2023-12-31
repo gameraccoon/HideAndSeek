@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <optional>
 
 #include "GameLogic/Game/Game.h"
 
@@ -15,7 +16,7 @@ class HapGame : public Game
 public:
 	using Game::Game;
 
-	void preStart(const ArgumentsParser& arguments, const RenderAccessorGameRef& renderAccessor);
+	void preStart(const ArgumentsParser& arguments, std::optional<RenderAccessorGameRef> renderAccessor);
 	void initResources() override;
 
 	void quitGame() override { mShouldQuit = true; }

@@ -37,7 +37,7 @@
 
 #include "GameLogic/Initialization/StateMachines.h"
 
-void HapGame::preStart(const ArgumentsParser& arguments, const RenderAccessorGameRef& renderAccessor)
+void HapGame::preStart(const ArgumentsParser& arguments, const std::optional<RenderAccessorGameRef> renderAccessor)
 {
 	SCOPED_PROFILER("HapGame::start");
 
@@ -64,8 +64,6 @@ void HapGame::initSystems()
 {
 	SCOPED_PROFILER("HapGame::initSystems");
 
-	AssertFatal(getEngine(), "HapGame was created without Engine, we are going to crash");
-
 	getPreFrameSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData());
 	getGameLogicSystemsManager().registerSystem<ControlSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<AiSystem>(getWorldHolder());
@@ -81,7 +79,10 @@ void HapGame::initSystems()
 	getPostFrameSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getResourceManager());
 
 #ifdef IMGUI_ENABLED
-	getPostFrameSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, *getEngine());
+	if (HAL::Engine* engine = getEngine())
+	{
+		getPostFrameSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, *engine);
+	}
 #endif // IMGUI_ENABLED
 }
 

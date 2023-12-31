@@ -9,6 +9,7 @@
 #include "Utils/Application/ArgumentsParser.h"
 
 #include "HAL/Base/Engine.h"
+#include "HAL/Base/GameLoop.h"
 
 #include "GameLogic/Game/HapGame.h"
 #include "GameLogic/Game/ApplicationData.h"
@@ -30,17 +31,34 @@ int main(int argc, char** argv)
 		return true;
 	}
 
+	const bool isRenderEnabled = !arguments.hasArgument("no-render");
+
 	ApplicationData applicationData(arguments.getIntArgumentValue("threads-count").getValueOr(ApplicationData::DefaultWorkerThreadCount));
-	HAL::Engine engine(800, 600);
+	std::unique_ptr<HAL::Engine> engine;
+	if (isRenderEnabled)
+	{
+		engine = std::make_unique<HAL::Engine>(800, 600);
 
-	// switch render context to render thread
-	engine.releaseRenderContext();
-	applicationData.renderThread.startThread(applicationData.resourceManager, engine, [&engine]{ engine.acquireRenderContext(); });
+		// switch render context to render thread
+		engine->releaseRenderContext();
+		applicationData.renderThread.startThread(applicationData.resourceManager, *engine, [&engine]
+		{
+			engine->acquireRenderContext();
+		});
+	}
 
-	HapGame game(&engine, applicationData.resourceManager, applicationData.threadPool);
-	game.preStart(arguments, RenderAccessorGameRef(applicationData.renderThread.getAccessor(), 0));
+	HapGame game(engine.get(), applicationData.resourceManager, applicationData.threadPool);
+	const std::optional<RenderAccessorGameRef> renderAccessor = isRenderEnabled ? std::optional<RenderAccessorGameRef>(RenderAccessorGameRef(applicationData.renderThread.getAccessor(), 0)) : std::nullopt;
+	game.preStart(arguments, renderAccessor);
 	game.initResources();
-	engine.start();	// this call waits until the game is being shut down
+	if (isRenderEnabled)
+	{
+		engine->start(); // this call waits until the game is being shut down
+	}
+	else
+	{
+		HAL::RunGameLoop(game);
+	}
 	game.onGameShutdown();
 
 	applicationData.shutdownThreads(); // this call waits for the threads to be joined

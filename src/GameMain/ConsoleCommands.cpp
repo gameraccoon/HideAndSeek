@@ -23,6 +23,7 @@ namespace ConsoleCommands
 			{ "gameData", "gameData path", "start the game with loading the given game data" },
 			{ "disable-input", "disable-input", "disable keyboard/mouse/controller input" },
 			{ "time-limit", "time-limit n", "quit the game after the given amount of frames" },
+			{ "no-render", "no-render", "disable rendering/sound/input and creting a window" },
 			{ "record-input", "record-input file", "record input into a file" },
 			{ "replay-input", "replay-input file", "replay previously recorded input from a file" },
 			{ "continue-after-input-end", "continue-after-input-end", "When replaying input, don't quit after recording is finished" },
