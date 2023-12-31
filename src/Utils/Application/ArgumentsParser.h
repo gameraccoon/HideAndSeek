@@ -21,6 +21,8 @@ public:
 
 	std::filesystem::path getExecutablePath() const;
 
+	[[nodiscard]] std::vector<std::string> getAllArguments() const;
+
 private:
 	static std::filesystem::path getExecutablePath(const char* firstArgument);
 

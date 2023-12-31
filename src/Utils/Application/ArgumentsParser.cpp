@@ -83,6 +83,22 @@ std::filesystem::path ArgumentsParser::getExecutablePath() const
 	return mExecutablePath;
 }
 
+std::vector<std::string> ArgumentsParser::getAllArguments() const
+{
+	std::vector<std::string> result;
+	result.reserve(mTokens.size());
+
+	for (const std::string& token : mTokens)
+	{
+		if (token.starts_with(mArgumentSwitch))
+		{
+			result.push_back(token.substr(mArgumentSwitch.size()));
+		}
+	}
+
+	return result;
+}
+
 std::filesystem::path ArgumentsParser::getExecutablePath(const char* firstArgument)
 {
 	namespace fs = std::filesystem;
