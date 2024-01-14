@@ -111,6 +111,6 @@ namespace Input
 		SimpleBitset<HardwareButtonsCount> mLastFramePressedButtons;
 		SimpleBitset<HardwareButtonsCount> mLastFrameReleasedButtons;
 
-		std::array<float, HardwareAxesCount> mAxes;
+		std::array<float, HardwareAxesCount> mAxes = {};
 	};
 }
