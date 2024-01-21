@@ -1,0 +1,1 @@
+{{"{attribute_name}", {component_name_capital}ComponentCustomSerialization::Serialize{attribute_name_capital}({component_name}->m{attribute_name_capital})}}{delim_comma}{delim_endl}{delim_tab}{delim_tab}

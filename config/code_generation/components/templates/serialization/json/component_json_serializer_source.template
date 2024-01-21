@@ -6,12 +6,15 @@
 
 #include "GameData/Components/{class_name}.generated.h"
 
+{serialization/json/attributes_json_includes_custom_serialization}
+
 
 void {class_name}JsonSerializer::toJson(nlohmann::json& outJson, MAYBE_UNUSED const void* component) const
 {{
 	MAYBE_UNUSED const {class_name}* {component_name} = static_cast<const {class_name}*>(component);
 	outJson = nlohmann::json::object({{
 		{serialization/json/attributes_json_serialization}
+		{serialization/json/attributes_json_serialization_custom}
 	}});
 }}
 
@@ -20,4 +23,5 @@ void {class_name}JsonSerializer::fromJson(MAYBE_UNUSED const nlohmann::json& jso
 	MAYBE_UNUSED {class_name}* out{component_name_capital} = static_cast<{class_name}*>(outComponent);
 	{serialization/json/attributes_json_deserialization}
 	{serialization/json/attributes_json_deserialization_defaulted}
+	{serialization/json/attributes_json_deserialization_custom}
 }}

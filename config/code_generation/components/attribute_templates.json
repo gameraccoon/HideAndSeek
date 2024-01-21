@@ -44,18 +44,36 @@
 	{
 		"name": "serialization/json/attributes_json_serialization",
 		"params": [],
-		"blacklist": ["transient"]
+		"blacklist": ["transient", "custom_serialization"]
 	},
 	{
 		"name": "serialization/json/attributes_json_deserialization",
 		"params": [],
-		"blacklist": ["transient", "defaulted"]
+		"blacklist": ["transient", "defaulted", "custom_serialization"]
 	},
 	{
 		"name": "serialization/json/attributes_json_deserialization_defaulted",
 		"params": [],
-		"blacklist": ["transient"],
+		"blacklist": ["transient", "custom_serialization"],
 		"whitelist": ["defaulted"]
+	},
+	{
+		"name": "serialization/json/attributes_json_includes_custom_serialization",
+		"params": ["remove_duplicates"],
+		"blacklist": ["transient"],
+		"whitelist": ["custom_serialization"]
+	},
+	{
+		"name": "serialization/json/attributes_json_serialization_custom",
+		"params": [],
+		"blacklist": ["transient"],
+		"whitelist": ["custom_serialization"]
+	},
+	{
+		"name": "serialization/json/attributes_json_deserialization_custom",
+		"params": [],
+		"blacklist": ["transient"],
+		"whitelist": ["custom_serialization"]
 	},
 	{
 		"name": "editor/attribute_edit_fields",

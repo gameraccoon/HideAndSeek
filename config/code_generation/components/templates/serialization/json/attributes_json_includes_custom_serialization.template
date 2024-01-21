@@ -1,0 +1,1 @@
+#include "GameData/Serialization/Json/Custom/{component_name_capital}ComponentCustomSerialization.h"{delim_endl}
