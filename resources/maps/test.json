@@ -5227,32 +5227,8 @@
             "components": {
                 "TrackedSpatialEntitiesComponent": {
                     "entities": [
-                        [
-                            "CameraEntity",
-                            {
-                                "cell": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "entity": {
-                                    "id": 1343345105,
-                                    "valid": true
-                                }
-                            }
-                        ],
-                        [
-                            "ControlledEntity",
-                            {
-                                "cell": {
-                                    "x": 0,
-                                    "y": 0
-                                },
-                                "entity": {
-                                    "id": 509098326,
-                                    "valid": true
-                                }
-                            }
-                        ]
+                        "CameraEntity",
+                        "ControlledEntity"
                     ]
                 }
             }

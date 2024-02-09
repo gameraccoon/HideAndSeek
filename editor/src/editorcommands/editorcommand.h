@@ -2,9 +2,18 @@
 
 #include "Base/Types/ComplexTypes/EnumBitset.h"
 
-#include "GameData/World.h"
+#include "../editorutils/editoridgenerator.h"
 
 class MainWindow;
+class World;
+
+struct CommandExecutionContext
+{
+	World* world;
+	std::reference_wrapper<EditorIdGenerator> editorIdGenerator;
+
+	EditorIdGenerator& getEditorIdGenerator() { return editorIdGenerator.get(); }
+};
 
 class EditorCommand
 {
@@ -27,8 +36,8 @@ public:
 	{}
 	virtual ~EditorCommand() = default;
 
-	virtual void doCommand(World* world) = 0;
-	virtual void undoCommand(World* world) = 0;
+	virtual void doCommand(CommandExecutionContext& context) = 0;
+	virtual void undoCommand(CommandExecutionContext& context) = 0;
 	EffectBitset getEffects() { return mEffects; }
 
 private:

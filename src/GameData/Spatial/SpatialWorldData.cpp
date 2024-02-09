@@ -12,9 +12,8 @@
 
 #include "GameData/Components/TransformComponent.generated.h"
 
-SpatialWorldData::SpatialWorldData(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator)
+SpatialWorldData::SpatialWorldData(const ComponentFactory& componentFactory)
 	: mComponentFactory(componentFactory)
-	, mEntityGenerator(entityGenerator)
 {}
 
 SpatialEntityManager::RecordsVector SpatialWorldData::getCellsAround(const Vector2D& centerPosition, const Vector2D& rect)
@@ -68,7 +67,7 @@ WorldCell& SpatialWorldData::getOrCreateCell(const CellPos& pos)
 	auto it = mCells.find(pos);
 	if (it == mCells.end())
 	{
-		std::tie(it, std::ignore) = mCells.try_emplace(pos, pos, mComponentFactory, mEntityGenerator);
+		std::tie(it, std::ignore) = mCells.try_emplace(pos, pos, mComponentFactory);
 	}
 	return it->second;
 }
@@ -227,7 +226,7 @@ void SpatialWorldData::fromJson(const nlohmann::json& json, const Json::Componen
 	for (const auto& cellJson : cellsJson)
 	{
 		CellPos pos = cellJson.at("pos");
-		auto res = mCells.try_emplace(pos, pos, mComponentFactory, mEntityGenerator);
+		auto res = mCells.try_emplace(pos, pos, mComponentFactory);
 		res.first->second.fromJson(cellJson.at("cell"), jsonSerializerHolder);
 	}
 

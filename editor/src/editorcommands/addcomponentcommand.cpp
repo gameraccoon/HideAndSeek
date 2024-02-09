@@ -14,20 +14,20 @@ AddComponentCommand::AddComponentCommand(const ComponentSourceReference& source,
 {
 }
 
-void AddComponentCommand::doCommand(World* world)
+void AddComponentCommand::doCommand(CommandExecutionContext& context)
 {
 	Utils::AddComponent(
 		mSource,
 		TypedComponent(mComponentTypeName, mComponentFactory.createComponent(mComponentTypeName)),
-		world
+		context.world
 	);
 }
 
-void AddComponentCommand::undoCommand(World* world)
+void AddComponentCommand::undoCommand(CommandExecutionContext& context)
 {
 	Utils::RemoveComponent(
 		mSource,
 		mComponentTypeName,
-		world
+		context.world
 	);
 }

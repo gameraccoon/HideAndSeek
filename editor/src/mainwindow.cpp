@@ -50,6 +50,11 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
+CommandExecutionContext MainWindow::getCommandExecutionContext()
+{
+	return CommandExecutionContext{mCurrentWorld.get(), mEditorIdGenerator};
+}
+
 void MainWindow::registerFactories()
 {
 	ComponentsRegistration::RegisterComponents(mComponentFactory);
@@ -87,7 +92,7 @@ void MainWindow::fillWindowContent()
 
 void MainWindow::createWorld()
 {
-	mCurrentWorld = std::make_unique<World>(mComponentFactory, mEntityGenerator);
+	mCurrentWorld = std::make_unique<World>(mComponentFactory);
 	mCommandStack.clear();
 	ui->actionRun_Game->setEnabled(true);
 	ui->actionSave_World->setEnabled(true);
@@ -112,12 +117,12 @@ void MainWindow::initActions()
 void MainWindow::bindEvents()
 {
 	// on selected entity change broadcast selected component source change automatically
-	OnSelectedEntityChanged.bind([this](const std::optional<EntityReference>& ref)
+	OnSelectedEntityChanged.bind([this](const std::optional<EditorEntityReference>& ref)
 	{
 		if (ref.has_value())
 		{
 			ComponentSourceReference componentSourceReference;
-			componentSourceReference.entity = ref->entity;
+			componentSourceReference.editorUniqueId = ref->editorUniqueId;
 			componentSourceReference.cellPos = ref->cellPos;
 			componentSourceReference.isWorld = true;
 			OnSelectedComponentSourceChanged.broadcast(componentSourceReference);
@@ -244,7 +249,7 @@ void MainWindow::on_actionUndo_triggered()
 {
 	if (mCurrentWorld)
 	{
-		mCommandStack.undo(mCurrentWorld.get());
+		mCommandStack.undo(getCommandExecutionContext());
 	}
 }
 
@@ -252,7 +257,7 @@ void MainWindow::on_actionRedo_triggered()
 {
 	if (mCurrentWorld)
 	{
-		mCommandStack.redo(mCurrentWorld.get());
+		mCommandStack.redo(getCommandExecutionContext());
 	}
 }
 
@@ -260,8 +265,7 @@ void MainWindow::on_actionCreate_triggered()
 {
 	if (mCurrentWorld)
 	{
-		EntityManager& worldEntityManager = mCurrentWorld->getEntityManager();
-		mCommandStack.executeNewCommand<AddEntityCommand>(mCurrentWorld.get(), worldEntityManager.generateNewEntityUnsafe());
+		mCommandStack.executeNewCommand<AddEntityCommand>(getCommandExecutionContext());
 	}
 }
 
@@ -296,13 +300,10 @@ void MainWindow::on_actionCreate_Spatial_triggered()
 {
 	if (mCurrentWorld)
 	{
-		EntityManager& worldEntityManager = mCurrentWorld->getEntityManager();
-		SpatialEntity entity{worldEntityManager.generateNewEntityUnsafe(), CellPos(0, 0)};
-		Vector2D location{ZERO_VECTOR};
 		if (mTransformEditorToolbox->isShown())
 		{
-			 std::tie(entity.cell, location) = mTransformEditorToolbox->getWidgetCenterWorldPosition();
+			auto [cell, location] = mTransformEditorToolbox->getWidgetCenterWorldPosition();
+			mCommandStack.executeNewCommand<AddSpatialEntityCommand>(getCommandExecutionContext(), cell, location);
 		}
-		mCommandStack.executeNewCommand<AddSpatialEntityCommand>(mCurrentWorld.get(), entity, location);
 	}
 }

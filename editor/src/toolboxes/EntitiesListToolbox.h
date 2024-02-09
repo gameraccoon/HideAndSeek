@@ -8,7 +8,7 @@
 
 #include "GameData/Spatial/SpatialEntity.h"
 
-#include "src/editorutils/entityreference.h"
+#include "src/editorutils/editorentityreference.h"
 
 class MainWindow;
 
@@ -36,7 +36,7 @@ public:
 
 private:
 	void onWorldUpdated();
-	void onEntityChangedEvent(const std::optional<EntityReference>& entity);
+	void onEntityChangedEvent(const std::optional<EditorEntityReference>& entity);
 	void updateContent();
 	void onCurrentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
 	void showContextMenu(const QPoint& pos);

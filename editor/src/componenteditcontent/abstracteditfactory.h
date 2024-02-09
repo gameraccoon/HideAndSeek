@@ -17,7 +17,7 @@ class EditData : public QObject
 {
 public:
 	virtual ~EditData() = default;
-	virtual void fillContent(QLayout* layout, const ComponentSourceReference& sourceReference, const void* component, EditorCommandsStack& commandStack, World* world) = 0;
+	virtual void fillContent(QLayout* layout, const ComponentSourceReference& sourceReference, const void* component, EditorCommandsStack& commandStack, CommandExecutionContext& context) = 0;
 };
 
 class AbstractEditFactory

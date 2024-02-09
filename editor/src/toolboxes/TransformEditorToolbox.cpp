@@ -5,6 +5,7 @@
 #include "src/editorcommands/changeentitygrouplocationcommand.h"
 #include "src/editorcommands/addentitygroupcommand.h"
 #include "src/editorcommands/removeentitiescommand.h"
+#include "src/editorutils/editoridutils.h"
 
 #include "DockManager.h"
 #include "DockWidget.h"
@@ -34,21 +35,33 @@ static bool IsCtrlPressed()
 	return (QApplication::keyboardModifiers() & Qt::ControlModifier) != 0;
 }
 
-static Vector2D GetEntityPosition(SpatialEntity entity, World* world)
+static Vector2D GetEntityPosition(EditorEntityReference entityRef, World* world)
 {
 	if (world == nullptr)
 	{
 		return ZERO_VECTOR;
 	}
 
-	WorldCell* cell = world->getSpatialData().getCell(entity.cell);
+	if (!entityRef.cellPos.has_value())
+	{
+		return ZERO_VECTOR;
+	}
+
+	WorldCell* cell = world->getSpatialData().getCell(*entityRef.cellPos);
 
 	if (cell == nullptr)
 	{
 		return ZERO_VECTOR;
 	}
 
-	auto [transform] = cell->getEntityManager().getEntityComponents<const TransformComponent>(entity.entity.getEntity());
+	const OptionalEntity entity = Utils::GetEntityFromId(entityRef.editorUniqueId, cell->getEntityManager());
+
+	if (!entity.isValid())
+	{
+		return ZERO_VECTOR;
+	}
+
+	auto [transform] = cell->getEntityManager().getEntityComponents<const TransformComponent>(entity.getEntity());
 
 	if (transform)
 	{
@@ -60,13 +73,22 @@ static Vector2D GetEntityPosition(SpatialEntity entity, World* world)
 	}
 }
 
-static Vector2D GetEntityGroupPosition(const std::vector<SpatialEntity>& entities, World* world)
+static Vector2D GetEntityGroupPosition(const std::vector<EditorEntityReference>& entities, World* world)
 {
-	Vector2D result;
+	Vector2D result = ZERO_VECTOR;
 	size_t entitiesProcessed = 0;
-	for (const SpatialEntity& entity : entities)
+	for (const EditorEntityReference& entityRef : entities)
 	{
-		result = result * static_cast<float>(entitiesProcessed) / static_cast<float>(entitiesProcessed + 1) + GetEntityPosition(entity, world) / static_cast<float>(entitiesProcessed + 1);
+		if (!entityRef.cellPos.has_value())
+		{
+			continue;
+		}
+		const OptionalEntity entity = Utils::GetEntityFromId(entityRef.editorUniqueId, world->getSpatialData().getOrCreateCell(*entityRef.cellPos).getEntityManager());
+		if (!entity.isValid())
+		{
+			continue;
+		}
+		result = result * static_cast<float>(entitiesProcessed) / static_cast<float>(entitiesProcessed + 1) + GetEntityPosition(entityRef, world) / static_cast<float>(entitiesProcessed + 1);
 		++entitiesProcessed;
 	}
 	return result;
@@ -142,7 +164,7 @@ void TransformEditorToolbox::show()
 	QObject::connect(scaleSlider, &QSlider::valueChanged, this, &TransformEditorToolbox::onScaleChanged);
 	layout->addWidget(scaleSlider);
 
-	mContent->OnEntitiesMoved.assign([this](const std::vector<SpatialEntity>& entities, const Vector2D& shift){onEntitiesMoved(entities, shift);});
+	mContent->OnEntitiesMoved.assign([this](const std::vector<EditorEntityReference>& entities, const Vector2D& shift){onEntitiesMoved(entities, shift);});
 }
 
 bool TransformEditorToolbox::isShown() const
@@ -172,22 +194,21 @@ void TransformEditorToolbox::updateEntitiesFromChangeEntityGroupLocationCommand(
 {
 	const bool isLastUndo = mMainWindow->getCommandStack().isLastExecutedUndo();
 
-	const std::vector<SpatialEntity>& oldEntities = isLastUndo ? command.getModifiedEntities() : command.getOriginalEntities();
-	const std::vector<SpatialEntity>& newEntities = isLastUndo ? command.getOriginalEntities() : command.getModifiedEntities();
+	const std::vector<size_t>& entities = command.getEditorEntityReferences();
+	const std::vector<CellPos>& newCells = isLastUndo ? command.getOriginalCellsOfEntities() : command.getModifiedCellsOfEntities();
 
-	std::unordered_map<Entity::EntityId, size_t> transformMap;
+	std::unordered_map<size_t, size_t> transformMap;
 
-	for (size_t i = 0; i < oldEntities.size(); ++i)
+	for (size_t i = 0; i < entities.size(); ++i)
 	{
-		const SpatialEntity& oldSpatialEntity = oldEntities[i];
-		transformMap[oldSpatialEntity.entity.getEntity().getId()] = i;
+		transformMap[entities[i]] = i;
 	}
 
-	for (SpatialEntity& spatialEntity : mContent->mSelectedEntities)
+	for (EditorEntityReference& entityReerence : mContent->mSelectedEntities)
 	{
-		if (const auto it = transformMap.find(spatialEntity.entity.getEntity().getId()); it != transformMap.end())
+		if (const auto it = transformMap.find(entityReerence.editorUniqueId); it != transformMap.end())
 		{
-			spatialEntity = newEntities[it->second];
+			entityReerence.cellPos = newCells[it->second];
 		}
 	}
 }
@@ -217,7 +238,7 @@ void TransformEditorToolbox::onCommandExecuted(EditorCommand::EffectBitset effec
 	mContent->repaint();
 }
 
-void TransformEditorToolbox::onEntitySelected(const std::optional<EntityReference>& entityRef)
+void TransformEditorToolbox::onEntitySelected(const std::optional<EditorEntityReference>& entityRef)
 {
 	if (mContent == nullptr)
 	{
@@ -234,25 +255,36 @@ void TransformEditorToolbox::onEntitySelected(const std::optional<EntityReferenc
 	if (entityRef.has_value() && entityRef->cellPos.has_value())
 	{
 		WorldCell* cell = world->getSpatialData().getCell(*entityRef->cellPos);
-		if (cell != nullptr && cell->getEntityManager().doesEntityHaveComponent<TransformComponent>(entityRef->entity))
+		if (cell == nullptr)
 		{
-			SpatialEntity spatialEntity(entityRef->entity, *entityRef->cellPos);
-			mContent->mSelectedEntities.push_back(spatialEntity);
+			return;
+		}
+
+		const OptionalEntity entity = Utils::GetEntityFromId(entityRef->editorUniqueId, cell->getEntityManager());
+		if (!entity.isValid())
+		{
+			return;
+		}
+
+		EntityManager& cellEntityManager = cell->getEntityManager();
+		if (cellEntityManager.doesEntityHaveComponent<TransformComponent>(entity.getEntity()))
+		{
+			mContent->mSelectedEntities.emplace_back(entityRef->editorUniqueId, *entityRef->cellPos);
 		}
 	}
 	mContent->updateSelectedEntitiesPosition();
 	mContent->repaint();
 }
 
-void TransformEditorToolbox::onEntitiesMoved(std::vector<SpatialEntity> entities, const Vector2D& shift)
+void TransformEditorToolbox::onEntitiesMoved(const std::vector<EditorEntityReference>& entities, const Vector2D& shift)
 {
-	World* world = mMainWindow->getCurrentWorld();
-	if (world == nullptr)
+	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	if (context.world == nullptr)
 	{
 		return;
 	}
 
-	mMainWindow->getCommandStack().executeNewCommand<ChangeEntityGroupLocationCommand>(world, entities, shift);
+	mMainWindow->getCommandStack().executeNewCommand<ChangeEntityGroupLocationCommand>(context, entities, shift);
 }
 
 void TransformEditorToolbox::onFreeMoveChanged(int newValue)
@@ -312,20 +344,32 @@ void TransformEditorToolbox::onCopyCommand()
 
 	Vector2D center{ZERO_VECTOR};
 	mCopiedObjects.clear();
-	for (SpatialEntity spatialEntity : mContent->mSelectedEntities)
+	for (EditorEntityReference entityRef : mContent->mSelectedEntities)
 	{
-		WorldCell* cell = world->getSpatialData().getCell(spatialEntity.cell);
-		if (cell != nullptr)
+		if (!entityRef.cellPos.has_value())
 		{
-			nlohmann::json serializedEntity;
-			EntityManager& cellEntityManager = cell->getEntityManager();
-			Json::GetPrefabFromEntity(cellEntityManager, serializedEntity, spatialEntity.entity.getEntity(), jsonSerializationHolder);
-			mCopiedObjects.push_back(serializedEntity);
-			auto [transform] = cellEntityManager.getEntityComponents<TransformComponent>(spatialEntity.entity.getEntity());
-			if (transform)
-			{
-				center += transform->getLocation();
-			}
+			continue;
+		}
+
+		WorldCell* cell = world->getSpatialData().getCell(*entityRef.cellPos);
+		if (cell == nullptr)
+		{
+			continue;
+		}
+
+		nlohmann::json serializedEntity;
+		EntityManager& cellEntityManager = cell->getEntityManager();
+		const OptionalEntity entity = Utils::GetEntityFromId(entityRef.editorUniqueId, cellEntityManager);
+		if (!entity.isValid())
+		{
+			continue;
+		}
+		Json::GetPrefabFromEntity(cellEntityManager, serializedEntity, entity.getEntity(), jsonSerializationHolder);
+		mCopiedObjects.push_back(serializedEntity);
+		auto [transform] = cellEntityManager.getEntityComponents<TransformComponent>(entity.getEntity());
+		if (transform)
+		{
+			center += transform->getLocation();
 		}
 	}
 
@@ -337,8 +381,8 @@ void TransformEditorToolbox::onCopyCommand()
 
 void TransformEditorToolbox::onPasteCommand()
 {
-	World* world = mMainWindow->getCurrentWorld();
-	if (world == nullptr)
+	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	if (context.world == nullptr)
 	{
 		return;
 	}
@@ -355,7 +399,7 @@ void TransformEditorToolbox::onPasteCommand()
 
 	const Json::ComponentSerializationHolder& serializationHolder = mMainWindow->getComponentSerializationHolder();
 
-	mMainWindow->getCommandStack().executeNewCommand<AddEntityGroupCommand>(world,
+	mMainWindow->getCommandStack().executeNewCommand<AddEntityGroupCommand>(context,
 		mCopiedObjects,
 		serializationHolder,
 		mContent->deprojectAbsolute(getWidgetCenter()) - mCopiedGroupCenter
@@ -366,8 +410,8 @@ void TransformEditorToolbox::onPasteCommand()
 
 void TransformEditorToolbox::onDeleteCommand()
 {
-	World* world = mMainWindow->getCurrentWorld();
-	if (world == nullptr)
+	CommandExecutionContext commandExecutionContext = mMainWindow->getCommandExecutionContext();
+	if (commandExecutionContext.world == nullptr)
 	{
 		return;
 	}
@@ -381,7 +425,7 @@ void TransformEditorToolbox::onDeleteCommand()
 	mCopiedObjects.clear();
 
 	mMainWindow->getCommandStack().executeNewCommand<RemoveEntitiesCommand>(
-		world,
+		commandExecutionContext,
 		mContent->mSelectedEntities,
 		mMainWindow->getComponentSerializationHolder()
 	);
@@ -399,15 +443,26 @@ void TransformEditorToolbox::unselectNonExistingEntities()
 	}
 
 	auto [begin, end] = std::ranges::remove_if(mContent->mSelectedEntities,
-		[world](const SpatialEntity& spatialEntity)
+		[world](const EditorEntityReference& entityRef)
 		{
-			WorldCell* cell = world->getSpatialData().getCell(spatialEntity.cell);
+			if (!entityRef.cellPos.has_value())
+			{
+				return true;
+			}
+
+			WorldCell* cell = world->getSpatialData().getCell(*entityRef.cellPos);
 
 			if (cell == nullptr) {
 				return true;
 			}
 
-			return !cell->getEntityManager().hasEntity(spatialEntity.entity.getEntity());
+			const OptionalEntity entity = Utils::GetEntityFromId(entityRef.editorUniqueId, cell->getEntityManager());
+			if (!entity.isValid())
+			{
+				return true;
+			}
+
+			return !cell->getEntityManager().hasEntity(entity.getEntity());
 		}
 	);
 	mContent->mSelectedEntities.erase(begin, end);
@@ -441,7 +496,7 @@ void TransformEditorWidget::mousePressEvent(QMouseEvent* event)
 	mIsCatchedSelectedEntity = false;
 	mIsRectangleSelection = false;
 
-	if (SpatialEntity entityUnderCursor = getEntityUnderPoint(event->pos()); entityUnderCursor.isValid())
+	if (EditorEntityReference entityUnderCursor = getEntityUnderPoint(event->pos()); entityUnderCursor.cellPos.has_value())
 	{
 		if (std::find(mSelectedEntities.begin(), mSelectedEntities.end(), entityUnderCursor) != mSelectedEntities.end())
 		{
@@ -450,7 +505,7 @@ void TransformEditorWidget::mousePressEvent(QMouseEvent* event)
 		else if (mFreeMove && !IsCtrlPressed())
 		{
 			mSelectedEntities.clear();
-			mSelectedEntities.push_back(entityUnderCursor);
+			mSelectedEntities.emplace_back(entityUnderCursor);
 			mIsCatchedSelectedEntity = true;
 			setGroupCenter(GetEntityPosition(entityUnderCursor, mWorld));
 		}
@@ -541,7 +596,9 @@ void TransformEditorWidget::paintEvent(QPaintEvent*)
 
 			auto [collision] = cell.getEntityManager().getEntityComponents<const CollisionComponent>(entity);
 
-			if (std::find(mSelectedEntities.begin(), mSelectedEntities.end(), SpatialEntity(entity, cellPos)) != mSelectedEntities.end())
+			const size_t editorId = Utils::GetOrCreateEditorIdFromEntity(entity, cell.getEntityManager(), mMainWindow->getEditorIdGenerator());
+
+			if (std::find(mSelectedEntities.begin(), mSelectedEntities.end(), EditorEntityReference(editorId, cellPos)) != mSelectedEntities.end())
 			{
 				// preview the movement
 				location += mMoveShift;
@@ -637,11 +694,11 @@ void TransformEditorWidget::paintEvent(QPaintEvent*)
 
 void TransformEditorWidget::onClick(const QPoint& pos)
 {
-	SpatialEntity findResult = getEntityUnderPoint(pos);
+	EditorEntityReference findResult = getEntityUnderPoint(pos);
 
 	if (IsCtrlPressed())
 	{
-		if (findResult.isValid())
+		if (findResult.cellPos.has_value())
 		{
 			auto it = std::find(mSelectedEntities.begin(), mSelectedEntities.end(), findResult);
 			if (it != mSelectedEntities.end())
@@ -658,10 +715,10 @@ void TransformEditorWidget::onClick(const QPoint& pos)
 	{
 		mSelectedEntities.clear();
 
-		if (findResult.isValid())
+		if (findResult.cellPos.has_value())
 		{
 			mSelectedEntities.push_back(findResult);
-			mMainWindow->OnSelectedEntityChanged.broadcast(EntityReference(findResult));
+			mMainWindow->OnSelectedEntityChanged.broadcast(EditorEntityReference(findResult));
 		}
 	}
 	updateSelectedEntitiesPosition();
@@ -674,7 +731,7 @@ SpatialEntityManager::RecordsVector TransformEditorWidget::getCellsOnScreen()
 	return mWorld->getSpatialData().getCellsAround(screenCenterPos, screenSizeInWorld);
 }
 
-SpatialEntity TransformEditorWidget::getEntityUnderPoint(const QPoint& pos)
+EditorEntityReference TransformEditorWidget::getEntityUnderPoint(const QPoint& pos)
 {
 	Vector2D worldPos = deprojectAbsolute(QVector2D(pos));
 
@@ -701,13 +758,20 @@ SpatialEntity TransformEditorWidget::getEntityUnderPoint(const QPoint& pos)
 		}
 	}
 
-	return findResult;
+	if (!findResult.isValid())
+	{
+		return EditorEntityReference{0};
+	}
+
+	const size_t editorId = Utils::GetOrCreateEditorIdFromEntity(findResult.entity.getEntity(), mWorld->getSpatialData().getOrCreateCell(findResult.cell).getEntityManager(), mMainWindow->getEditorIdGenerator());
+
+	return EditorEntityReference{editorId, findResult.cell};
 }
 
 void TransformEditorWidget::onCoordinateXChanged(const QString& newValueStr)
 {
-	World* world = mMainWindow->getCurrentWorld();
-	if (world == nullptr)
+	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	if (context.world == nullptr)
 	{
 		return;
 	}
@@ -722,14 +786,14 @@ void TransformEditorWidget::onCoordinateXChanged(const QString& newValueStr)
 
 	const Vector2D shift(newValue - mSelectedGroupCenter.x, 0.0f);
 
-	mMainWindow->getCommandStack().executeNewCommand<ChangeEntityGroupLocationCommand>(world, mSelectedEntities, shift);
+	mMainWindow->getCommandStack().executeNewCommand<ChangeEntityGroupLocationCommand>(context, mSelectedEntities, shift);
 	mSelectedGroupCenter.x = newValue;
 }
 
 void TransformEditorWidget::onCoordinateYChanged(const QString& newValueStr)
 {
-	World* world = mMainWindow->getCurrentWorld();
-	if (world == nullptr)
+	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	if (context.world == nullptr)
 	{
 		return;
 	}
@@ -744,7 +808,7 @@ void TransformEditorWidget::onCoordinateYChanged(const QString& newValueStr)
 
 	const Vector2D shift(0.0f, newValue - mSelectedGroupCenter.y);
 
-	mMainWindow->getCommandStack().executeNewCommand<ChangeEntityGroupLocationCommand>(world, mSelectedEntities, shift);
+	mMainWindow->getCommandStack().executeNewCommand<ChangeEntityGroupLocationCommand>(context, mSelectedEntities, shift);
 	mSelectedGroupCenter.y = newValue;
 }
 
@@ -782,18 +846,16 @@ void TransformEditorWidget::addEntitiesInRectToSelection(const Vector2D& start, 
 		{
 			WorldCell& cell = record.extraData;
 			cell.getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
-				[this, lt, rd, cellPos = cell.getPos()](Entity entity, const TransformComponent* transform)
+				[this, lt, rd, &cell](Entity entity, const TransformComponent* transform)
 			{
 				Vector2D location = transform->getLocation();
 				if (lt.x < location.x && location.x < rd.x && lt.y < location.y && location.y < rd.y)
 				{
-					auto it = std::find(mSelectedEntities.begin(), mSelectedEntities.end(), SpatialEntity(entity, cellPos));
+					const size_t editorId = Utils::GetOrCreateEditorIdFromEntity(entity, cell.getEntityManager(), mMainWindow->getEditorIdGenerator());
+					auto it = std::find(mSelectedEntities.begin(), mSelectedEntities.end(), EditorEntityReference(editorId, cell.getPos()));
 					if (it == mSelectedEntities.end())
 					{
-						SpatialEntity findResult;
-						findResult.entity = entity;
-						findResult.cell = cellPos;
-						mSelectedEntities.push_back(findResult);
+						mSelectedEntities.emplace_back(editorId, cell.getPos());
 					}
 				}
 			});

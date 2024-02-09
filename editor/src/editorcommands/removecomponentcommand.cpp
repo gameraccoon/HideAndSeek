@@ -15,11 +15,11 @@ RemoveComponentCommand::RemoveComponentCommand(const ComponentSourceReference& s
 {
 }
 
-void RemoveComponentCommand::doCommand(World* world)
+void RemoveComponentCommand::doCommand(CommandExecutionContext& context)
 {
 	if (mSerializedComponent.empty())
 	{
-		std::vector<TypedComponent> components = Utils::GetComponents(mSource, world);
+		std::vector<TypedComponent> components = Utils::GetComponents(mSource, context.world);
 
 		auto it = std::find_if(components.begin(), components.end(), [typeName = mComponentTypeName](const TypedComponent& component)
 		{
@@ -38,11 +38,11 @@ void RemoveComponentCommand::doCommand(World* world)
 	Utils::RemoveComponent(
 		mSource,
 		mComponentTypeName,
-		world
+		context.world
 	);
 }
 
-void RemoveComponentCommand::undoCommand(World* world)
+void RemoveComponentCommand::undoCommand(CommandExecutionContext& context)
 {
 	void* component = mComponentFactory.createComponent(mComponentTypeName);
 
@@ -52,6 +52,6 @@ void RemoveComponentCommand::undoCommand(World* world)
 	Utils::AddComponent(
 		mSource,
 		TypedComponent(mComponentTypeName, component),
-		world
+		context.world
 	);
 }

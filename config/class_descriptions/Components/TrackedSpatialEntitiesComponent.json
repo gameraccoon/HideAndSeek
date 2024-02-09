@@ -8,7 +8,7 @@
 				"<map>",
 				"\"GameData/Spatial/SpatialEntity.h\""
 			],
-			"flags": ["get_by_ref"]
+			"flags": ["get_by_ref", "custom_serialization"]
 		}
 	]
 }

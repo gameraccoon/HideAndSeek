@@ -13,7 +13,12 @@
 
 #include "src/editorcommands/removeentitiescommand.h"
 
+#include "src/editorutils/editoridutils.h"
+
 #include "src/toolboxes/PrefabListToolbox.h"
+
+#include "GameData/World.h"
+#include "GameData/Components/EditorIdComponent.generated.h"
 
 const QString EntitiesListToolbox::WidgetName = "EntitiesList";
 const QString EntitiesListToolbox::ToolboxName = EntitiesListToolbox::WidgetName + "Toolbox";
@@ -80,7 +85,7 @@ void EntitiesListToolbox::onWorldUpdated()
 	bindEvents();
 }
 
-void EntitiesListToolbox::onEntityChangedEvent(const std::optional<EntityReference>& entity)
+void EntitiesListToolbox::onEntityChangedEvent(const std::optional<EditorEntityReference>& entity)
 {
 	if (!entity.has_value())
 	{
@@ -93,7 +98,7 @@ void EntitiesListToolbox::onEntityChangedEvent(const std::optional<EntityReferen
 		return;
 	}
 
-	QString text = QString::number(entity->entity.getId());
+	QString text = QString::number(entity->editorUniqueId);
 	int i = 0;
 	while (QListWidgetItem* item = entitiesList->item(i))
 	{
@@ -116,16 +121,16 @@ void EntitiesListToolbox::updateContent()
 		return;
 	}
 
-	const auto& entities = currentWorld->getEntityManager().getEntities();
 	if (QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName))
 	{
-		for (Entity entity : entities)
+		currentWorld->getEntityManager().forEachComponentSet<const EditorIdComponent>(
+		[entitiesList](const EditorIdComponent* editorIdComponent)
 		{
-			QListWidgetItem* newItem = HS_NEW QListWidgetItem(QString::number(entity.getId()));
-			newItem->setData(0, static_cast<unsigned long long>(entity.getId()));
+			QListWidgetItem* newItem = HS_NEW QListWidgetItem(QString::number(editorIdComponent->getId()));
+			newItem->setData(0, static_cast<unsigned long long>(editorIdComponent->getId()));
 			newItem->setData(1, false);
 			entitiesList->addItem(newItem);
-		}
+		});
 	}
 }
 
@@ -133,8 +138,8 @@ void EntitiesListToolbox::onCurrentItemChanged(QListWidgetItem* current, QListWi
 {
 	if (current)
 	{
-		Entity::EntityId entityID = current->data(0).toUInt();
-		EntityReference reference{Entity(entityID)};
+		size_t editorId = current->data(0).toUInt();
+		EditorEntityReference reference{editorId};
 
 		if (current->data(1).toBool())
 		{
@@ -177,7 +182,7 @@ void EntitiesListToolbox::showContextMenu(const QPoint& pos)
 
 void EntitiesListToolbox::removeSelectedEntity()
 {
-	/*QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
+	QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
 	if (entitiesList == nullptr)
 	{
 		return;
@@ -189,17 +194,17 @@ void EntitiesListToolbox::removeSelectedEntity()
 		return;
 	}
 
-	World* currentWorld = mMainWindow->getCurrentWorld();
-	if (currentWorld == nullptr)
+	CommandExecutionContext commandExecutionContext = mMainWindow->getCommandExecutionContext();
+	if (commandExecutionContext.world == nullptr)
 	{
 		return;
 	}
 
 	mMainWindow->getCommandStack().executeNewCommand<RemoveEntitiesCommand>(
-		currentWorld,
-		{ Entity(currentItem->text().toUInt()) },
+		commandExecutionContext,
+		std::vector<EditorEntityReference>{ EditorEntityReference{currentItem->text().toUInt()} },
 		mMainWindow->getComponentSerializationHolder()
-	);*/
+	);
 }
 
 void EntitiesListToolbox::createPrefabRequested()
@@ -232,7 +237,17 @@ void EntitiesListToolbox::createPrefab(const QString& prefabName)
 	}
 
 	prefabToolbox->show();
-	prefabToolbox->createPrefabFromEntity(prefabName, Entity(currentItem->text().toUInt()));
+
+	const size_t editorId = currentItem->text().toUInt();
+
+	const OptionalEntity entity = Utils::GetEntityFromId(editorId, mMainWindow->getCurrentWorld()->getEntityManager());
+
+	if (!entity.isValid())
+	{
+		return;
+	}
+
+	prefabToolbox->createPrefabFromEntity(prefabName, entity.getEntity());
 }
 
 void EntitiesListToolbox::bindEvents()

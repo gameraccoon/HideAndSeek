@@ -6,8 +6,8 @@
 
 #include <nlohmann/json.hpp>
 
-WorldCell::WorldCell(const CellPos& pos, const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator)
-	: mEntityManager(componentFactory, entityGenerator)
+WorldCell::WorldCell(const CellPos& pos, const ComponentFactory& componentFactory)
+	: mEntityManager(componentFactory)
 	, mCellComponents(componentFactory)
 	, mPos(pos)
 {
@@ -34,5 +34,5 @@ void WorldCell::clearCaches()
 
 bool WorldCell::hasAnyData() const
 {
-	return mEntityManager.hasAnyEntities() || mCellComponents.hasAnyComponents();
+	return mEntityManager.hasAnyEntity() || mCellComponents.hasAnyComponents();
 }

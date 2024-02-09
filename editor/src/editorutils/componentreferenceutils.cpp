@@ -26,8 +26,15 @@ namespace Utils
 			auto componentHolderOrEntityManager = GetBoundComponentHolderOrEntityManager(source, world);
 			if (auto entityManager = std::get_if<EntityManager*>(&componentHolderOrEntityManager))
 			{
+				const OptionalEntity entity = Utils::GetEntityFromId(*source.editorUniqueId, **entityManager);
+				if (!entity.isValid())
+				{
+					std::cout << "Could not find entity with id " << *source.editorUniqueId << "\n";
+					return {};
+				}
+
 				std::vector<TypedComponent> componentDatas;
-				(*entityManager)->getAllEntityComponents(*source.entity, componentDatas);
+				(*entityManager)->getAllEntityComponents(entity.getEntity(), componentDatas);
 				return componentDatas;
 			}
 			else if (auto componentHolder = std::get_if<ComponentSetHolder*>(&componentHolderOrEntityManager))
@@ -45,8 +52,14 @@ namespace Utils
 			auto componentHolderOrEntityManager = GetBoundComponentHolderOrEntityManager(source, world);
 			if (auto entityManager = std::get_if<EntityManager*>(&componentHolderOrEntityManager))
 			{
+				const OptionalEntity entity = Utils::GetEntityFromId(*source.editorUniqueId, **entityManager);
+				if (!entity.isValid())
+				{
+					std::cout << "Could not find entity with id " << *source.editorUniqueId << "\n";
+					return;
+				}
 				(*entityManager)->addComponent(
-					*source.entity,
+					entity.getEntity(),
 					componentData.component,
 					componentData.typeId
 				);
@@ -68,8 +81,14 @@ namespace Utils
 			auto componentHolderOrEntityManager = GetBoundComponentHolderOrEntityManager(source, world);
 			if (auto entityManager = std::get_if<EntityManager*>(&componentHolderOrEntityManager))
 			{
+				const OptionalEntity entity = Utils::GetEntityFromId(*source.editorUniqueId, **entityManager);
+				if (!entity.isValid())
+				{
+					std::cout << "Could not find entity with id " << *source.editorUniqueId << "\n";
+					return;
+				}
 				(*entityManager)->removeComponent(
-					*source.entity,
+					entity.getEntity(),
 					componentTypeName
 				);
 			}
@@ -88,7 +107,7 @@ namespace Utils
 		{
 			if (source.cellPos.has_value())
 			{
-				if (source.entity.has_value()) // spatial entity
+				if (source.editorUniqueId.has_value()) // spatial entity
 				{
 					if (WorldCell* cell = world->getSpatialData().getCell(*source.cellPos))
 					{
@@ -101,17 +120,23 @@ namespace Utils
 				}
 				else // cell component
 				{
+					if (!source.cellPos.has_value())
+					{
+						std::cout << "Cell component source has no cellPos\n";
+						return nullptr;
+					}
 					if (WorldCell* cell = world->getSpatialData().getCell(*source.cellPos))
 					{
 						return &cell->getCellComponents();
 					}
 					else
 					{
+						std::cout << "Could not find cell at " << source.cellPos->x << ", " << source.cellPos->y << "\n";
 						return nullptr;
 					}
 				}
 			}
-			else if (source.entity.has_value()) // world entity
+			else if (source.editorUniqueId.has_value()) // world entity
 			{
 				return &world->getEntityManager();
 			}

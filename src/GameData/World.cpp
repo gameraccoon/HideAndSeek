@@ -10,10 +10,10 @@
 #include "GameData/Serialization/Json/EntityManager.h"
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
-World::World(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator)
-	: mEntityManager(componentFactory, entityGenerator)
+World::World(const ComponentFactory& componentFactory)
+	: mEntityManager(componentFactory)
 	, mWorldComponents(componentFactory)
-	, mSpatialData(componentFactory, entityGenerator)
+	, mSpatialData(componentFactory)
 {
 }
 
@@ -33,12 +33,13 @@ static void InitSpatialTrackedEntities(SpatialWorldData& spatialData, ComponentS
 	auto& cells = spatialData.getAllCells();
 	for (auto& cellPair : cells)
 	{
-		cellPair.second.getEntityManager().forEachComponentSet<const SpatialTrackComponent>(
-			[trackedSpatialEntities, cell = &cellPair.second](const SpatialTrackComponent* spatialTrack)
+		cellPair.second.getEntityManager().forEachComponentSetWithEntity<const SpatialTrackComponent>(
+			[trackedSpatialEntities, cell = &cellPair.second](Entity entity, const SpatialTrackComponent* spatialTrack)
 		{
 			auto it = trackedSpatialEntities->getEntitiesRef().find(spatialTrack->getId());
 			if (it != trackedSpatialEntities->getEntitiesRef().end())
 			{
+				it->second.entity = entity;
 				it->second.cell = cell->getPos();
 			}
 			else

@@ -7,42 +7,19 @@
 
 namespace Json
 {
-	static void StableSortEntitiesById(RaccoonEcs::ComponentMapImpl<StringId>& components, std::vector<Entity>& entities, std::unordered_map<Entity::EntityId, size_t>& entityIndexMap)
-	{
-		std::vector<size_t> positions;
-		soasort::getSortedPositions(positions, entities);
-
-		std::vector<soasort::Swap> swaps;
-		soasort::generateSwaps(swaps, positions);
-
-		for (auto& componentVectorPair : components)
-		{
-			componentVectorPair.second.resize(entities.size(), nullptr);
-			soasort::applySwaps(componentVectorPair.second, swaps);
-		}
-
-		soasort::applySwaps(entities, swaps);
-		for (EntityManager::EntityIndex idx = 0u; idx < entities.size(); ++idx)
-		{
-			entityIndexMap[entities[idx].getId()] = idx;
-		}
-	}
-
 	nlohmann::json SerializeEntityManager(EntityManager& entityManager, const Json::ComponentSerializationHolder& jsonSerializationHolder)
 	{
-		entityManager.applySortingFunction(&StableSortEntitiesById);
 		entityManager.clearCaches();
 
-		// we sorted them two lines above
-		const std::vector<Entity>& sortedEntities = entityManager.getEntities();
+		const std::vector<Entity> sortedEntities = entityManager.collectAllEntities();
 		nlohmann::json entitiesJson;
 		for (Entity entity : sortedEntities)
 		{
-			entitiesJson.push_back(entity.getId());
+			entitiesJson.push_back(entity.getRawId());
 		}
 
 		nlohmann::json outJson{
-			{"entities", entitiesJson}
+			{ "entities", entitiesJson }
 		};
 
 		auto components = nlohmann::json{};
@@ -74,16 +51,17 @@ namespace Json
 		// make sure the manager is fully reset
 		outEntityManager.clear();
 
-		// entities go in order of indexes, starting from zero
+		// entities go in order of component indexes, starting from zero
 		const auto& entitiesJson = json.at("entities");
 
-		std::vector<Entity> entities;
-		entities.reserve(entitiesJson.size());
+		std::unordered_map<Entity::RawId, Entity> entityMap;
+		std::vector<Entity::RawId> rawIds;
 		for (const auto& entityData : entitiesJson)
 		{
-			Entity entity(entityData.get<Entity::EntityId>());
-			outEntityManager.addExistingEntityUnsafe(entity);
-			entities.push_back(entity);
+			Entity::RawId rawIdx = entityData.get<Entity::RawId>();
+			const Entity newEntity = outEntityManager.addEntity();
+			entityMap.emplace(rawIdx, newEntity);
+			rawIds.push_back(rawIdx);
 		}
 
 		const auto& components = json.at("components");
@@ -97,7 +75,7 @@ namespace Json
 				{
 					if (!componentData.is_null())
 					{
-						void* component = outEntityManager.addComponentByType(entities[entityIndex], type);
+						void* component = outEntityManager.addComponentByType(entityMap.find(rawIds[entityIndex])->second, type);
 						jsonSerializer->fromJson(componentData, component);
 					}
 					++entityIndex;

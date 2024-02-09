@@ -10,8 +10,8 @@ class Change{class_name}{attribute_name_capital}Command : public EditorCommand
 public:
 	Change{class_name}{attribute_name_capital}Command(const ComponentSourceReference& source, const {attribute_type}& old{attribute_name_capital}, const {attribute_type}& new{attribute_name_capital}, bool needToUpdateLayout);
 
-	void doCommand(World* world) override;
-	void undoCommand(World* world) override;
+	void doCommand(CommandExecutionContext& context) override;
+	void undoCommand(CommandExecutionContext& context) override;
 
 private:
 	ComponentSourceReference mComponentSource;

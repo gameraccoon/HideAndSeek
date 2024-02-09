@@ -18,6 +18,7 @@
 #include <raccoon-ecs/component_factory.h>
 
 #include "GameData/Serialization/Json/EntityManager.h"
+#include "GameData/World.h"
 
 #include "src/editorcommands/addcomponentcommand.h"
 

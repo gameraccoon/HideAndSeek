@@ -2,30 +2,48 @@
 
 #include <QtWidgets/qcombobox.h>
 
+#include "../editorutils/editoridutils.h"
+
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/World.h"
 
-AddSpatialEntityCommand::AddSpatialEntityCommand(const SpatialEntity& entity, const Vector2D& location)
+AddSpatialEntityCommand::AddSpatialEntityCommand(const CellPos cellPos, const Vector2D& location)
 	: EditorCommand(EffectBitset(EffectType::Entities))
-	, mEntity(entity)
+	, mCellPos(cellPos)
 	, mLocation(location)
 {
 }
 
-void AddSpatialEntityCommand::doCommand(World* world)
+void AddSpatialEntityCommand::doCommand(CommandExecutionContext& context)
 {
-	WorldCell& cell = world->getSpatialData().getOrCreateCell(mEntity.cell);
-	EntityManager& cellEnttiyManager = cell.getEntityManager();
-	cellEnttiyManager.addExistingEntityUnsafe(mEntity.entity.getEntity());
-	TransformComponent* transform = cellEnttiyManager.addComponent<TransformComponent>(mEntity.entity.getEntity());
+	if (!mEditorEntityId)
+	{
+		mEditorEntityId = context.getEditorIdGenerator().getNextId();
+	}
+
+	WorldCell& cell = context.world->getSpatialData().getOrCreateCell(mCellPos);
+	EntityManager& cellEntityManager = cell.getEntityManager();
+
+	const Entity entity = cellEntityManager.addEntity();
+
+	Utils::SetEntityId(entity, *mEditorEntityId, cellEntityManager);
+
+	TransformComponent* transform = cellEntityManager.addComponent<TransformComponent>(entity);
 	transform->setLocation(mLocation);
 }
 
-void AddSpatialEntityCommand::undoCommand(World* world)
+void AddSpatialEntityCommand::undoCommand(CommandExecutionContext& context)
 {
-	if (WorldCell* cell = world->getSpatialData().getCell(mEntity.cell))
+	if (WorldCell* cell = context.world->getSpatialData().getCell(mCellPos))
 	{
 		EntityManager& cellEnttiyManager = cell->getEntityManager();
-		cellEnttiyManager.removeEntity(mEntity.entity.getEntity());
+		const OptionalEntity entity = Utils::GetEntityFromId(*mEditorEntityId, cellEnttiyManager);
+		if (!entity.isValid())
+		{
+			std::cout << "AddSpatialEntityCommand::undoCommand: entity with id " << *mEditorEntityId << " not found\n";
+			return;
+		}
+
+		cellEnttiyManager.removeEntity(entity.getEntity());
 	}
 }

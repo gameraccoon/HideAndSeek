@@ -11,7 +11,7 @@
 class WorldCell
 {
 public:
-	WorldCell(const CellPos& pos, const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator);
+	WorldCell(const CellPos& pos, const ComponentFactory& componentFactory);
 
 	EntityManager& getEntityManager() { return mEntityManager; }
 	const EntityManager& getEntityManager() const { return mEntityManager; }

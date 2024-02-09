@@ -18,7 +18,4 @@ struct SpatialEntity
 
 	bool operator==(const SpatialEntity& other) const;
 	bool operator!=(const SpatialEntity& other) const;
-
-	friend void to_json(nlohmann::json& outJson, const SpatialEntity& spatialEntity);
-	friend void from_json(const nlohmann::json& json, SpatialEntity& outSpatialEntity);
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <raccoon-ecs/entity.h>
 
 #include "editorcommand.h"
@@ -9,11 +11,11 @@ class World;
 class AddEntityCommand : public EditorCommand
 {
 public:
-	AddEntityCommand(Entity entity);
+	AddEntityCommand();
 
-	void doCommand(World* world) override;
-	void undoCommand(World* world) override;
+	void doCommand(CommandExecutionContext& context) override;
+	void undoCommand(CommandExecutionContext& context) override;
 
 private:
-	Entity mEntity;
+	std::optional<size_t> mEditorEntityId;
 };

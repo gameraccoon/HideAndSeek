@@ -15,7 +15,7 @@ class ComponentContentFactory
 {
 public:
 	void registerComponents();
-	void replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, TypedComponent componentData, EditorCommandsStack& commandStack, World* world);
+	void replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, TypedComponent componentData, EditorCommandsStack& commandStack, CommandExecutionContext& context);
 	void removeEditContent(QLayout* layout);
 	bool isComponentEditable(StringId componentType) const;
 

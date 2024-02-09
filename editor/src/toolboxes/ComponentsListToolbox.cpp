@@ -152,8 +152,8 @@ void ComponentsListToolbox::removeSelectedComponent()
 		return;
 	}
 
-	World* currentWorld = mMainWindow->getCurrentWorld();
-	if (currentWorld == nullptr)
+	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	if (context.world == nullptr)
 	{
 		return;
 	}
@@ -164,7 +164,7 @@ void ComponentsListToolbox::removeSelectedComponent()
 	}
 
 	mMainWindow->getCommandStack().executeNewCommand<RemoveComponentCommand>(
-		currentWorld,
+		context,
 		*mLastSelectedComponentSource,
 		STR_TO_ID(currentItem->text().toStdString()),
 		mMainWindow->getComponentSerializationHolder(),
@@ -220,7 +220,7 @@ void ComponentsListToolbox::addComponent(const QString& typeName)
 	if (mLastSelectedComponentSource.has_value())
 	{
 		mMainWindow->getCommandStack().executeNewCommand<AddComponentCommand>(
-			currentWorld,
+			mMainWindow->getCommandExecutionContext(),
 			*mLastSelectedComponentSource,
 			STR_TO_ID(typeName.toStdString()),
 			mMainWindow->getComponentFactory()

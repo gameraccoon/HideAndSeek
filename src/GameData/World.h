@@ -8,7 +8,7 @@
 class World
 {
 public:
-	World(const ComponentFactory& componentFactory, RaccoonEcs::EntityGenerator& entityGenerator);
+	World(const ComponentFactory& componentFactory);
 
 	World(const World&) = delete;
 	World(World&&) = delete;

@@ -16,8 +16,8 @@ class RemoveComponentCommand : public EditorCommand
 public:
 	RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const Json::ComponentSerializationHolder& jsonSerializerHolder, const ComponentFactory& componentFactory);
 
-	void doCommand(World* world) override;
-	void undoCommand(World* world) override;
+	void doCommand(CommandExecutionContext& context) override;
+	void undoCommand(CommandExecutionContext& context) override;
 
 private:
 	ComponentSourceReference mSource;

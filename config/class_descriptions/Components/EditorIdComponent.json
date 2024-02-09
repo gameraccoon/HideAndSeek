@@ -1,0 +1,11 @@
+{
+	"description": "Component that tracks entities in the editor. Mandatory for all entities while in editor.",
+	"flags": ["transient"],
+	"attributes": [
+		{
+			"name": "id",
+			"type": "size_t",
+			"default": " = 0"
+		}
+	]
+}

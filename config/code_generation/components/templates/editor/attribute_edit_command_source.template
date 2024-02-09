@@ -14,17 +14,17 @@ Change{class_name}{attribute_name_capital}Command::Change{class_name}{attribute_
 {{
 }}
 
-void Change{class_name}{attribute_name_capital}Command::doCommand(World* world)
+void Change{class_name}{attribute_name_capital}Command::doCommand(CommandExecutionContext& context)
 {{
-	if ({class_name}* component = Utils::GetComponent<{class_name}>(mComponentSource, world))
+	if ({class_name}* component = Utils::GetComponent<{class_name}>(mComponentSource, context.world))
 	{{
 		component->set{attribute_name_capital}(mNew{attribute_name_capital});
 	}}
 }}
 
-void Change{class_name}{attribute_name_capital}Command::undoCommand(World* world)
+void Change{class_name}{attribute_name_capital}Command::undoCommand(CommandExecutionContext& context)
 {{
-	if ({class_name}* component = Utils::GetComponent<{class_name}>(mComponentSource, world))
+	if ({class_name}* component = Utils::GetComponent<{class_name}>(mComponentSource, context.world))
 	{{
 		component->set{attribute_name_capital}(mOld{attribute_name_capital});
 	}}

@@ -7,7 +7,7 @@
 
 #include "GameData/EcsDefinitions.h"
 
-#include "src/editorutils/entityreference.h"
+#include "src/editorutils/editorentityreference.h"
 #include "src/editorutils/componentreference.h"
 
 class MainWindow;

@@ -17,7 +17,7 @@
 #include "GameData/Spatial/CellPos.h"
 
 #include "src/editorcommands/editorcommand.h"
-#include "src/editorutils/entityreference.h"
+#include "src/editorutils/editorentityreference.h"
 
 class MainWindow;
 
@@ -38,7 +38,7 @@ public:
 
 	void onClick(const class QPoint& pos);
 	SpatialEntityManager::RecordsVector getCellsOnScreen();
-	SpatialEntity getEntityUnderPoint(const QPoint& pos);
+	EditorEntityReference getEntityUnderPoint(const QPoint& pos);
 
 	void onCoordinateXChanged(const QString& newValueStr);
 	void onCoordinateYChanged(const QString& newValueStr);
@@ -67,9 +67,9 @@ public:
 	float mScale = 1.0f;
 	Vector2D mCursorObjectOffset;
 
-	RaccoonEcs::SinglecastDelegate<std::vector<SpatialEntity>, const Vector2D&> OnEntitiesMoved;
+	RaccoonEcs::SinglecastDelegate<const std::vector<EditorEntityReference>&, const Vector2D&> OnEntitiesMoved;
 
-	std::vector<SpatialEntity> mSelectedEntities;
+	std::vector<EditorEntityReference> mSelectedEntities;
 	Vector2D mSelectedGroupCenter;
 
 	bool mFreeMove = true;
@@ -95,8 +95,8 @@ private:
 	void updateWorld();
 	void updateEntitiesFromChangeEntityGroupLocationCommand(const class ChangeEntityGroupLocationCommand& command);
 	void onCommandExecuted(EditorCommand::EffectBitset effects, bool originalCall);
-	void onEntitySelected(const std::optional<EntityReference>& entityRef);
-	void onEntitiesMoved(std::vector<SpatialEntity> entities, const Vector2D& shift);
+	void onEntitySelected(const std::optional<EditorEntityReference>& entityRef);
+	void onEntitiesMoved(const std::vector<EditorEntityReference>& entities, const Vector2D& shift);
 	void onFreeMoveChanged(int newValue);
 	void onScaleChanged(int newValue);
 	void showContextMenu(const QPoint& pos);

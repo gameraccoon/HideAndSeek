@@ -20,15 +20,25 @@ namespace TypesEditConstructor
 		Edit<RaccoonEcs::Entity>::Ptr edit = std::make_shared<Edit<RaccoonEcs::Entity>>(initialValue);
 		Edit<RaccoonEcs::Entity>::WeakPtr editWeakPtr = edit;
 
-		Edit<RaccoonEcs::Entity::EntityId>::Ptr editAngle = FillEdit<RaccoonEcs::Entity::EntityId>::Call(innerLayout, "id", initialValue.getId());
-		editAngle->bindOnChange([editWeakPtr](float /*oldValue*/, RaccoonEcs::Entity::EntityId newValue, bool)
+		Edit<RaccoonEcs::Entity::RawId>::Ptr editRawId = FillEdit<RaccoonEcs::Entity::RawId>::Call(innerLayout, "rawId", initialValue.getRawId());
+		editRawId->bindOnChange([editWeakPtr](RaccoonEcs::Entity::RawId /*oldValue*/, RaccoonEcs::Entity::RawId newValue, bool)
 		{
 			if (Edit<RaccoonEcs::Entity>::Ptr edit = editWeakPtr.lock())
 			{
-				edit->transmitValueChange(RaccoonEcs::Entity(newValue));
+				edit->transmitValueChange(RaccoonEcs::Entity(newValue, edit->getPreviousValue().getVersion()));
 			}
 		});
-		edit->addChild(editAngle);
+		edit->addChild(editRawId);
+
+		Edit<RaccoonEcs::Entity::Version>::Ptr editVersion = FillEdit<RaccoonEcs::Entity::Version>::Call(innerLayout, "version", initialValue.getVersion());
+		editVersion->bindOnChange([editWeakPtr](RaccoonEcs::Entity::Version /*oldValue*/, RaccoonEcs::Entity::Version newValue, bool)
+		{
+			if (Edit<RaccoonEcs::Entity>::Ptr edit = editWeakPtr.lock())
+			{
+				edit->transmitValueChange(RaccoonEcs::Entity(edit->getPreviousValue().getRawId(), newValue));
+			}
+		});
+		edit->addChild(editVersion);
 
 		innerLayout->addStretch();
 		QWidget* container = HS_NEW QWidget();

@@ -96,8 +96,8 @@ void ComponentAttributesToolbox::onSelectedComponentChange(const std::optional<C
 		return;
 	}
 
-	World* currentWorld = mMainWindow->getCurrentWorld();
-	if (currentWorld == nullptr)
+	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	if (context.world == nullptr)
 	{
 		return;
 	}
@@ -106,14 +106,14 @@ void ComponentAttributesToolbox::onSelectedComponentChange(const std::optional<C
 
 	if (componentReference.has_value())
 	{
-		if (void* component = Utils::GetComponent(*componentReference, currentWorld))
+		if (void* component = Utils::GetComponent(*componentReference, context.world))
 		{
 			mMainWindow->getComponentContentFactory().replaceEditContent(
 				componentAttributesContainerWidget->layout(),
 				componentReference->source,
 				TypedComponent(componentReference->componentTypeName, component),
 				mMainWindow->getCommandStack(),
-				currentWorld
+				context
 			);
 			validComponentIsSelected = true;
 			mLastSelectedComponent = componentReference;

@@ -16,7 +16,8 @@
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 #include "editorutils/componentreference.h"
-#include "editorutils/entityreference.h"
+#include "editorutils/editorentityreference.h"
+#include "editorutils/editoridgenerator.h"
 
 namespace ads
 {
@@ -43,15 +44,17 @@ public:
 	~MainWindow();
 
 	World* getCurrentWorld() { return mCurrentWorld.get(); }
+	CommandExecutionContext getCommandExecutionContext();
 	const Json::ComponentSerializationHolder& getComponentSerializationHolder() const { return mComponentSerializationHolder; }
 	const ComponentFactory& getComponentFactory() const { return mComponentFactory; }
 	ComponentContentFactory& getComponentContentFactory() { return mComponentContentFactory; }
 	EditorCommandsStack& getCommandStack() { return mCommandStack; }
 	PrefabListToolbox* getPrefabToolbox() { return mPrefabListToolbox.get(); }
+	EditorIdGenerator& getEditorIdGenerator() { return mEditorIdGenerator; }
 
 public:
 	RaccoonEcs::MulticastDelegate<> OnWorldChanged;
-	RaccoonEcs::MulticastDelegate<const std::optional<EntityReference>&> OnSelectedEntityChanged;
+	RaccoonEcs::MulticastDelegate<const std::optional<EditorEntityReference>&> OnSelectedEntityChanged;
 	RaccoonEcs::MulticastDelegate<const std::optional<ComponentSourceReference>&> OnSelectedComponentSourceChanged;
 	RaccoonEcs::MulticastDelegate<const std::optional<ComponentReference>&> OnSelectedComponentChanged;
 	RaccoonEcs::MulticastDelegate<EditorCommand::EffectBitset, bool> OnCommandEffectApplied;
@@ -98,12 +101,12 @@ private:
 	Ui::mainwindow* ui;
 	std::unique_ptr<ads::CDockManager> mDockManager;
 	ComponentFactory mComponentFactory;
-	RaccoonEcs::IncrementalEntityGenerator mEntityGenerator;
 	std::unique_ptr<class World> mCurrentWorld;
 	Json::ComponentSerializationHolder mComponentSerializationHolder;
 	ComponentContentFactory mComponentContentFactory;
 	std::string mOpenedWorldPath;
 	EditorCommandsStack mCommandStack;
+	EditorIdGenerator mEditorIdGenerator;
 
 	std::unique_ptr<EntitiesListToolbox> mEntitiesListToolbox;
 	std::unique_ptr<ComponentAttributesToolbox> mComponentAttributesToolbox;

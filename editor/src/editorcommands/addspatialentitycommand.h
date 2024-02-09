@@ -1,19 +1,25 @@
 #pragma once
 
+#include <optional>
+
 #include "editorcommand.h"
-#include "GameData/Spatial/SpatialEntity.h"
+
+#include "../editorutils/editorentityreference.h"
+
+#include "GameData/Geometry/Vector2D.h"
 
 class World;
 
 class AddSpatialEntityCommand : public EditorCommand
 {
 public:
-	AddSpatialEntityCommand(const SpatialEntity& entity, const Vector2D& location);
+	AddSpatialEntityCommand(const CellPos cellPos, const Vector2D& location);
 
-	void doCommand(World* world) override;
-	void undoCommand(World* world) override;
+	void doCommand(CommandExecutionContext& context) override;
+	void undoCommand(CommandExecutionContext& context) override;
 
 private:
-	SpatialEntity mEntity;
-	Vector2D mLocation;
+	const CellPos mCellPos;
+	const Vector2D mLocation;
+	std::optional<size_t> mEditorEntityId;
 };

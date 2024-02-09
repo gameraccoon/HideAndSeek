@@ -48,8 +48,7 @@ private:
 
 private:
 	ComponentFactory mComponentFactory;
-	RaccoonEcs::IncrementalEntityGenerator mEntityGenerator;
-	World mWorld{mComponentFactory, mEntityGenerator};
+	World mWorld{mComponentFactory};
 	GameData mGameData{mComponentFactory};
 	WorldHolder mWorldHolder{&mWorld, mGameData};
 

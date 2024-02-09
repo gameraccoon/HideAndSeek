@@ -17,12 +17,13 @@ class AddEntityGroupCommand : public EditorCommand
 public:
 	AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, const Json::ComponentSerializationHolder& jsonSerializerHolder, const Vector2D& shift);
 
-	void doCommand(World* world) override;
-	void undoCommand(World* world) override;
+	void doCommand(CommandExecutionContext& context) override;
+	void undoCommand(CommandExecutionContext& context) override;
 
 private:
 	std::vector<nlohmann::json> mEntities;
-	std::vector<SpatialEntity> mCreatedEntities;
+	std::vector<EditorEntityReference> mCreatedEntities;
+	std::vector<Vector2D> mCreatedEntityPositions;
 	const Json::ComponentSerializationHolder& mSerializationHolder;
 	Vector2D mShift;
 };

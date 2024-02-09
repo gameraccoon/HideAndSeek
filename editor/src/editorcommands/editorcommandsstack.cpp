@@ -1,11 +1,11 @@
 #include "editorcommandsstack.h"
 
 
-void EditorCommandsStack::undo(World* world)
+void EditorCommandsStack::undo(CommandExecutionContext context)
 {
 	if (haveSomethingToUndo())
 	{
-		mCommands[static_cast<size_t>(mCurrentHeadIndex)]->undoCommand(world);
+		mCommands[static_cast<size_t>(mCurrentHeadIndex)]->undoCommand(context);
 		EditorCommand::EffectBitset effects = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffects();
 		--mCurrentHeadIndex;
 
@@ -19,12 +19,12 @@ void EditorCommandsStack::undo(World* world)
 	}
 }
 
-void EditorCommandsStack::redo(World* world)
+void EditorCommandsStack::redo(CommandExecutionContext context)
 {
 	if (haveSomethingToRedo())
 	{
 		++mCurrentHeadIndex;
-		mCommands[static_cast<size_t>(mCurrentHeadIndex)]->doCommand(world);
+		mCommands[static_cast<size_t>(mCurrentHeadIndex)]->doCommand(context);
 		EditorCommand::EffectBitset effects = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffects();
 
 		mLastExecutedCommandIdx = mCurrentHeadIndex;

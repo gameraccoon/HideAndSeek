@@ -1,10 +1,12 @@
 #pragma once
 
 #include <variant>
+#include <iostream>
 
 #include "GameData/EcsDefinitions.h"
 
 #include "componentreference.h"
+#include "editoridutils.h"
 
 class World;
 
@@ -23,7 +25,13 @@ namespace Utils
 		auto componentHolderOrEntityManager = GetBoundComponentHolderOrEntityManager(source, world);
 		if (auto entityManager = std::get_if<EntityManager*>(&componentHolderOrEntityManager))
 		{
-			return std::get<0>((*entityManager)->getEntityComponents<T>(*source.entity));
+			OptionalEntity entity = Utils::GetEntityFromId(*source.editorUniqueId, **entityManager);
+			if (!entity.isValid())
+			{
+				std::cout << "Could not find entity with id " << *source.editorUniqueId << "\n";
+				return nullptr;
+			}
+			return std::get<0>((*entityManager)->getEntityComponents<T>(entity.getEntity()));
 		}
 		else if (auto componentHolder = std::get_if<ComponentSetHolder*>(&componentHolderOrEntityManager))
 		{

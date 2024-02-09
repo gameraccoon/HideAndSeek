@@ -2,6 +2,8 @@
 
 #include "editorcommand.h"
 
+#include "../editorutils/editorentityreference.h"
+
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 #include "GameData/Spatial/SpatialEntity.h"
 
@@ -12,13 +14,13 @@ class World;
 class RemoveEntitiesCommand : public EditorCommand
 {
 public:
-	RemoveEntitiesCommand(const std::vector<SpatialEntity>& entities, const Json::ComponentSerializationHolder& serializerHolder);
+	RemoveEntitiesCommand(const std::vector<EditorEntityReference>& entities, const Json::ComponentSerializationHolder& serializerHolder);
 
-	void doCommand(World* world) override;
-	void undoCommand(World* world) override;
+	void doCommand(CommandExecutionContext& context) override;
+	void undoCommand(CommandExecutionContext& context) override;
 
 private:
-	std::vector<SpatialEntity> mEntities;
-	std::vector<nlohmann::json> mSerializedComponents;
+	const std::vector<EditorEntityReference> mEntities;
 	const Json::ComponentSerializationHolder& mComponentSerializerHolder;
+	std::vector<nlohmann::json> mSerializedComponents;
 };

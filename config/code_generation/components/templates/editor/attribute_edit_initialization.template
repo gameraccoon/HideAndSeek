@@ -1,9 +1,11 @@
 m{attribute_name_capital}Edit = TypesEditConstructor::FillEdit<{attribute_type}>::Call(layout, "{attribute_name}", {component_name}->get{attribute_name_capital}());
-	m{attribute_name_capital}Edit->bindOnChange([componentSource, &commandStack, world](const {attribute_type}& oldValue, const {attribute_type}& newValue, bool needLayoutUpdate)
+	m{attribute_name_capital}Edit->bindOnChange([componentSource, &commandStack, context](const {attribute_type}& oldValue, const {attribute_type}& newValue, bool needLayoutUpdate)
 	{{
-		commandStack.executeNewCommand<Change{class_name}{attribute_name_capital}Command>(world,
+		commandStack.executeNewCommand<Change{class_name}{attribute_name_capital}Command>(
+			context,
 			componentSource,
 			oldValue,
 			newValue,
-			needLayoutUpdate);
+			needLayoutUpdate
+		);
 	}});{delim_endl}{delim_endl}{delim_tab}

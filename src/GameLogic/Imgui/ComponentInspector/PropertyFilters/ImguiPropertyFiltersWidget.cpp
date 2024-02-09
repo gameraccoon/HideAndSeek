@@ -45,18 +45,6 @@ namespace ImguiPropertyFiltration
 
 	ImguiPropertyFiltersWidget::~ImguiPropertyFiltersWidget() = default;
 
-	static WorldCell* findEntityCell(std::unordered_map<CellPos, WorldCell>& cells, Entity entity)
-	{
-		for (auto& [pos, cell] : cells)
-		{
-			if (cell.getEntityManager().hasEntity(entity))
-			{
-				return &cell;
-			}
-		}
-		return nullptr;
-	}
-
 	void ImguiPropertyFiltersWidget::update(ImguiDebugData& debugData)
 	{
 		if (!mIsInited)
@@ -82,29 +70,29 @@ namespace ImguiPropertyFiltration
 
 		if (ImGui::InputTextWithHint("##FilterSearch", "Search Query", mFilterQueryBuffer, IM_ARRAYSIZE(mFilterQueryBuffer)))
 		{
-			{
-				Entity::EntityId id = 0;
-				std::string_view strId(mFilterQueryBuffer, IM_ARRAYSIZE(mFilterQueryBuffer));
-				std::stringstream ss;
-				if (strId[0] == '0' && strId[1] == 'x') {
-					ss << std::hex;
-				}
-				ss << strId;
-				ss >> id;
-				Entity entity(id);
-
-				std::unordered_map<CellPos, WorldCell>& allCells = debugData.worldHolder.getWorld().getSpatialData().getAllCells();
-				WorldCell* cell = findEntityCell(allCells, entity);
-				if (cell != nullptr)
-				{
-					mExplicitlySetEntity = std::make_tuple(cell, entity);
-					return;
-				}
-				else
-				{
-					mExplicitlySetEntity = std::nullopt;
-				}
-			}
+//			{
+//				Entity::RawId id = 0;
+//				std::string_view strId(mFilterQueryBuffer, IM_ARRAYSIZE(mFilterQueryBuffer));
+//				std::stringstream ss;
+//				if (strId[0] == '0' && strId[1] == 'x') {
+//					ss << std::hex;
+//				}
+//				ss << strId;
+//				ss >> id;
+//				Entity entity = Entity{id, 0};
+//
+//				std::unordered_map<CellPos, WorldCell>& allCells = debugData.worldHolder.getWorld().getSpatialData().getAllCells();
+//				WorldCell* cell = findEntityCell(allCells, entity);
+//				if (cell != nullptr)
+//				{
+//					mExplicitlySetEntity = std::make_tuple(cell, entity);
+//					return;
+//				}
+//				else
+//				{
+//					mExplicitlySetEntity = std::nullopt;
+//				}
+//			}
 
 			std::string strId(mFilterQueryBuffer, std::strlen(mFilterQueryBuffer));
 			// tolower

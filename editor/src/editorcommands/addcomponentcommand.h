@@ -14,8 +14,8 @@ class AddComponentCommand : public EditorCommand
 public:
 	AddComponentCommand(const ComponentSourceReference& source, StringId typeName, const ComponentFactory& factory);
 
-	void doCommand(World* world) override;
-	void undoCommand(World* world) override;
+	void doCommand(CommandExecutionContext& context) override;
+	void undoCommand(CommandExecutionContext& context) override;
 
 private:
 	ComponentSourceReference mSource;

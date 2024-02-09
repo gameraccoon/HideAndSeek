@@ -12,7 +12,7 @@ void ComponentContentFactory::registerComponents()
 	ComponentRegistration::RegisterToEditFactory(mFactories);
 }
 
-void ComponentContentFactory::replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, TypedComponent componentData, EditorCommandsStack& commandStack, World* world)
+void ComponentContentFactory::replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, TypedComponent componentData, EditorCommandsStack& commandStack, CommandExecutionContext& context)
 {
 	auto it = mFactories.find(componentData.typeId);
 
@@ -22,7 +22,7 @@ void ComponentContentFactory::replaceEditContent(QLayout* layout, const Componen
 		mCurrentEdit = it->second->getEditData();
 		newContent = HS_NEW QWidget();
 		QVBoxLayout* innerLayout = HS_NEW QVBoxLayout();
-		mCurrentEdit->fillContent(innerLayout, sourceReference, componentData.component, commandStack, world);
+		mCurrentEdit->fillContent(innerLayout, sourceReference, componentData.component, commandStack, context);
 		innerLayout->addStretch();
 		newContent->setLayout(innerLayout);
 	}
