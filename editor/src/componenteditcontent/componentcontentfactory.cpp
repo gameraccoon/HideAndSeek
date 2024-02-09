@@ -64,3 +64,8 @@ void ComponentContentFactory::removeEditContent(QLayout* layout)
 		mContentWidget = nullptr;
 	}
 }
+
+bool ComponentContentFactory::isComponentEditable(StringId componentType) const
+{
+	return mFactories.find(componentType) != mFactories.end();
+}

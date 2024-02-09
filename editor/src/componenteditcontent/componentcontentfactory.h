@@ -17,6 +17,7 @@ public:
 	void registerComponents();
 	void replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, TypedComponent componentData, EditorCommandsStack& commandStack, World* world);
 	void removeEditContent(QLayout* layout);
+	bool isComponentEditable(StringId componentType) const;
 
 private:
 	QWidget* mContentWidget = nullptr;

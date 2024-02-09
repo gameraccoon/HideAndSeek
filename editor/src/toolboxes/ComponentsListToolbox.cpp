@@ -101,7 +101,10 @@ void ComponentsListToolbox::onSelectedComponentSourceChanged(const std::optional
 		const std::vector<TypedComponent> components = Utils::GetComponents(*newSource, currentWorld);
 		for (const auto& componentData : components)
 		{
-			componentsList->addItem(QString::fromStdString(ID_TO_STR(componentData.typeId)));
+			if (mMainWindow->getComponentContentFactory().isComponentEditable(componentData.typeId))
+			{
+				componentsList->addItem(QString::fromStdString(ID_TO_STR(componentData.typeId)));
+			}
 		}
 		mAddComponentButton->setEnabled(true);
 	}
