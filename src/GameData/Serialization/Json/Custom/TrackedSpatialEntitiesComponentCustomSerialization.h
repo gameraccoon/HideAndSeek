@@ -2,11 +2,11 @@
 
 #include <map>
 
-#include <nlohmann/json_fwd.hpp>
+#include <nlohmann/json.hpp>
 
 #include "Base/Types/String/StringId.h"
 
-class SpatialEntity;
+struct SpatialEntity;
 
 namespace TrackedSpatialEntitiesComponentCustomSerialization
 {

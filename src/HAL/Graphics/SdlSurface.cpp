@@ -111,7 +111,7 @@ namespace Graphics
 		: mSurface(IMG_Load(filename.getAbsolutePathStr().c_str()))
 		, mTextureID(0)
 	{
-		AssertFatal(mSurface, "Unable to load texture %s", filename);
+		AssertFatal(mSurface, "Unable to load texture %s", filename.getAbsolutePath().c_str());
 	}
 
 	Surface::~Surface()

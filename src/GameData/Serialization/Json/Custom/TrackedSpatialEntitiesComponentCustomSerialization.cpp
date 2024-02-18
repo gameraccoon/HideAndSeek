@@ -2,8 +2,6 @@
 
 #include "TrackedSpatialEntitiesComponentCustomSerialization.h"
 
-#include <nlohmann/json.hpp>
-
 #include "GameData/Spatial/SpatialEntity.h"
 
 namespace TrackedSpatialEntitiesComponentCustomSerialization

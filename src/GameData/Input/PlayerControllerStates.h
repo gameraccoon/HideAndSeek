@@ -5,7 +5,7 @@
 
 namespace Input
 {
-	class InputBindings;
+	struct InputBindings;
 
 	struct PlayerControllerStates
 	{
@@ -40,7 +40,7 @@ namespace Input
 			case ControllerType::Gamepad:
 				return gamepadState;
 			default:
-				AssertFatal(false, "Invalid controller type specified");
+				ReportFatalError("Invalid controller type specified");
 				return keyboardState;
 			}
 		}
@@ -56,7 +56,7 @@ namespace Input
 			case ControllerType::Gamepad:
 				return gamepadState;
 			default:
-				AssertFatal(false, "Invalid controller type specified");
+				ReportFatalError("Invalid controller type specified");
 				return keyboardState;
 			}
 		}
