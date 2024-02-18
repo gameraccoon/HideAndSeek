@@ -8,7 +8,6 @@
 
 ArgumentsParser::ArgumentsParser(int argc, const char** argv, const std::string& argumentSwitch)
 	: mArgumentSwitch(argumentSwitch)
-	, mExecutablePath(getExecutablePath(argv[0]))
 {
 	for (int i = 1; i < argc; ++i)
 	{
@@ -18,7 +17,6 @@ ArgumentsParser::ArgumentsParser(int argc, const char** argv, const std::string&
 
 ArgumentsParser::ArgumentsParser(int argc, char** argv, const std::string& argumentSwitch)
 	: mArgumentSwitch(argumentSwitch)
-	, mExecutablePath(getExecutablePath(argv[0]))
 {
 	for (int i = 1; i < argc; ++i)
 	{
@@ -78,11 +76,6 @@ bool ArgumentsParser::hasArgument(const std::string& argument) const
 	return std::find(mTokens.begin(), mTokens.end(), mArgumentSwitch + argument) != mTokens.end();
 }
 
-std::filesystem::path ArgumentsParser::getExecutablePath() const
-{
-	return mExecutablePath;
-}
-
 std::vector<std::string> ArgumentsParser::getAllArguments() const
 {
 	std::vector<std::string> result;
@@ -97,11 +90,4 @@ std::vector<std::string> ArgumentsParser::getAllArguments() const
 	}
 
 	return result;
-}
-
-std::filesystem::path ArgumentsParser::getExecutablePath(const char* firstArgument)
-{
-	namespace fs = std::filesystem;
-	// this is platform dependent, so we may need to add more cases here
-	return fs::path(firstArgument).parent_path();
 }

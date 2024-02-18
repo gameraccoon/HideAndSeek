@@ -19,15 +19,9 @@ public:
 
 	const std::string& getArgumentSwitch() const { return mArgumentSwitch; }
 
-	std::filesystem::path getExecutablePath() const;
-
 	[[nodiscard]] std::vector<std::string> getAllArguments() const;
-
-private:
-	static std::filesystem::path getExecutablePath(const char* firstArgument);
 
 private:
 	std::vector<std::string> mTokens;
 	std::string mArgumentSwitch;
-	std::filesystem::path mExecutablePath;
 };
