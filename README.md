@@ -3,7 +3,7 @@ Simple 2D game
 Made with **C++**
 
 [![MIT License](https://img.shields.io/github/license/gameraccoon/hide-and-seek)](https://github.com/gameraccoon/hide-and-seek/blob/develop/License.txt)  
-[![Windows - build](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-windows.yml/badge.svg)](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-windows.yml) [![Ubuntu - build and run unit-tests](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-ubuntu.yml/badge.svg)](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-ubuntu.yml)
+[![Windows - build](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-windows.yml/badge.svg)](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-windows.yml) [![Ubuntu - build and run unit-tests](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-ubuntu.yml/badge.svg)](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-ubuntu.yml) [![Ubuntu - build with clang](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-ubuntu-clang.yml/badge.svg)](https://github.com/gameraccoon/hide-and-seek/actions/workflows/build-game-ubuntu-clang.yml)
 
 ## Intent
 This is an educational project that doesn't have any applications to real-world problems, but it can still be used as a source of inspiration (or as a copypaste source).
@@ -84,7 +84,7 @@ External libraries can be found in `external` folder.
 - git with git-lfs
 - CMake (see minimal supported version in [CMakeLists.txt](https://github.com/gameraccoon/hide-and-seek/blob/develop/CMakeLists.txt#L1=))
 - python3
-- gcc 13 (or higher) or latest Visual Studio 2022 (or newer)
+- gcc 13 (or higher), or clang-16 (or higher), or latest Visual Studio 2022 (or newer)
 - for Linux you need to install sound libraries using your packet manager  
 e.g. for apt: `sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev`
 
