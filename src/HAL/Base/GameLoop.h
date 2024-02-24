@@ -8,7 +8,7 @@
 
 namespace HAL
 {
-	template<typename ShouldStopFnT = nullptr_t, typename OnIterationFnT = nullptr_t, typename AfterFrameFnT = nullptr_t>
+	template<typename ShouldStopFnT = std::nullptr_t, typename OnIterationFnT = std::nullptr_t, typename AfterFrameFnT = std::nullptr_t>
 	void RunGameLoop(IGame& game, ShouldStopFnT&& shouldStopFn = nullptr, OnIterationFnT&& onIterationFn = nullptr, AfterFrameFnT&& afterFrameFn = nullptr)
 	{
 		constexpr auto oneFrameDuration = TimeConstants::ONE_FIXED_UPDATE_DURATION;
@@ -17,7 +17,7 @@ namespace HAL
 
 		while (!game.shouldQuitGame())
 		{
-			if constexpr (!std::is_same_v<ShouldStopFnT, nullptr_t>)
+			if constexpr (!std::is_same_v<ShouldStopFnT, std::nullptr_t>)
 			{
 				 if (shouldStopFn())
 				 {
@@ -25,7 +25,7 @@ namespace HAL
 				 }
 			}
 
-			if constexpr (!std::is_same_v<OnIterationFnT, nullptr_t>)
+			if constexpr (!std::is_same_v<OnIterationFnT, std::nullptr_t>)
 			{
 				onIterationFn();
 			}
@@ -69,7 +69,7 @@ namespace HAL
 
 				lastFrameTime = timeNow - passedTime;
 
-				if constexpr (!std::is_same_v<AfterFrameFnT, nullptr_t>)
+				if constexpr (!std::is_same_v<AfterFrameFnT, std::nullptr_t>)
 				{
 					afterFrameFn();
 				}

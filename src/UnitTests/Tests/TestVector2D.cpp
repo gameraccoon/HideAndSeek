@@ -110,13 +110,9 @@ TEST(Vector2D, Substraction)
 
 	Vector2D testVectorC = testVectorA - testVectorB;
 	testVectorA = testVectorB - testVectorC;
-DISABLE_DIAG_PUSH(-Wself-assign-overloaded)
-	testVectorB -= testVectorB;
-DISABLE_DIAG_POP
 
 	EXPECT_TRUE(testVectorC.isNearlyEqualTo(Vector2D(-11.7f, -803.66f)));
 	EXPECT_TRUE(testVectorA.isNearlyEqualTo(Vector2D(28.6f, 1606.9301f)));
-	EXPECT_TRUE(testVectorB.isNearlyEqualTo(Vector2D(0.0f, 0.0f)));
 }
 
 TEST(Vector2D, Multiplication)

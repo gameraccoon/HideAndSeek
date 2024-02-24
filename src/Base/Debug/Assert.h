@@ -26,7 +26,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 	#define ReportError(...) \
 		do \
 		{ \
-			LogAssertHelper("false", __FILE__, __LINE__, ##__VA_ARGS__); \
+			LogAssertHelper("false", __FILE__, __LINE__, __VA_ARGS__); \
 			gGlobalAssertHandler(); \
 		} while(0)
 #else
@@ -37,7 +37,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 	#define ReportFatalError(...) \
 		do \
 		{ \
-			LogAssertHelper("false", __FILE__, __LINE__, ##__VA_ARGS__); \
+			LogAssertHelper("false", __FILE__, __LINE__, __VA_ARGS__); \
 			gGlobalFatalAssertHandler(); \
 		} while(0)
 #else
@@ -50,7 +50,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 	{ \
 		if (static_cast<bool>(cond) == false) [[unlikely]] \
 		{ \
-			LogAssertHelper(STR(cond), __FILE__, __LINE__, ##__VA_ARGS__); \
+			LogAssertHelper(STR(cond), __FILE__, __LINE__, __VA_ARGS__); \
 			gGlobalAssertHandler(); \
 		} \
 	} while(0)
@@ -63,7 +63,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 	do { \
 		if (static_cast<bool>(cond) == false) [[unlikely]] \
 		{ \
-			LogAssertHelper(STR(cond), __FILE__, __LINE__, ##__VA_ARGS__); \
+			LogAssertHelper(STR(cond), __FILE__, __LINE__, __VA_ARGS__); \
 			gGlobalFatalAssertHandler(); \
 		} \
 	} while(0)
@@ -74,7 +74,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 #define ReportErrorRelease(...) \
 	do \
 	{ \
-		LogAssertHelper("false", __FILE__, __LINE__, ##__VA_ARGS__); \
+		LogAssertHelper("false", __FILE__, __LINE__, __VA_ARGS__); \
 		gGlobalAssertHandler(); \
 	} while(0)
 
@@ -82,7 +82,7 @@ void LogAssertHelper(const char* condition, const char* file, size_t line, const
 	do { \
 	if (static_cast<bool>(cond) == false) [[unlikely]] \
 	{ \
-		LogAssertHelper(STR(cond), __FILE__, __LINE__, ##__VA_ARGS__); \
+		LogAssertHelper(STR(cond), __FILE__, __LINE__, __VA_ARGS__); \
 		gGlobalAssertHandler(); \
 	} \
 } while(0)

@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 
 	if (ConsoleCommands::TryExecuteQuickConsoleCommands(arguments))
 	{
-		return true;
+		return 0;
 	}
 
 	const bool isRenderEnabled = !arguments.hasArgument("no-render");

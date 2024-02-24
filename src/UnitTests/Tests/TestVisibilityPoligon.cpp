@@ -28,14 +28,14 @@ static bool AreVisibilityPolygonsEqual(const std::vector<Vector2D>& a, const std
 
 	auto aCopy = a;
 
-	auto it = std::find_if(aCopy.begin(), aCopy.end(), [start = b.front(), allowedError](Vector2D val){ return val.isNearlyEqualTo(start, allowedError); });
+	auto it = std::find_if(aCopy.begin(), aCopy.end(), [start = b.front()](Vector2D val){ return val.isNearlyEqualTo(start, allowedError); });
 	if (it == aCopy.end())
 	{
 		return false;
 	}
 
 	std::rotate(aCopy.begin(), it, aCopy.end());
-	return aCopy.size() == b.size() && std::equal(aCopy.begin(), aCopy.end(), b.begin(), [allowedError](Vector2D a, Vector2D b){ return a.isNearlyEqualTo(b, allowedError); });
+	return aCopy.size() == b.size() && std::equal(aCopy.begin(), aCopy.end(), b.begin(), [](Vector2D a, Vector2D b){ return a.isNearlyEqualTo(b, allowedError); });
 }
 
 static void FillTestLightBlockingGeometry(LightBlockingGeometryComponent& component, const Hull& geometry, const Vector2D& location)
