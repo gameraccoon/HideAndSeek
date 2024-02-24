@@ -31,6 +31,7 @@ ImguiSystem::ImguiSystem(
 		HAL::Engine& engine) noexcept
 	: mEngine(engine)
 	, mDebugData(debugData)
+	, mHasPreviousFrameProcessedOnRenderThread(std::make_shared<bool>(true))
 {
 }
 
@@ -55,7 +56,15 @@ void ImguiSystem::update()
 	}
 
 	{
-		std::lock_guard l(mRenderDataMutex);
+		std::unique_lock lock(mRenderDataMutex);
+
+		// throttle the update until the previous frame has been processed
+		while (!*mHasPreviousFrameProcessedOnRenderThread)
+		{
+			mRenderDataMutex.unlock();
+			std::this_thread::yield();
+			mRenderDataMutex.lock();
+		}
 
 		const auto [time] = mDebugData.worldHolder.getWorld().getWorldComponents().getComponents<const TimeComponent>();
 		mDebugData.time = time->getValue();
@@ -81,13 +90,14 @@ void ImguiSystem::update()
 	RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
 	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
 	CustomRenderFunction& syncData = TemplateHelpers::EmplaceVariant<CustomRenderFunction>(renderData->layers);
-	syncData.renderThreadFn = [&mutex = mRenderDataMutex]
+	syncData.renderThreadFn = [&mutex = mRenderDataMutex, previousFrameProcessed = mHasPreviousFrameProcessedOnRenderThread]
 	{
 		std::lock_guard l(mutex);
 		ImGui_ImplOpenGL2_NewFrame();
 		ImGuiIO& io = ImGui::GetIO();
 		glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
 		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+		*previousFrameProcessed = true;
 	};
 	renderAccessor.submitData(std::move(renderData));
 }

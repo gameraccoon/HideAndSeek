@@ -3,6 +3,7 @@
 #ifdef IMGUI_ENABLED
 
 #include <mutex>
+#include <memory>
 
 #include <raccoon-ecs/utils/system.h>
 
@@ -34,6 +35,7 @@ private:
 	ImguiMainMenu mImguiMainMenu;
 
 	std::mutex mRenderDataMutex;
+	std::shared_ptr<bool> mHasPreviousFrameProcessedOnRenderThread;
 };
 
 #endif // IMGUI_ENABLED
