@@ -131,7 +131,7 @@ namespace HAL
 	void Engine::Impl::start()
 	{
 		AssertFatal(mGame, "Game should be set to Engine before calling start()");
-		RunGameLoop(*mGame, nullptr, [this]{ parseEvents(); });
+		RunGameLoop(*mGame, nullptr, [this]{ parseEvents(); }, [this]{ mLastFrameEvents.clear(); });
 	}
 
 	void Engine::Impl::parseEvents()

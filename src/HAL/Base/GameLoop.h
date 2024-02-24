@@ -8,8 +8,8 @@
 
 namespace HAL
 {
-	template<typename ShouldStopFnT = nullptr_t, typename OnIterationFnT = nullptr_t>
-	void RunGameLoop(IGame& game, ShouldStopFnT&& shouldStopFn = nullptr, OnIterationFnT&& onIterationFn = nullptr)
+	template<typename ShouldStopFnT = nullptr_t, typename OnIterationFnT = nullptr_t, typename AfterFrameFnT = nullptr_t>
+	void RunGameLoop(IGame& game, ShouldStopFnT&& shouldStopFn = nullptr, OnIterationFnT&& onIterationFn = nullptr, AfterFrameFnT&& afterFrameFn = nullptr)
 	{
 		constexpr auto oneFrameDuration = TimeConstants::ONE_FIXED_UPDATE_DURATION;
 
@@ -53,14 +53,26 @@ namespace HAL
 					++iterationsThisFrame;
 				}
 
-				game.dynamicTimePreFrameUpdate(lastFrameDurationSec, iterationsThisFrame);
-				for (int i = 0; i < iterationsThisFrame; ++i)
+				game.notPausablePreFrameUpdate(lastFrameDurationSec);
+
+				if (!game.shouldPauseGame())
 				{
-					game.fixedTimeUpdate(TimeConstants::ONE_FIXED_UPDATE_SEC);
+					game.dynamicTimePreFrameUpdate(lastFrameDurationSec, iterationsThisFrame);
+					for (int i = 0; i < iterationsThisFrame; ++i)
+					{
+						game.fixedTimeUpdate(TimeConstants::ONE_FIXED_UPDATE_SEC);
+					}
+					game.dynamicTimePostFrameUpdate(lastFrameDurationSec, iterationsThisFrame);
 				}
-				game.dynamicTimePostFrameUpdate(lastFrameDurationSec, iterationsThisFrame);
+
+				game.notPausablePostFrameUpdate(lastFrameDurationSec);
 
 				lastFrameTime = timeNow - passedTime;
+
+				if constexpr (!std::is_same_v<AfterFrameFnT, nullptr_t>)
+				{
+					afterFrameFn();
+				}
 			}
 
 			if (iterationsThisFrame <= 1)

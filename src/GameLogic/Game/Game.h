@@ -25,9 +25,11 @@ public:
 	void preStart(const ArgumentsParser& arguments);
 	void onGameShutdown();
 
+	void notPausablePreFrameUpdate(float dt) final;
 	void dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates) final;
 	void fixedTimeUpdate(float dt) override;
 	void dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates) final;
+	void notPausablePostFrameUpdate(float dt) final;
 	void initResources() override;
 
 	std::chrono::duration<s64, std::micro> getFrameLengthCorrection() const final { return std::chrono::duration<s64, std::micro>(0); }
@@ -35,9 +37,11 @@ public:
 protected:
 	ComponentFactory& getComponentFactory() { return mComponentFactory; }
 	WorldHolder& getWorldHolder() { return mWorldHolder; }
+	RaccoonEcs::SystemsManager& getNotPausablePreFrameSystemsManager() { return mNotPausablePreFrameSystemsManager; }
 	RaccoonEcs::SystemsManager& getPreFrameSystemsManager() { return mPreFrameSystemsManager; }
 	RaccoonEcs::SystemsManager& getGameLogicSystemsManager() { return mGameLogicSystemsManager; }
 	RaccoonEcs::SystemsManager& getPostFrameSystemsManager() { return mPostFrameSystemsManager; }
+	RaccoonEcs::SystemsManager& getNotPausablePostFrameSystemsManager() { return mNotPausablePostFrameSystemsManager; }
 	HAL::InputControllersData& getInputData() { return mInputControllersData; }
 	ThreadPool& getThreadPool() { return mThreadPool; }
 	GameData& getGameData() { return mGameData; }
@@ -48,16 +52,18 @@ private:
 
 private:
 	ComponentFactory mComponentFactory;
-	World mWorld{mComponentFactory};
-	GameData mGameData{mComponentFactory};
-	WorldHolder mWorldHolder{&mWorld, mGameData};
+	World mWorld{ mComponentFactory };
+	GameData mGameData{ mComponentFactory };
+	WorldHolder mWorldHolder{ &mWorld, mGameData };
 
 	HAL::InputControllersData mInputControllersData;
 
 	ThreadPool& mThreadPool;
+	RaccoonEcs::SystemsManager mNotPausablePreFrameSystemsManager;
 	RaccoonEcs::SystemsManager mPreFrameSystemsManager;
 	RaccoonEcs::SystemsManager mGameLogicSystemsManager;
 	RaccoonEcs::SystemsManager mPostFrameSystemsManager;
+	RaccoonEcs::SystemsManager mNotPausablePostFrameSystemsManager;
 	Json::ComponentSerializationHolder mComponentSerializers;
 
 #ifdef ENABLE_SCOPED_PROFILER

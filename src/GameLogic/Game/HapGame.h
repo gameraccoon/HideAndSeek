@@ -19,13 +19,15 @@ public:
 	void preStart(const ArgumentsParser& arguments, std::optional<RenderAccessorGameRef> renderAccessor);
 	void initResources() override;
 
-	void quitGame() override { mShouldQuit = true; }
+	bool shouldPauseGame() const final { return mShouldPauseGame; }
 	bool shouldQuitGame() const override { return mShouldQuit; }
+	void quitGame() override { mShouldQuit = true; }
 
 private:
 	void initSystems();
 
 private:
+	bool mShouldPauseGame = false;
 	bool mShouldQuit = false;
 
 #ifdef IMGUI_ENABLED

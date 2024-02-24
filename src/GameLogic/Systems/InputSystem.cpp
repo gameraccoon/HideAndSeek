@@ -25,14 +25,6 @@ InputSystem::InputSystem(WorldHolder& worldHolder, const HAL::InputControllersDa
 {
 }
 
-static void UpdateRenderStateOnPressed(const Input::PlayerControllerStates::KeyboardState keyboardState, int button, bool& value)
-{
-	if (keyboardState.isButtonJustPressed(button))
-	{
-		value = !value;
-	}
-}
-
 void InputSystem::update()
 {
 	SCOPED_PROFILER("InputSystem::update");
@@ -41,7 +33,6 @@ void InputSystem::update()
 	GameData& gameData = mWorldHolder.getGameData();
 	if (auto [imgui] = gameData.getGameComponents().getComponents<ImguiComponent>(); imgui)
 	{
-		UpdateRenderStateOnPressed(mInputData.controllerStates.keyboardState, SDL_SCANCODE_F1, imgui->getIsImguiVisibleRef());
 		if (imgui->getIsImguiVisible())
 		{
 			// stop processing input if imgui is shown
@@ -51,8 +42,6 @@ void InputSystem::update()
 #endif // IMGUI_ENABLED
 
 	processGameplayInput();
-
-	processDebugInput();
 }
 
 static Input::InputBindings GetDebugInputBindings()
@@ -110,25 +99,5 @@ void InputSystem::processGameplayInput()
 	for (const auto& pair : gameplayBindings.axisBindings)
 	{
 		gameplayInputState.updateAxis(pair.first, InputBindings::GetBlendedAxisValue(pair.second, controllerStates));
-	}
-}
-
-void InputSystem::processDebugInput()
-{
-	SCOPED_PROFILER("InputSystem::processDebugInput");
-
-	GameData& gameData = mWorldHolder.getGameData();
-
-	const Input::PlayerControllerStates::KeyboardState& keyboardState = mInputData.controllerStates.keyboardState;
-
-	if (auto [renderMode] = gameData.getGameComponents().getComponents<RenderModeComponent>(); renderMode)
-	{
-		UpdateRenderStateOnPressed(keyboardState, SDL_SCANCODE_F2, renderMode->getIsDrawDebugCollisionsEnabledRef());
-		UpdateRenderStateOnPressed(keyboardState, SDL_SCANCODE_F3, renderMode->getIsDrawBackgroundEnabledRef());
-		UpdateRenderStateOnPressed(keyboardState, SDL_SCANCODE_F4, renderMode->getIsDrawLightsEnabledRef());
-		UpdateRenderStateOnPressed(keyboardState, SDL_SCANCODE_F5, renderMode->getIsDrawVisibleEntitiesEnabledRef());
-		UpdateRenderStateOnPressed(keyboardState, SDL_SCANCODE_F7, renderMode->getIsDrawDebugCharacterInfoEnabledRef());
-		UpdateRenderStateOnPressed(keyboardState, SDL_SCANCODE_F8, renderMode->getIsDrawDebugPrimitivesEnabledRef());
-		UpdateRenderStateOnPressed(keyboardState, SDL_SCANCODE_F9, renderMode->getIsDrawDebugCellInfoEnabledRef());
 	}
 }

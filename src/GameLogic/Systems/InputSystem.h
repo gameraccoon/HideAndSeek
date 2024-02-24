@@ -21,7 +21,6 @@ public:
 
 private:
 	void processGameplayInput();
-	void processDebugInput();
 
 private:
 	WorldHolder& mWorldHolder;

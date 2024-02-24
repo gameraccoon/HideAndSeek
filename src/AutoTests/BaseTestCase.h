@@ -17,6 +17,7 @@ public:
 	TestChecklist start(const ArgumentsParser& arguments, RenderAccessorGameRef renderAccessor);
 	void fixedTimeUpdate(float dt) final;
 
+	bool shouldPauseGame() const override { return false; }
 	bool shouldQuitGame() const override { return mShouldQuit; }
 	void quitGame() override { mShouldQuit = true; }
 

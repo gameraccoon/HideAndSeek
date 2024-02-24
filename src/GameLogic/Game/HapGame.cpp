@@ -25,6 +25,7 @@
 #include "GameLogic/Systems/ControlSystem.h"
 #include "GameLogic/Systems/DeadEntitiesDestructionSystem.h"
 #include "GameLogic/Systems/DebugDrawSystem.h"
+#include "GameLogic/Systems/DebugInputSystem.h"
 #include "GameLogic/Systems/InputSystem.h"
 #include "GameLogic/Systems/MovementSystem.h"
 #include "GameLogic/Systems/RenderSystem.h"
@@ -64,7 +65,10 @@ void HapGame::initSystems()
 {
 	SCOPED_PROFILER("HapGame::initSystems");
 
+	getNotPausablePreFrameSystemsManager().registerSystem<DebugInputSystem>(getWorldHolder(), getInputData(), mShouldPauseGame);
+
 	getPreFrameSystemsManager().registerSystem<InputSystem>(getWorldHolder(), getInputData());
+
 	getGameLogicSystemsManager().registerSystem<ControlSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<AiSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<WeaponSystem>(getWorldHolder());
@@ -74,14 +78,14 @@ void HapGame::initSystems()
 	getGameLogicSystemsManager().registerSystem<MovementSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<AnimationSystem>(getWorldHolder());
-	getPostFrameSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
-	getPostFrameSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getResourceManager(), getThreadPool());
-	getPostFrameSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getResourceManager());
 
+	getNotPausablePostFrameSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
+	getNotPausablePostFrameSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getResourceManager(), getThreadPool());
+	getNotPausablePostFrameSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getResourceManager());
 #ifdef IMGUI_ENABLED
 	if (HAL::Engine* engine = getEngine())
 	{
-		getPostFrameSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, *engine);
+		getNotPausablePostFrameSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, *engine);
 	}
 #endif // IMGUI_ENABLED
 }
