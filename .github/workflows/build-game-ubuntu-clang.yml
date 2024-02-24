@@ -1,0 +1,71 @@
+name: Ubuntu - build with clang
+
+on:
+  push:
+    paths:
+      - .github/workflows/build-game-ubuntu-clang.yml
+      - .gitmodules
+      - config/**
+      - external/**
+      - src/**
+      - scripts/**
+      - CMakeLists.txt
+      - CMakePresets.json
+  workflow_dispatch:
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release]
+    env:
+      BUILD_TYPE: ${{matrix.build_type}}
+
+    steps:
+    - name: Checkout code with lfs
+      uses: nschloe/action-cached-lfs-checkout@v1
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build/game
+
+    - name: Reconfigure git to use HTTP authentication
+      run: >
+        git config --global url."https://github.com/".insteadOf
+        git@github.com:
+
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
+
+    - name: Update deb repo links
+      run: sudo apt-get update
+
+    - name: Install dependencies
+      run: sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev
+
+    - name: Install LLVM and Clang
+      uses: KyleMayes/install-llvm-action@v1
+      with:
+        version: "16.0"
+
+    - name: Generate project
+      shell: bash
+      working-directory: ${{github.workspace}}/build/game
+      env:
+        CC: clang-16
+        CXX: clang-16
+      run: cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Build
+      working-directory: ${{github.workspace}}/build/game
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Run unit tests
+      working-directory: ${{github.workspace}}/bin
+      run: ./UnitTests
+
+    - name: Run autotests
+      working-directory: ${{github.workspace}}
+      run: ./scripts/tests/run_all_autotests.sh --no-render
+
