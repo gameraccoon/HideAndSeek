@@ -1,7 +1,5 @@
 #pragma once
 
-#include <nlohmann/json_fwd.hpp>
-
 #include "GameData/EcsDefinitions.h"
 
 #include "GameData/Spatial/CellPos.h"

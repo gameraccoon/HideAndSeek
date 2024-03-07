@@ -2,8 +2,6 @@
 
 #include "GameData/Spatial/SpatialEntity.h"
 
-#include <nlohmann/json.hpp>
-
 SpatialEntity::SpatialEntity(Entity entity, CellPos cellPos)
 	: entity(entity)
 	, cell(cellPos)

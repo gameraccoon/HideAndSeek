@@ -4,8 +4,6 @@
 #include <cmath>
 #include <cstring>
 
-#include <nlohmann/json_fwd.hpp>
-
 #include "Rotator.h"
 
 
