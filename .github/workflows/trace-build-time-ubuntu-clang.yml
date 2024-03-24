@@ -1,0 +1,49 @@
+name: Ubuntu - trace build times with clang
+
+on:
+  workflow_dispatch:
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release]
+    env:
+      BUILD_TYPE: ${{matrix.build_type}}
+
+    steps:
+    - name: Checkout code with lfs
+      uses: nschloe/action-cached-lfs-checkout@v1
+
+    - name: Reconfigure git to use HTTP authentication
+      run: >
+        git config --global url."https://github.com/".insteadOf
+        git@github.com:
+
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
+
+    - name: Update deb repo links
+      run: sudo apt-get update
+
+    - name: Install ninja-build tool
+      uses: seanmiddleditch/gha-setup-ninja@v4
+
+    - name: Install dependencies
+      run: sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev libssl-dev libprotobuf-dev protobuf-compiler
+    - name: Install LLVM and Clang
+      uses: KyleMayes/install-llvm-action@v1
+      with:
+        version: "16.0"
+
+    - name: Build and generate the report
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: ./scripts/perf/build_time_trace_linux.sh
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: chrome-tracing-build-time-report.json
+        path: ./build_time_trace.json
+
