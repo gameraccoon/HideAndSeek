@@ -49,13 +49,16 @@ jobs:
         version: 13
         platform: x64
 
+    - name: Install ninja-build tool
+      uses: seanmiddleditch/gha-setup-ninja@v4
+
     - name: Generate project
       shell: bash
       working-directory: ${{github.workspace}}/build/game
       env:
         CC: gcc-13
         CXX: g++-13
-      run: cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE --preset linux-ninja
 
     - name: Build
       working-directory: ${{github.workspace}}/build/game

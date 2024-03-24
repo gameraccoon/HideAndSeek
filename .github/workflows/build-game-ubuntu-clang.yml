@@ -48,13 +48,16 @@ jobs:
       with:
         version: "16.0"
 
+    - name: Install ninja-build tool
+      uses: seanmiddleditch/gha-setup-ninja@v4
+
     - name: Generate project
       shell: bash
       working-directory: ${{github.workspace}}/build/game
       env:
         CC: clang-16
-        CXX: clang-16
-      run: cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        CXX: clang++-16
+      run: cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE --preset linux-ninja-clang
 
     - name: Build
       working-directory: ${{github.workspace}}/build/game
