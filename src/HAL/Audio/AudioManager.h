@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef DISABLE_SDL
+
 namespace Audio
 {
 	class Sound;
@@ -25,3 +27,4 @@ namespace Audio
 		float GetMusicVolume();
 	}
 }
+#endif // !DISABLE_SDL

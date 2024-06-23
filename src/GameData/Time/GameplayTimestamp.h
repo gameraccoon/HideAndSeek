@@ -8,8 +8,7 @@
 class GameplayTimestamp
 {
 public:
-	// as 1/30000 of a second
-	using TimeValueType = u64;
+	using TimeValueType = u32;
 
 public:
 	constexpr GameplayTimestamp() = default;
@@ -17,22 +16,19 @@ public:
 
 	[[nodiscard]] bool isInitialized() const noexcept;
 
-	[[nodiscard]] bool operator==(GameplayTimestamp other) const noexcept;
-	[[nodiscard]] bool operator!=(GameplayTimestamp other) const noexcept;
-	[[nodiscard]] bool operator<(GameplayTimestamp other) const noexcept;
-	[[nodiscard]] bool operator<=(GameplayTimestamp other) const noexcept;
-	[[nodiscard]] bool operator>(GameplayTimestamp other) const noexcept;
-	[[nodiscard]] bool operator>=(GameplayTimestamp other) const noexcept;
+	auto operator<=>(const GameplayTimestamp& other) const noexcept = default;
 
-	void increaseByFloatTime(float passedTime) noexcept;
-	[[nodiscard]] GameplayTimestamp getIncreasedByFloatTime(float passedTime) const noexcept;
-	[[nodiscard]] GameplayTimestamp getDecreasedByFloatTime(float timeInThePast) const noexcept;
+	void increaseByUpdateCount(s32 passedUpdates) noexcept;
+	[[nodiscard]] GameplayTimestamp getIncreasedByUpdateCount(s32 passedUpdates) const noexcept;
+	[[nodiscard]] GameplayTimestamp getDecreasedByUpdateCount(s32 updatesAgo) const noexcept;
 
-	friend void to_json(nlohmann::json& outJson, const GameplayTimestamp timestamp);
+	friend void to_json(nlohmann::json& outJson, GameplayTimestamp timestamp);
 	friend void from_json(const nlohmann::json& json, GameplayTimestamp& outTimestamp);
 
+	[[nodiscard]] TimeValueType getRawValue() const { return mTimestamp; }
+
 public:
-	static constexpr float TimeMultiplier = 300.0f;
+	static constexpr s32 TimeMultiplier = 1;
 
 private:
 	static constexpr TimeValueType UNINITIALIZED_TIME = std::numeric_limits<TimeValueType>::max();

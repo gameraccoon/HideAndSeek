@@ -70,7 +70,10 @@ void DebugRecordedInput::processArguments(const ArgumentsParser& arguments)
 			return;
 		}
 
-		mRecordedInputDataFile = std::fopen((*argumentOption + std::format("_{}.rawinput", mInstanceIndex)).c_str(), "wb");
+		const std::string& fileName = *argumentOption + std::format("_{}.rawinput", mInstanceIndex);
+
+		mRecordedInputDataFile = std::fopen(fileName.c_str(), "wb");
+		AssertFatal(mRecordedInputDataFile, "Failed to open file for recording input data %s", fileName.c_str());
 	}
 	else if (arguments.hasArgument("replay-input"))
 	{
@@ -168,13 +171,22 @@ std::vector<HAL::InputControllersData> DebugRecordedInput::loadInputDataFromFile
 	HAL::InputControllersData inputData;
 
 	size_t cursorPos = 0;
-	while (cursorPos < inputDataBytes.size())
+	const size_t oneInputFrameSize =
+		BitsetTraits<Input::PlayerControllerStates::KeyboardButtonCount>::ByteCount
+		+ BitsetTraits<Input::PlayerControllerStates::MouseButtonCount>::ByteCount
+		+ Input::PlayerControllerStates::MouseAxesCount * sizeof(float)
+		+ BitsetTraits<Input::PlayerControllerStates::GamepadButtonCount>::ByteCount
+		+ Input::PlayerControllerStates::GamepadAxesCount * sizeof(float);
+
+	while (cursorPos + oneInputFrameSize - 1 < inputDataBytes.size())
 	{
 		// deserialize keyboard keys
 		std::array<std::byte, BitsetTraits<Input::PlayerControllerStates::KeyboardButtonCount>::ByteCount> keyboardButtons;
 		for (size_t i = 0; i < keyboardButtons.size(); ++i)
 		{
-			keyboardButtons[i] = static_cast<std::byte>(UnsafeSerialization::ReadNumber<u8>(inputDataBytes, cursorPos));
+			const auto valueOption = Serialization::ReadNumber<u8>(inputDataBytes, cursorPos);
+			AssertFatal(valueOption.has_value(), "Failed to read keyboard button value");
+			keyboardButtons[i] = static_cast<std::byte>(*valueOption);
 		}
 		inputData.controllerStates.keyboardState.updatePressedButtonsFromRawData(keyboardButtons);
 
@@ -182,28 +194,36 @@ std::vector<HAL::InputControllersData> DebugRecordedInput::loadInputDataFromFile
 		std::array<std::byte, BitsetTraits<Input::PlayerControllerStates::MouseButtonCount>::ByteCount> mouseButtons;
 		for (size_t i = 0; i < mouseButtons.size(); ++i)
 		{
-			mouseButtons[i] = static_cast<std::byte>(UnsafeSerialization::ReadNumber<u8>(inputDataBytes, cursorPos));
+			const auto valueOption = Serialization::ReadNumber<u8>(inputDataBytes, cursorPos);
+			AssertFatal(valueOption.has_value(), "Failed to read mouse button value");
+			mouseButtons[i] = static_cast<std::byte>(*valueOption);
 		}
 		inputData.controllerStates.mouseState.updatePressedButtonsFromRawData(mouseButtons);
 
 		// deserialize mouse axes
 		for (size_t i = 0; i < Input::PlayerControllerStates::MouseAxesCount; ++i)
 		{
-			inputData.controllerStates.mouseState.updateAxis(i, UnsafeSerialization::ReadNumber<float>(inputDataBytes, cursorPos));
+			const auto valueOption = Serialization::ReadNumber<float>(inputDataBytes, cursorPos);
+			AssertFatal(valueOption.has_value(), "Failed to read mouse axis value");
+			inputData.controllerStates.mouseState.updateAxis(i, *valueOption);
 		}
 
 		// deserialize gamepad buttons
 		std::array<std::byte, BitsetTraits<Input::PlayerControllerStates::GamepadButtonCount>::ByteCount> gamepadButtons;
 		for (size_t i = 0; i < gamepadButtons.size(); ++i)
 		{
-			gamepadButtons[i] = static_cast<std::byte>(UnsafeSerialization::ReadNumber<u8>(inputDataBytes, cursorPos));
+			const auto valueOption = Serialization::ReadNumber<u8>(inputDataBytes, cursorPos);
+			AssertFatal(valueOption.has_value(), "Failed to read gamepad button value");
+			gamepadButtons[i] = static_cast<std::byte>(*valueOption);
 		}
 		inputData.controllerStates.gamepadState.updatePressedButtonsFromRawData(gamepadButtons);
 
 		// deserialize gamepad axes
 		for (size_t i = 0; i < Input::PlayerControllerStates::GamepadAxesCount; ++i)
 		{
-			inputData.controllerStates.gamepadState.updateAxis(i, UnsafeSerialization::ReadNumber<float>(inputDataBytes, cursorPos));
+			const auto valueOption = Serialization::ReadNumber<float>(inputDataBytes, cursorPos);
+			AssertFatal(valueOption.has_value(), "Failed to read gamepad axis value");
+			inputData.controllerStates.gamepadState.updateAxis(i, *valueOption);
 		}
 
 		result.push_back(inputData);

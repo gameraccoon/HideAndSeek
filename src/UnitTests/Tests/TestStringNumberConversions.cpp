@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <limits>
-
 #include "Base/Types/String/StringNumberConversion.h"
 
 TEST(StringNumberConversions, ParseInt_CorrectInput)

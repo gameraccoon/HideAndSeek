@@ -5,81 +5,27 @@
 #include <type_traits>
 #include <nlohmann/json.hpp>
 
-static auto PositiveRoundFunc(float toRound)
-{
-	using namespace std; // to compile on both msvc and clang/gcc
-	Assert(toRound >= 0.0f, "PositiveRoundFunc works only with positive values");
-	return floor(toRound - 0.5);
-}
-
-GameplayTimestamp::TimeValueType GetConvertedPassedTime(float passedTime)
-{
-	return static_cast<GameplayTimestamp::TimeValueType>(PositiveRoundFunc(passedTime * GameplayTimestamp::TimeMultiplier));
-}
-
 bool GameplayTimestamp::isInitialized() const noexcept
 {
 	return mTimestamp != UNINITIALIZED_TIME;
 }
 
-bool GameplayTimestamp::operator==(GameplayTimestamp other) const noexcept
+void GameplayTimestamp::increaseByUpdateCount(s32 passedUpdates) noexcept
 {
 	Assert(isInitialized(), "Timestamp should be initialized before being used");
-	Assert(other.isInitialized(), "Timestamp should be initialized before being used");
-	return mTimestamp == other.mTimestamp;
+	mTimestamp += passedUpdates * TimeMultiplier;
 }
 
-bool GameplayTimestamp::operator!=(GameplayTimestamp other) const noexcept
+GameplayTimestamp GameplayTimestamp::getIncreasedByUpdateCount(s32 passedUpdates) const noexcept
 {
 	Assert(isInitialized(), "Timestamp should be initialized before being used");
-	Assert(other.isInitialized(), "Timestamp should be initialized before being used");
-	return mTimestamp != other.mTimestamp;
+	return GameplayTimestamp(mTimestamp + passedUpdates * TimeMultiplier);
 }
 
-bool GameplayTimestamp::operator<(GameplayTimestamp other) const noexcept
+GameplayTimestamp GameplayTimestamp::getDecreasedByUpdateCount(s32 updatesAgo) const noexcept
 {
 	Assert(isInitialized(), "Timestamp should be initialized before being used");
-	Assert(other.isInitialized(), "Timestamp should be initialized before being used");
-	return mTimestamp < other.mTimestamp;
-}
-
-bool GameplayTimestamp::operator<=(GameplayTimestamp other) const noexcept
-{
-	Assert(isInitialized(), "Timestamp should be initialized before being used");
-	Assert(other.isInitialized(), "Timestamp should be initialized before being used");
-	return mTimestamp <= other.mTimestamp;
-}
-
-bool GameplayTimestamp::operator>(GameplayTimestamp other) const noexcept
-{
-	Assert(isInitialized(), "Timestamp should be initialized before being used");
-	Assert(other.isInitialized(), "Timestamp should be initialized before being used");
-	return mTimestamp > other.mTimestamp;
-}
-
-bool GameplayTimestamp::operator>=(GameplayTimestamp other) const noexcept
-{
-	Assert(isInitialized(), "Timestamp should be initialized before being used");
-	Assert(other.isInitialized(), "Timestamp should be initialized before being used");
-	return mTimestamp >= other.mTimestamp;
-}
-
-void GameplayTimestamp::increaseByFloatTime(float passedTime) noexcept
-{
-	Assert(isInitialized(), "Timestamp should be initialized before being used");
-	mTimestamp += GetConvertedPassedTime(passedTime);
-}
-
-GameplayTimestamp GameplayTimestamp::getIncreasedByFloatTime(float passedTime) const noexcept
-{
-	Assert(isInitialized(), "Timestamp should be initialized before being used");
-	return GameplayTimestamp(mTimestamp + GetConvertedPassedTime(passedTime));
-}
-
-GameplayTimestamp GameplayTimestamp::getDecreasedByFloatTime(float timeInThePast) const noexcept
-{
-	Assert(isInitialized(), "Timestamp should be initialized before being used");
-	return GameplayTimestamp(mTimestamp - GetConvertedPassedTime(timeInThePast));
+	return GameplayTimestamp(mTimestamp - updatesAgo * TimeMultiplier);
 }
 
 void to_json(nlohmann::json& outJson, const GameplayTimestamp timestamp)
@@ -95,4 +41,4 @@ void from_json(const nlohmann::json& json, GameplayTimestamp& outTimestamp)
 }
 
 static_assert(std::is_trivially_copyable<GameplayTimestamp>(), "GameplayTimestamp should be trivially copyable");
-static_assert(sizeof(GameplayTimestamp) == 8, "GameplayTimestamp changed its size, is this a mistake?");
+static_assert(sizeof(GameplayTimestamp) == 4, "GameplayTimestamp changed its size, is this a mistake?");

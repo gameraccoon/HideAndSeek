@@ -2,6 +2,8 @@
 
 #include "GameLogic/Systems/WeaponSystem.h"
 
+#include "Base/TimeConstants.h"
+
 #include "GameData/Components/CharacterStateComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/DeathComponent.generated.h"
@@ -28,9 +30,9 @@ struct ShotInfo
 	ShotInfo(Entity instigator) : instigator(instigator) {}
 
 	Entity instigator;
-	WorldCell* instigatorCell;
-	float distance;
-	float damage;
+	WorldCell* instigatorCell = nullptr;
+	float distance = 0.0f;
+	float damage = 0.0f;
 };
 
 struct HitInfo
@@ -38,10 +40,10 @@ struct HitInfo
 	explicit HitInfo(Entity instigator) : instigator(instigator) {}
 
 	Entity instigator;
-	WorldCell* instigatorCell;
+	WorldCell* instigatorCell = nullptr;
 	SpatialEntity hitEntity;
-	Vector2D impulse;
-	float damageValue;
+	Vector2D impulse = {};
+	float damageValue = 0.0f;
 };
 
 void WeaponSystem::update()
@@ -66,7 +68,7 @@ void WeaponSystem::update()
 				shot.damage = weapon->getDamageValue();
 				shotsToMake.push_back(shot);
 
-				weapon->setShotFinishTimestamp(currentTime.getIncreasedByFloatTime(weapon->getShotPeriod()));
+				weapon->setShotFinishTimestamp(currentTime.getIncreasedByUpdateCount(static_cast<s32>(weapon->getShotPeriod() / TimeConstants::ONE_FIXED_UPDATE_SEC)));
 			}
 		}
 	});

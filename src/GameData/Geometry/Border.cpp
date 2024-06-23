@@ -2,7 +2,7 @@
 
 #include "GameData/Geometry/Border.h"
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 
 Border::Border(Vector2D a, Vector2D b) noexcept

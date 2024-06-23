@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(APP_NAME GameMain)
 project(${APP_NAME})
@@ -10,7 +11,7 @@ set(EXECUTABLE_NAME Game)
 
 # parameters
 option(DEBUG_CHECKS "Enable debug checks and assertions" ON)
-option(ENABLE_SCOPED_PROFILER "Enable pfofiler that records time of execution of scopes across threads" OFF)
+option(ENABLE_SCOPED_PROFILER "Enable profiler that records time of execution of scopes across threads" OFF)
 option(MEMLEAK_DETECTION "Enable memory leaks detection code (slow)" OFF)
 option(MEMLEAK_REDEFINE_NEW "Redefine default new (provide more detailed info but can conflict with some libs)" OFF)
 option(CONCURRENT_ACCESS_DETECTION "Enable concurrent access detection" ON)

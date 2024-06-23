@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifndef DISABLE_SDL
+
 #include "Sdl.h"
 
 #include <SDL.h>
@@ -23,3 +25,5 @@ namespace HAL
 		}
 	}
 }
+
+#endif // !DISABLE_SDL

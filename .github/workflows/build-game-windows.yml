@@ -23,11 +23,8 @@ jobs:
       BUILD_TYPE: ${{matrix.build_type}}
 
     steps:
-    - name: Checkout code with lfs
+    - name: Checkout code with LFS
       uses: nschloe/action-cached-lfs-checkout@v1
-
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{github.workspace}}/build/game
 
     - name: Reconfigure git to use HTTP authentication
       run: >
@@ -43,6 +40,7 @@ jobs:
       run: scripts/scripter/windows/generate_vs_project.cmd
 
     - name: Build
+      working-directory: ${{github.workspace}}/build/game
       shell: cmd
-      working-directory: ${{github.workspace}}
-      run: scripts/scripter/windows/build_project.cmd
+      run: cmake --build .
+

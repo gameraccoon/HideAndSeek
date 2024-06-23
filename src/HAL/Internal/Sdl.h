@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef DISABLE_SDL
+
 namespace HAL
 {
 	namespace Internal
@@ -18,3 +20,5 @@ namespace HAL
 		};
 	}
 }
+
+#endif // !DISABLE_SDL

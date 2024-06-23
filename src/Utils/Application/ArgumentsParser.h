@@ -21,6 +21,8 @@ public:
 
 	[[nodiscard]] std::vector<std::string> getAllArguments() const;
 
+	void manuallySetArgument(const std::string& argument, const std::string& value = "");
+
 private:
 	std::vector<std::string> mTokens;
 	std::string mArgumentSwitch;

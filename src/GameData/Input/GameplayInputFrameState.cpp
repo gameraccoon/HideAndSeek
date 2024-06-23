@@ -50,6 +50,26 @@ namespace GameplayInput
 	{
 		return mKeys[static_cast<size_t>(key)].lastFlipTime;
 	}
+
+	float FrameState::getRawAxisState(size_t axisIdx) const
+	{
+		return mAxes[axisIdx];
+	}
+
+	FrameState::KeyInfo FrameState::getRawKeyState(size_t keyIdx) const
+	{
+		return mKeys[keyIdx];
+	}
+
+	void FrameState::setRawAxisState(size_t axisIdx, float value)
+	{
+		mAxes[axisIdx] = value;
+	}
+
+	void FrameState::setRawKeyState(size_t keyIdx, KeyState state, GameplayTimestamp lastFlipTimestamp)
+	{
+		mKeys[keyIdx] = {state, lastFlipTimestamp};
+	}
 }
 
 static_assert(std::is_trivially_copyable<GameplayInput::FrameState>(), "GameplayInput should be trivially copyable");

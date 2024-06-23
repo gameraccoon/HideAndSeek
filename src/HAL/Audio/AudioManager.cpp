@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifndef DISABLE_SDL
+
 #include "HAL/Audio/AudioManager.h"
 
 #include <cmath>
@@ -66,3 +68,4 @@ namespace Audio
 		return static_cast<float>(Mix_VolumeMusic(-1)) / 128.0f;
 	}
 }
+#endif // !DISABLE_SDL

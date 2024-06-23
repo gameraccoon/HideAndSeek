@@ -47,6 +47,7 @@ log.txt
 *.cache
 /bin
 /build
+/package
 __pycache__
 /cmake-build-*
 /editor/cmake-build-*

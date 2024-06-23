@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifndef DISABLE_SDL
+
 #include "HAL/Graphics/Renderer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -131,3 +133,5 @@ namespace Graphics
 		return { 1, 1 };
 	}
 }
+
+#endif // !DISABLE_SDL

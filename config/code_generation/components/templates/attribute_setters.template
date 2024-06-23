@@ -1,2 +1,2 @@
 template<typename T, typename = std::enable_if_t<std::is_convertible_v<T, {attribute_type}>>>
-    void set{attribute_name_capital}(T&& new{attribute_name_capital}) {{ m{attribute_name_capital} = std::forward<T>(new{attribute_name_capital}); }}{delim_endl}{delim_tab}
+	void set{attribute_name_capital}(T&& new{attribute_name_capital}) {{ m{attribute_name_capital} = std::forward<T>(new{attribute_name_capital}); }}{delim_endl}{delim_tab}

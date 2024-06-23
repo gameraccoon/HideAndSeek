@@ -1,0 +1,119 @@
+BasedOnStyle: GNU
+Standard: Latest
+
+# tabs vs spaces and indentation sizes
+TabWidth: 4
+UseTab: ForContinuationAndIndentation
+IndentWidth: 4
+AccessModifierOffset: -4
+ContinuationIndentWidth: 4
+
+# alignment and indentation rules
+AlignAfterOpenBracket: BlockIndent
+AlignConsecutiveAssignments: None
+AlignEscapedNewlines: DontAlign
+AlignOperands: DontAlign
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+IndentCaseLabels: false
+IndentPPDirectives: None
+LambdaBodyIndentation: Signature
+NamespaceIndentation: All
+
+# line breaks
+AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: Always
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: true
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+AlwaysBreakTemplateDeclarations: MultiLine
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterExternBlock: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false # this messes up lambdas completely when true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: true
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+PackConstructorInitializers: CurrentLine
+ReflowComments: false
+
+# empty lines
+InsertNewlineAtEOF: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: Always
+MaxEmptyLinesToKeep: 1
+
+# namespaces
+CompactNamespaces: false
+FixNamespaceComments: true
+ShortNamespaceLines: 10
+
+# includes
+SortIncludes: CaseInsensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  # note that 0 is reserved for the current file header
+  - Regex: '^(<|")Base/precomp.h(>|")$'
+    Priority: -1
+  - Regex: '^(<|")Base/.*$'
+    Priority: 3
+  - Regex: '^(<|")GameData/.*$'
+    Priority: 4
+  - Regex: '^(<|")Utils/.*$'
+    Priority: 6
+  - Regex: '^(<|")HAL/.*$'
+    Priority: 5
+  - Regex: '^(<|")GameLogic/.*$'
+    Priority: 7
+  - Regex: '^(<|")AutoTests/.*$'
+    Priority: 8
+  - Regex: '^(<|")GameMain/.*$'
+    Priority: 9
+  - Regex: '^<[a-zA-Z0-9_/]+>$'
+    Priority: 1
+  - Regex: '.*'
+    Priority: 2
+
+# spaces
+ObjCSpaceAfterProperty: false
+ObjCSpaceBeforeProtocolList: false
+PointerAlignment: Left
+Cpp11BracedListStyle: false # true breaks closing brace for multiline initialization lists
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: Never
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# other
+ColumnLimit: 0
+InsertBraces: true

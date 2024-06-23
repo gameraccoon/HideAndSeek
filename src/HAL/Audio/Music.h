@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef DISABLE_SDL
+
 #include "Base/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/Resource.h"
@@ -30,3 +32,5 @@ namespace Audio
 		Mix_Music* mMusic = nullptr;
 	};
 }
+
+#endif // !DISABLE_SDL

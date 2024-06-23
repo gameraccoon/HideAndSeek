@@ -1,15 +1,16 @@
 {
-  "version": "0.10.5",
+  "version": "0.16.2",
   "rewritable": {
-    "always_on_top": false,
     "window_status_reactions": true,
     "keep_window_size": false,
     "enable_script_filtering": true,
+    "enable_title_editing": true,
+    "config_version_update_behavior": "OnManualSave",
     "custom_theme": {
       "background": [
         0.25,
-        0.26,
-        0.29
+        0.2578125,
+        0.2890625
       ],
       "text": [
         0.0,
@@ -17,31 +18,162 @@
         0.0
       ],
       "primary": [
-        0.44,
-        0.53,
-        0.855
+        0.44921875,
+        0.52734375,
+        0.8515625
       ],
       "success": [
-        0.31,
+        0.30859375,
         0.5,
-        0.17
+        0.16796875
       ],
       "danger": [
-        0.5,
-        0.125,
-        0.125
+        0.69921875,
+        0.296875,
+        0.296875
       ],
       "caption_text": [
-        0.44,
-        0.53,
-        0.855
+        0.69921875,
+        0.69921875,
+        0.69921875
       ],
       "error_text": [
-        0.5,
-        0.125,
-        0.125
+        0.8984375,
+        0.296875,
+        0.296875
       ]
-    }
+    },
+    "app_actions_keybinds": [
+      {
+        "action": "RequestCloseApp",
+        "keybind": {
+          "key": "W",
+          "modifiers": "Cmd"
+        }
+      },
+      {
+        "action": "FocusFilter",
+        "keybind": {
+          "key": "F",
+          "modifiers": "Cmd"
+        }
+      },
+      {
+        "action": "TrySwitchWindowEditMode",
+        "keybind": {
+          "key": "E",
+          "modifiers": "Cmd"
+        }
+      },
+      {
+        "action": "RescheduleScripts",
+        "keybind": {
+          "key": "R",
+          "modifiers": "Cmd+Shift"
+        }
+      },
+      {
+        "action": "RunScriptsAfterExecution",
+        "keybind": {
+          "key": "R",
+          "modifiers": "Cmd"
+        }
+      },
+      {
+        "action": "StopScripts",
+        "keybind": {
+          "key": "C",
+          "modifiers": "Cmd+Shift"
+        }
+      },
+      {
+        "action": "ClearExecutionScripts",
+        "keybind": {
+          "key": "C",
+          "modifiers": "Cmd"
+        }
+      },
+      {
+        "action": "MaximizeOrRestoreExecutionPane",
+        "keybind": {
+          "key": "Q",
+          "modifiers": "Cmd"
+        }
+      },
+      {
+        "action": "CursorConfirm",
+        "keybind": {
+          "key": "Enter",
+          "modifiers": ""
+        }
+      },
+      {
+        "action": "CursorConfirm",
+        "keybind": {
+          "key": "Enter",
+          "modifiers": "Cmd"
+        }
+      },
+      {
+        "action": "MoveScriptDown",
+        "keybind": {
+          "key": "Down",
+          "modifiers": "Shift"
+        }
+      },
+      {
+        "action": "MoveScriptUp",
+        "keybind": {
+          "key": "Up",
+          "modifiers": "Shift"
+        }
+      },
+      {
+        "action": "SwitchPaneFocusBackwards",
+        "keybind": {
+          "key": "Tab",
+          "modifiers": "Shift"
+        }
+      },
+      {
+        "action": "MoveCursorDown",
+        "keybind": {
+          "key": "Down",
+          "modifiers": ""
+        }
+      },
+      {
+        "action": "MoveCursorUp",
+        "keybind": {
+          "key": "Up",
+          "modifiers": ""
+        }
+      },
+      {
+        "action": "SwitchPaneFocusForward",
+        "keybind": {
+          "key": "Tab",
+          "modifiers": ""
+        }
+      },
+      {
+        "action": "RemoveCursorScript",
+        "keybind": {
+          "key": "Delete",
+          "modifiers": ""
+        }
+      },
+      {
+        "action": "CursorConfirm",
+        "keybind": {
+          "key": "Enter",
+          "modifiers": "Cmd+Alt"
+        }
+      }
+    ],
+    "script_keybinds": [],
+    "show_current_git_branch": true,
+    "quick_launch_scripts": []
   },
   "script_definitions": [
     {
@@ -147,7 +279,11 @@
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/windows/switch_branch.cmd",
+          "path": "git switch",
+          "path_type": "WorkingDirRelative"
+        },
+        "working_directory": {
+          "path": ".",
           "path_type": "WorkingDirRelative"
         },
         "arguments": "",
@@ -166,7 +302,11 @@
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/windows/update_submodules.cmd",
+          "path": "git submodule update --init --recursive",
+          "path_type": "WorkingDirRelative"
+        },
+        "working_directory": {
+          "path": ".",
           "path_type": "WorkingDirRelative"
         },
         "arguments": "",
@@ -188,6 +328,10 @@
           "path": "scripts/scripter/windows/generate_vs_project.cmd",
           "path_type": "WorkingDirRelative"
         },
+        "working_directory": {
+          "path": ".",
+          "path_type": "WorkingDirRelative"
+        },
         "arguments": "",
         "autorerun_count": 0,
         "ignore_previous_failures": false,
@@ -198,13 +342,17 @@
     {
       "Original": {
         "uid": "802ce303-567e-41e8-aafc-abfa5e55d3f4",
-        "name": "Build Project",
+        "name": "Build Project (debug)",
         "icon": {
           "path": "scripts/scripter/icons/vs.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/windows/build_project.cmd",
+          "path": "cmake --build .",
+          "path_type": "WorkingDirRelative"
+        },
+        "working_directory": {
+          "path": "build\\game",
           "path_type": "WorkingDirRelative"
         },
         "arguments": "",
@@ -223,7 +371,11 @@
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/windows/open_vs_solution.cmd",
+          "path": "start GameMain.sln",
+          "path_type": "WorkingDirRelative"
+        },
+        "working_directory": {
+          "path": "build\\game",
           "path_type": "WorkingDirRelative"
         },
         "arguments": "",
@@ -231,6 +383,29 @@
         "ignore_previous_failures": false,
         "requires_arguments": false,
         "arguments_hint": "no arguments"
+      }
+    },
+    {
+      "Original": {
+        "uid": "f992a9f3-d542-483b-aff7-65f1eb78c521",
+        "name": "Run unit tests",
+        "icon": {
+          "path": "scripts/scripter/icons/tests.webp",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "Debug\\UnitTests.exe",
+          "path_type": "WorkingDirRelative"
+        },
+        "working_directory": {
+          "path": "bin",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "\"arg1\" \"arg2\""
       }
     },
     {
@@ -243,6 +418,10 @@
         },
         "command": {
           "path": "scripts/scripter/windows/clean_reset.cmd",
+          "path_type": "WorkingDirRelative"
+        },
+        "working_directory": {
+          "path": ".",
           "path_type": "WorkingDirRelative"
         },
         "arguments": "",
@@ -264,6 +443,10 @@
           "path": "git",
           "path_type": "WorkingDirRelative"
         },
+        "working_directory": {
+          "path": ".",
+          "path_type": "WorkingDirRelative"
+        },
         "arguments": "",
         "autorerun_count": 0,
         "ignore_previous_failures": false,
@@ -283,15 +466,42 @@
           "path": "rundll32",
           "path_type": "WorkingDirRelative"
         },
+        "working_directory": {
+          "path": ".",
+          "path_type": "WorkingDirRelative"
+        },
         "arguments": "user32.dll, MessageBeep -MB_OK",
         "autorerun_count": 0,
         "ignore_previous_failures": true,
         "requires_arguments": false,
         "arguments_hint": "leave the arguments alone"
       }
+    },
+    {
+      "Original": {
+        "uid": "a1a3ba04-7053-4a4b-98b0-b762deee402a",
+        "name": "Run game (Debug)",
+        "icon": {
+          "path": "scripts/scripter/icons/play.png",
+          "path_type": "WorkingDirRelative"
+        },
+        "command": {
+          "path": "./Debug/GameMain.exe",
+          "path_type": "WorkingDirRelative"
+        },
+        "working_directory": {
+          "path": "bin",
+          "path_type": "WorkingDirRelative"
+        },
+        "arguments": "",
+        "autorerun_count": 0,
+        "ignore_previous_failures": false,
+        "requires_arguments": false,
+        "arguments_hint": "--arg1 --arg2"
+      }
     }
   ],
-  "child_config_path": {
+  "local_config_path": {
     "path": ".scripter_config.local.json",
     "path_type": "WorkingDirRelative"
   }

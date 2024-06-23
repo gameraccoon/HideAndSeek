@@ -18,6 +18,29 @@ namespace GameplayInput
 	class FrameState
 	{
 	public:
+		struct KeyInfo
+		{
+			KeyState state = KeyState::Inactive;
+			GameplayTimestamp lastFlipTime;
+
+			auto operator<=>(const KeyInfo&) const noexcept = default;
+		};
+
+		using RawAxesData = std::array<float, static_cast<size_t>(InputAxis::Count)>;
+		using RawKeysData = std::array<KeyInfo, static_cast<size_t>(InputKey::Count)>;
+
+	public:
+		FrameState() = default;
+
+		template<typename RawAxes, typename RawKeys>
+		FrameState(RawAxes&& rawAxesData, RawKeys&& rawKeysData)
+			: mAxes(std::forward<RawAxes>(rawAxesData))
+			, mKeys(std::forward<RawKeys>(rawKeysData))
+		{}
+
+		bool operator==(const FrameState&) const noexcept = default;
+		bool operator!=(const FrameState&) const noexcept = default;
+
 		void updateAxis(InputAxis axis, float newValue);
 		float getAxisValue(InputAxis axis) const;
 
@@ -28,15 +51,14 @@ namespace GameplayInput
 		bool isKeyJustDeactivated(InputKey key) const;
 		GameplayTimestamp getLastFlipTime(InputKey key) const;
 
-	private:
-		struct KeyInfo
-		{
-			KeyState state = KeyState::Inactive;
-			GameplayTimestamp lastFlipTime;
-		};
+		// for serialization and deserialization
+		float getRawAxisState(size_t axisIdx) const;
+		KeyInfo getRawKeyState(size_t keyIdx) const;
+		void setRawAxisState(size_t axisIdx, float value);
+		void setRawKeyState(size_t keyIdx, KeyState state, GameplayTimestamp lastFlipTimestamp);
 
 	private:
-		std::array<float, static_cast<size_t>(InputAxis::Count)> mAxes{};
-		std::array<KeyInfo, static_cast<size_t>(InputKey::Count)> mKeys;
+		RawAxesData mAxes{};
+		RawKeysData mKeys;
 	};
 }

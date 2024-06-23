@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <SDL.h>
-
 #include "UnitTests/TestAssertHelper.h"
 
 using ::testing::EmptyTestEventListener;

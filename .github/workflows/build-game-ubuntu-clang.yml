@@ -59,7 +59,7 @@ jobs:
         CXX: clang++-16
       run: cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE --preset linux-ninja-clang
 
-    - name: Build
+    - name: Build game
       working-directory: ${{github.workspace}}/build/game
       shell: bash
       run: cmake --build . --config $BUILD_TYPE

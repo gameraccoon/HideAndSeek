@@ -64,3 +64,4 @@ jobs:
       working-directory: ${{github.workspace}}/build/editor
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
+

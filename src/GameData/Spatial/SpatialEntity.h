@@ -7,7 +7,7 @@
 struct SpatialEntity
 {
 	OptionalEntity entity;
-	CellPos cell;
+	CellPos cell = {};
 
 	SpatialEntity() = default;
 	SpatialEntity(Entity entity, CellPos cellPos);

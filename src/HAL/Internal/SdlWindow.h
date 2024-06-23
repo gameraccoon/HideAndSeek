@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef DISABLE_SDL
+
 struct SDL_Window;
 
 namespace HAL
@@ -25,3 +27,5 @@ namespace HAL
 		};
 	}
 }
+
+#endif // !DISABLE_SDL

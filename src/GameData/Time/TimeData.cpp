@@ -6,7 +6,6 @@ void TimeData::fixedUpdate(float deltaTime, u32 updatesCount)
 {
 	lastFixedUpdateDt = deltaTime;
 	lastUpdateDt = deltaTime;
-	lastFixedUpdateTimestamp.increaseByFloatTime(deltaTime);
-	countFixedTimeUpdatesThisFrame += updatesCount;
+	lastFixedUpdateTimestamp.increaseByUpdateCount(updatesCount);
 	++lastFixedUpdateIndex;
 }

@@ -2,6 +2,8 @@
 
 #include "GameLogic/Systems/AiSystem.h"
 
+#include "Base/TimeConstants.h"
+
 #include "GameData/Components/AiControllerComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
@@ -101,7 +103,7 @@ void AiSystem::update()
 
 			for (size_t i = 1; i < path.size(); ++i)
 			{
-				debugDraw->getWorldLineSegmentsRef().emplace_back(path[i - 1], path[i], timestampNow.getIncreasedByFloatTime(10.0f));
+				debugDraw->getWorldLineSegmentsRef().emplace_back(path[i - 1], path[i], timestampNow.getIncreasedByUpdateCount(TimeConstants::ONE_SECOND_TICKS * 10));
 			}
 
 			characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::TryingToMove, path.size() > 1);

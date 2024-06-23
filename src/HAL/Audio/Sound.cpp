@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifndef DISABLE_SDL
+
 #include "HAL/Audio/Sound.h"
 
 #include <SDL_mixer.h>
@@ -28,3 +30,5 @@ namespace Audio
 		return mSound != nullptr;
 	}
 }
+
+#endif // !DISABLE_SDL
