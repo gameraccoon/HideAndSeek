@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifndef DISABLE_SDL
+
 #include "Base/Types/String/ResourcePath.h"
 
 #include "HAL/Base/Types.h"
@@ -16,7 +18,7 @@ namespace Graphics
 		QuadUV uv;
 	};
 
-	static UniqueAny CalculateSpriteDependencies(UniqueAny&& resource, ResourceManager& resourceManager, ResourceHandle handle)
+	static UniqueAny CalculateSpriteDependencies(UniqueAny&& resource, ResourceManager& resourceManager, const ResourceHandle handle)
 	{
 		SCOPED_PROFILER("CalculateSpriteDependencies");
 
@@ -31,8 +33,8 @@ namespace Graphics
 		const RelativeResourcePath& path = *pathPtr;
 
 		RelativeResourcePath surfacePath;
-		Graphics::QuadUV spriteUV;
-		auto it = resourceManager.getAtlasFrames().find(path);
+		QuadUV spriteUV;
+		const auto it = resourceManager.getAtlasFrames().find(path);
 		if (it != resourceManager.getAtlasFrames().end())
 		{
 			surfacePath = it->second.atlasPath;
@@ -114,3 +116,5 @@ namespace Graphics
 		return {};
 	}
 }
+
+#endif // !DISABLE_SDL

@@ -70,9 +70,9 @@ private:
 
 private:
 	template<typename U>
-	Result(U&& value) : mData(std::forward<U>(value)) {}
+	explicit Result(U&& value) : mData(std::forward<U>(value)) {}
 	template<typename U>
-	Result(Error&& error) : mData(std::move(error)) {}
+	explicit Result(Error&& error) : mData(std::move(error)) {}
 
 	std::variant<T, Error> mData;
 };

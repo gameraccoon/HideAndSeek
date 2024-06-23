@@ -7,10 +7,10 @@ class WorldHolder;
 /**
  * System that processes gameplay controls
  */
-class ControlSystem : public RaccoonEcs::System
+class ControlSystem final : public RaccoonEcs::System
 {
 public:
-	ControlSystem(WorldHolder& worldHolder) noexcept;
+	explicit ControlSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 

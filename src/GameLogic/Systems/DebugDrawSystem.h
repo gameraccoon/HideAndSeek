@@ -1,11 +1,6 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include <raccoon-ecs/utils/system.h>
-
-#include "HAL/EngineFwd.h"
 
 #include "Utils/ResourceManagement/ResourceManager.h"
 
@@ -14,13 +9,13 @@
 /**
  * System that handles rendering of world objects
  */
-class DebugDrawSystem : public RaccoonEcs::System
+class DebugDrawSystem final : public RaccoonEcs::System
 {
 public:
 	using KeyStatesMap = std::unordered_map<int, bool>;
 
 public:
-	DebugDrawSystem(
+	explicit DebugDrawSystem(
 		WorldHolder& worldHolder,
 		ResourceManager& resourceManager) noexcept;
 

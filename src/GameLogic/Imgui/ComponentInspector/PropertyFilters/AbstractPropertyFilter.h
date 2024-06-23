@@ -65,16 +65,16 @@ namespace ImguiPropertyFiltration
 	};
 
 	template<typename T>
-	class PropertyFilterFactory : public AbstractPropertyFilterFactory
+	class PropertyFilterFactory final : public AbstractPropertyFilterFactory
 	{
 	public:
 		explicit PropertyFilterFactory(const std::weak_ptr<AbstractPropertyDescriptor>& descriptor)
 			: mDescriptor(descriptor)
 		{}
 
-		[[nodiscard]] std::string getName() const final { return T::GetStaticName(); }
+		[[nodiscard]] std::string getName() const override { return T::GetStaticName(); }
 
-		[[nodiscard]] std::unique_ptr<AbstractPropertyFilter> createFilter() const final
+		[[nodiscard]] std::unique_ptr<AbstractPropertyFilter> createFilter() const override
 		{
 			return std::make_unique<T>(mDescriptor);
 		}

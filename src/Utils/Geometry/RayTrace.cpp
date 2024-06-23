@@ -4,14 +4,11 @@
 
 #include "Utils/Geometry/RayTrace.h"
 
-#include <algorithm>
-
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 
 #include "GameData/Geometry/Vector2D.h"
 #include "GameData/Geometry/Rotator.h"
-#include "GameData/Geometry/BoundingBox.h"
 #include "GameData/World.h"
 
 #include "Utils/Geometry/Collide.h"
@@ -54,20 +51,20 @@ namespace RayTrace
 				}
 				else
 				{
-					Vector2D d = endPoint - startPoint;
-					Vector2D f = startPoint - transform->getLocation();
-					float r = hull.getRadius();
+					const Vector2D d = endPoint - startPoint;
+					const Vector2D f = startPoint - transform->getLocation();
+					const float r = hull.getRadius();
 
-					float a = Vector2D::DotProduct(d, d);
-					float b = 2.0f * Vector2D::DotProduct(f, d);
-					float c = Vector2D::DotProduct(f, f) - r * r;
+					const float a = Vector2D::DotProduct(d, d);
+					const float b = 2.0f * Vector2D::DotProduct(f, d);
+					const float c = Vector2D::DotProduct(f, f) - r * r;
 
 					float discriminant = b * b - 4 * a * c;
 					if (discriminant >= 0)
 					{
 						discriminant = sqrt(discriminant);
 
-						float t1 = (-b - discriminant) / (2.0f * a);
+						const float t1 = (-b - discriminant) / (2.0f * a);
 
 						if (t1 >= 0 && t1 <= 1)
 						{
@@ -88,10 +85,10 @@ namespace RayTrace
 
 		// ToDo: choose only potentially intersecting cells
 		world.getSpatialData().getAllCellManagers().forEachComponentSetWithEntityAndExtraData<const CollisionComponent, const TransformComponent>(
-			[&result, &minRayQLength, startPoint, endPoint](WorldCell& cell, EntityView entityView, const CollisionComponent* collision, const TransformComponent* transform)
+			[&result, &minRayQLength, startPoint, endPoint](const WorldCell& cell, const EntityView entityView, const CollisionComponent* collision, const TransformComponent* transform)
 		{
-			Vector2D transformedStartPoint = startPoint - transform->getLocation();
-			Vector2D transformedEndPoint = endPoint - transform->getLocation();
+			const Vector2D transformedStartPoint = startPoint - transform->getLocation();
+			const Vector2D transformedEndPoint = endPoint - transform->getLocation();
 
 			// if the raytrace intersects with AABB of this entity
 			if (Collide::IsLineIntersectAABB(collision->getBoundingBox(), transformedStartPoint, transformedEndPoint))
@@ -115,10 +112,10 @@ namespace RayTrace
 							continue;
 						}
 
-						Vector2D hitLocation = Collide::GetPointIntersect2Lines(border.getA(), border.getB(),
+						const Vector2D hitLocation = Collide::GetPointIntersect2Lines(border.getA(), border.getB(),
 							transformedStartPoint, transformedEndPoint);
 
-						float rayQLength = (transformedStartPoint - hitLocation).qSize();
+						const float rayQLength = (transformedStartPoint - hitLocation).qSize();
 
 						// if currentActor closer than the previous one
 						if (rayQLength < minRayQLength)
@@ -134,25 +131,25 @@ namespace RayTrace
 				}
 				else
 				{
-					Vector2D d = endPoint - startPoint;
-					Vector2D f = startPoint - transform->getLocation();
-					float r = hull.getRadius();
+					const Vector2D d = endPoint - startPoint;
+					const Vector2D f = startPoint - transform->getLocation();
+					const float r = hull.getRadius();
 
-					float a = Vector2D::DotProduct(d, d);
-					float b = 2.0f * Vector2D::DotProduct(f, d);
-					float c = Vector2D::DotProduct(f, f) - r * r;
+					const float a = Vector2D::DotProduct(d, d);
+					const float b = 2.0f * Vector2D::DotProduct(f, d);
+					const float c = Vector2D::DotProduct(f, f) - r * r;
 
 					float discriminant = b * b - 4 * a * c;
 					if (discriminant >= 0)
 					{
 						discriminant = sqrt(discriminant);
 
-						float t1 = (-b - discriminant) / (2.0f * a);
+						const float t1 = (-b - discriminant) / (2.0f * a);
 
 						if (t1 >= 0 && t1 <= 1)
 						{
-							float rayLength = d.size() * t1;
-							float rayQLength = rayLength * rayLength;
+							const float rayLength = d.size() * t1;
+							const float rayQLength = rayLength * rayLength;
 							if (rayQLength < minRayQLength)
 							{
 								minRayQLength = rayQLength;

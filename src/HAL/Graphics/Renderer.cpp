@@ -7,15 +7,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glew/glew.h>
 
-#include "SDL_surface.h"
-
 #include "Base/Debug/ConcurrentAccessDetector.h"
 
-#include "HAL/Internal/GlContext.h"
-
-#include "HAL/Internal/SdlWindow.h"
 #include "HAL/Graphics/SdlSurface.h"
-#include "HAL/Graphics/Font.h"
 
 
 static constexpr double MATH_PI = 3.14159265358979323846;
@@ -34,7 +28,7 @@ namespace Graphics
 		surface.bind();
 	}
 
-	void Render::DrawQuad(const glm::mat4& transform, Vector2D size, Graphics::QuadUV uv, float alpha)
+	void Render::DrawQuad(const glm::mat4& transform, const Vector2D size, const QuadUV uv, const float alpha)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glLoadMatrixf(reinterpret_cast<const float*>(&transform));
@@ -49,7 +43,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::DrawQuad(Vector2D pos, Vector2D size)
+	void Render::DrawQuad(const Vector2D pos, const Vector2D size)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glm::mat4 transform{ 1.0f };
@@ -66,7 +60,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::DrawQuad(Vector2D pos, Vector2D size, Vector2D anchor, float rotation, Graphics::QuadUV uv, float alpha)
+	void Render::DrawQuad(const Vector2D pos, const Vector2D size, const Vector2D anchor, const float rotation, const QuadUV uv, const float alpha)
 	{
 		glm::mat4 transform{ 1.0f };
 		transform = glm::translate(transform, glm::vec3(pos.x, pos.y, 0.0f));
@@ -75,7 +69,7 @@ namespace Graphics
 		DrawQuad(transform, size, uv, alpha);
 	}
 
-	void Render::DrawFan(const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
+	void Render::DrawFan(const std::vector<DrawPoint>& points, const glm::mat4& transform, const float alpha)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glLoadMatrixf(reinterpret_cast<const float*>(&transform));
@@ -91,7 +85,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::DrawStrip(const std::vector<DrawPoint>& points, const glm::mat4& transform, float alpha)
+	void Render::DrawStrip(const std::vector<DrawPoint>& points, const glm::mat4& transform, const float alpha)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glLoadMatrixf(reinterpret_cast<const float*>(&transform));
@@ -107,7 +101,7 @@ namespace Graphics
 		glEnd();
 	}
 
-	void Render::DrawTiledQuad(Vector2D start, Vector2D size, const QuadUV& uv)
+	void Render::DrawTiledQuad(const Vector2D start, const Vector2D size, const QuadUV& uv)
 	{
 		DETECT_CONCURRENT_ACCESS(HAL::gSDLAccessDetector);
 		glm::mat4 transform{ 1.0f };

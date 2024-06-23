@@ -7,7 +7,7 @@
 class TestSubstringSearchData
 {
 public:
-	TestSubstringSearchData(int val) : value(val) {} // implicit
+	explicit TestSubstringSearchData(const int val) : value(val) {} // implicit
 	TestSubstringSearchData(const TestSubstringSearchData&) = delete;
 	TestSubstringSearchData& operator=(const TestSubstringSearchData&) = delete;
 	TestSubstringSearchData(TestSubstringSearchData&&) = default;
@@ -32,7 +32,7 @@ TEST(SubstringSearcher, BasicUsageVal)
 	EXPECT_EQ(3u, searcher.findAllMatches("te").size());
 	EXPECT_EQ(0u, searcher.findAllMatches("et").size());
 
-	auto matches = searcher.findAllMatches("t.v");
+	const auto matches = searcher.findAllMatches("t.v");
 	EXPECT_EQ(1u, matches.size());
 	if (matches.size() > 0)
 	{
@@ -56,7 +56,7 @@ TEST(SubstringSearcher, BasicUsageRef)
 	EXPECT_EQ(3u, searcher.findAllMatchesRef("te").size());
 	EXPECT_EQ(0u, searcher.findAllMatchesRef("et").size());
 
-	auto matches = searcher.findAllMatchesRef("t.v");
+	const auto matches = searcher.findAllMatchesRef("t.v");
 	EXPECT_EQ(1u, matches.size());
 	if (matches.size() > 0)
 	{
@@ -82,7 +82,7 @@ TEST(SubstringSearcher, MultipleKeys)
 	EXPECT_EQ(3u, searcher.findAllMatches("value").size());
 	EXPECT_EQ(2u, searcher.findAllMatches("alias").size());
 
-	auto matches = searcher.findAllMatches("alias2");
+	const auto matches = searcher.findAllMatches("alias2");
 	EXPECT_EQ(1u, matches.size());
 	if (matches.size() > 0)
 	{

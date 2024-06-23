@@ -2,8 +2,6 @@
 
 #include "AutoTests/Tests/WeaponShooting/Systems/TestDestroyedEntitiesRegistrationSystem.h"
 
-#include "Base/Random/Random.h"
-
 #include "GameData/Components/DeathComponent.generated.h"
 #include "GameData/World.h"
 

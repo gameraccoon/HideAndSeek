@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifndef DISABLE_SDL
+
 #include "HAL/Base/Engine.h"
 
 #include <algorithm>
@@ -37,7 +39,7 @@ namespace HAL
 
 		std::vector<SDL_Event> mLastFrameEvents;
 
-		Impl(int windowWidth, int windowHeight) noexcept
+		Impl(const int windowWidth, const int windowHeight) noexcept
 			: mSdl(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE)
 			, mWindowWidth(windowWidth)
 			, mWindowHeight(windowHeight)
@@ -51,7 +53,7 @@ namespace HAL
 		void parseEvents();
 	};
 
-	Engine::Engine(int windowWidth, int windowHeight) noexcept
+	Engine::Engine(const int windowWidth, const int windowHeight) noexcept
 		: mPimpl(HS_NEW Impl(windowWidth, windowHeight))
 	{
 		DETECT_CONCURRENT_ACCESS(gSDLAccessDetector);
@@ -82,10 +84,10 @@ namespace HAL
 		Mix_CloseAudio();
 	}
 
-	void Engine::init(IGame* game, InputControllersData* inputData)
+	void Engine::init(IGame* game, InputControllersData* inputControllersData)
 	{
 		mPimpl->mGame = game;
-		mPimpl->mInputDataPtr = inputData;
+		mPimpl->mInputDataPtr = inputControllersData;
 		mPimpl->mWindow.show();
 	}
 
@@ -132,6 +134,7 @@ namespace HAL
 	void Engine::Impl::start()
 	{
 		AssertFatal(mGame, "Game should be set to Engine before calling start()");
+
 		RunGameLoop(*mGame, nullptr, [this]{ parseEvents(); }, [this]{
 			DETECT_CONCURRENT_ACCESS(gSDLEventsAccessDetector);
 			mLastFrameEvents.clear();
@@ -140,7 +143,7 @@ namespace HAL
 
 	void Engine::Impl::parseEvents()
 	{
-//		SCOPED_PROFILER("Engine::Impl::parseEvents");
+		//SCOPED_PROFILER("Engine::Impl::parseEvents");
 		DETECT_CONCURRENT_ACCESS(gSDLEventsAccessDetector);
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
@@ -199,3 +202,5 @@ namespace HAL
 		}
 	}
 }
+
+#endif // !DISABLE_SDL

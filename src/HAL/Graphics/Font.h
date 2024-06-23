@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef DISABLE_SDL
+
 #include "Base/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/Resource.h"
@@ -9,7 +11,7 @@ struct SDL_Renderer;
 
 namespace Graphics
 {
-	class Font : public Resource
+	class Font final : public Resource
 	{
 	public:
 		Font() = default;
@@ -33,3 +35,5 @@ namespace Graphics
 		FC_Font* mFont = nullptr;
 	};
 }
+
+#endif // !DISABLE_SDL

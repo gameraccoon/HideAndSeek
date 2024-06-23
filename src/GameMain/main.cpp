@@ -16,7 +16,7 @@
 
 #include "GameMain/ConsoleCommands.h"
 
-int main(int argc, char** argv)
+int main(const int argc, char** argv)
 {
 	Random::gGlobalGenerator = Random::GlobalGeneratorType(std::random_device()());
 
@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 	RaccoonEcs::gErrorHandler = [](const std::string& error) { ReportError(error); };
 #endif // RACCOON_ECS_DEBUG_CHECKS_ENABLED
 
-	ArgumentsParser arguments(argc, argv);
+	const ArgumentsParser arguments(argc, argv);
 
 	if (ConsoleCommands::TryExecuteQuickConsoleCommands(arguments))
 	{
@@ -64,6 +64,4 @@ int main(int argc, char** argv)
 	applicationData.shutdownThreads(); // this call waits for the threads to be joined
 
 	applicationData.writeProfilingData(); // this call waits for the data to be written to the files
-
-	return 0;
 }

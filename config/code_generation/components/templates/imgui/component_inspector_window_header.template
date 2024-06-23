@@ -4,10 +4,10 @@
 
 #include "GameLogic/Imgui/ComponentInspector/AbstractComponentImguiWidget.h"
 
-class {class_name}ImguiWidget : public AbstractComponentImguiWidget
+class {class_name}ImguiWidget final : public AbstractComponentImguiWidget
 {{
 public:
-	void update(void* component);
+	void update(void* component) override;
 }};
 
 #endif // IMGUI_ENABLED

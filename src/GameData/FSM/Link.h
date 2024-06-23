@@ -1,9 +1,7 @@
 #pragma once
 
-#include <any>
 #include <functional>
 #include <memory>
-#include <string>
 
 #include "GameData/FSM/Blackboard.h"
 
@@ -18,7 +16,7 @@ namespace FSM
 	public:
 		virtual ~LinkRule() = default;
 		virtual bool canFollow(const BlackboardType& blackboard) const = 0;
-		virtual std::unique_ptr<LinkRule<BlackboardKeyType>> makeCopy() const = 0;
+		virtual std::unique_ptr<LinkRule> makeCopy() const = 0;
 	};
 
 	namespace LinkRules
@@ -27,14 +25,14 @@ namespace FSM
 		 * Link that can be parametrized with functor
 		 */
 		template<typename BlackboardKeyType>
-		class FunctorLink : public LinkRule<BlackboardKeyType>
+		class FunctorLink final : public LinkRule<BlackboardKeyType>
 		{
 		public:
 			using BlackboardType = Blackboard<BlackboardKeyType>;
 			using CanFollowFn = std::function<bool(const BlackboardType& blackboard)>;
 
 		public:
-			FunctorLink(CanFollowFn canFollowFn)
+			explicit FunctorLink(CanFollowFn canFollowFn)
 				: mCanFollowFn(canFollowFn)
 			{
 			}
@@ -57,7 +55,7 @@ namespace FSM
 		 * Link that will be followed if a blackboard variable have a specific value
 		 */
 		template<typename BlackboardKeyType, typename ValueType>
-		class VariableEqualLink : public LinkRule<BlackboardKeyType>
+		class VariableEqualLink final : public LinkRule<BlackboardKeyType>
 		{
 		public:
 			using BlackboardType = Blackboard<BlackboardKeyType>;

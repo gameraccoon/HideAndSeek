@@ -1,10 +1,8 @@
 #pragma once
 
-#include "GameData/EcsDefinitions.h"
-
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
-class {class_name}JsonSerializer : public Json::ComponentSerializer
+class {class_name}JsonSerializer final : public Json::ComponentSerializer
 {{
 public:
 	void toJson(nlohmann::json& outJson, const void* component) const override;

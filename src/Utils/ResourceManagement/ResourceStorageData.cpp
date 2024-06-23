@@ -6,7 +6,7 @@ namespace ResourceLoading
 {
 	ResourceHandle ResourceStorage::createResourceLock(const std::string& id)
 	{
-		ResourceHandle currentHandle(handleIdx);
+		const ResourceHandle currentHandle(handleIdx);
 		idsMap[id] = currentHandle;
 		idFindMap[currentHandle] = id;
 		resourceLocksCount[currentHandle] = 1;

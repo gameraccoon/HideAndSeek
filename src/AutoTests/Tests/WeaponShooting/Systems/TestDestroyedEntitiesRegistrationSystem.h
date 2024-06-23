@@ -5,7 +5,7 @@
 class WorldHolder;
 class DestroyedEntitiesTestCheck;
 
-class TestDestroyedEntitiesRegistrationSystem : public RaccoonEcs::System
+class TestDestroyedEntitiesRegistrationSystem final : public RaccoonEcs::System
 {
 public:
 	TestDestroyedEntitiesRegistrationSystem(

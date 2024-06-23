@@ -14,7 +14,7 @@ public:
 	}
 
 	template<typename Vec>
-	void findAndFillAllMatches(Vec& outResult, std::string_view searchQuery) const noexcept
+	void findAndFillAllMatches(Vec& outResult, const std::string_view searchQuery) const noexcept
 	{
 		std::vector<size_t> valueIndexes;
 		// the most straightforward solution for now

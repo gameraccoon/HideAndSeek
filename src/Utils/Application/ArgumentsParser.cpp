@@ -6,7 +6,7 @@
 
 #include <format>
 
-ArgumentsParser::ArgumentsParser(int argc, const char** argv, const std::string& argumentSwitch)
+ArgumentsParser::ArgumentsParser(const int argc, const char** argv, const std::string& argumentSwitch)
 	: mArgumentSwitch(argumentSwitch)
 {
 	for (int i = 1; i < argc; ++i)
@@ -15,7 +15,7 @@ ArgumentsParser::ArgumentsParser(int argc, const char** argv, const std::string&
 	}
 }
 
-ArgumentsParser::ArgumentsParser(int argc, char** argv, const std::string& argumentSwitch)
+ArgumentsParser::ArgumentsParser(const int argc, char** argv, const std::string& argumentSwitch)
 	: mArgumentSwitch(argumentSwitch)
 {
 	for (int i = 1; i < argc; ++i)
@@ -26,7 +26,7 @@ ArgumentsParser::ArgumentsParser(int argc, char** argv, const std::string& argum
 
 std::optional<std::string> ArgumentsParser::getArgumentValue(const std::string& argument) const
 {
-	std::vector<std::string>::const_iterator itr = std::find(this->mTokens.begin(), this->mTokens.end(), mArgumentSwitch + argument);
+	std::vector<std::string>::const_iterator itr = std::ranges::find(this->mTokens, mArgumentSwitch + argument);
 
 	if (itr != mTokens.end())
 	{
@@ -46,7 +46,7 @@ std::optional<std::string> ArgumentsParser::getArgumentValue(const std::string& 
 
 Result<int, std::string> ArgumentsParser::getIntArgumentValue(const std::string& argument) const
 {
-	std::vector<std::string>::const_iterator itr = std::find(this->mTokens.begin(), this->mTokens.end(), mArgumentSwitch + argument);
+	std::vector<std::string>::const_iterator itr = std::ranges::find(this->mTokens, mArgumentSwitch + argument);
 
 	if (itr != mTokens.end())
 	{
@@ -73,7 +73,7 @@ Result<int, std::string> ArgumentsParser::getIntArgumentValue(const std::string&
 
 bool ArgumentsParser::hasArgument(const std::string& argument) const
 {
-	return std::find(mTokens.begin(), mTokens.end(), mArgumentSwitch + argument) != mTokens.end();
+	return std::ranges::find(mTokens, mArgumentSwitch + argument) != mTokens.end();
 }
 
 std::vector<std::string> ArgumentsParser::getAllArguments() const

@@ -2,7 +2,7 @@
 
 #include "GameData/Time/TimeData.h"
 
-void TimeData::fixedUpdate(float deltaTime, u32 updatesCount)
+void TimeData::fixedUpdate(const float deltaTime, const u32 updatesCount)
 {
 	lastFixedUpdateDt = deltaTime;
 	lastUpdateDt = deltaTime;

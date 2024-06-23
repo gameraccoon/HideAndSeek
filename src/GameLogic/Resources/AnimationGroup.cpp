@@ -1,12 +1,13 @@
 #include "Base/precomp.h"
 
+#ifndef DISABLE_SDL
+
 #include <filesystem>
 
 #include <nlohmann/json.hpp>
 
 #include "Base/Types/String/ResourcePath.h"
 
-#include "HAL/Base/Engine.h"
 #include "HAL/Graphics/SdlSurface.h"
 
 #include "Utils/ResourceManagement/ResourceManager.h"
@@ -55,7 +56,7 @@ namespace Graphics
 		return result;
 	}
 
-	static UniqueAny CalculateAnimationGroupDependencies(UniqueAny&& resource, ResourceManager& resourceManager, ResourceHandle handle)
+	static UniqueAny CalculateAnimationGroupDependencies(UniqueAny&& resource, ResourceManager& resourceManager, const ResourceHandle handle)
 	{
 		SCOPED_PROFILER("CalculateSpriteDependencies");
 
@@ -99,13 +100,13 @@ namespace Graphics
 		std::map<StringId, std::vector<ResourceHandle>> animClips;
 		for (auto&& [clipPath, clipHandle] : animGroupLoadData->clips)
 		{
-			animClips.emplace(std::move(clipPath), resourceManager.tryGetResource<Graphics::SpriteAnimationClip>(clipHandle)->getSprites());
+			animClips.emplace(std::move(clipPath), resourceManager.tryGetResource<SpriteAnimationClip>(clipHandle)->getSprites());
 		}
 
-		return UniqueAny::Create<Resource::Ptr>(std::make_unique<Graphics::AnimationGroup>(std::move(animClips), animGroupLoadData->stateMachineID, animGroupLoadData->defaultState));
+		return UniqueAny::Create<Resource::Ptr>(std::make_unique<AnimationGroup>(std::move(animClips), animGroupLoadData->stateMachineID, animGroupLoadData->defaultState));
 	}
 
-	AnimationGroup::AnimationGroup(std::map<StringId, std::vector<ResourceHandle>>&& animationClips, StringId stateMachineId, StringId defaultState)
+	AnimationGroup::AnimationGroup(std::map<StringId, std::vector<ResourceHandle>>&& animationClips, const StringId stateMachineId, const StringId defaultState)
 		: mAnimationClips(animationClips)
 		, mStateMachineId(stateMachineId)
 		, mDefaultState(defaultState)
@@ -141,3 +142,5 @@ namespace Graphics
 		return {};
 	}
 }
+
+#endif // !DISABLE_SDL

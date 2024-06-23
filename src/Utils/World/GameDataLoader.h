@@ -3,8 +3,6 @@
 #include <string>
 #include <filesystem>
 
-#include "GameData/EcsDefinitions.h"
-
 class World;
 class GameData;
 

@@ -34,18 +34,18 @@ void ResourceStreamingSystem::update()
 	World& world = mWorldHolder.getWorld();
 
 	auto [worldCachedData] = world.getWorldComponents().getComponents<const WorldCachedDataComponent>();
-	Vector2D workingRect = worldCachedData->getScreenSize();
+	const Vector2D workingRect = worldCachedData->getScreenSize();
 
 	// load sprites
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(worldCachedData->getCameraPos(), workingRect);
-	spatialManager.forEachComponentSetWithEntity<SpriteCreatorComponent>(
-			[this](EntityView entityView, SpriteCreatorComponent* spriteCreator)
+	spatialManager.forEachComponentSetWithEntity<const SpriteCreatorComponent>(
+			[this](EntityView entityView, const SpriteCreatorComponent* spriteCreator)
 	{
 		const auto& descriptions = spriteCreator->getDescriptions();
 		Assert(!descriptions.empty(), "Sprite descriptions should not be empty");
 
 		SpriteRenderComponent* spriteRender = entityView.scheduleAddComponent<SpriteRenderComponent>();
-		size_t spritesCount = descriptions.size();
+		const size_t spritesCount = descriptions.size();
 		auto& spriteDatas = spriteRender->getSpriteDatasRef();
 		spriteDatas.resize(spritesCount);
 		for (size_t i = 0; i < spritesCount; ++i)
@@ -68,7 +68,7 @@ void ResourceStreamingSystem::update()
 		Assert(!descriptions.empty(), "Animation descriptions should not be empty");
 
 		AnimationClipsComponent* animationClips = entityView.scheduleAddComponent<AnimationClipsComponent>();
-		size_t animationCount = descriptions.size();
+		const size_t animationCount = descriptions.size();
 		auto& animations = animationClips->getDatasRef();
 		animations.resize(animationCount);
 
@@ -102,8 +102,8 @@ void ResourceStreamingSystem::update()
 	spatialManager.executeScheduledActions();
 
 	// load animation groups
-	spatialManager.forEachComponentSetWithEntity<AnimationGroupCreatorComponent>(
-			[this](EntityView entityView, AnimationGroupCreatorComponent* animationGroupCreator)
+	spatialManager.forEachComponentSetWithEntity<const AnimationGroupCreatorComponent>(
+			[this](EntityView entityView, const AnimationGroupCreatorComponent* animationGroupCreator)
 	{
 		AnimationGroupsComponent* animationGroups = entityView.scheduleAddComponent<AnimationGroupsComponent>();
 
@@ -124,7 +124,7 @@ void ResourceStreamingSystem::update()
 		const size_t animGroupCount = animationGroupCreator->getAnimationGroups().size();
 		for (size_t i = 0; i < animGroupCount; ++i)
 		{
-			ResourceHandle animGroupHandle = mResourceManager.lockResource<Graphics::AnimationGroup>(animationGroupCreator->getAnimationGroups()[i]);
+			const ResourceHandle animGroupHandle = mResourceManager.lockResource<Graphics::AnimationGroup>(animationGroupCreator->getAnimationGroups()[i]);
 
 			const Graphics::AnimationGroup* group = mResourceManager.tryGetResource<Graphics::AnimationGroup>(animGroupHandle);
 			AnimationGroup<StringId> animationGroup;

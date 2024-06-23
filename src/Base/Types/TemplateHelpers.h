@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-#include <ranges>
 #include <type_traits>
 #include <variant>
 
@@ -11,7 +9,7 @@ namespace TemplateHelpers
 {
 	// copy or move depending on the container type category
 	template<typename SourceContainerType, typename IteratorType>
-	void CopyOrMoveContainer(const typename std::remove_reference<SourceContainerType>::type& sourceContainer, IteratorType&& outputIterator)
+	void CopyOrMoveContainer(const std::remove_reference_t<SourceContainerType>& sourceContainer, IteratorType&& outputIterator)
 	{
 		std::ranges::copy(sourceContainer, std::forward<IteratorType>(outputIterator));
 	}

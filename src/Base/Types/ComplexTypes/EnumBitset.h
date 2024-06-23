@@ -1,7 +1,6 @@
 #pragma once
 
 #include <bitset>
-#include <limits>
 
 #include <neargye/magic_enum.hpp>
 

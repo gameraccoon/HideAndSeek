@@ -7,7 +7,7 @@
 
 namespace Json
 {
-	nlohmann::json SerializeEntityManager(EntityManager& entityManager, const Json::ComponentSerializationHolder& jsonSerializationHolder)
+	nlohmann::json SerializeEntityManager(EntityManager& entityManager, const ComponentSerializationHolder& jsonSerializationHolder)
 	{
 		entityManager.clearCaches();
 
@@ -24,12 +24,12 @@ namespace Json
 
 		auto components = nlohmann::json{};
 
-		for (auto& componentArray : entityManager.getComponentsData())
+		for (const auto& [componentId, rawComponents] : entityManager.getComponentsData())
 		{
 			auto componentArrayObject = nlohmann::json::array();
-			if (const ComponentSerializer* jsonSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(componentArray.first))
+			if (const ComponentSerializer* jsonSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(componentId))
 			{
-				for (auto& component : componentArray.second)
+				for (auto& component : rawComponents)
 				{
 					auto componentObj = nlohmann::json{};
 					if (component != nullptr)
@@ -38,7 +38,7 @@ namespace Json
 					}
 					componentArrayObject.push_back(componentObj);
 				}
-				components[ID_TO_STR(componentArray.first)] = componentArrayObject;
+				components[ID_TO_STR(componentId)] = componentArrayObject;
 			}
 		}
 		outJson["components"] = components;
@@ -46,7 +46,7 @@ namespace Json
 		return outJson;
 	}
 
-	void DeserializeEntityManager(EntityManager& outEntityManager, const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializationHolder)
+	void DeserializeEntityManager(EntityManager& outEntityManager, const nlohmann::json& json, const ComponentSerializationHolder& jsonSerializationHolder)
 	{
 		// make sure the manager is fully reset
 		outEntityManager.clear();
@@ -67,7 +67,7 @@ namespace Json
 		const auto& components = json.at("components");
 		for (const auto& [typeStr, vector] : components.items())
 		{
-			StringId type = STR_TO_ID(typeStr);
+			const StringId type = STR_TO_ID(typeStr);
 			if (const ComponentSerializer* jsonSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(type))
 			{
 				size_t entityIndex = 0;
@@ -88,7 +88,7 @@ namespace Json
 		}
 	}
 
-	void GetPrefabFromEntity(const EntityManager& entityManager, nlohmann::json& json, Entity entity, const Json::ComponentSerializationHolder& jsonSerializationHolder)
+	void GetPrefabFromEntity(const EntityManager& entityManager, nlohmann::json& json, const Entity entity, const ComponentSerializationHolder& jsonSerializationHolder)
 	{
 		std::vector<ConstTypedComponent> components;
 		entityManager.getAllEntityComponents(entity, components);
@@ -96,7 +96,7 @@ namespace Json
 		for (const ConstTypedComponent& componentData : components)
 		{
 			auto componentObj = nlohmann::json{};
-			StringId componentTypeName = componentData.typeId;
+			const StringId componentTypeName = componentData.typeId;
 			if (const ComponentSerializer* componentSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(componentTypeName))
 			{
 				componentSerializer->toJson(componentObj, componentData.component);
@@ -105,18 +105,18 @@ namespace Json
 		}
 	}
 
-	Entity CreatePrefabInstance(EntityManager& entityManager, const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializationHolder)
+	Entity CreatePrefabInstance(EntityManager& entityManager, const nlohmann::json& json, const ComponentSerializationHolder& jsonSerializationHolder)
 	{
-		Entity entity = entityManager.addEntity();
+		const Entity entity = entityManager.addEntity();
 		ApplyPrefabToExistentEntity(entityManager, json, entity, jsonSerializationHolder);
 		return entity;
 	}
 
-	void ApplyPrefabToExistentEntity(EntityManager& entityManager, const nlohmann::json& json, Entity entity, const Json::ComponentSerializationHolder& jsonSerializationHolder)
+	void ApplyPrefabToExistentEntity(EntityManager& entityManager, const nlohmann::json& json, const Entity entity, const ComponentSerializationHolder& jsonSerializationHolder)
 	{
 		for (const auto& [componentTypeNameStr, componentObj] : json.items())
 		{
-			StringId componentTypeName = STR_TO_ID(componentTypeNameStr);
+			const StringId componentTypeName = STR_TO_ID(componentTypeNameStr);
 
 			void* component = entityManager.addComponentByType(entity, componentTypeName);
 			if (const ComponentSerializer* componentSerializer = jsonSerializationHolder.getComponentSerializerFromClassName(componentTypeName))

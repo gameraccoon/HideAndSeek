@@ -15,7 +15,7 @@ namespace ThreadPoolInternal
 class ThreadPool
 {
 public:
-	ThreadPool(size_t threadsCount = 0, std::function<void()>&& threadPreShutdownTask = nullptr);
+	explicit ThreadPool(size_t threadsCount = 0, std::function<void()>&& threadPreShutdownTask = nullptr);
 
 	~ThreadPool();
 
@@ -33,11 +33,13 @@ public:
 	 * @param taskFn
 	 * @param finalizeFn
 	 * @param groupId  an unique group id to be able to separate task finalization for different groups
+	 * @param wakeUpThread  if true, will tru to wake up a thread to process the task, useful to set it
+	 * to false if we are scheduling multiple tesks and this one is not the last one
 	 *
 	 * Can be safely called during a finalizeFn of another task
 	 */
 	template<typename TaskFnT, typename FinalizeFnT>
-	void executeTask(TaskFnT&& taskFn, FinalizeFnT&& finalizeFn, size_t groupId = 0, bool wakeUpThread = true)
+	void executeTask(TaskFnT&& taskFn, FinalizeFnT&& finalizeFn, size_t groupId = 0, const bool wakeUpThread = true)
 	{
 		{
 			std::lock_guard<std::mutex> lock(mDataMutex);
@@ -105,7 +107,7 @@ private:
 		Task() = default;
 
 		template<typename TaskFnT, typename FinalizeFnT>
-		Task(size_t groupId, TaskFnT&& taskFn, FinalizeFnT&& finalizeFn = nullptr)
+		Task(const size_t groupId, TaskFnT&& taskFn, FinalizeFnT&& finalizeFn = nullptr)
 			: groupId(groupId)
 			, taskFn(std::forward<TaskFnT>(taskFn))
 			, finalizeFn(std::forward<FinalizeFnT>(finalizeFn))
@@ -115,8 +117,6 @@ private:
 		TaskFn taskFn;
 		FinalizeFn finalizeFn;
 	};
-
-	void initImpl();
 
 	void workerThreadFunction();
 	static void taskPostProcess(Task& currentTask, ThreadPoolInternal::FinalizerGroup& finalizerGroup, std::any&& result);

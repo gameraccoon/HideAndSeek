@@ -24,10 +24,9 @@ namespace Json
 		ComponentSerializationHolder(ComponentSerializationHolder&) = delete;
 		ComponentSerializationHolder& operator=(ComponentSerializationHolder&) = delete;
 
-		[[nodiscard]] const ComponentSerializer* getComponentSerializerFromClassName(StringId className) const
+		[[nodiscard]] const ComponentSerializer* getComponentSerializerFromClassName(const StringId className) const
 		{
-			const auto& it = mClassNameToSerializer.find(className);
-			if (it != mClassNameToSerializer.end())
+			if (const auto& it = mClassNameToSerializer.find(className); it != mClassNameToSerializer.end())
 			{
 				return mSerializers[it->second].get();
 			}

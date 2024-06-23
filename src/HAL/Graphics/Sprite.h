@@ -1,6 +1,6 @@
 #pragma once
 
-#include "HAL/EngineFwd.h"
+#ifndef DISABLE_SDL
 
 #include "GameData/Resources/Resource.h"
 
@@ -12,7 +12,7 @@ namespace Graphics
 {
 	class Surface;
 
-	class Sprite : public Resource
+	class Sprite final : public Resource
 	{
 	public:
 		Sprite(const Surface* surface, QuadUV uv);
@@ -34,3 +34,5 @@ namespace Graphics
 		QuadUV mUV;
 	};
 }
+
+#endif // !DISABLE_SDL

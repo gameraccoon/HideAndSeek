@@ -1,7 +1,8 @@
 #pragma once
 
+#ifndef DISABLE_SDL
+
 #include <string>
-#include <memory>
 
 #include "GameData/Resources/Resource.h"
 
@@ -10,7 +11,7 @@ class AbsoluteResourcePath;
 
 namespace Graphics
 {
-	class Surface : public Resource
+	class Surface final : public Resource
 	{
 	public:
 		explicit Surface(const AbsoluteResourcePath& filename);
@@ -24,8 +25,8 @@ namespace Graphics
 
 		bool isValid() const override;
 
-		void setTextureId(unsigned int textureId) { mTextureID = textureId; }
-		unsigned int getTextureId() { return mTextureID; }
+		void setTextureId(const unsigned int textureId) { mTextureID = textureId; }
+		unsigned int getTextureId() const { return mTextureID; }
 
 		int getWidth() const;
 		int getHeight() const;
@@ -42,3 +43,5 @@ namespace Graphics
 		unsigned int mTextureID;
 	};
 }
+
+#endif // !DISABLE_SDL

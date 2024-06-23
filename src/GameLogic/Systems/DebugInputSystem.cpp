@@ -4,16 +4,12 @@
 
 #ifndef DISABLE_SDL
 
-#include <SDL_mouse.h>
 #include <SDL_scancode.h>
 
-#include "GameData/Components/GameplayInputComponent.generated.h"
 #include "GameData/Components/ImguiComponent.generated.h"
 #include "GameData/Components/RenderModeComponent.generated.h"
-#include "GameData/Components/TimeComponent.generated.h"
 #include "GameData/GameData.h"
 #include "GameData/Input/ControllerState.h"
-#include "GameData/Input/InputBindings.h"
 
 #include "HAL/InputControllersData.h"
 
@@ -28,7 +24,7 @@ DebugInputSystem::DebugInputSystem(
 {
 }
 
-static void UpdateRenderStateOnPressed(const Input::PlayerControllerStates::KeyboardState keyboardState, int button, bool& value)
+static void UpdateRenderStateOnPressed(const Input::PlayerControllerStates::KeyboardState &keyboardState, const int button, bool& value)
 {
 	if (keyboardState.isButtonJustPressed(button))
 	{
@@ -56,7 +52,7 @@ void DebugInputSystem::update()
 	processDebugInput();
 }
 
-void DebugInputSystem::processDebugInput()
+void DebugInputSystem::processDebugInput() const
 {
 	SCOPED_PROFILER("DebugInputSystem::processDebugInput");
 

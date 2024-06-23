@@ -2,7 +2,6 @@
 
 #include <condition_variable>
 #include <functional>
-#include <map>
 #include <mutex>
 #include <thread>
 #include <unordered_map>
@@ -13,8 +12,6 @@
 
 #include "GameData/Resources/Resource.h"
 #include "GameData/Resources/ResourceHandle.h"
-
-#include "HAL/Base/Types.h"
 
 #include "Utils/ResourceManagement/ResourceDependencies.h"
 #include "Utils/ResourceManagement/ResourceLoadingData.h"
@@ -60,52 +57,49 @@ public:
 	}
 
 	template<typename T, typename... Args>
-	[[nodiscard]] ResourceHandle lockResourceFromThread(Resource::Thread currentThread, Args&&... args)
+	[[nodiscard]] ResourceHandle lockResourceFromThread(const Resource::Thread currentThread, Args&&... args)
 	{
 		SCOPED_PROFILER("ResourceManager::lockResourceFromThread");
 		std::scoped_lock l(mDataMutex);
 		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
-		std::string id = T::GetUniqueId(args...);
+		const std::string id = T::GetUniqueId(args...);
 
-		auto it = mStorage.idsMap.find(id);
-		if (it != mStorage.idsMap.end())
+		if (const auto it = mStorage.idsMap.find(id);it != mStorage.idsMap.end())
 		{
 			++mStorage.resourceLocksCount[it->second];
 			return ResourceHandle(it->second);
 		}
+
+		ResourceHandle newHandle = mStorage.createResourceLock(id);
+
+		if constexpr (sizeof...(Args) == 1)
+		{
+			startResourceLoading(std::make_unique<ResourceLoading::ResourceLoad::LoadingData>(
+				newHandle,
+				T::GetInitSteps(),
+				// if it's one argument, pass it normally to create UniqueAny
+				UniqueAny::Create<Args...>(std::forward<Args>(args)...)
+			), currentThread);
+		}
 		else
 		{
-			ResourceHandle newHandle = mStorage.createResourceLock(id);
-
-			if constexpr (sizeof...(Args) == 1)
-			{
-				startResourceLoading(std::make_unique<ResourceLoading::ResourceLoad::LoadingData>(
-					newHandle,
-					T::GetInitSteps(),
-					// if it's one argument, pass it normally to create UniqueAny
-					UniqueAny::Create<Args...>(std::forward<Args>(args)...)
-				), currentThread);
-			}
-			else
-			{
-				startResourceLoading(std::make_unique<ResourceLoading::ResourceLoad::LoadingData>(
-					newHandle,
-					T::GetInitSteps(),
-					// if there are multiple arguments, pack them as tuple
-					UniqueAny::Create<std::tuple<Args...>>(std::forward<Args>(args)...)
-				), currentThread);
-			}
-
-			return newHandle;
+			startResourceLoading(std::make_unique<ResourceLoading::ResourceLoad::LoadingData>(
+				newHandle,
+				T::GetInitSteps(),
+				// if there are multiple arguments, pack them as tuple
+				UniqueAny::Create<std::tuple<Args...>>(std::forward<Args>(args)...)
+			), currentThread);
 		}
+
+		return newHandle;
 	}
 
 	template<typename T>
-	[[nodiscard]] const T* tryGetResource(ResourceHandle handle)
+	[[nodiscard]] const T* tryGetResource(const ResourceHandle handle)
 	{
 		std::scoped_lock l(mDataMutex);
 		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
-		auto it = mStorage.resources.find(handle);
+		const auto it = mStorage.resources.find(handle);
 		return it == mStorage.resources.end() ? nullptr : static_cast<T*>(it->second.get());
 	}
 
@@ -126,7 +120,7 @@ public:
 	void stopLoadingThread();
 
 private:
-	void startResourceLoading(ResourceLoading::ResourceLoad::LoadingDataPtr&& loadingGata, Resource::Thread currentThread);
+	void startResourceLoading(ResourceLoading::ResourceLoad::LoadingDataPtr&& loadingData, Resource::Thread currentThread);
 	void loadOneAtlasData(const AbsoluteResourcePath& path);
 	void finalizeResourceLoading(ResourceHandle handle, Resource::Ptr&& resource);
 

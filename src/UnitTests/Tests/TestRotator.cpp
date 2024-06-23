@@ -7,11 +7,11 @@
 
 TEST(Rotator, Comparison)
 {
-	Rotator zero{0.0f};
-	Rotator pi{PI};
-	Rotator minusPi{-PI};
-	Rotator minusHalfPi{-PI/2.0f};
-	Rotator smallAngle{0.01f};
+	const Rotator zero{0.0f};
+	const Rotator pi{PI};
+	const Rotator minusPi{-PI};
+	const Rotator minusHalfPi{-PI/2.0f};
+	const Rotator smallAngle{0.01f};
 
 	EXPECT_TRUE((pi-pi).isNearlyEqualTo(zero));
 	EXPECT_TRUE((zero-minusHalfPi-minusHalfPi).isNearlyEqualTo(minusPi));
@@ -25,9 +25,9 @@ TEST(Rotator, Comparison)
 
 TEST(Rotator, Normalization)
 {
-	Rotator zero{0.0f};
-	Rotator pi{PI};
-	Rotator halfPi{PI/2.0f};
+	const Rotator zero{0.0f};
+	const Rotator pi{PI};
+	const Rotator halfPi{PI/2.0f};
 	EXPECT_TRUE(pi.isNearlyEqualTo(zero + pi + halfPi + halfPi + pi));
 	EXPECT_TRUE(zero.isNearlyEqualTo(zero - pi - pi));
 	EXPECT_TRUE(pi.isNearlyEqualTo(Rotator(PI*3.0f)));

@@ -35,7 +35,7 @@ namespace ConsoleCommands
 		// check that the given commands are valid
 		for (const std::string& argument : arguments.getAllArguments())
 		{
-			if (std::find_if(commands.begin(), commands.end(), [&argument](const CommandInfo& commandInfo)
+			if (std::ranges::find_if(commands, [&argument](const CommandInfo& commandInfo)
 			{
 				return commandInfo.command == argument;
 			}) == commands.end())
@@ -49,7 +49,7 @@ namespace ConsoleCommands
 		{
 			std::cout << "Options:";
 
-			const size_t longestCommand = std::max_element(commands.begin(), commands.end(),
+			const size_t longestCommand = std::ranges::max_element(commands,
 				[](const CommandInfo& a, const CommandInfo& b){
 					return a.syntax.size() < b.syntax.size();
 				}

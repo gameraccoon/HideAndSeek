@@ -6,7 +6,7 @@
 
 #include "GameLogic/Game/Game.h"
 
-DebugGameBehavior::DebugGameBehavior(int instanceIndex)
+DebugGameBehavior::DebugGameBehavior(const int instanceIndex)
 	: mDebugRecordedInput(instanceIndex)
 {
 }

@@ -159,16 +159,16 @@ TEST(BasicTypesSerialization, AppendNumber_ReadNumber)
 {
 	std::vector<std::byte> stream;
 
-	const s8 testSignedInt8 = -4;
-	const s16 testSignedInt16 = -3;
-	const s32 testSignedInt32 = -2;
-	const s64 testSignedInt64 = -1;
-	const u8 testUnsignedInt8 = 1u;
-	const u16 testUnsignedInt16 = 2u;
-	const u32 testUnsignedInt32 = 3u;
-	const u64 testUnsignedInt64 = 4u;
-	const f32 testFloat32 = -5.0f;
-	const f64 testFloat64 = 6.0;
+	constexpr s8 testSignedInt8 = -4;
+	constexpr s16 testSignedInt16 = -3;
+	constexpr s32 testSignedInt32 = -2;
+	constexpr s64 testSignedInt64 = -1;
+	constexpr u8 testUnsignedInt8 = 1u;
+	constexpr u16 testUnsignedInt16 = 2u;
+	constexpr u32 testUnsignedInt32 = 3u;
+	constexpr u64 testUnsignedInt64 = 4u;
+	constexpr f32 testFloat32 = -5.0f;
+	constexpr f64 testFloat64 = 6.0;
 
 	Serialization::AppendNumber<s8>(stream, testSignedInt8);
 	Serialization::AppendNumber<s16>(stream, testSignedInt16);

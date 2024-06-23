@@ -20,8 +20,6 @@
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
-#include "Utils/Geometry/VisibilityPolygon.h"
-
 #include "HAL/Graphics/Font.h"
 #include "HAL/Graphics/Sprite.h"
 
@@ -44,7 +42,7 @@ void RemoveOldDrawElement(std::vector<T>& vector, GameplayTimestamp now)
 	);
 }
 
-static void DrawPath(RenderData& renderData, const std::vector<Vector2D>& path, const ResourceHandle& navMeshSprite, Vector2D drawShift)
+static void DrawPath(RenderData& renderData, const std::vector<Vector2D>& path, const ResourceHandle& navMeshSprite, const Vector2D drawShift)
 {
 	if (path.size() > 1)
 	{
@@ -61,7 +59,7 @@ static void DrawPath(RenderData& renderData, const std::vector<Vector2D>& path, 
 			float u2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 			float v2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
-			Vector2D normal = (path[1] - path[0]).normal() * 3;
+			const Vector2D normal = (path[1] - path[0]).normal() * 3;
 
 			stripData.points.push_back(Graphics::DrawPoint{path[0] + normal, {u1, v1}});
 			stripData.points.push_back(Graphics::DrawPoint{path[0] - normal, {u2, v2}});
@@ -74,7 +72,7 @@ static void DrawPath(RenderData& renderData, const std::vector<Vector2D>& path, 
 			float u2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 			float v2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
-			Vector2D normal = (path[i] - path[i-1]).normal() * 3;
+			const Vector2D normal = (path[i] - path[i-1]).normal() * 3;
 
 			stripData.points.push_back(Graphics::DrawPoint{path[i] + normal, {u1, v1}});
 			stripData.points.push_back(Graphics::DrawPoint{path[i] - normal, {u2, v2}});
@@ -109,7 +107,7 @@ void DebugDrawSystem::update()
 		return;
 	}
 
-	RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
+	const RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
 
 	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
 
@@ -120,7 +118,7 @@ void DebugDrawSystem::update()
 		for (SpatialEntityManager::Record& record : cellsAround)
 		{
 			CellPos cellPos = record.extraData.get().getPos();
-			Vector2D location = SpatialWorldData::GetRelativeLocation(cameraCell, cellPos, drawShift);
+			const Vector2D location = SpatialWorldData::GetRelativeLocation(cameraCell, cellPos, drawShift);
 			QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
 			quadData.position = location;
 			quadData.size = SpatialWorldData::CellSizeVector;
@@ -167,7 +165,7 @@ void DebugDrawSystem::update()
 					float u = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 					float v = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
-					Vector2D pos = navMeshGeometry.vertices[navMeshGeometry.indexes[k*navMeshGeometry.verticesPerPoly + j]];
+					const Vector2D pos = navMeshGeometry.vertices[navMeshGeometry.indexes[k*navMeshGeometry.verticesPerPoly + j]];
 					polygon.points.push_back(Graphics::DrawPoint{pos, {u, v}});
 				}
 
@@ -208,7 +206,7 @@ void DebugDrawSystem::update()
 
 			for (const auto& worldPoint : debugDraw->getWorldPoints())
 			{
-				Vector2D screenPos = worldPoint.pos - cameraLocation + screenHalfSize;
+				const Vector2D screenPos = worldPoint.pos - cameraLocation + screenHalfSize;
 
 				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
 				quadData.position = screenPos;

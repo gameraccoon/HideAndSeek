@@ -18,7 +18,7 @@ namespace Audio
 		Mix_PlayChannel(-1, sound.getRawSound(), 0);
 	}
 
-	void AudioManager::SetSoundVolume(const Sound& sound, float volume)
+	void AudioManager::SetSoundVolume(const Sound& sound, const float volume)
 	{
 		Mix_VolumeChunk(sound.getRawSound(), static_cast<int>(std::ceil(volume * 128.0f)));
 	}
@@ -58,7 +58,7 @@ namespace Audio
 		return Mix_PausedMusic() == 1;
 	}
 
-	void AudioManager::SetMusicVolume(float volume)
+	void AudioManager::SetMusicVolume(const float volume)
 	{
 		Mix_VolumeMusic(static_cast<int>(std::ceil(volume * 128.0f)));
 	}

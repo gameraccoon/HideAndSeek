@@ -15,7 +15,7 @@ namespace ResourceLoading
 		struct LoadingData
 		{
 			LoadingData(
-				ResourceHandle handle,
+				const ResourceHandle handle,
 				Resource::InitSteps&& loadingSteps,
 				UniqueAny&& defaultData
 			)
@@ -32,7 +32,7 @@ namespace ResourceLoading
 		struct UnloadingData
 		{
 			UnloadingData(
-				ResourceHandle handle,
+				const ResourceHandle handle,
 				UniqueAny&& resourceData,
 				Resource::DeinitSteps&& unloadingSteps
 			)

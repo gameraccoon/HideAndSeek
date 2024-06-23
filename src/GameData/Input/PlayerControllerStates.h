@@ -29,7 +29,7 @@ namespace Input
 		MouseState mouseState;
 		GamepadState gamepadState;
 
-		BaseControllerState& getState(ControllerType controllerType) noexcept
+		BaseControllerState& getState(const ControllerType controllerType) noexcept
 		{
 			switch (controllerType)
 			{
@@ -45,7 +45,7 @@ namespace Input
 			}
 		}
 
-		const BaseControllerState& getState(ControllerType controllerType) const noexcept
+		const BaseControllerState& getState(const ControllerType controllerType) const noexcept
 		{
 			switch (controllerType)
 			{

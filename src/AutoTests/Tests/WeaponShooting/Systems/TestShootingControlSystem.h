@@ -4,10 +4,10 @@
 
 class WorldHolder;
 
-class TestShootingControlSystem : public RaccoonEcs::System
+class TestShootingControlSystem final : public RaccoonEcs::System
 {
 public:
-	TestShootingControlSystem(WorldHolder& worldHolder) noexcept;
+	explicit TestShootingControlSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 

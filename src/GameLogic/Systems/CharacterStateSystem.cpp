@@ -26,7 +26,7 @@ static bool CanMove(CharacterState /*state*/)
 	return true;
 }
 
-static bool IsRunning(CharacterState state)
+static bool IsRunning(const CharacterState state)
 {
 	return state == CharacterState::Run;
 }
@@ -58,7 +58,7 @@ void CharacterStateSystem::update()
 		allCellManagers.forEachComponentSet<const CharacterStateComponent, MovementComponent>(
 			[dt](const CharacterStateComponent* characterState, MovementComponent* movement)
 		{
-			CharacterState state = characterState->getState();
+			const CharacterState state = characterState->getState();
 			// allow movement
 			if (!CanMove(state))
 			{
@@ -74,7 +74,7 @@ void CharacterStateSystem::update()
 		allCellManagers.forEachComponentSet<const CharacterStateComponent, const MovementComponent, AnimationGroupsComponent>(
 			[](const CharacterStateComponent* characterState, const MovementComponent* movement, AnimationGroupsComponent* animationGroups)
 		{
-			CharacterState state = characterState->getState();
+			const CharacterState state = characterState->getState();
 
 			auto& animBlackboard = animationGroups->getBlackboardRef();
 			animBlackboard.setValue<StringId>(STR_TO_ID("charState"), enum_to_string(state));
@@ -82,10 +82,10 @@ void CharacterStateSystem::update()
 			animBlackboard.setValue<bool>(enum_to_string(CharacterStateBlackboardKeys::TryingToMove), characterState->getBlackboard().getValue<bool>(CharacterStateBlackboardKeys::TryingToMove, false));
 			animBlackboard.setValue<bool>(enum_to_string(CharacterStateBlackboardKeys::ReadyToRun), characterState->getBlackboard().getValue<bool>(CharacterStateBlackboardKeys::ReadyToRun, false));
 
-			Vector2D moveDirection = movement->getMoveDirection();
+			const Vector2D moveDirection = movement->getMoveDirection();
 			if (!moveDirection.isZeroLength())
 			{
-				float relativeRotation = (moveDirection.rotation() - movement->getSightDirection().rotation()).getValue();
+				const float relativeRotation = (moveDirection.rotation() - movement->getSightDirection().rotation()).getValue();
 
 				if (relativeRotation < PI * 0.25f && relativeRotation > -PI * 0.25f)
 				{

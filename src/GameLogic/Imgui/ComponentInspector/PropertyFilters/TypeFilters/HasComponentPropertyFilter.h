@@ -4,7 +4,7 @@
 
 namespace ImguiPropertyFiltration
 {
-	class HasComponentPropertyFilter : public AbstractPropertyFilter
+	class HasComponentPropertyFilter final : public AbstractPropertyFilter
 	{
 	public:
 		using AbstractPropertyFilter::AbstractPropertyFilter;

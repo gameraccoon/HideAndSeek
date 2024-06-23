@@ -2,19 +2,16 @@
 
 #include "Utils/Geometry/LightBlockingGeometry.h"
 
-#include <numeric>
-
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 
 #include "GameData/Spatial/SpatialWorldData.h"
 
-#include "Utils/Geometry/Collide.h"
 #include "Utils/Geometry/ShapeOperations.h"
 
 namespace LightBlockingGeometry
 {
-	static bool isPointInsideAABB(const BoundingBox& box, Vector2D a)
+	static bool isPointInsideAABB(const BoundingBox& box, const Vector2D a)
 	{
 		return box.minX <= a.x && a.x < box.maxX
 			&& box.minY <= a.y && a.y < box.maxY;
@@ -55,7 +52,7 @@ namespace LightBlockingGeometry
 				}
 				else
 				{
-					Vector2D leftmostPoint = GetLeftmostPoint(border);
+					const Vector2D leftmostPoint = GetLeftmostPoint(border);
 					// only add to the cell where our left-most point
 					if (isPointInsideAABB(cellAABB, leftmostPoint))
 					{

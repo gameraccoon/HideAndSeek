@@ -8,7 +8,7 @@ class ArgumentsParser;
 class DebugGameBehavior
 {
 public:
-	DebugGameBehavior(int instanceIndex);
+	explicit DebugGameBehavior(int instanceIndex);
 
 	void preInnerUpdate(Game& game);
 	void postInnerUpdate(Game& game);

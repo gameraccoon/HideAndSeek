@@ -7,10 +7,10 @@ class WorldHolder;
 /**
  * System that ensures correct character state
  */
-class CharacterStateSystem : public RaccoonEcs::System
+class CharacterStateSystem final : public RaccoonEcs::System
 {
 public:
-	CharacterStateSystem(WorldHolder& worldHolder) noexcept;
+	explicit CharacterStateSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 

@@ -7,10 +7,10 @@ class WorldHolder;
 /**
  * System that handles weapon manipulation
  */
-class WeaponSystem : public RaccoonEcs::System
+class WeaponSystem final : public RaccoonEcs::System
 {
 public:
-	WeaponSystem(WorldHolder& worldHolder) noexcept;
+	explicit WeaponSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 

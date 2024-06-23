@@ -1,7 +1,5 @@
 #pragma once
 
-#include <thread>
-
 #include <raccoon-ecs/utils/systems_manager.h>
 
 #include "GameData/World.h"
@@ -46,9 +44,6 @@ protected:
 	ThreadPool& getThreadPool() { return mThreadPool; }
 	GameData& getGameData() { return mGameData; }
 	Json::ComponentSerializationHolder& getComponentSerializers() { return mComponentSerializers; }
-
-private:
-	void workingThreadSaveProfileData();
 
 private:
 	ComponentFactory mComponentFactory;

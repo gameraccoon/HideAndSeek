@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-CellPosDiff::CellPosDiff(int x, int y)
+CellPosDiff::CellPosDiff(const int x, const int y)
 	: x(x)
 	, y(y)
 {

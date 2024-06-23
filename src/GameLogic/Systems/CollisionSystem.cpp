@@ -34,10 +34,10 @@ void CollisionSystem::update()
 	{
 		SCOPED_PROFILER("get components");
 		size_t i = 0;
-		for (auto& pair : allCellsMap)
+		for (auto& [cellPos, cell] : allCellsMap)
 		{
-			pair.second.getEntityManager().getComponentsWithEntities<CollisionComponent, const TransformComponent>(collidableComponentGroups[i].components);
-			collidableComponentGroups[i].cell = &pair.second;
+			cell.getEntityManager().getComponentsWithEntities<CollisionComponent, const TransformComponent>(collidableComponentGroups[i].components);
+			collidableComponentGroups[i].cell = &cell;
 			++i;
 		}
 	}
@@ -63,7 +63,7 @@ void CollisionSystem::update()
 			{
 				if (collision != collisionComponent)
 				{
-					bool doCollide = Collide::DoCollide(collisionComponent, transformComponent->getLocation() + movementComponent->getNextStep(), collision, transform->getLocation(), resist);
+					const bool doCollide = Collide::DoCollide(collisionComponent, transformComponent->getLocation() + movementComponent->getNextStep(), collision, transform->getLocation(), resist);
 
 					if (doCollide)
 					{

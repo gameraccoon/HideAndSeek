@@ -26,13 +26,13 @@ namespace Input
 	class ControllerState final : public BaseControllerState
 	{
 	public:
-		void clearLastFrameState() noexcept final
+		void clearLastFrameState() noexcept override
 		{
 			mLastFramePressedButtons.clear();
 			mLastFrameReleasedButtons.clear();
 		}
 
-		void updateButtonState(size_t button, bool isPressed) noexcept final
+		void updateButtonState(const size_t button, const bool isPressed) noexcept override
 		{
 			AssertFatal(button < HardwareButtonsCount, "Invalid button index %d, max is %d", button, HardwareButtonsCount);
 			const bool wasPressed = mPressedButtons.get(button);
@@ -44,7 +44,7 @@ namespace Input
 					mLastFramePressedButtons.set(button, true);
 				}
 			}
-			else if (!isPressed)
+			else
 			{
 				mPressedButtons.set(button, false);
 				if (wasPressed)
@@ -54,31 +54,31 @@ namespace Input
 			}
 		}
 
-		bool isButtonPressed(size_t button) const noexcept final
+		bool isButtonPressed(const size_t button) const noexcept override
 		{
 			AssertFatal(button < HardwareButtonsCount, "Invalid button index %d max is %d", button, HardwareButtonsCount);
 			return mPressedButtons.get(button);
 		}
 
-		bool isButtonJustPressed(size_t button) const noexcept final
+		bool isButtonJustPressed(const size_t button) const noexcept override
 		{
 			AssertFatal(button < HardwareButtonsCount, "Invalid button index %d max is %d", button, HardwareButtonsCount);
 			return mLastFramePressedButtons.get(button);
 		}
 
-		bool isButtonJustReleased(size_t button) const noexcept final
+		bool isButtonJustReleased(const size_t button) const noexcept override
 		{
 			AssertFatal(button < HardwareButtonsCount, "Invalid button index %d max is %d", button, HardwareButtonsCount);
 			return mLastFrameReleasedButtons.get(button);
 		}
 
-		void updateAxis(size_t axis, float newValue) noexcept final
+		void updateAxis(const size_t axis, const float newValue) noexcept override
 		{
 			AssertFatal(axis < HardwareAxesCount, "Invalid axis index %d max is %d", axis, HardwareAxesCount);
 			mAxes[axis] = newValue;
 		}
 
-		float getAxisValue(size_t axis) const noexcept final
+		float getAxisValue(const size_t axis) const noexcept override
 		{
 			AssertFatal(axis < HardwareAxesCount, "Invalid axis index %d max is %d", axis, HardwareAxesCount);
 			return mAxes[axis];

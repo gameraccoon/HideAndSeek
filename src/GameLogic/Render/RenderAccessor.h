@@ -7,7 +7,9 @@
 #include <vector>
 #include <functional>
 
+#ifdef ENABLE_SCOPED_PROFILER
 #include "Base/Profile/ScopedProfiler.h"
+#endif // ENABLE_SCOPED_PROFILER
 
 #include "GameData/Geometry/Vector2D.h"
 #include "GameData/Resources/ResourceHandle.h"
@@ -90,7 +92,7 @@ struct RenderData
 
 	RenderData() = default;
 
-	RenderData(std::vector<Layer>&& layers)
+	explicit RenderData(std::vector<Layer>&& layers)
 		: layers(layers)
 	{}
 
@@ -98,13 +100,13 @@ struct RenderData
 	int gameInstanceIndex = 0;
 };
 
-class RenderAccessor : public IRenderAccessor
+class RenderAccessor final : public IRenderAccessor
 {
 	friend class RenderThreadManager;
 
 public:
 	RenderAccessor() = default;
-	~RenderAccessor() = default;
+	~RenderAccessor() override = default;
 	RenderAccessor(RenderAccessor&) = delete;
 	RenderAccessor& operator=(RenderAccessor&) = delete;
 	RenderAccessor(RenderAccessor&&) = delete;

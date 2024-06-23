@@ -10,13 +10,10 @@
 
 #include "imgui/imgui.h"
 
-#include <raccoon-ecs/component_factory.h>
-
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
 #include "GameLogic/Imgui/ImguiDebugData.h"
-#include "GameLogic/SharedManagers/WorldHolder.h"
 
 #include "GameLogic/Imgui/ComponentInspector/ComponentWidgetsRegistration.h"
 
@@ -38,12 +35,12 @@ static void HelpMarker(const char* desc)
 	}
 }
 
-void ImguiComponentInspectorWindow::applyFilters(ImguiDebugData& debugData)
+void ImguiComponentInspectorWindow::applyFilters(const ImguiDebugData& debugData)
 {
 	 mPropertyFiltersWidget.getFilteredEntities(debugData, mFilteredEntities);
 }
 
-void ImguiComponentInspectorWindow::showEntityId()
+void ImguiComponentInspectorWindow::showEntityId() const
 {
 	if (mSelectedEntity.has_value())
 	{
@@ -65,10 +62,10 @@ void ImguiComponentInspectorWindow::showFilteredEntities()
 		if (ImGui::TreeNode("Filtered entities"))
 		{
 			ImGui::BeginGroup();
-			auto scrollBoxSize = ImVec2(200.0f, std::min(180.0f, static_cast<float>(mFilteredEntities.size()) * 17.0f + ImGui::GetStyle().FramePadding.y*4));
+			const auto scrollBoxSize = ImVec2(200.0f, std::min(180.0f, static_cast<float>(mFilteredEntities.size()) * 17.0f + ImGui::GetStyle().FramePadding.y*4));
 			if (ImGui::BeginChild("FilteredEntities", scrollBoxSize, true))
 			{
-				for (auto & filteredEntity : mFilteredEntities)
+				for (auto& filteredEntity : mFilteredEntities)
 				{
 					const Entity& entity = std::get<1>(filteredEntity);
 					char buf[32];
@@ -126,7 +123,7 @@ void ImguiComponentInspectorWindow::showComponentsInspector()
 	}
 }
 
-void ImguiComponentInspectorWindow::update(ImguiDebugData& debugData)
+void ImguiComponentInspectorWindow::update(const ImguiDebugData& debugData)
 {
 	if (isVisible)
 	{

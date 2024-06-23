@@ -3,7 +3,7 @@
 #include "GameLogic/Render/RenderAccessor.h"
 
 
-void RenderAccessor::submitData(std::unique_ptr<RenderData>&& newData, int gameInstanceIndex)
+void RenderAccessor::submitData(std::unique_ptr<RenderData>&& newData, const int gameInstanceIndex)
 {
 	newData->gameInstanceIndex = gameInstanceIndex;
 

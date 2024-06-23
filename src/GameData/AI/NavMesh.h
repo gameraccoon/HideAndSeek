@@ -28,7 +28,7 @@ struct NavMesh
 		struct LinkData
 		{
 			LinkData() = default;
-			LinkData(size_t neighbor, size_t borderPoint1, size_t borderPoint2)
+			LinkData(const size_t neighbor, const size_t borderPoint1, const size_t borderPoint2)
 				: neighbor(neighbor)
 				, borderPoint1(borderPoint1)
 				, borderPoint2(borderPoint2)

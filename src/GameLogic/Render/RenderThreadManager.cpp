@@ -26,7 +26,7 @@ namespace RenderThreadManagerInternal
 	class RenderVisitor
 	{
 	public:
-		RenderVisitor(ResourceManager& resourceManager, HAL::Engine& engine, const Graphics::Surface*& lastSurface, int gameInstanceIdx)
+		RenderVisitor(ResourceManager& resourceManager, HAL::Engine& engine, const Graphics::Surface*& lastSurface, const int gameInstanceIdx)
 			: mResourceManager(resourceManager)
 			, mEngine(engine)
 			, mLastSurface(lastSurface)
@@ -116,11 +116,11 @@ namespace RenderThreadManagerInternal
 				return;
 			}
 
-			Graphics::QuadUV spriteUV = sprite->getUV();
+			const Graphics::QuadUV spriteUV = sprite->getUV();
 
 			for (Graphics::DrawPoint& point : polygonData.points)
 			{
-				point.texturePoint = Graphics::QuadLerp(spriteUV, point.texturePoint);
+				point.texturePoint = QuadLerp(spriteUV, point.texturePoint);
 			}
 
 			glm::mat4 transform(1.0f);
@@ -139,11 +139,11 @@ namespace RenderThreadManagerInternal
 				return;
 			}
 
-			Graphics::QuadUV spriteUV = sprite->getUV();
+			const Graphics::QuadUV spriteUV = sprite->getUV();
 
 			for (Graphics::DrawPoint& point : stripData.points)
 			{
-				point.texturePoint = Graphics::QuadLerp(spriteUV, point.texturePoint);
+				point.texturePoint = QuadLerp(spriteUV, point.texturePoint);
 			}
 
 			glm::mat4 transform(1.0f);
@@ -159,14 +159,14 @@ namespace RenderThreadManagerInternal
 			// need an implimentation when text rendering is fixed
 		}
 
-		void operator()(const CustomRenderFunction& renderFunction)
+		void operator()(const CustomRenderFunction& renderFunction) const
 		{
 			SCOPED_PROFILER("RenderVisitor->CustomRenderFunction");
 
 			renderFunction.renderThreadFn();
 		}
 
-		void operator()(const FinalizeFrameCommand&)
+		void operator()(const FinalizeFrameCommand&) const
 		{
 			SCOPED_PROFILER("RenderVisitor->SwapBuffersCommand");
 
@@ -220,7 +220,7 @@ namespace RenderThreadManagerInternal
 					instanceData.emplace_back();
 				}
 
-				const bool containsFinalization = std::any_of(operationsBulk->layers.begin(), operationsBulk->layers.end(), [](const RenderData::Layer& layer)
+				const bool containsFinalization = std::ranges::any_of(operationsBulk->layers, [](const RenderData::Layer& layer)
 				{
 					return std::holds_alternative<FinalizeFrameCommand>(layer);
 				});

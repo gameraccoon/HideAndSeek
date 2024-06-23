@@ -9,7 +9,7 @@ StringId get_enum_name<{enum_name}>()
 }}
 
 template <>
-StringId enum_to_string({enum_name} value)
+StringId enum_to_string(const {enum_name} value)
 {{
 	switch(value)
 	{{
@@ -19,7 +19,7 @@ StringId enum_to_string({enum_name} value)
 }}
 
 template <>
-{enum_name} string_to_enum(StringId value)
+{enum_name} string_to_enum(const StringId value)
 {{
 	{string_to_enum_case}
 	return static_cast<{enum_name}>(0);

@@ -20,16 +20,16 @@ namespace ImguiPropertyFiltration
 
 	void FloatGreaterPropertyFilter::updateImguiWidget()
 	{
-		std::string name = getDescriptor()->getName() + " is greater than ";
+		const std::string name = getDescriptor()->getName() + " is greater than ";
 		ImGui::TextUnformatted(name.c_str());
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(80);
 		ImGui::InputFloat(std::string("##").append(name).c_str(), &mMinValue);
 	}
 
-	bool FloatGreaterPropertyFilter::isConditionPassed(EntityManager& manager, Entity entity) const
+	bool FloatGreaterPropertyFilter::isConditionPassed(EntityManager& manager, const Entity entity) const
 	{
-		float val = std::any_cast<float>(getDescriptor()->getPropertyValue(manager, entity));
+		const float val = std::any_cast<float>(getDescriptor()->getPropertyValue(manager, entity));
 		return val > mMinValue;
 	}
 
@@ -45,16 +45,16 @@ namespace ImguiPropertyFiltration
 
 	void FloatLessPropertyFilter::updateImguiWidget()
 	{
-		std::string name = getDescriptor()->getName() + " is less than ";
+		const std::string name = getDescriptor()->getName() + " is less than ";
 		ImGui::TextUnformatted(name.c_str());
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(80);
 		ImGui::InputFloat(std::string("##").append(name).c_str(), &mMaxValue);
 	}
 
-	bool FloatLessPropertyFilter::isConditionPassed(EntityManager& manager, Entity entity) const
+	bool FloatLessPropertyFilter::isConditionPassed(EntityManager& manager, const Entity entity) const
 	{
-		float val = std::any_cast<float>(getDescriptor()->getPropertyValue(manager, entity));
+		const float val = std::any_cast<float>(getDescriptor()->getPropertyValue(manager, entity));
 		return val < mMaxValue;
 	}
 }

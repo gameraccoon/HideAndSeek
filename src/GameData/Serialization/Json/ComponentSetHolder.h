@@ -7,6 +7,6 @@
 
 namespace Json
 {
-	nlohmann::json SerializeComponentSetHolder(const ComponentSetHolder& componentSetHolder, const Json::ComponentSerializationHolder& jsonSerializerHolder);
-	void DeserializeComponentSetHolder(ComponentSetHolder& outComponentSetHolder, const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder);
+	nlohmann::json SerializeComponentSetHolder(const ComponentSetHolder& componentSetHolder, const ComponentSerializationHolder& jsonSerializerHolder);
+	void DeserializeComponentSetHolder(ComponentSetHolder& outComponentSetHolder, const nlohmann::json& json, const ComponentSerializationHolder& jsonSerializerHolder);
 }

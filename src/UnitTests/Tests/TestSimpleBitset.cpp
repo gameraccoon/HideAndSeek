@@ -179,7 +179,7 @@ TEST(SimpleBitset, BitsetWithValues_GetRawDataAndThenSetRawData_ProducesSameValu
 		bitset.set(6, true);
 		bitset.set(7, false);
 
-		std::copy(bitset.getRawData(), bitset.getRawData() + BitsetTraits<8>::ByteCount, rawData.data());
+		std::copy_n(bitset.getRawData(), BitsetTraits<8>::ByteCount, rawData.data());
 	}
 	SimpleBitset<8> bitset2;
 	bitset2.setRawData(rawData.data());

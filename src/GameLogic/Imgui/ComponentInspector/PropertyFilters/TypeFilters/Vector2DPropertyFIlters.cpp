@@ -20,7 +20,7 @@ namespace ImguiPropertyFiltration
 
 	void Vector2DInRectPropertyFilter::updateImguiWidget()
 	{
-		std::string nameStart = getDescriptor()->getName() + " is in rect (";
+		const std::string nameStart = getDescriptor()->getName() + " is in rect (";
 		ImGui::TextUnformatted(nameStart.c_str());
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(50);
@@ -44,9 +44,9 @@ namespace ImguiPropertyFiltration
 		ImGui::TextUnformatted(")");
 	}
 
-	bool Vector2DInRectPropertyFilter::isConditionPassed(EntityManager& manager, Entity entity) const
+	bool Vector2DInRectPropertyFilter::isConditionPassed(EntityManager& manager, const Entity entity) const
 	{
-		Vector2D val = std::any_cast<Vector2D>(getDescriptor()->getPropertyValue(manager, entity));
+		const Vector2D val = std::any_cast<Vector2D>(getDescriptor()->getPropertyValue(manager, entity));
 		return mLT.x < val.x && val.x < mRB.x && mLT.y < val.y && val.y < mRB.y;
 	}
 }

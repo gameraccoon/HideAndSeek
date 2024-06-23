@@ -6,7 +6,7 @@
 
 TEST(FloatMath, AreFloatsEqual)
 {
-	const float epsilon = 0.001f;
+	constexpr float epsilon = 0.001f;
 
 	EXPECT_TRUE(Math::AreEqualWithEpsilon(0.0f, 0.0f, epsilon));
 	EXPECT_TRUE(Math::AreEqualWithEpsilon(1.0f, 1.0f, epsilon));
@@ -19,7 +19,7 @@ TEST(FloatMath, AreFloatsEqual)
 
 TEST(FloatMath, IsFloatGreater)
 {
-	const float epsilon = 0.001f;
+	constexpr float epsilon = 0.001f;
 
 	EXPECT_FALSE(Math::IsGreaterWithEpsilon(0.0f, 0.01f, epsilon));
 	EXPECT_TRUE(Math::IsGreaterWithEpsilon(0.02f, 0.01f, epsilon));
@@ -32,7 +32,7 @@ TEST(FloatMath, IsFloatGreater)
 
 TEST(FloatMath, IsFloatGreaterOrEqual)
 {
-	const float epsilon = 0.001f;
+	constexpr float epsilon = 0.001f;
 
 	EXPECT_FALSE(Math::IsGreaterOrEqualWithEpsilon(0.0f, 0.01f, epsilon));
 	EXPECT_TRUE(Math::IsGreaterOrEqualWithEpsilon(0.02f, 0.01f, epsilon));
@@ -45,7 +45,7 @@ TEST(FloatMath, IsFloatGreaterOrEqual)
 
 TEST(FloatMath, IsFloatLess)
 {
-	const float epsilon = 0.001f;
+	constexpr float epsilon = 0.001f;
 
 	EXPECT_TRUE(Math::IsLessWithEpsilon(0.0f, 0.01f, epsilon));
 	EXPECT_FALSE(Math::IsLessWithEpsilon(0.02f, 0.01f, epsilon));
@@ -58,7 +58,7 @@ TEST(FloatMath, IsFloatLess)
 
 TEST(FloatMath, IsFloatLessOrEqual)
 {
-	const float epsilon = 0.001f;
+	constexpr float epsilon = 0.001f;
 
 	EXPECT_TRUE(Math::IsLessOrEqualWithEpsilon(0.0f, 0.01f, epsilon));
 	EXPECT_FALSE(Math::IsLessOrEqualWithEpsilon(0.02f, 0.01f, epsilon));

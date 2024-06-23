@@ -11,7 +11,7 @@ namespace HAL
 {
 	namespace Internal
 	{
-		SDLInstance::SDLInstance(unsigned int flags)
+		SDLInstance::SDLInstance(const unsigned int flags)
 		{
 			if (SDL_Init(flags) != 0)
 			{

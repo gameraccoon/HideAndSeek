@@ -76,14 +76,14 @@ bool ValidateChecklist(const TestChecklist& checklist)
 	}
 }
 
-int main(int argc, char** argv)
+int main(const int argc, char** argv)
 {
-	ArgumentsParser arguments(argc, argv);
+	const ArgumentsParser arguments(argc, argv);
 
 	unsigned int seed = std::random_device()();
 	if (arguments.hasArgument("randseed"))
 	{
-		auto seedValue = arguments.getIntArgumentValue("randseed");
+		const auto seedValue = arguments.getIntArgumentValue("randseed");
 		if (seedValue.hasValue())
 		{
 			seed = static_cast<unsigned int>(seedValue.getValue());
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	auto caseIt = cases.find(arguments.getArgumentValue("case").value());
+	const auto caseIt = cases.find(arguments.getArgumentValue("case").value());
 	if (caseIt != cases.end())
 	{
 		LogInit("Random seed is %u", seed);
@@ -139,9 +139,9 @@ int main(int argc, char** argv)
 			applicationData.renderThread.startThread(applicationData.resourceManager, *engine, [&engine]
 			{ engine->acquireRenderContext(); });
 		}
-		std::unique_ptr<BaseTestCase> testCase = caseIt->second(engine.get(), applicationData.resourceManager, applicationData.threadPool);
-		TestChecklist checklist = testCase->start(arguments, RenderAccessorGameRef(applicationData.renderThread.getAccessor(), 0));
-		bool isSuccessful = ValidateChecklist(checklist);
+		const std::unique_ptr<BaseTestCase> testCase = caseIt->second(engine.get(), applicationData.resourceManager, applicationData.threadPool);
+		const TestChecklist checklist = testCase->start(arguments, RenderAccessorGameRef(applicationData.renderThread.getAccessor(), 0));
+		const bool isSuccessful = ValidateChecklist(checklist);
 
 		applicationData.shutdownThreads(); // this call waits for the threads to be joined
 

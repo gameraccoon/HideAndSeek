@@ -7,10 +7,10 @@ class WorldHolder;
 /**
  * System that resolve object collisions
  */
-class CollisionSystem : public RaccoonEcs::System
+class CollisionSystem final : public RaccoonEcs::System
 {
 public:
-	CollisionSystem(WorldHolder& worldHolder) noexcept;
+	explicit CollisionSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 

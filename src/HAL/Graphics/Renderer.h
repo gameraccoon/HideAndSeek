@@ -10,7 +10,6 @@
 #include "GameData/Geometry/Vector2D.h"
 
 #include "HAL/Base/Types.h"
-#include "HAL/EngineFwd.h"
 
 struct SDL_Renderer;
 

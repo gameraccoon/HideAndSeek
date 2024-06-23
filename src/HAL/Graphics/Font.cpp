@@ -1,8 +1,8 @@
 #include "Base/precomp.h"
 
-#include "HAL/Graphics/Font.h"
+#ifndef DISABLE_SDL
 
-#include "HAL/Base/Engine.h"
+#include "HAL/Graphics/Font.h"
 
 //#include "SDL_FontCache/SDL_FontCache.h"
 
@@ -34,3 +34,5 @@ namespace Graphics
 		return mFont;
 	}
 }
+
+#endif // !DISABLE_SDL

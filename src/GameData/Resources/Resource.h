@@ -2,7 +2,6 @@
 
 #include <list>
 #include <memory>
-#include <functional>
 
 class ResourceManager;
 class UniqueAny;

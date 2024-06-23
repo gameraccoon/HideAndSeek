@@ -11,7 +11,7 @@ namespace UnsafeSerialization
 	template<typename Num, typename NumArg>
 	void AppendNumber(std::vector<std::byte>& inOutByteStream, NumArg number)
 	{
-		static_assert(std::is_same_v<typename std::decay<NumArg>::type, Num>, "We should provide argument of the same type that we want to write. If you want to make conversion, you can use WriteNumberNarrowCast or WriteNumberWideCast");
+		static_assert(std::is_same_v<std::decay_t<NumArg>, Num>, "We should provide argument of the same type that we want to write. If you want to make conversion, you can use WriteNumberNarrowCast or WriteNumberWideCast");
 		static_assert(std::is_arithmetic_v<Num>, "Type should be ariphmetic to be serialized with WriteNumber");
 		static_assert(sizeof(std::array<std::byte, sizeof(Num)>) == sizeof(Num), "Unexpected std::array layout");
 		static_assert(std::is_standard_layout_v<std::array<std::byte, sizeof(Num)>>, "Unexpected std::array layout");
@@ -45,7 +45,7 @@ namespace UnsafeSerialization
 	template<typename Num, typename NumArg, typename ByteStream>
 	void WriteNumber(ByteStream& inOutByteStream, NumArg number, size_t& cursorPos)
 	{
-		static_assert(std::is_same_v<typename std::decay<NumArg>::type, Num>, "We should provide argument of the same type that we want to write. If you want to make conversion, you can use WriteNumberNarrowCast or WriteNumberWideCast");
+		static_assert(std::is_same_v<std::decay_t<NumArg>, Num>, "We should provide argument of the same type that we want to write. If you want to make conversion, you can use WriteNumberNarrowCast or WriteNumberWideCast");
 		static_assert(std::is_arithmetic_v<Num>, "Type should be ariphmetic to be serialized with WriteNumber");
 		static_assert(sizeof(std::array<std::byte, sizeof(Num)>) == sizeof(Num), "Unexpected std::array layout");
 		static_assert(std::is_standard_layout_v<std::array<std::byte, sizeof(Num)>>, "Unexpected std::array layout");

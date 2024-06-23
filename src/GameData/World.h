@@ -8,7 +8,7 @@
 class World
 {
 public:
-	World(const ComponentFactory& componentFactory);
+	explicit World(const ComponentFactory& componentFactory);
 
 	World(const World&) = delete;
 	World(World&&) = delete;

@@ -36,7 +36,7 @@ TEST(ConcurrentAccessDetector, SingleThreadedAccess)
 
 TEST(ConcurrentAccessDetector, AccessedFromMultipleThreads)
 {
-	DisableAssertGuard assertGuard;
+	const DisableAssertGuard assertGuard;
 	{
 		ConcurrentAccessDetector detectorInstance;
 		{
@@ -54,7 +54,7 @@ TEST(ConcurrentAccessDetector, AccessedFromMultipleThreads)
 
 TEST(ConcurrentAccessDetector, UnlockableGuard_UnlockedWhenAccessedFromMultipleThreads)
 {
-	DisableAssertGuard assertGuard;
+	const DisableAssertGuard assertGuard;
 	{
 		ConcurrentAccessDetector detectorInstance;
 		{
@@ -74,7 +74,7 @@ TEST(ConcurrentAccessDetector, UnlockableGuard_UnlockedWhenAccessedFromMultipleT
 
 TEST(ConcurrentAccessDetector, UnlockableGuard_AccessedFromMultipleThreads)
 {
-	DisableAssertGuard assertGuard;
+	const DisableAssertGuard assertGuard;
 	{
 		ConcurrentAccessDetector detectorInstance;
 		{

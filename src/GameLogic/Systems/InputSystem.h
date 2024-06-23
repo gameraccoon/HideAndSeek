@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef DISABLE_SDL
+
 #include <raccoon-ecs/utils/system.h>
 
 class WorldHolder;
@@ -12,17 +14,22 @@ namespace HAL
 /**
  * System that transforms raw controller input into gameplay input commands
  */
-class InputSystem : public RaccoonEcs::System
+class InputSystem final : public RaccoonEcs::System
 {
 public:
-	InputSystem(WorldHolder& worldHolder, const HAL::InputControllersData& inputData) noexcept;
+	explicit InputSystem(
+		WorldHolder& worldHolder,
+		const HAL::InputControllersData& inputData
+	) noexcept;
 
 	void update() override;
 
 private:
-	void processGameplayInput();
+	void processGameplayInput() const;
 
 private:
 	WorldHolder& mWorldHolder;
 	const HAL::InputControllersData& mInputData;
 };
+
+#endif // !DISABLE_SDL

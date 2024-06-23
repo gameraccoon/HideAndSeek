@@ -3,7 +3,6 @@
 #include "GameLogic/Systems/RenderSystem.h"
 
 #include <algorithm>
-#include <ranges>
 
 #include "Base/Types/TemplateAliases.h"
 #include "Base/Types/TemplateHelpers.h"

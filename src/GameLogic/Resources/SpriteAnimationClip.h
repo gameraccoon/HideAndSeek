@@ -1,6 +1,7 @@
 #pragma once
 
-#include <memory>
+#ifndef DISABLE_SDL
+
 #include <vector>
 
 #include "GameData/Resources/ResourceHandle.h"
@@ -8,7 +9,7 @@
 
 namespace Graphics
 {
-	class SpriteAnimationClip : public Resource
+	class SpriteAnimationClip final : public Resource
 	{
 	public:
 		SpriteAnimationClip() = default;
@@ -27,3 +28,5 @@ namespace Graphics
 		std::vector<ResourceHandle> mSprites;
 	};
 }
+
+#endif // !DISABLE_SDL

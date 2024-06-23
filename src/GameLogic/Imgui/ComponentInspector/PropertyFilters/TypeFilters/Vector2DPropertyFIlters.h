@@ -6,7 +6,7 @@
 
 namespace ImguiPropertyFiltration
 {
-	class Vector2DInRectPropertyFilter : public AbstractPropertyFilter
+	class Vector2DInRectPropertyFilter final : public AbstractPropertyFilter
 	{
 	public:
 		using AbstractPropertyFilter::AbstractPropertyFilter;

@@ -22,7 +22,7 @@ static bool LessPointAngle(const VisibilityPolygonCalculator::AngledBorder& a, c
 	return a.angleA < b.angleA;
 }
 
-static bool NormalizePoint(Vector2D& point, const Vector2D& pair, float left, float right, float top, float bottom)
+static bool NormalizePoint(Vector2D& point, const Vector2D& pair, const float left, const float right, const float top, const float bottom)
 {
 	if (point.x < left)
 	{
@@ -53,24 +53,24 @@ static void FilterOutPotentialContinuations(std::vector<size_t>& outPotentialCon
 	// filter out the continuations that are not longer stick out of the end of the closest border
 	std::erase_if(
 		outPotentialContinuations,
-		[&boardersToTrace, maxAngle](size_t idx)
+		[&boardersToTrace, maxAngle](const size_t idx)
 		{
 			return (Rotator::NormalizeRawAngle(maxAngle - boardersToTrace[idx].angleB) >= 0.0f);
 		}
 	);
 }
 
-std::tuple<size_t, Vector2D> VisibilityPolygonCalculator::getNextClosestBorderFromCandidates(const std::vector<size_t>& potentialContinuations, const AngledBorder& closestBorder, float maxExtent) const
+std::tuple<size_t, Vector2D> VisibilityPolygonCalculator::getNextClosestBorderFromCandidates(const std::vector<size_t>& potentialContinuations, const AngledBorder& closestBorder, const float maxExtent) const
 {
 	float closestBorderQDist = std::numeric_limits<float>::max();
 	Vector2D closestIntersectionPoint{};
 	size_t closestBorderIdx = 0;
-	Vector2D raytraceCoordinate = closestBorder.coords.b.unit() * (maxExtent + 10.0f);
-	for (size_t idx : potentialContinuations)
+	const Vector2D raytraceCoordinate = closestBorder.coords.b.unit() * (maxExtent + 10.0f);
+	for (const size_t idx : potentialContinuations)
 	{
 		const AngledBorder& potentialContinuation = mCaches.bordersToTrace[idx];
 		Vector2D intersectionPoint = Collide::GetPointIntersect2Lines(potentialContinuation.coords.a, potentialContinuation.coords.b, ZERO_VECTOR, raytraceCoordinate);
-		float intersectionQDist = intersectionPoint.qSize();
+		const float intersectionQDist = intersectionPoint.qSize();
 		if (intersectionQDist < closestBorderQDist)
 		{
 			closestBorderQDist = intersectionQDist;
@@ -81,7 +81,7 @@ std::tuple<size_t, Vector2D> VisibilityPolygonCalculator::getNextClosestBorderFr
 	return std::make_tuple(closestBorderIdx, closestIntersectionPoint);
 }
 
-void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<const LightBlockingGeometryComponent*>& components, Vector2D sourcePos, Vector2D polygonMaxSize)
+void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2D>& outVisibilityPolygon, const std::vector<const LightBlockingGeometryComponent*>& components, const Vector2D sourcePos, const Vector2D polygonMaxSize)
 {
 	outVisibilityPolygon.clear();
 
@@ -114,7 +114,7 @@ void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2
 			border.b -= sourcePos;
 
 			// keep only borders inside the draw area and facing the light source
-			bool isVisible = (
+			const bool isVisible = (
 				(border.a.x > left && border.a.x < right && border.a.y > top && border.a.y < bottom)
 				|| (border.b.x > left && border.b.x < right && border.b.y > top && border.b.y < bottom)
 			) && CalcClockwiseDirection(border.a, border.b) < 0.0f;
@@ -167,7 +167,7 @@ void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2
 			const AngledBorder& processedItem = mCaches.bordersToTrace[processedItemIdx];
 			if (Collide::AreLinesIntersect(processedItem.coords.a, processedItem.coords.b, ZERO_VECTOR, startTrace))
 			{
-				float intersectionQDist = Collide::GetPointIntersect2Lines(processedItem.coords.a, processedItem.coords.b, ZERO_VECTOR, startTrace).qSize();
+				const float intersectionQDist = Collide::GetPointIntersect2Lines(processedItem.coords.a, processedItem.coords.b, ZERO_VECTOR, startTrace).qSize();
 				if (intersectionQDist < closestBorderQDist)
 				{
 					closestBorderQDist = intersectionQDist;

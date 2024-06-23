@@ -6,7 +6,7 @@
 
 namespace Json
 {
-	nlohmann::json SerializeComponentSetHolder(const ComponentSetHolder& componentSetHolder, const Json::ComponentSerializationHolder& jsonSerializerHolder)
+	nlohmann::json SerializeComponentSetHolder(const ComponentSetHolder& componentSetHolder, const ComponentSerializationHolder& jsonSerializerHolder)
 	{
 		nlohmann::json outJson;
 		auto components = nlohmann::json{};
@@ -30,7 +30,7 @@ namespace Json
 		const auto& components = json.at("components");
 		for (const auto& [stringType, componentData] : components.items())
 		{
-			StringId className = STR_TO_ID(stringType);
+			const StringId className = STR_TO_ID(stringType);
 			if (!componentData.is_null())
 			{
 				void* component = outComponentSetHolder.addComponentByType(className);

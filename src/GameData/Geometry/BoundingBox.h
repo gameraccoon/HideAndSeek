@@ -11,7 +11,7 @@ class BoundingBox
 public:
 	BoundingBox() = default;
 
-	constexpr BoundingBox(float minX, float minY, float maxX, float maxY)
+	constexpr BoundingBox(const float minX, const float minY, const float maxX, const float maxY)
 		: minX(minX)
 		, minY(minY)
 		, maxX(maxX)
@@ -19,7 +19,7 @@ public:
 	{
 	}
 
-	constexpr BoundingBox(Vector2D minPoint, Vector2D maxPoint)
+	constexpr BoundingBox(const Vector2D minPoint, const Vector2D maxPoint)
 		: minX(minPoint.x)
 		, minY(minPoint.y)
 		, maxX(maxPoint.x)

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <memory>
+#ifndef DISABLE_SDL
+
 #include <vector>
 #include <map>
 
@@ -8,8 +9,6 @@
 
 #include "GameData/Resources/ResourceHandle.h"
 #include "GameData/Resources/Resource.h"
-
-#include "HAL/Graphics/Sprite.h"
 
 class RelativeResourcePath;
 
@@ -36,3 +35,5 @@ namespace Graphics
 		StringId mDefaultState;
 	};
 }
+
+#endif // !DISABLE_SDL

@@ -13,7 +13,7 @@
 
 namespace PathBlockingGeometry
 {
-	static const float GEOMETRY_EXTENT = 17.0f;
+	static constexpr float GEOMETRY_EXTENT = 17.0f;
 
 	void CalculatePathBlockingGeometry(std::vector<std::vector<Vector2D>>& outGeometry, const TupleVector<const CollisionComponent*, const TransformComponent*>& components)
 	{

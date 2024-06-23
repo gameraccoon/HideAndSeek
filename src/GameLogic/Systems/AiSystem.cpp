@@ -12,7 +12,6 @@
 #include "GameData/Components/NavMeshComponent.generated.h"
 #include "GameData/Components/PathBlockingGeometryComponent.generated.h"
 #include "GameData/Components/TimeComponent.generated.h"
-#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/GameData.h"
 #include "GameData/World.h"

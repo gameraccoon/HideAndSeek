@@ -10,7 +10,7 @@ struct Mix_Chunk;
 
 namespace Audio
 {
-	class Sound : public Resource
+	class Sound final : public Resource
 	{
 	public:
 		Sound() = default;

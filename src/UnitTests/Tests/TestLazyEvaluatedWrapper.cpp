@@ -80,9 +80,9 @@ TEST(LazyEvaluatedWrapper, ReferenceReturnType)
 	}
 
 	{
-		int& test = lazyEvaluatedFunction();
+		const int& test = lazyEvaluatedFunction();
 		EXPECT_EQ(1, test);
 	}
 
-	static_assert(std::is_same<decltype(lazyEvaluatedFunction()), std::reference_wrapper<int>>::value, "Reference type should be returned");
+	static_assert(std::is_same_v<decltype(lazyEvaluatedFunction()), std::reference_wrapper<int>>, "Reference type should be returned");
 }

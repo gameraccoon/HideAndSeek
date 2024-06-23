@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "GameData/Input/GameplayInputConstants.h"
+#include "GameData/Geometry/Vector2D.h"
 
 #include "HAL/InputControllersData.h"
 
@@ -13,6 +13,7 @@ namespace HAL
 {
 	class IGame;
 
+#ifndef DISABLE_SDL
 	class Engine
 	{
 	public:
@@ -43,4 +44,5 @@ namespace HAL
 		struct Impl;
 		std::unique_ptr<Impl> mPimpl;
 	};
+#endif // !DISABLE_SDL
 }

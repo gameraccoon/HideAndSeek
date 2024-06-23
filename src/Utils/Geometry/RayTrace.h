@@ -17,5 +17,5 @@ namespace RayTrace
 	};
 
 	bool FastTrace(World& world, const Vector2D& startPoint, const Vector2D& endPoint);
-	TraceResult Trace(World& world, Vector2D entityView, Vector2D endPoint);
+	TraceResult Trace(World& world, Vector2D startPoint, Vector2D endPoint);
 }

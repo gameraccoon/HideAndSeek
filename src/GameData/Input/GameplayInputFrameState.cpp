@@ -4,7 +4,7 @@
 
 namespace GameplayInput
 {
-	void FrameState::updateAxis(InputAxis axis, float newValue)
+	void FrameState::updateAxis(InputAxis axis, const float newValue)
 	{
 		mAxes[static_cast<size_t>(axis)] = newValue;
 	}
@@ -14,7 +14,7 @@ namespace GameplayInput
 		return mAxes[static_cast<size_t>(axis)];
 	}
 
-	void FrameState::updateKey(InputKey key, KeyState newState, GameplayTimestamp currentTimestamp)
+	void FrameState::updateKey(InputKey key, const KeyState newState, const GameplayTimestamp currentTimestamp)
 	{
 		KeyInfo& info = mKeys[static_cast<size_t>(key)];
 		if ((info.state == KeyState::Active || info.state == KeyState::JustActivated) != (newState == KeyState::Active || newState == KeyState::JustActivated)
@@ -25,23 +25,23 @@ namespace GameplayInput
 		info.state = newState;
 	}
 
-	KeyState FrameState::getKeyState(InputKey key) const
+	KeyState FrameState::getKeyState(const InputKey key) const
 	{
 		return mKeys[static_cast<size_t>(key)].state;
 	}
 
-	bool FrameState::isKeyJustActivated(InputKey key) const
+	bool FrameState::isKeyJustActivated(const InputKey key) const
 	{
 		return getKeyState(key) == KeyState::JustActivated;
 	}
 
-	bool FrameState::isKeyActive(InputKey key) const
+	bool FrameState::isKeyActive(const InputKey key) const
 	{
 		const KeyState state = getKeyState(key);
 		return state == KeyState::Active || state == KeyState::JustActivated;
 	}
 
-	bool FrameState::isKeyJustDeactivated(InputKey key) const
+	bool FrameState::isKeyJustDeactivated(const InputKey key) const
 	{
 		return getKeyState(key) == KeyState::JustDeactivated;
 	}
@@ -51,22 +51,22 @@ namespace GameplayInput
 		return mKeys[static_cast<size_t>(key)].lastFlipTime;
 	}
 
-	float FrameState::getRawAxisState(size_t axisIdx) const
+	float FrameState::getRawAxisState(const size_t axisIdx) const
 	{
 		return mAxes[axisIdx];
 	}
 
-	FrameState::KeyInfo FrameState::getRawKeyState(size_t keyIdx) const
+	FrameState::KeyInfo FrameState::getRawKeyState(const size_t keyIdx) const
 	{
 		return mKeys[keyIdx];
 	}
 
-	void FrameState::setRawAxisState(size_t axisIdx, float value)
+	void FrameState::setRawAxisState(const size_t axisIdx, const float value)
 	{
 		mAxes[axisIdx] = value;
 	}
 
-	void FrameState::setRawKeyState(size_t keyIdx, KeyState state, GameplayTimestamp lastFlipTimestamp)
+	void FrameState::setRawKeyState(const size_t keyIdx, const KeyState state, const GameplayTimestamp lastFlipTimestamp)
 	{
 		mKeys[keyIdx] = {state, lastFlipTimestamp};
 	}

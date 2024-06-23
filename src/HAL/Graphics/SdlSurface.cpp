@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifndef DISABLE_SDL
+
 #include <string>
 
 #include "SdlSurface.h"
@@ -94,7 +96,7 @@ namespace Graphics
 
 	static UniqueAny DeinitSurfaceRenderThread(UniqueAny&& resource, ResourceManager&, ResourceHandle)
 	{
-		std::unique_ptr<Surface>* surfacePtr = resource.cast<std::unique_ptr<Surface>>();
+		const std::unique_ptr<Surface>* surfacePtr = resource.cast<std::unique_ptr<Surface>>();
 
 		if (!surfacePtr) {
 			ReportFatalError("We got an incorrect type of value when deinitializing a surface");
@@ -102,7 +104,7 @@ namespace Graphics
 		}
 
 		Surface* surface = surfacePtr->get();
-		unsigned int textureId = surface->getTextureId();
+		const unsigned int textureId = surface->getTextureId();
 		glDeleteTextures(1, &textureId);
 		return {};
 	}
@@ -171,3 +173,5 @@ namespace Graphics
 		};
 	}
 }
+
+#endif // !DISABLE_SDL

@@ -26,7 +26,7 @@ bool Hull::operator!=(const Hull& other) const noexcept
 	return !(*this == other);
 }
 
-void Hull::setRadius(float newRadius) noexcept
+void Hull::setRadius(const float newRadius) noexcept
 {
 	mRadius = newRadius;
 	mQRadius = newRadius * newRadius;

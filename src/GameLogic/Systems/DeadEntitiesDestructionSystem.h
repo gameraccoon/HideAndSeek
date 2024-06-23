@@ -7,7 +7,7 @@ class WorldHolder;
 /**
  * System that destructs enemies marked with DeathComponent
  */
-class DeadEntitiesDestructionSystem : public RaccoonEcs::System
+class DeadEntitiesDestructionSystem final : public RaccoonEcs::System
 {
 public:
 	explicit DeadEntitiesDestructionSystem(WorldHolder& worldHolder) noexcept;

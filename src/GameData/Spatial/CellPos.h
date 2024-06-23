@@ -18,7 +18,7 @@ struct CellPos
 	int y;
 
 	CellPos() = default;
-	constexpr CellPos(int x, int y)
+	constexpr CellPos(const int x, const int y)
 		: x(x)
 		, y(y)
 	{
@@ -32,13 +32,11 @@ struct CellPos
 	friend void from_json(const nlohmann::json& json, CellPos& outPos);
 };
 
-namespace std
+template<>
+struct std::hash<CellPos>
 {
-	template<> struct hash<CellPos>
+	size_t operator()(const CellPos& cellPos) const noexcept
 	{
-		size_t operator()(const CellPos& cellPos) const noexcept
-		{
-			return hash<int>()(cellPos.x) ^ (hash<int>()(cellPos.y) << 1);
-		}
-	};
-}
+		return hash<int>()(cellPos.x) ^ (hash<int>()(cellPos.y) << 1);
+	}
+};

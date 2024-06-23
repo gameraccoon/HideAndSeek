@@ -13,7 +13,7 @@
 #include "AutoTests/BaseTestCase.h"
 #include "AutoTests/Tests/WeaponShooting/DestroyedEntitiesTestCheck.h"
 
-class WeaponShootingTestCase : public BaseTestCase
+class WeaponShootingTestCase final : public BaseTestCase
 {
 public:
 	using BaseTestCase::BaseTestCase;

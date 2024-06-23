@@ -24,7 +24,7 @@ CollidableObjects FillCollidableObjects(World& world)
 		Vector2D rectPos(50.0f, 30.0f);
 		WorldCell& cell = world.getSpatialData().getOrCreateCell(SpatialWorldData::GetCellForPos(rectPos));
 		EntityManager& cellEntityManager = cell.getEntityManager();
-		Entity entity = cellEntityManager.addEntity();
+		const Entity entity = cellEntityManager.addEntity();
 		TransformComponent* transform = cellEntityManager.addComponent<TransformComponent>(entity);
 		transform->setLocation(rectPos);
 		transform->setRotation(Rotator(0.0f));
@@ -42,7 +42,7 @@ CollidableObjects FillCollidableObjects(World& world)
 		Vector2D circlePos(550.0f, 30.0f);
 		WorldCell& cell = world.getSpatialData().getOrCreateCell(SpatialWorldData::GetCellForPos(circlePos));
 		EntityManager& cellEntityManager = cell.getEntityManager();
-		Entity entity = cellEntityManager.addEntity();
+		const Entity entity = cellEntityManager.addEntity();
 		TransformComponent* transform = cellEntityManager.addComponent<TransformComponent>(entity);
 		transform->setLocation(circlePos);
 		transform->setRotation(Rotator(0.0f));
@@ -94,9 +94,9 @@ TEST(Raytrace, TraceRect)
 	ComponentsRegistration::RegisterComponents(componentFactory);
 	World world(componentFactory);
 
-	CollidableObjects objects = FillCollidableObjects(world);
+	const CollidableObjects objects = FillCollidableObjects(world);
 
-	RayTrace::TraceResult traceResult = RayTrace::Trace(world, Vector2D(20.f, 20.f), Vector2D(80.f, 60.f));
+	const RayTrace::TraceResult traceResult = RayTrace::Trace(world, Vector2D(20.f, 20.f), Vector2D(80.f, 60.f));
 
 	EXPECT_TRUE(traceResult.hasHit);
 	EXPECT_EQ(objects.rect.getEntity(), traceResult.hitEntity.entity.getEntity());
@@ -130,9 +130,9 @@ TEST(Raytrace, TraceCircle)
 	ComponentsRegistration::RegisterComponents(componentFactory);
 	World world(componentFactory);
 
-	CollidableObjects objects = FillCollidableObjects(world);
+	const CollidableObjects objects = FillCollidableObjects(world);
 
-	RayTrace::TraceResult traceResult = RayTrace::Trace(world, Vector2D(520.f, 20.f), Vector2D(580.f, 60.f));
+	const RayTrace::TraceResult traceResult = RayTrace::Trace(world, Vector2D(520.f, 20.f), Vector2D(580.f, 60.f));
 
 	EXPECT_TRUE(traceResult.hasHit);
 	EXPECT_EQ(objects.circle.getEntity(), traceResult.hitEntity.entity.getEntity());

@@ -17,7 +17,7 @@ struct Vector2D
 	// leaves inner data uninitialized
 	Vector2D() = default;
 	// can be created from initializer list
-	constexpr Vector2D(float x, float y) : x(x), y(y) {}
+	constexpr Vector2D(const float x, const float y) : x(x), y(y) {}
 	explicit Vector2D(Rotator rotator) noexcept;
 
 	/** Get vector length in units */
@@ -95,7 +95,7 @@ struct Vector2DKey
 	static constexpr float Multiplier = static_cast<float>(1 << PrecisionBin);
 
 	struct Key {
-		Key(long x, long y): x(x), y(y) {}
+		Key(const long x, const long y): x(x), y(y) {}
 
 		long x;
 		long y;
@@ -104,7 +104,7 @@ struct Vector2DKey
 	Key key;
 	Vector2D value;
 
-	constexpr explicit Vector2DKey(Vector2D value)
+	constexpr explicit Vector2DKey(const Vector2D value)
 		: key(static_cast<long>(std::round(value.x * Multiplier)), static_cast<long>(std::round(value.y * Multiplier)))
 		, value(value)
 	{}
@@ -124,20 +124,17 @@ struct Vector2DKey
 	}
 };
 
-namespace std
+template <>
+struct std::hash<Vector2D>
 {
-	template <>
-	struct hash<Vector2D>
-	{
-		std::size_t operator()(Vector2D k) const;
-	};
+	std::size_t operator()(Vector2D k) const noexcept;
+};
 
-	template <int Precision>
-	struct hash<Vector2DKey<Precision>>
+template <int Precision>
+struct std::hash<Vector2DKey<Precision>>
+{
+	std::size_t operator()(const Vector2DKey<Precision>& k) const
 	{
-		std::size_t operator()(const Vector2DKey<Precision>& k) const
-		{
-			return hash<long>()(k.key.x) ^ std::rotl(hash<long>()(k.key.y), 7);
-		}
-	};
-}
+		return hash<long>()(k.key.x) ^ std::rotl(hash<long>()(k.key.y), 7);
+	}
+};

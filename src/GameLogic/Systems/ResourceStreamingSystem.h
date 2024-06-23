@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <raccoon-ecs/utils/system.h>
 
 class ResourceManager;
@@ -10,10 +8,10 @@ class WorldHolder;
 /**
  * System that loads and distributes resources
  */
-class ResourceStreamingSystem : public RaccoonEcs::System
+class ResourceStreamingSystem final : public RaccoonEcs::System
 {
 public:
-	ResourceStreamingSystem(
+	explicit ResourceStreamingSystem(
 		WorldHolder& worldHolder,
 		ResourceManager& resourceManager) noexcept;
 

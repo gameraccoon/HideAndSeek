@@ -10,7 +10,7 @@
 class SpatialWorldData
 {
 public:
-	SpatialWorldData(const ComponentFactory& componentFactory);
+	explicit SpatialWorldData(const ComponentFactory& componentFactory);
 	/**
 	 * @brief getCellsAround returns cells that are inside or toucing a rect that have center in
 	 * `centerPosition` and size of `rect`

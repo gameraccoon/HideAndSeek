@@ -2,7 +2,7 @@
 
 #include "GameData/Spatial/SpatialEntity.h"
 
-SpatialEntity::SpatialEntity(Entity entity, CellPos cellPos)
+SpatialEntity::SpatialEntity(const Entity entity, const CellPos cellPos)
 	: entity(entity)
 	, cell(cellPos)
 {

@@ -34,7 +34,7 @@ namespace ThreadPoolInternal
 		moodycamel::ConcurrentQueue<Finalizer> readyFinalizers;
 	};
 
-	static void FinalizeReadyTasks(std::array<Finalizer, 24>& finalizersToExecute, size_t size)
+	static void FinalizeReadyTasks(std::array<Finalizer, 24>& finalizersToExecute, const size_t size)
 	{
 		for (size_t i = 0; i < size; ++i)
 		{
@@ -53,7 +53,7 @@ struct ThreadPool::Impl
 	std::vector<std::thread> threads;
 };
 
-ThreadPool::ThreadPool(size_t threadsCount, std::function<void()>&& threadPreShutdownTask)
+ThreadPool::ThreadPool(const size_t threadsCount, std::function<void()>&& threadPreShutdownTask)
 	: mPimpl(std::make_unique<Impl>())
 	, mThreadPreShutdownTask(std::move(threadPreShutdownTask))
 {
@@ -80,7 +80,7 @@ void ThreadPool::shutdown()
 	mPimpl->threads.clear();
 }
 
-void ThreadPool::spawnThreads(size_t threadsCount, size_t firstThreadIndex)
+void ThreadPool::spawnThreads(const size_t threadsCount, const size_t firstThreadIndex)
 {
 	for (size_t i = 0; i < threadsCount; ++i)
 	{
@@ -93,7 +93,7 @@ void ThreadPool::spawnThreads(size_t threadsCount, size_t firstThreadIndex)
 	}
 }
 
-void ThreadPool::finalizeTasks(size_t groupId)
+void ThreadPool::finalizeTasks(const size_t groupId)
 {
 	using namespace ThreadPoolInternal;
 
@@ -106,12 +106,11 @@ void ThreadPool::finalizeTasks(size_t groupId)
 	finalizeTaskForGroup(finalizerGroup);
 }
 
-void ThreadPool::processAndFinalizeTasks(size_t finalizationGroupId)
+void ThreadPool::processAndFinalizeTasks(const size_t finalizationGroupId)
 {
 	using namespace ThreadPoolInternal;
 
 	std::array<Finalizer, 24> finalizersToExecute;
-	Task currentTask;
 
 	std::unique_lock lock(mDataMutex);
 	FinalizerGroup& finalizerGroup = getOrCreateFinalizerGroup(finalizationGroupId);
@@ -119,7 +118,7 @@ void ThreadPool::processAndFinalizeTasks(size_t finalizationGroupId)
 
 	while(finalizerGroup.tasksNotFinalizedCount.load(std::memory_order::acquire) > 0)
 	{
-		if (size_t count = finalizerGroup.readyFinalizers.try_dequeue_bulk(finalizersToExecute.begin(), finalizersToExecute.size()); count > 0)
+		if (const size_t count = finalizerGroup.readyFinalizers.try_dequeue_bulk(finalizersToExecute.begin(), finalizersToExecute.size()); count > 0)
 		{
 			finalizerGroup.tasksNotFinalizedCount -= static_cast<int>(count);
 			FinalizeReadyTasks(finalizersToExecute, count);
@@ -129,7 +128,7 @@ void ThreadPool::processAndFinalizeTasks(size_t finalizationGroupId)
 		lock.lock();
 		if (!mTasksQueue.empty())
 		{
-			currentTask = std::move(mTasksQueue.front());
+			Task currentTask = std::move(mTasksQueue.front());
 			mTasksQueue.pop_front();
 			FinalizerGroup& taskFinalizerGroup = getOrCreateFinalizerGroup(currentTask.groupId);
 			lock.unlock();
@@ -206,7 +205,7 @@ void ThreadPool::finalizeTaskForGroup(ThreadPoolInternal::FinalizerGroup& finali
 
 	while(finalizerGroup.tasksNotFinalizedCount.load(std::memory_order::acquire) > 0)
 	{
-		if (size_t count = finalizerGroup.readyFinalizers.try_dequeue_bulk(finalizersToExecute.begin(), finalizersToExecute.size()); count > 0)
+		if (const size_t count = finalizerGroup.readyFinalizers.try_dequeue_bulk(finalizersToExecute.begin(), finalizersToExecute.size()); count > 0)
 		{
 			finalizerGroup.tasksNotFinalizedCount -= static_cast<int>(count);
 			FinalizeReadyTasks(finalizersToExecute, count);
@@ -214,7 +213,7 @@ void ThreadPool::finalizeTaskForGroup(ThreadPoolInternal::FinalizerGroup& finali
 	}
 }
 
-void ThreadPool::processAndFinalizeOneTask(size_t finalizationGroupId, ThreadPoolInternal::FinalizerGroup& finalizerGroup, Task& currentTask)
+void ThreadPool::processAndFinalizeOneTask(const size_t finalizationGroupId, ThreadPoolInternal::FinalizerGroup& finalizerGroup, Task& currentTask)
 {
 	std::any result = currentTask.taskFn();
 
@@ -232,7 +231,7 @@ void ThreadPool::processAndFinalizeOneTask(size_t finalizationGroupId, ThreadPoo
 	}
 }
 
-ThreadPoolInternal::FinalizerGroup& ThreadPool::getOrCreateFinalizerGroup(size_t groupId)
+ThreadPoolInternal::FinalizerGroup& ThreadPool::getOrCreateFinalizerGroup(const size_t groupId)
 {
 	using namespace ThreadPoolInternal;
 
@@ -245,7 +244,7 @@ ThreadPoolInternal::FinalizerGroup& ThreadPool::getOrCreateFinalizerGroup(size_t
 	return *groupPtr;
 }
 
-void ThreadPool::incrementNotFinalizedTasksCount(size_t groupId, size_t addedCount)
+void ThreadPool::incrementNotFinalizedTasksCount(const size_t groupId, const size_t addedCount)
 {
 	using namespace ThreadPoolInternal;
 

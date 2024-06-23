@@ -7,7 +7,6 @@
 
 #include "GameData/Geometry/Hull.h"
 
-#include "GameData/Geometry/Vector2D.h"
 #include "GameData/Spatial/CellPos.h"
 
 class WorldCell;

@@ -15,8 +15,8 @@ public:
 	{}
 
 	[[nodiscard]] bool hasBeenValidated() const override { return mHasBeenValidated; }
-	[[nodiscard]] bool hasPassed() const final { return mHasPassed; }
-	[[nodiscard]] std::string getErrorMessage() const final { return mErrorMessage; }
+	[[nodiscard]] bool hasPassed() const override { return mHasPassed; }
+	[[nodiscard]] std::string getErrorMessage() const override { return mErrorMessage; }
 
 	void checkAsPassed()
 	{

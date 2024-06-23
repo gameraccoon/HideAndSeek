@@ -14,14 +14,14 @@ TEST(Components, EntityCreationAndRemovement)
 	ComponentsRegistration::RegisterComponents(componentFactory);
 
 	EntityManager entityManager(componentFactory);
-	Entity testEntity1 = entityManager.addEntity();
-	Entity testEntity2 = entityManager.addEntity();
+	const Entity testEntity1 = entityManager.addEntity();
+	const Entity testEntity2 = entityManager.addEntity();
 
 	EXPECT_NE(testEntity1, testEntity2);
 
 	entityManager.removeEntity(testEntity2);
 
-	Entity testEntity3 = entityManager.addEntity();
+	const Entity testEntity3 = entityManager.addEntity();
 
 	EXPECT_NE(testEntity1, testEntity3);
 }
@@ -34,7 +34,7 @@ TEST(Components, ComponentsAttachment)
 	Vector2D location(Vector2D(1.0f, 0.0f));
 
 	EntityManager entityManager(componentFactory);
-	Entity testEntity = entityManager.addEntity();
+	const Entity testEntity = entityManager.addEntity();
 	TransformComponent* transform = entityManager.addComponent<TransformComponent>(testEntity);
 	transform->setLocation(location);
 

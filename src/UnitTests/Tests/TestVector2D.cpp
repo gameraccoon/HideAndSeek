@@ -4,16 +4,14 @@
 
 #include <gtest/gtest.h>
 
-#include "Base/CompilerHelpers.h"
-
 #include "GameData/Geometry/Vector2D.h"
 
 
 TEST(Vector2D, Creation)
 {
-	Vector2D testVectorA(5.2f, -0.39f);
-	Vector2D testVectorB(testVectorA);
-		
+	constexpr Vector2D testVectorA(5.2f, -0.39f);
+	constexpr Vector2D testVectorB(testVectorA);
+
 	EXPECT_FLOAT_EQ(testVectorA.x, 5.2f);
 	EXPECT_FLOAT_EQ(testVectorA.y, -0.39f);
 	EXPECT_FLOAT_EQ(testVectorB.x, 5.2f);
@@ -35,10 +33,10 @@ TEST(Vector2D, InitializationFromAngle)
 
 TEST(Vector2D, Comparison)
 {
-	Vector2D testVectorA(5.2f, -0.39f);
-	Vector2D testVectorB(testVectorA);
-	Vector2D testVectorC(5.199998f, -0.390001f);
-	Vector2D testVectorD(5.3f, -0.39f);
+	constexpr Vector2D testVectorA(5.2f, -0.39f);
+	constexpr Vector2D testVectorB(testVectorA);
+	constexpr Vector2D testVectorC(5.199998f, -0.390001f);
+	constexpr Vector2D testVectorD(5.3f, -0.39f);
 
 	EXPECT_TRUE(testVectorA == testVectorB); // A == B
 	EXPECT_TRUE(testVectorA.isNearlyEqualTo(testVectorB)); // A == B
@@ -48,7 +46,7 @@ TEST(Vector2D, Comparison)
 
 TEST(Vector2D, Protection)
 {
-	Vector2D testVectorA(5.2f, -0.39f);
+	constexpr Vector2D testVectorA(5.2f, -0.39f);
 
 	Vector2D testVectorB = testVectorA;
 	testVectorB.x = 30.0f;
@@ -59,25 +57,25 @@ TEST(Vector2D, Protection)
 
 TEST(Vector2D, Size)
 {
-	Vector2D testVectorA(5.2f, -0.39f);
+	constexpr Vector2D testVectorA(5.2f, -0.39f);
 
-	float testVectorSize = testVectorA.size();
+	const float testVectorSize = testVectorA.size();
 
 	EXPECT_NEAR(5.2146f, testVectorSize, 0.00001);
 }
 
 TEST(Vector2D, QSize)
 {
-	Vector2D testVectorA(5.2f, -0.39f);
+	constexpr Vector2D testVectorA(5.2f, -0.39f);
 
-	float testVectorSize = testVectorA.qSize();
+	const float testVectorSize = testVectorA.qSize();
 
 	EXPECT_FLOAT_EQ(27.1921f, testVectorSize);
 }
 
 TEST(Vector2D, Negation)
 {
-	Vector2D testVectorA(5.2f, -0.39f);
+	constexpr Vector2D testVectorA(5.2f, -0.39f);
 
 	Vector2D testVectorB = -testVectorA;
 
@@ -94,7 +92,7 @@ TEST(Vector2D, Addition)
 	Vector2D testVectorA(5.2f, -0.39f);
 	Vector2D testVectorB(16.9f, 803.27f);
 
-	Vector2D testVectorC = testVectorA + testVectorB;
+	const Vector2D testVectorC = testVectorA + testVectorB;
 	testVectorA = testVectorB + testVectorC;
 	testVectorB += testVectorB;
 
@@ -106,9 +104,9 @@ TEST(Vector2D, Addition)
 TEST(Vector2D, Substraction)
 {
 	Vector2D testVectorA(5.2f, -0.39f);
-	Vector2D testVectorB(16.9f, 803.27f);
+	constexpr Vector2D testVectorB(16.9f, 803.27f);
 
-	Vector2D testVectorC = testVectorA - testVectorB;
+	const Vector2D testVectorC = testVectorA - testVectorB;
 	testVectorA = testVectorB - testVectorC;
 
 	EXPECT_TRUE(testVectorC.isNearlyEqualTo(Vector2D(-11.7f, -803.66f)));
@@ -118,9 +116,9 @@ TEST(Vector2D, Substraction)
 TEST(Vector2D, Multiplication)
 {
 	Vector2D testVectorA(5.2f, -0.39f);
-	float testScalar = 18.3f;
+	constexpr float testScalar = 18.3f;
 
-	Vector2D testVectorB = testVectorA * testScalar;
+	const Vector2D testVectorB = testVectorA * testScalar;
 	testVectorA *= -testScalar;
 
 	EXPECT_TRUE(testVectorB.isNearlyEqualTo(Vector2D(95.16f, -7.137f)));
@@ -131,10 +129,10 @@ TEST(Vector2D, Multiplication)
 TEST(Vector2D, Division)
 {
 	Vector2D testVectorA(5.2f, -0.39f);
-	float testScalar = 18.3f;
+	constexpr float testScalar = 18.3f;
 
 	testVectorA /= testScalar;
-	Vector2D testVectorB = testVectorA / testVectorA.size(); // B = ort(A);
+	const Vector2D testVectorB = testVectorA / testVectorA.size(); // B = ort(A);
 
 	EXPECT_TRUE(testVectorA.isNearlyEqualTo(Vector2D(0.2841f, -0.0213f)));
 	EXPECT_TRUE(testVectorB.isNearlyEqualTo(Vector2D(0.9972f, -0.07476377f)));
@@ -156,12 +154,12 @@ TEST(Vector2D, Unit)
 
 TEST(Vector2D, GetRotation)
 {
-	Vector2D testVectorA(1.0f, 0.0f);
-	Vector2D testVectorB(-1.0f, 0.0f);
-	Vector2D testVectorC(0.0f, 1.0f);
-	Vector2D testVectorD(0.0f, -1.0f);
-	Vector2D testVectorE(0.0f, 0.0f);
-		
+	constexpr Vector2D testVectorA(1.0f, 0.0f);
+	constexpr Vector2D testVectorB(-1.0f, 0.0f);
+	constexpr Vector2D testVectorC(0.0f, 1.0f);
+	constexpr Vector2D testVectorD(0.0f, -1.0f);
+	constexpr Vector2D testVectorE(0.0f, 0.0f);
+
 	EXPECT_FLOAT_EQ(0.0f, testVectorA.rotation().getValue());
 	EXPECT_FLOAT_EQ(PI, testVectorB.rotation().getValue());
 	EXPECT_FLOAT_EQ(PI/2, testVectorC.rotation().getValue());
@@ -171,22 +169,22 @@ TEST(Vector2D, GetRotation)
 
 TEST(Vector2D, DotProduct)
 {
-	Vector2D testVectorA(5.2f, -0.39f);
-	Vector2D testVectorB(16.9f, 803.27f);
+	constexpr Vector2D testVectorA(5.2f, -0.39f);
+	constexpr Vector2D testVectorB(16.9f, 803.27f);
 
 	EXPECT_FLOAT_EQ(-225.3953f, Vector2D::DotProduct(testVectorA, testVectorB));
 }
 
 TEST(Vector2D, Project)
 {
-	Vector2D oX(1.0f, 0.0f);
-	Vector2D oYxFive(0.0f, 5.0f);
-		
-	Vector2D testVectorA(5.2f, -0.39f);
-	Vector2D testVectorB(16.9f, 803.27f);
+	constexpr Vector2D oX(1.0f, 0.0f);
+	constexpr Vector2D oYxFive(0.0f, 5.0f);
 
-	// Another (slowler) way to calc projection vector
-	Vector2D projectAB = testVectorA.unit() * testVectorB.size() * std::cos((testVectorA.rotation() - testVectorB.rotation()).getValue());
+	constexpr Vector2D testVectorA(5.2f, -0.39f);
+	constexpr Vector2D testVectorB(16.9f, 803.27f);
+
+	// Another (slower) way to calc projection vector
+	const Vector2D projectAB = testVectorA.unit() * testVectorB.size() * std::cos((testVectorA.rotation() - testVectorB.rotation()).getValue());
 
 	EXPECT_TRUE(testVectorA.project(oX).isNearlyEqualTo(Vector2D(5.2f, 0.0f)));
 	EXPECT_TRUE(testVectorB.project(oYxFive).isNearlyEqualTo(Vector2D(0.0f, 803.27f)));
@@ -202,13 +200,13 @@ TEST(Vector2D, Normal)
 	EXPECT_TRUE(Vector2D(-0.0748f, -0.99719f).isNearlyEqualTo(Vector2D(5.2f, -0.39f).normal()));
 	EXPECT_TRUE(Vector2D(-0.9998f, -0.021f).isNearlyEqualTo(Vector2D(16.9f, -803.27f).normal()));
 
-	Vector2D testVector(-1234.321f, 184.99f);
+	constexpr Vector2D testVector(-1234.321f, 184.99f);
 	EXPECT_TRUE(Vector2D(testVector.rotation() - Rotator(HALF_PI)).isNearlyEqualTo(testVector.normal()));
 }
 
 TEST(Vector2D, Rotate)
 {
-	Vector2D testVectorA(30, 40);
+	constexpr Vector2D testVectorA(30, 40);
 
 	EXPECT_TRUE(Vector2D(30, 40).isNearlyEqualTo(testVectorA.getRotated(Rotator(0.0f))));
 	EXPECT_TRUE(Vector2D(-40, 30).isNearlyEqualTo(testVectorA.getRotated(Rotator(PI * 0.5f))));
@@ -219,8 +217,8 @@ TEST(Vector2D, Rotate)
 
 TEST(Vector2D, HadamardProduct)
 {
-	Vector2D testVectorA(10.0f, 20.0f);
-	Vector2D testVectorB(-3.0f, 2.0f);
+	constexpr Vector2D testVectorA(10.0f, 20.0f);
+	constexpr Vector2D testVectorB(-3.0f, 2.0f);
 
 	EXPECT_TRUE(Vector2D(-30, 40).isNearlyEqualTo(Vector2D::HadamardProduct(testVectorA, testVectorB)));
 }
@@ -228,8 +226,8 @@ TEST(Vector2D, HadamardProduct)
 TEST(Vector2D, Lerp)
 {
 	{
-		Vector2D testVectorA(10.0f, 20.0f);
-		Vector2D testVectorB(-3.0f, 2.0f);
+		constexpr Vector2D testVectorA(10.0f, 20.0f);
+		constexpr Vector2D testVectorB(-3.0f, 2.0f);
 
 		EXPECT_TRUE(Vector2D(10.0f, 20.0f).isNearlyEqualTo(Vector2D::Lerp(testVectorA, testVectorB, 0.0f)));
 		EXPECT_TRUE(Vector2D(-3.0f, 2.0f).isNearlyEqualTo(Vector2D::Lerp(testVectorA, testVectorB, 1.0f)));
@@ -237,8 +235,8 @@ TEST(Vector2D, Lerp)
 	}
 
 	{
-		Vector2D testVectorA(10.0f, 10.0f);
-		Vector2D testVectorB(10.0f, 10.0f);
+		constexpr Vector2D testVectorA(10.0f, 10.0f);
+		constexpr Vector2D testVectorB(10.0f, 10.0f);
 
 		EXPECT_TRUE(Vector2D(10.0f, 10.0f).isNearlyEqualTo(Vector2D::Lerp(testVectorA, testVectorB, 0.0f)));
 		EXPECT_TRUE(Vector2D(10.0f, 10.0f).isNearlyEqualTo(Vector2D::Lerp(testVectorA, testVectorB, 1.0f)));
@@ -249,8 +247,8 @@ TEST(Vector2D, Lerp)
 TEST(Vector2D, InvLerp)
 {
 	{
-		Vector2D testVectorA(10.0f, 20.0f);
-		Vector2D testVectorB(-3.0f, 2.0f);
+		constexpr Vector2D testVectorA(10.0f, 20.0f);
+		constexpr Vector2D testVectorB(-3.0f, 2.0f);
 
 		EXPECT_FLOAT_EQ(0.0f, Vector2D::InvLerp(testVectorA, testVectorB, Vector2D::Lerp(testVectorA, testVectorB, 0.0f)));
 		EXPECT_FLOAT_EQ(1.0f, Vector2D::InvLerp(testVectorA, testVectorB, Vector2D::Lerp(testVectorA, testVectorB, 1.0f)));
@@ -259,8 +257,8 @@ TEST(Vector2D, InvLerp)
 	}
 
 	{
-		Vector2D testVectorA(10.000001f, 10.0f);
-		Vector2D testVectorB(10.0f, -20.0f);
+		constexpr Vector2D testVectorA(10.000001f, 10.0f);
+		constexpr Vector2D testVectorB(10.0f, -20.0f);
 
 		EXPECT_FLOAT_EQ(0.0f, Vector2D::InvLerp(testVectorA, testVectorB, Vector2D::Lerp(testVectorA, testVectorB, 0.0f)));
 		EXPECT_FLOAT_EQ(1.0f, Vector2D::InvLerp(testVectorA, testVectorB, Vector2D::Lerp(testVectorA, testVectorB, 1.0f)));

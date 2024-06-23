@@ -4,7 +4,6 @@
 
 #include "GameData/EcsDefinitions.h"
 
-#include "GameData/Geometry/Vector2D.h"
 #include "GameData/Spatial/CellPos.h"
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 

@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "Base/Debug/Assert.h"
-#include "Base/CompilerHelpers.h"
 
 #include "GameData/FSM/Blackboard.h"
 #include "GameData/FSM/Link.h"
@@ -79,7 +78,7 @@ namespace FSM
 			Assert(isAdded, "State is already exists");
 		}
 
-		void linkStates(StateIdType childStateId, StateIdType parentStateId, bool isDefaultState = false)
+		void linkStates(StateIdType childStateId, StateIdType parentStateId, const bool isDefaultState = false)
 		{
 			if (isDefaultState)
 			{
@@ -98,7 +97,7 @@ namespace FSM
 			{
 				needToProcess = false;
 
-				bool isProcessedByParent = recursiveUpdateParents(currentState, blackboard);
+				const bool isProcessedByParent = recursiveUpdateParents(currentState, blackboard);
 				if (isProcessedByParent)
 				{
 					replaceToChildState(currentState);
@@ -150,7 +149,7 @@ namespace FSM
 
 			StateIdType processingState = parentIt->second;
 
-			bool isProcessed = recursiveUpdateParents(processingState, blackboard);
+			const bool isProcessed = recursiveUpdateParents(processingState, blackboard);
 			if (isProcessed)
 			{
 				return true;

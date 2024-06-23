@@ -6,7 +6,6 @@
 #include "GameData/Geometry/Hull.h"
 
 #include "Utils/Geometry/Collide.h"
-#include "Utils/Functional/ScopeFinalizer.h"
 
 #include "GameData/Components/CollisionComponent.generated.h"
 

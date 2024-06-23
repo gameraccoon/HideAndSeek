@@ -36,20 +36,17 @@ StringId StringIdManager::stringToId(const std::string& stringValue)
 	return StringId(hash);
 }
 
-const std::string& StringIdManager::getStringFromId(StringId id)
+const std::string& StringIdManager::getStringFromId(const StringId id)
 {
 	const static std::string emptyString;
 
-	auto it = mStringIdsToStringsMap.find(id.mHash);
-	if (it != mStringIdsToStringsMap.end())
+	if (const auto it = mStringIdsToStringsMap.find(id.mHash); it != mStringIdsToStringsMap.end())
 	{
 		return it->second;
 	}
-	else
-	{
-		ReportError("String representation for id '%d' not found", id.mHash);
-		return emptyString;
-	}
+
+	ReportError("String representation for id '%d' not found", id.mHash);
+	return emptyString;
 }
 
 static_assert(sizeof(StringId) == sizeof(uint64_t), "StringId is too big");

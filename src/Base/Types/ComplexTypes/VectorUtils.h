@@ -64,7 +64,7 @@ namespace VectorUtils
 	template<typename First, typename... Others>
 	auto JoinVectors(First&& firstVector, Others&&... otherVectors)
 	{
-		using value_type = typename std::decay<decltype(*firstVector.begin())>::type;
+		using value_type = std::decay_t<decltype(*firstVector.begin())>;
 		std::vector<value_type> result;
 		size_t size = firstVector.size() + (otherVectors.size() + ...);
 		result.reserve(size);
@@ -82,7 +82,7 @@ namespace VectorUtils
 		}
 		else
 		{
-			if constexpr (std::is_rvalue_reference<VectorAdded&&>::value)
+			if constexpr (std::is_rvalue_reference_v<VectorAdded&&>)
 			{
 				std::move(
 					added.begin(),

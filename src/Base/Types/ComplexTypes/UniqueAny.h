@@ -64,7 +64,7 @@ private:
 	{
 
 		template <typename... Args>
-		TypeStoredData(Args&&... args)
+		explicit TypeStoredData(Args&&... args)
 			: data(std::forward<Args>(args)...)
 		{}
 

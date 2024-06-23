@@ -6,34 +6,34 @@
 
 #include "Base/Math/Float.h"
 
-Rotator::Rotator(float angle) noexcept
+Rotator::Rotator(const float angle) noexcept
 	: mValue(angle)
 {
 	normalize();
 }
 
-bool Rotator::isNearlyEqualTo(Rotator other) const noexcept
+bool Rotator::isNearlyEqualTo(const Rotator other) const noexcept
 {
-	float difference = this->getValue() - other.getValue();
+	const float difference = this->getValue() - other.getValue();
 	return Math::AreEqualWithEpsilon(difference, 0) || Math::AreEqualWithEpsilon(difference, TWO_PI);
 }
 
-bool Rotator::operator==(Rotator other) const noexcept
+bool Rotator::operator==(const Rotator other) const noexcept
 {
 	return getValue() == other.getValue();
 }
 
-bool Rotator::operator!=(Rotator other) const noexcept
+bool Rotator::operator!=(const Rotator other) const noexcept
 {
 	return !(*this == other);
 }
 
-Rotator Rotator::operator+(Rotator other) const noexcept
+Rotator Rotator::operator+(const Rotator other) const noexcept
 {
 	return Rotator(getValue() + other.getValue());
 }
 
-Rotator Rotator::operator+=(Rotator other) noexcept
+Rotator Rotator::operator+=(const Rotator other) noexcept
 {
 	mValue += other.getValue();
 	normalize();
@@ -41,12 +41,12 @@ Rotator Rotator::operator+=(Rotator other) noexcept
 	return *this;
 }
 
-Rotator Rotator::operator-(Rotator right) const noexcept
+Rotator Rotator::operator-(const Rotator right) const noexcept
 {
 	return Rotator(getValue() - right.getValue());
 }
 
-Rotator Rotator::operator-=(Rotator right) noexcept
+Rotator Rotator::operator-=(const Rotator right) noexcept
 {
 	mValue -= right.getValue();
 	normalize();

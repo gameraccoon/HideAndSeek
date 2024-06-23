@@ -5,7 +5,6 @@
 #include "Base/TimeConstants.h"
 
 #include "GameData/Components/CharacterStateComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/DeathComponent.generated.h"
 #include "GameData/Components/HealthComponent.generated.h"
 #include "GameData/Components/TimeComponent.generated.h"
@@ -27,7 +26,7 @@ WeaponSystem::WeaponSystem(WorldHolder& worldHolder) noexcept
 
 struct ShotInfo
 {
-	ShotInfo(Entity instigator) : instigator(instigator) {}
+	explicit ShotInfo(const Entity instigator) : instigator(instigator) {}
 
 	Entity instigator;
 	WorldCell* instigatorCell = nullptr;
@@ -37,7 +36,7 @@ struct ShotInfo
 
 struct HitInfo
 {
-	explicit HitInfo(Entity instigator) : instigator(instigator) {}
+	explicit HitInfo(const Entity instigator) : instigator(instigator) {}
 
 	Entity instigator;
 	WorldCell* instigatorCell = nullptr;
@@ -55,8 +54,8 @@ void WeaponSystem::update()
 	GameplayTimestamp currentTime = time->getValue().lastFixedUpdateTimestamp;
 
 	std::vector<ShotInfo> shotsToMake;
-	world.getSpatialData().getAllCellManagers().forEachComponentSetWithEntityAndExtraData<WeaponComponent, CharacterStateComponent>(
-		[currentTime, &shotsToMake](WorldCell& cell, EntityView entityView, WeaponComponent* weapon, CharacterStateComponent* characterState)
+	world.getSpatialData().getAllCellManagers().forEachComponentSetWithEntityAndExtraData<WeaponComponent, const CharacterStateComponent>(
+		[currentTime, &shotsToMake](WorldCell& cell, const EntityView entityView, WeaponComponent* weapon, const CharacterStateComponent* characterState)
 	{
 		if (characterState->getState() == CharacterState::Shoot || characterState->getState() == CharacterState::WalkAndShoot)
 		{
@@ -80,7 +79,7 @@ void WeaponSystem::update()
 		if (transform)
 		{
 			Vector2D traceEndPoint = transform->getLocation() + Vector2D(transform->getRotation()) * shotInfo.distance;
-			RayTrace::TraceResult result = RayTrace::Trace(
+			const RayTrace::TraceResult result = RayTrace::Trace(
 				world,
 				transform->getLocation(),
 				traceEndPoint

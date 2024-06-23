@@ -39,7 +39,7 @@ void Game::preStart(const ArgumentsParser& arguments)
 	mWorld.getWorldComponents().addComponent<TimeComponent>();
 }
 
-void Game::notPausablePreFrameUpdate(float dt)
+void Game::notPausablePreFrameUpdate(const float dt)
 {
 	SCOPED_PROFILER("Game::notPausablePreFrameUpdate");
 
@@ -47,7 +47,7 @@ void Game::notPausablePreFrameUpdate(float dt)
 	mFrameBeginTime = std::chrono::steady_clock::now();
 #endif // ENABLE_SCOPED_PROFILER
 
-	if (HAL::Engine* engine = getEngine())
+	if (const HAL::Engine* engine = getEngine())
 	{
 		mWorld.getWorldComponents().getOrAddComponent<WorldCachedDataComponent>()->setScreenSize(engine->getWindowSize());
 	}
@@ -58,7 +58,7 @@ void Game::notPausablePreFrameUpdate(float dt)
 	mNotPausablePreFrameSystemsManager.update();
 }
 
-void Game::dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates)
+void Game::dynamicTimePreFrameUpdate(const float dt, const int plannedFixedTimeUpdates)
 {
 	SCOPED_PROFILER("Game::dynamicTimePreFrameUpdate");
 
@@ -71,7 +71,7 @@ void Game::dynamicTimePreFrameUpdate(float dt, int plannedFixedTimeUpdates)
 	mPreFrameSystemsManager.update();
 }
 
-void Game::fixedTimeUpdate(float dt)
+void Game::fixedTimeUpdate(const float dt)
 {
 	SCOPED_PROFILER("Game::fixedTimeUpdate");
 
@@ -81,7 +81,7 @@ void Game::fixedTimeUpdate(float dt)
 	mInputControllersData.resetLastFrameStates();
 }
 
-void Game::dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates)
+void Game::dynamicTimePostFrameUpdate(const float dt, const int processedFixedTimeUpdates)
 {
 	SCOPED_PROFILER("Game::dynamicTimePostFrameUpdate");
 
@@ -94,7 +94,7 @@ void Game::dynamicTimePostFrameUpdate(float dt, int processedFixedTimeUpdates)
 	mDebugBehavior.postInnerUpdate(*this);
 }
 
-void Game::notPausablePostFrameUpdate(float dt) {
+void Game::notPausablePostFrameUpdate(const float dt) {
 	SCOPED_PROFILER("Game::notPausablePostFrameUpdate");
 
 	auto [time] = mWorld.getWorldComponents().getComponents<TimeComponent>();

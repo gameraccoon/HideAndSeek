@@ -23,7 +23,7 @@ TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(WorldHolder& worldH
 
 void TestSpawnShootableUnitsSystem::spawnUnit(EntityManager& entityManager, const Vector2D& pos)
 {
-	Entity entity = entityManager.addEntity();
+	const Entity entity = entityManager.addEntity();
 	{
 		TransformComponent* transform = entityManager.addComponent<TransformComponent>(entity);
 		transform->setLocation(pos);
@@ -49,18 +49,18 @@ void TestSpawnShootableUnitsSystem::spawnUnit(EntityManager& entityManager, cons
 
 void TestSpawnShootableUnitsSystem::spawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData)
 {
-	Vector2D jitter = Vector2D(static_cast<float>(Random::gGlobalGenerator() % JitterRand) / JitterDivider - HalfJitterMax, (static_cast<float>(Random::gGlobalGenerator() % JitterRand) / JitterDivider - HalfJitterMax));
-	Vector2D newPos = centerShifted + pos + jitter;
-	CellPos cellPos = SpatialWorldData::GetCellForPos(newPos);
+	const Vector2D jitter = Vector2D(static_cast<float>(Random::gGlobalGenerator() % JitterRand) / JitterDivider - HalfJitterMax, (static_cast<float>(Random::gGlobalGenerator() % JitterRand) / JitterDivider - HalfJitterMax));
+	const Vector2D newPos = centerShifted + pos + jitter;
+	const CellPos cellPos = SpatialWorldData::GetCellForPos(newPos);
 	spawnUnit(spatialData.getOrCreateCell(cellPos).getEntityManager(), newPos);
 }
 
-void TestSpawnShootableUnitsSystem::spawnUnits(SpatialWorldData& spatialData, int count, const Vector2D& pos)
+void TestSpawnShootableUnitsSystem::spawnUnits(SpatialWorldData& spatialData, const int count, const Vector2D& pos)
 {
-	int n = static_cast<int>(std::sqrt(count));
-	int m = count / n;
+	const int n = static_cast<int>(std::sqrt(count));
+	const int m = count / n;
 
-	Vector2D centerShifted = pos - Vector2D(static_cast<float>(n - 1), static_cast<float>(m) - ((count == m * n) ? 1.0f : 0.0f)) * (Distance * 0.5f);
+	const Vector2D centerShifted = pos - Vector2D(static_cast<float>(n - 1), static_cast<float>(m) - ((count == m * n) ? 1.0f : 0.0f)) * (Distance * 0.5f);
 
 	for (int j = 0; j < m; ++j)
 	{
@@ -70,8 +70,8 @@ void TestSpawnShootableUnitsSystem::spawnUnits(SpatialWorldData& spatialData, in
 		}
 	}
 
-	float yPos = static_cast<float>(m) * Distance;
-	int unitsLeft = count - m * n;
+	const float yPos = static_cast<float>(m) * Distance;
+	const int unitsLeft = count - m * n;
 	for (int i = 0; i < unitsLeft; ++i)
 	{
 		spawnJitteredUnit(Vector2D(static_cast<float>(i) * Distance, yPos), centerShifted, spatialData);

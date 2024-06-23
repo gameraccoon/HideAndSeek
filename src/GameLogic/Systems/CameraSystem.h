@@ -7,10 +7,10 @@ class WorldHolder;
 /**
  * System that handles camera position
  */
-class CameraSystem : public RaccoonEcs::System
+class CameraSystem final : public RaccoonEcs::System
 {
 public:
-	CameraSystem(WorldHolder& worldHolder) noexcept;
+	explicit CameraSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 

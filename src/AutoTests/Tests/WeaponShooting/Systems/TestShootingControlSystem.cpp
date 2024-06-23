@@ -42,7 +42,7 @@ void TestShootingControlSystem::update()
 	world.getSpatialData().getAllCellManagers().forEachComponentSet<const HealthComponent, const TransformComponent>(
 			[playerLocation, &closestTarget, &closestQDist](const HealthComponent* health, const TransformComponent* transform)
 	{
-		float qDist = (transform->getLocation() - playerLocation).qSize();
+		const float qDist = (transform->getLocation() - playerLocation).qSize();
 		if (health->getHealthValue() > 0.0f && qDist < closestQDist)
 		{
 			closestQDist = qDist;

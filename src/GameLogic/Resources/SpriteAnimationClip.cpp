@@ -1,5 +1,7 @@
 #include "Base/precomp.h"
 
+#ifndef DISABLE_SDL
+
 #include <algorithm>
 #include <filesystem>
 
@@ -45,7 +47,7 @@ namespace Graphics
 		return result;
 	}
 
-	static UniqueAny CreateAnimationClip(UniqueAny&& resource, ResourceManager& resourceManager, ResourceHandle handle)
+	static UniqueAny CreateAnimationClip(UniqueAny&& resource, ResourceManager& resourceManager, const ResourceHandle handle)
 	{
 		SCOPED_PROFILER("CreateAnimationClip");
 
@@ -81,7 +83,7 @@ namespace Graphics
 		return !mSprites.empty();
 	}
 
-	const ResourceHandle& SpriteAnimationClip::getSprite(float progress) const
+	const ResourceHandle& SpriteAnimationClip::getSprite(const float progress) const
 	{
 		return mSprites[std::min(mSprites.size()*static_cast<size_t>(progress), mSprites.size() - 1)];
 	}
@@ -111,3 +113,5 @@ namespace Graphics
 		return {};
 	}
 }
+
+#endif // !DISABLE_SDL

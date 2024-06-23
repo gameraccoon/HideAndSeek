@@ -4,7 +4,7 @@
 
 namespace ImguiPropertyFiltration
 {
-	class ComponentAvailabilityPropertyDescriptor : public AbstractPropertyDescriptor
+	class ComponentAvailabilityPropertyDescriptor final : public AbstractPropertyDescriptor
 	{
 	public:
 		ComponentAvailabilityPropertyDescriptor(const std::string& componentName, StringId typeId);

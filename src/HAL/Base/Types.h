@@ -15,14 +15,14 @@ namespace Graphics
 
 		QuadUV() = default;
 
-		QuadUV(float u1, float v1, float u2, float v2)
+		QuadUV(const float u1, const float v1, const float u2, const float v2)
 			: u1(u1)
 			, v1(v1)
 			, u2(u2)
 			, v2(v2)
 		{}
 
-		QuadUV(Vector2D start, Vector2D end)
+		QuadUV(const Vector2D start, const Vector2D end)
 			: u1(start.x)
 			, v1(start.y)
 			, u2(end.x)

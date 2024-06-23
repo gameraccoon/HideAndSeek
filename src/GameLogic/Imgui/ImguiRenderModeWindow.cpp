@@ -12,7 +12,7 @@
 #include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/Imgui/ImguiDebugData.h"
 
-void ImguiRenderModeWindow::update(ImguiDebugData& debugData)
+void ImguiRenderModeWindow::update(const ImguiDebugData& debugData)
 {
 	GameData& gameData = debugData.worldHolder.getGameData();
 

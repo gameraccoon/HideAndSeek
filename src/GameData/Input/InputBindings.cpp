@@ -6,7 +6,7 @@
 
 namespace Input
 {
-	PressSingleButtonKeyBinding::PressSingleButtonKeyBinding(ControllerType controllerType, int button)
+	PressSingleButtonKeyBinding::PressSingleButtonKeyBinding(const ControllerType controllerType, const int button)
 		: mControllerType(controllerType)
 		, mButton(button)
 	{
@@ -29,7 +29,7 @@ namespace Input
 		}
 	}
 
-	PressButtonChordKeyBinding::PressButtonChordKeyBinding(ControllerType controllerType, const std::vector<int>& buttons)
+	PressButtonChordKeyBinding::PressButtonChordKeyBinding(const ControllerType controllerType, const std::vector<int>& buttons)
 		: mControllerType(controllerType)
 		, mButtons(buttons)
 	{}
@@ -89,7 +89,7 @@ namespace Input
 		}
 	}
 
-	PositiveButtonAxisBinding::PositiveButtonAxisBinding(ControllerType controllerType, int button)
+	PositiveButtonAxisBinding::PositiveButtonAxisBinding(const ControllerType controllerType, const int button)
 		: mControllerType(controllerType)
 		, mButton(button)
 	{}
@@ -100,7 +100,7 @@ namespace Input
 		return state.isButtonPressed(mButton) ? 1.0f : 0.0f;
 	}
 
-	NegativeButtonAxisBinding::NegativeButtonAxisBinding(ControllerType controllerType, int button)
+	NegativeButtonAxisBinding::NegativeButtonAxisBinding(const ControllerType controllerType, const int button)
 		: mControllerType(controllerType)
 		, mButton(button)
 	{}
@@ -111,7 +111,7 @@ namespace Input
 		return state.isButtonPressed(mButton) ? -1.0f : 0.0f;
 	}
 
-	DirectAxisToAxisBinding::DirectAxisToAxisBinding(ControllerType controllerType, int axis)
+	DirectAxisToAxisBinding::DirectAxisToAxisBinding(const ControllerType controllerType, const int axis)
 		: mControllerType(controllerType)
 		, mAxis(axis)
 	{}

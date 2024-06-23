@@ -1,13 +1,11 @@
 #include "Base/precomp.h"
 
 #include <unordered_map>
-#include <list>
 #include <array>
 
 #include "Utils/AI/PathFinding.h"
 
 #include "GameData/AI/NavMesh.h"
-#include "GameData/Geometry/BoundingBox.h"
 
 #include "Utils/Geometry/Collide.h"
 
@@ -15,7 +13,7 @@ namespace PathFinding
 {
 	static constexpr size_t INVALID_POLYGON = std::numeric_limits<size_t>::max();
 
-	bool IsPointInsideConvexHull(Vector2D point, const std::vector<Vector2D>& hull)
+	bool IsPointInsideConvexHull(const Vector2D point, const std::vector<Vector2D>& hull)
 	{
 		const size_t hullSize = hull.size();
 		FOR_EACH_BORDER(hullSize,
@@ -29,10 +27,10 @@ namespace PathFinding
 		return true;
 	}
 
-	static size_t FindPolygonForPoint(Vector2D point, const NavMesh& navMesh)
+	static size_t FindPolygonForPoint(const Vector2D point, const NavMesh& navMesh)
 	{
-		Vector2D cellPointFloat = (point - navMesh.geometry.navMeshStart) / navMesh.spatialHash.cellSize;
-		IntVector2D cellPoint(static_cast<int>(cellPointFloat.x), static_cast<int>(cellPointFloat.y));
+		const Vector2D cellPointFloat = (point - navMesh.geometry.navMeshStart) / navMesh.spatialHash.cellSize;
+		const IntVector2D cellPoint(static_cast<int>(cellPointFloat.x), static_cast<int>(cellPointFloat.y));
 		if (cellPoint.x < 0 || cellPoint.x >= navMesh.spatialHash.hashSize.x
 			||
 			cellPoint.y < 0 || cellPoint.y >= navMesh.spatialHash.hashSize.y)
@@ -42,9 +40,9 @@ namespace PathFinding
 
 		const std::vector<size_t>& polygons = navMesh.spatialHash.polygonsHash[cellPoint.x + cellPoint.y * navMesh.spatialHash.hashSize.x];
 		std::vector<Vector2D> polygonPoints(navMesh.geometry.verticesPerPoly);
-		for (size_t polygon : polygons)
+		for (const size_t polygon : polygons)
 		{
-			size_t polyShift = polygon * navMesh.geometry.verticesPerPoly;
+			const size_t polyShift = polygon * navMesh.geometry.verticesPerPoly;
 			for (size_t i = 0; i < navMesh.geometry.verticesPerPoly; ++i)
 			{
 				polygonPoints[i] = navMesh.geometry.vertices[navMesh.geometry.indexes[polyShift + i]];
@@ -70,9 +68,9 @@ namespace PathFinding
 					pointY >= 0 && pointY < navMesh.spatialHash.hashSize.y)
 				{
 					const std::vector<size_t>& cellPolygons = navMesh.spatialHash.polygonsHash[cellPoint.x + cellPoint.y * navMesh.spatialHash.hashSize.x];
-					for (size_t polygon : cellPolygons)
+					for (const size_t polygon : cellPolygons)
 					{
-						size_t polyShift = polygon * navMesh.geometry.verticesPerPoly;
+						const size_t polyShift = polygon * navMesh.geometry.verticesPerPoly;
 						for (size_t i = 0; i < navMesh.geometry.verticesPerPoly; ++i)
 						{
 							polygonPoints[i] = navMesh.geometry.vertices[navMesh.geometry.indexes[polyShift + i]];
@@ -101,9 +99,9 @@ namespace PathFinding
 	static_assert(std::is_trivially_copyable<LineSegmentToNeighborIntersection>(), "LineSegmentToNeighborIntersection should be trivially copyable");
 	static_assert(std::is_trivially_constructible<LineSegmentToNeighborIntersection>(), "LineSegmentToNeighborIntersection should be trivially constructible");
 
-	static LineSegmentToNeighborIntersection FindLineSegmentToNeighborIntersection(const NavMesh& navMesh, Vector2D start, Vector2D finish, size_t polygon, size_t ignoredNeighbor)
+	static LineSegmentToNeighborIntersection FindLineSegmentToNeighborIntersection(const NavMesh& navMesh, const Vector2D start, const Vector2D finish, const size_t polygon, const size_t ignoredNeighbor)
 	{
-		LineSegmentToNeighborIntersection result;
+		LineSegmentToNeighborIntersection result{};
 		result.link.neighbor = INVALID_POLYGON;
 		float bestIntersectionQDistance = 0.0f;
 
@@ -114,12 +112,12 @@ namespace PathFinding
 				Vector2D vert1 = navMesh.geometry.vertices[link.borderPoint1];
 				Vector2D vert2 = navMesh.geometry.vertices[link.borderPoint2];
 
-				bool areIntersect = Collide::AreLinesIntersect(start, finish, vert1, vert2);
+				const bool areIntersect = Collide::AreLinesIntersect(start, finish, vert1, vert2);
 
 				if (areIntersect)
 				{
 					Vector2D intersectionPoint = Collide::GetPointIntersect2Lines(start, finish, vert1, vert2);
-					float intersectionQDistance = (intersectionPoint - finish).qSize();
+					const float intersectionQDistance = (intersectionPoint - finish).qSize();
 					if (result.link.neighbor == INVALID_POLYGON
 						// choose the variant closer to the finish point
 						|| intersectionQDistance < bestIntersectionQDistance)
@@ -200,14 +198,14 @@ namespace PathFinding
 
 	static PathPoint PopBestFromOpenList(OpenListType& openList, OpenMapType& openMap)
 	{
-		PathPoint result = openList.begin()->second;
+		const PathPoint result = openList.begin()->second;
 		openList.erase(openList.begin());
 		openMap.erase(result.polygon);
 		AssertFatal(openList.size() == openMap.size(), "openList and openMap have diverged");
 		return result;
 	}
 
-	static PointScores CalculatePointScores(Vector2D pos, float previousG, Vector2D previousPos, Vector2D target)
+	static PointScores CalculatePointScores(const Vector2D pos, const float previousG, const Vector2D previousPos, const Vector2D target)
 	{
 		PointScores result;
 		result.g = previousG + (pos - previousPos).size();
@@ -216,7 +214,7 @@ namespace PathFinding
 		return result;
 	}
 
-	static std::pair<size_t, size_t> FindNextBestPoints(const std::vector<std::array<Vector2D, 2>>& portals, size_t start)
+	static std::pair<size_t, size_t> FindNextBestPoints(const std::vector<std::array<Vector2D, 2>>& portals, const size_t start)
 	{
 		// find next points that are not equal in position to the current ones
 
@@ -318,8 +316,8 @@ namespace PathFinding
 
 			// if the portal will be rotated on more than 90 degrees to the funnel start
 			{
-				size_t bestLeftPreview = updateLeft ? i : bestLeft;
-				size_t bestRightPreview = updateRight ? i : bestRight;
+				const size_t bestLeftPreview = updateLeft ? i : bestLeft;
+				const size_t bestRightPreview = updateRight ? i : bestRight;
 				if ((turnLeft && turnRight) || Collide::SignedArea(portals[bestRightPreview][1], funnelStart, portals[bestLeftPreview][0]) < 0.0f)
 				{
 					// make the closest turn

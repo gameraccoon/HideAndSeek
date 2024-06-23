@@ -8,7 +8,7 @@
 class GameData
 {
 public:
-	GameData(const ComponentFactory& componentFactory);
+	explicit GameData(const ComponentFactory& componentFactory);
 
 	ComponentSetHolder& getGameComponents() { return mGameComponents; }
 

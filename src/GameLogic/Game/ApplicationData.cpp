@@ -6,13 +6,11 @@
 #include "Utils/Profiling/ProfileDataWriter.h"
 #endif // ENABLE_SCOPED_PROFILER
 
-#include "GameLogic/Game/HapGame.h"
-
-ApplicationData::ApplicationData(int threadsCount)
+ApplicationData::ApplicationData(const int threadsCount)
 	: WorkerThreadsCount(threadsCount)
 	, RenderThreadId(threadsCount + 1)
 	, ResourceLoadingThreadId(threadsCount + 2)
-	, threadPool(threadsCount, [this]{ threadSaveProfileData(ThreadPool::GetThisThreadId()); })
+	, threadPool(threadsCount, []{ threadSaveProfileData(ThreadPool::GetThisThreadId()); })
 {
 	resourceManager.startLoadingThread([this]{ threadSaveProfileData(ResourceLoadingThreadId); });
 }

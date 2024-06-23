@@ -4,10 +4,10 @@
 
 #include "AutoTests/BasicTestChecks.h"
 
-class DestroyedEntitiesTestCheck : public TestCheck
+class DestroyedEntitiesTestCheck final : public TestCheck
 {
 public:
-	explicit DestroyedEntitiesTestCheck(int expectedDestroyedEntities)
+	explicit DestroyedEntitiesTestCheck(const int expectedDestroyedEntities)
 		: mExpectedDestroyedEntities(expectedDestroyedEntities)
 	{}
 
@@ -18,7 +18,7 @@ public:
 		return FormatString("Destroyed entities: %d, expected %d.", mDestroyedEntities, mExpectedDestroyedEntities);
 	}
 
-	void addDestroyedEntities(int count) { mDestroyedEntities += count; }
+	void addDestroyedEntities(const int count) { mDestroyedEntities += count; }
 
 private:
 	int mDestroyedEntities = 0;

@@ -7,15 +7,15 @@
 
 TEST(ValueCompression, FloatToIntRL)
 {
-	float zero = 0;
-	float half = 0.5;
-	float one = 1;
+	constexpr float zero = 0;
+	constexpr float half = 0.5;
+	constexpr float one = 1;
 
-	unsigned int bitsCount = 16;
+	constexpr unsigned int bitsCount = 16;
 
-	unsigned int zeroInt = Utils::CompressNormalizedFloatToIntCL<unsigned int>(zero, bitsCount);
-	unsigned int halfInt = Utils::CompressNormalizedFloatToIntCL<unsigned int>(half, bitsCount);
-	unsigned int oneInt = Utils::CompressNormalizedFloatToIntCL<unsigned int>(one, bitsCount);
+	const unsigned int zeroInt = Utils::CompressNormalizedFloatToIntCL<unsigned int>(zero, bitsCount);
+	const unsigned int halfInt = Utils::CompressNormalizedFloatToIntCL<unsigned int>(half, bitsCount);
+	const unsigned int oneInt = Utils::CompressNormalizedFloatToIntCL<unsigned int>(one, bitsCount);
 
 	EXPECT_EQ(0u, zeroInt);
 	EXPECT_EQ((1ul << bitsCount) - 1ul, oneInt);

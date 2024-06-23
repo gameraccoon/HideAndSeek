@@ -2,10 +2,6 @@
 
 #include "AutoTests/Tests/WeaponShooting/TestCase.h"
 
-#include <memory>
-
-#include "HAL/Base/Engine.h"
-
 #include "GameData/Spatial/SpatialWorldData.h"
 
 #include "GameData/Components/CharacterStateComponent.generated.h"

@@ -20,8 +20,8 @@ World::World(const ComponentFactory& componentFactory)
 nlohmann::json World::toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
 	return nlohmann::json{
-		{"entity_manager", Json::SerializeEntityManager(mEntityManager, jsonSerializerHolder)},
-		{"world_components", Json::SerializeComponentSetHolder(mWorldComponents, jsonSerializerHolder)},
+		{"entity_manager", SerializeEntityManager(mEntityManager, jsonSerializerHolder)},
+		{"world_components", SerializeComponentSetHolder(mWorldComponents, jsonSerializerHolder)},
 		{"spatial_data", mSpatialData.toJson(jsonSerializerHolder)}
 	};
 }
@@ -31,10 +31,10 @@ static void InitSpatialTrackedEntities(SpatialWorldData& spatialData, ComponentS
 	auto [trackedSpatialEntities] = worldComponents.getComponents<TrackedSpatialEntitiesComponent>();
 
 	auto& cells = spatialData.getAllCells();
-	for (auto& cellPair : cells)
+	for (auto& [_, cell] : cells)
 	{
-		cellPair.second.getEntityManager().forEachComponentSetWithEntity<const SpatialTrackComponent>(
-			[trackedSpatialEntities, cell = &cellPair.second](Entity entity, const SpatialTrackComponent* spatialTrack)
+		cell.getEntityManager().forEachComponentSetWithEntity<const SpatialTrackComponent>(
+			[trackedSpatialEntities, cell = &cell](const Entity entity, const SpatialTrackComponent* spatialTrack)
 		{
 			auto it = trackedSpatialEntities->getEntitiesRef().find(spatialTrack->getId());
 			if (it != trackedSpatialEntities->getEntitiesRef().end())
@@ -52,21 +52,20 @@ static void InitSpatialTrackedEntities(SpatialWorldData& spatialData, ComponentS
 
 void World::fromJson(const nlohmann::json& json, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
-	Json::DeserializeEntityManager(mEntityManager, json.at("entity_manager"), jsonSerializerHolder);
-	Json::DeserializeComponentSetHolder(mWorldComponents, json.at("world_components"), jsonSerializerHolder);
+	DeserializeEntityManager(mEntityManager, json.at("entity_manager"), jsonSerializerHolder);
+	DeserializeComponentSetHolder(mWorldComponents, json.at("world_components"), jsonSerializerHolder);
 	mSpatialData.fromJson(json.at("spatial_data"), jsonSerializerHolder);
 
 	InitSpatialTrackedEntities(mSpatialData, mWorldComponents);
 }
 
-std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(StringId entityStringId)
+std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(const StringId entityStringId)
 {
 	std::optional<std::pair<EntityView, CellPos>> result;
-	const auto [trackedSpatialEntities] = getWorldComponents().getComponents<TrackedSpatialEntitiesComponent>();
 
-	if (trackedSpatialEntities)
+	if (const auto [trackedSpatialEntities] = getWorldComponents().getComponents<TrackedSpatialEntitiesComponent>(); trackedSpatialEntities)
 	{
-		auto it = trackedSpatialEntities->getEntities().find(entityStringId);
+		const auto it = trackedSpatialEntities->getEntities().find(entityStringId);
 		if (it != trackedSpatialEntities->getEntities().end())
 		{
 			if (WorldCell* cell = getSpatialData().getCell(it->second.cell))
@@ -79,7 +78,7 @@ std::optional<std::pair<EntityView, CellPos>> World::getTrackedSpatialEntity(Str
 	return result;
 }
 
-EntityView World::createTrackedSpatialEntity(StringId entityStringId, CellPos pos)
+EntityView World::createTrackedSpatialEntity(StringId entityStringId, const CellPos pos)
 {
 	EntityView result = createSpatialEntity(pos);
 	TrackedSpatialEntitiesComponent* trackedSpatialEntities = getWorldComponents().getOrAddComponent<TrackedSpatialEntitiesComponent>();
@@ -90,7 +89,7 @@ EntityView World::createTrackedSpatialEntity(StringId entityStringId, CellPos po
 	return result;
 }
 
-EntityView World::createSpatialEntity(CellPos pos)
+EntityView World::createSpatialEntity(const CellPos pos)
 {
 	WorldCell& cell = getSpatialData().getOrCreateCell(pos);
 	return EntityView(cell.getEntityManager().addEntity(), cell.getEntityManager());

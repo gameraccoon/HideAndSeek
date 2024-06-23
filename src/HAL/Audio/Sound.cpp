@@ -6,8 +6,6 @@
 
 #include <SDL_mixer.h>
 
-#include "HAL/Base/Engine.h"
-
 namespace Audio
 {
 	Sound::Sound(const AbsoluteResourcePath& path)

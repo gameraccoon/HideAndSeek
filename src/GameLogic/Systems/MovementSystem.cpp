@@ -2,8 +2,6 @@
 
 #include "GameLogic/Systems/MovementSystem.h"
 
-#include <SDL_keycode.h>
-
 #include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/SpatialTrackComponent.generated.h"
 #include "GameData/Components/TimeComponent.generated.h"
@@ -32,7 +30,7 @@ void MovementSystem::update()
 		CellPos cellTo;
 		EntityView entityView;
 
-		MAYBE_UNUSED CellScheduledTransfers(CellPos to, EntityView entity)
+		MAYBE_UNUSED CellScheduledTransfers(const CellPos to, const EntityView entity)
 			: cellTo(to)
 			, entityView(entity)
 		{
@@ -42,7 +40,7 @@ void MovementSystem::update()
 	std::vector<CellScheduledTransfers> transfers;
 
 	world.getSpatialData().getAllCellManagers().forEachComponentSetWithEntityAndExtraData<MovementComponent, TransformComponent>(
-		[timestampNow, &transfers](WorldCell& cell, EntityView entityView, MovementComponent* movement, TransformComponent* transform)
+		[timestampNow, &transfers](const WorldCell& cell, EntityView entityView, MovementComponent* movement, TransformComponent* transform)
 	{
 		if (!movement->getNextStep().isZeroLength())
 		{
@@ -50,7 +48,7 @@ void MovementSystem::update()
 			transform->setLocation(pos);
 
 			CellPos cellPos = cell.getPos();
-			bool isCellChanged = SpatialWorldData::TransformCellForPos(cellPos, pos);
+			const bool isCellChanged = SpatialWorldData::TransformCellForPos(cellPos, pos);
 			if (isCellChanged)
 			{
 				transfers.emplace_back(cellPos, entityView);

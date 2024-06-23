@@ -5,7 +5,7 @@
 class ImguiRenderModeWindow
 {
 public:
-	void update(struct ImguiDebugData& debugData);
+	void update(const struct ImguiDebugData& debugData);
 
 	bool isVisible = false;
 };

@@ -11,7 +11,7 @@ namespace TemplateHelperTestsInternal
 	class Movable
 	{
 	public:
-		Movable(int value) : mVal(value) {} // NOLINT(google-explicit-constructor)
+		Movable(const int value) : mVal(value) {} // NOLINT(google-explicit-constructor)
 		Movable(const Movable& other) = default;
 		Movable& operator=(const Movable& other) = default;
 		Movable(Movable&& other) noexcept : mVal(other.mVal) { other.mVal = 0; }
@@ -32,7 +32,7 @@ TEST(TemplateHelpers, CopyOrMoveContainer)
 {
 	using namespace TemplateHelperTestsInternal;
 
-	std::vector<Movable> lvalueOriginalVector({1, 2});
+	const std::vector<Movable> lvalueOriginalVector({1, 2});
 	std::vector<Movable> movedOriginalVector({3, 4});
 
 	std::vector<Movable> result;

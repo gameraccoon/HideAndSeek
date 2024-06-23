@@ -6,7 +6,6 @@
 #include <cmath>
 
 #include "Base/Debug/Assert.h"
-#include "Base/Types/BasicTypes.h"
 #include "Base/Types/UnsafeSerialization.h"
 
 namespace Serialization

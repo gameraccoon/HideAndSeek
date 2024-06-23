@@ -5,7 +5,6 @@
 #include <array>
 #include <algorithm>
 #include <numeric>
-#include <ranges>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -36,7 +35,7 @@ namespace ShapeOperations
 
 	struct CutDirection
 	{
-		CutDirection(SidePosition firstSidePosition, SidePosition secondSidePosition, PointPositionOnSide otherBorderPointPosition)
+		CutDirection(const SidePosition firstSidePosition, const SidePosition secondSidePosition, const PointPositionOnSide otherBorderPointPosition)
 			: firstSidePosition(firstSidePosition)
 			, secondSidePosition(secondSidePosition)
 			, otherBorderPointPosition(otherBorderPointPosition)
@@ -49,12 +48,12 @@ namespace ShapeOperations
 
 	struct BorderPoint
 	{
-		explicit BorderPoint(Vector2D pos)
+		explicit BorderPoint(const Vector2D pos)
 			: pos(pos)
 			, cutDirection(SidePosition::Unknown, SidePosition::Unknown, PointPositionOnSide::Unknown)
 		{}
 
-		explicit BorderPoint(Vector2D pos, CutDirection cutDirection)
+		explicit BorderPoint(const Vector2D pos, const CutDirection cutDirection)
 			: pos(pos)
 			, cutDirection(cutDirection)
 		{}
@@ -65,7 +64,7 @@ namespace ShapeOperations
 
 	struct BorderIntersection
 	{
-		BorderIntersection(size_t intersectionPoint, CutDirection cutDirection)
+		BorderIntersection(const size_t intersectionPoint, const CutDirection cutDirection)
 			: intersectionPoint(intersectionPoint)
 			, cutDirection(cutDirection)
 		{}
@@ -76,11 +75,11 @@ namespace ShapeOperations
 
 	size_t addIntersectionPoint(Vector2DKey<> intersectionPoint, std::unordered_set<Vector2DKey<>>& intersectionPointsSet, std::vector<Vector2DKey<>>& intersectionPoints)
 	{
-		auto insertionResult = intersectionPointsSet.emplace(intersectionPoint);
+		const auto insertionResult = intersectionPointsSet.emplace(intersectionPoint);
 
 		if (!insertionResult.second)
 		{
-			auto it = std::find(intersectionPoints.begin(), intersectionPoints.end(), intersectionPoint);
+			const auto it = std::ranges::find(intersectionPoints, intersectionPoint);
 			if (it != intersectionPoints.end())
 			{
 				return std::distance(intersectionPoints.begin(), it);
@@ -98,7 +97,7 @@ namespace ShapeOperations
 		}
 	}
 
-	static bool FindBordersRotationAroundPoint(SimpleBorder border1, SimpleBorder border2, Vector2D intersectionPoint)
+	static bool FindBordersRotationAroundPoint(const SimpleBorder border1, const SimpleBorder border2, const Vector2D intersectionPoint)
 	{
 		bool isCheckInverted = false;
 
@@ -124,12 +123,12 @@ namespace ShapeOperations
 			secondPoint = border2.b;
 		}
 
-		float signedArea = Collide::SignedArea(firstPoint, secondPoint, intersectionPoint);
+		const float signedArea = Collide::SignedArea(firstPoint, secondPoint, intersectionPoint);
 
 		return isCheckInverted ? (signedArea < 0) : (signedArea > 0);
 	}
 
-	static Vector2D ChangePointBasis(const std::array<float, 4>& matrix, Vector2D point)
+	static Vector2D ChangePointBasis(const std::array<float, 4>& matrix, const Vector2D point)
 	{
 		return Vector2D(
 			point.x * matrix[0] + point.y * matrix[1],
@@ -142,7 +141,7 @@ namespace ShapeOperations
 		return SimpleBorder(ChangePointBasis(baisisTransformMatrix, border.a), ChangePointBasis(baisisTransformMatrix, border.b));
 	}
 
-	static std::array<float, 4> InverseMatrix(std::array<float, 4> matrix)
+	static std::array<float, 4> InverseMatrix(const std::array<float, 4> matrix)
 	{
 		const float determinant = matrix[0]*matrix[3] - matrix[1]*matrix[2];
 		Assert(determinant != 0.0f, "Determinant should never be equal to zero");
@@ -151,12 +150,12 @@ namespace ShapeOperations
 		return { matrix[3] * inverseDeterminant, -matrix[1] * inverseDeterminant, -matrix[2] * inverseDeterminant, matrix[0] * inverseDeterminant };
 	}
 
-	static bool IsInside(float value, float a, float b)
+	static bool IsInside(const float value, const float a, const float b)
 	{
 		return std::min(a, b) < value && value <= std::max(a, b);
 	}
 
-	static PointPositionOnSide GetPointPositionOnSide(Vector2D start, Vector2D end, Vector2D point, bool shouldInverse)
+	static PointPositionOnSide GetPointPositionOnSide(const Vector2D start, const Vector2D end, const Vector2D point, const bool shouldInverse)
 	{
 		// ToDo: add a comment about the meaning of shouldInverse
 		if (point == start)
@@ -182,11 +181,11 @@ namespace ShapeOperations
 			std::vector<BorderIntersection>& borderBIntersections)
 	{
 		// project borderB into coordinate system based on a borderA
-		Vector2D basisX = (borderA.b - borderA.a).unit();
-		Vector2D basisY = -basisX.normal();
-		std::array<float, 4> basisTransformMatrix = InverseMatrix({basisX.x, basisY.x, basisX.y, basisY.y});
-		SimpleBorder transformedA = ChangeBorderBasis(basisTransformMatrix, borderA);
-		SimpleBorder transformedB = ChangeBorderBasis(basisTransformMatrix, borderB);
+		const Vector2D basisX = (borderA.b - borderA.a).unit();
+		const Vector2D basisY = -basisX.normal();
+		const std::array<float, 4> basisTransformMatrix = InverseMatrix({basisX.x, basisY.x, basisX.y, basisY.y});
+		const SimpleBorder transformedA = ChangeBorderBasis(basisTransformMatrix, borderA);
+		const SimpleBorder transformedB = ChangeBorderBasis(basisTransformMatrix, borderB);
 		Assert(transformedA.a.x < transformedA.b.x, "The line segment should have the same direction with the 0X origin");
 		// check borderB direction
 		const bool bHasSameDirection = transformedB.a.x < transformedB.b.x;
@@ -360,12 +359,12 @@ namespace ShapeOperations
 		);
 	}
 
-	static SidePosition GetSidePostionForNormalCut(bool isOutside)
+	static SidePosition GetSidePostionForNormalCut(const bool isOutside)
 	{
 		return isOutside ? SidePosition::Outside : SidePosition::Inside;
 	}
 
-	static bool IsSideOutside(SidePosition sidePos)
+	static bool IsSideOutside(const SidePosition sidePos)
 	{
 		return sidePos == SidePosition::Outside || sidePos == SidePosition::OutsideOverride;
 	}
@@ -386,7 +385,7 @@ namespace ShapeOperations
 		auto getKeyIndex = [&shapePoints, &shapePointsMap](const Vector2D pos) -> size_t
 		{
 			const VectorKey key(pos);
-			auto it = shapePointsMap.find(key);
+			const auto it = shapePointsMap.find(key);
 			if (it != shapePointsMap.end())
 			{
 				return it->second;
@@ -546,7 +545,7 @@ namespace ShapeOperations
 							break;
 						}
 
-						if (intersectionPointsSet.find(nextPoint) != intersectionPointsSet.end())
+						if (intersectionPointsSet.contains(nextPoint))
 						{
 							break;
 						}
@@ -558,7 +557,7 @@ namespace ShapeOperations
 		}
 
 		std::ranges::sort(bordersToRemove, std::greater());
-		bordersToRemove.erase(std::unique(bordersToRemove.begin(), bordersToRemove.end()), bordersToRemove.end());
+		bordersToRemove.erase(std::ranges::unique(bordersToRemove).begin(), bordersToRemove.end());
 
 		for (size_t index : bordersToRemove)
 		{
@@ -569,7 +568,7 @@ namespace ShapeOperations
 		// ToDo: probably need to correct the logic above to normally eliminate such borders
 		// instead of doing this NlogN overcomplicated stuff to fight a super-rare case
 		std::ranges::sort(fracturedBorders);
-		auto last = std::unique(fracturedBorders.begin(), fracturedBorders.end());
+		auto last = std::ranges::unique(fracturedBorders).begin();
 		fracturedBorders.erase(last, fracturedBorders.end());
 
 		std::vector<SimpleBorder> resultingBorders;
@@ -589,7 +588,7 @@ namespace ShapeOperations
 
 	struct BorderInfo
 	{
-		BorderInfo(Vector2D secondBorderPoint, size_t borderIndex, bool isFirstPoint)
+		BorderInfo(const Vector2D secondBorderPoint, const size_t borderIndex, const bool isFirstPoint)
 			: secondBorderPoint(secondBorderPoint)
 			, borderIndex(borderIndex)
 			, isFirstPoint(isFirstPoint)
@@ -710,7 +709,7 @@ namespace ShapeOperations
 
 		// remove extra borders that have left
 		std::ranges::sort(bordersToRemove, std::greater());
-		for (size_t index : bordersToRemove)
+		for (const size_t index : bordersToRemove)
 		{
 			inOutShape.erase(inOutShape.begin() + static_cast<int>(index));
 		}
@@ -768,13 +767,13 @@ namespace ShapeOperations
 		}
 	}
 
-	static void UpdateAABBsX(BoundingBox& box, float x)
+	static void UpdateAABBsX(BoundingBox& box, const float x)
 	{
 		if (x < box.minX) { box.minX = x; }
 		if (x > box.maxX) { box.maxX = x; }
 	}
 
-	static void UpdateAABBsY(BoundingBox& box, float y)
+	static void UpdateAABBsY(BoundingBox& box, const float y)
 	{
 		if (y < box.minY) { box.minY = y; }
 		if (y > box.maxY) { box.maxY = y; }
@@ -788,7 +787,7 @@ namespace ShapeOperations
 		UpdateAABBsY(aabb, border.b.y);
 	}
 
-	MergedGeometry::MergedGeometry(const std::vector<Border>& inBorders, Vector2D location)
+	MergedGeometry::MergedGeometry(const std::vector<Border>& inBorders, const Vector2D location)
 	{
 		borders.reserve(inBorders.size());
 		for (const Border& border : inBorders)
@@ -838,7 +837,7 @@ namespace ShapeOperations
 			for (size_t idx = startIdx; idx < endIdx; ++idx)
 			{
 				const SimpleBorder& border = geometry[idx];
-				size_t pointIdx = idx - startIdx;
+				const size_t pointIdx = idx - startIdx;
 				ttplPolygon[pointIdx].x = border.a.x;
 				ttplPolygon[pointIdx].y = border.a.y;
 				areaSum += (border.b.x - border.a.x) * (border.b.y + border.a.y);
@@ -881,7 +880,7 @@ namespace ShapeOperations
 
 		const float oneBorderFraction = 1.0f / static_cast<float>(inOutShape.size());
 		Vector2D middlePos = std::accumulate(inOutShape.begin(), inOutShape.end(), ZERO_VECTOR,
-			[oneBorderFraction](Vector2D accumulatedValue, const SimpleBorder& border) -> Vector2D
+			[oneBorderFraction](const Vector2D accumulatedValue, const SimpleBorder& border) -> Vector2D
 			{
 				return accumulatedValue + border.a * oneBorderFraction;
 			}
@@ -889,9 +888,8 @@ namespace ShapeOperations
 
 		std::vector<AngledBorder> sortedBorders(inOutShape.size());
 
-		std::transform(
-			inOutShape.begin(),
-			inOutShape.end(),
+		std::ranges::transform(
+			inOutShape,
 			sortedBorders.begin(),
 			[middlePos](const SimpleBorder& border)
 			{
@@ -910,7 +908,7 @@ namespace ShapeOperations
 
 		std::ranges::sort(sortedBorders, lessPointAngle);
 
-		auto moveSortedBorders = [](std::vector<SimpleBorder>& inOutResult, std::vector<AngledBorder>& inOutSource, size_t sourceIndex)
+		auto moveSortedBorders = [](std::vector<SimpleBorder>& inOutResult, std::vector<AngledBorder>& inOutSource, const size_t sourceIndex)
 		{
 			inOutResult.push_back(inOutSource[sourceIndex].coords);
 			inOutSource.erase(inOutSource.begin() + static_cast<ptrdiff_t>(sourceIndex));
@@ -950,13 +948,13 @@ namespace ShapeOperations
 		return shapeStartIndexes;
 	}
 
-	void ExtendGeometry(Shape& outResultingShape, const std::vector<Vector2D>& geometry, float radius)
+	void ExtendGeometry(Shape& outResultingShape, const std::vector<Vector2D>& geometry, const float radius)
 	{
 		outResultingShape.clear();
 
 		std::vector<Vector2D> points(geometry.size());
 
-		auto getNeighboringPoints = [size = points.size()](size_t i) -> std::pair<size_t, size_t>
+		auto getNeighboringPoints = [size = points.size()](const size_t i) -> std::pair<size_t, size_t>
 		{
 			return { (i > 0) ? i - 1 : size - 1, (i < size - 1) ? i + 1 : 0 };
 		};

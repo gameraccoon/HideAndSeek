@@ -4,7 +4,7 @@
 
 namespace ImguiPropertyFiltration
 {
-	class FloatGreaterPropertyFilter : public AbstractPropertyFilter
+	class FloatGreaterPropertyFilter final : public AbstractPropertyFilter
 	{
 	public:
 		using AbstractPropertyFilter::AbstractPropertyFilter;
@@ -19,7 +19,7 @@ namespace ImguiPropertyFiltration
 		float mMinValue = 0.0f;
 	};
 
-	class FloatLessPropertyFilter : public AbstractPropertyFilter
+	class FloatLessPropertyFilter final : public AbstractPropertyFilter
 	{
 	public:
 		using AbstractPropertyFilter::AbstractPropertyFilter;

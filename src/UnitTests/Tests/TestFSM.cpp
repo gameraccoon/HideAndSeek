@@ -50,7 +50,7 @@ TEST(FSM, BasicStateAndLink)
 	using BlackBoardKeyType = BlackboardTestValues;
 	using TestFSM = FSM::StateMachine<StateIdType, BlackBoardKeyType>;
 
-	FSM::Blackboard<BlackBoardKeyType> blackboard;
+	const FSM::Blackboard<BlackBoardKeyType> blackboard;
 	TestFSM fsm;
 	StateIdType currentState = TestStates::StateOne;
 

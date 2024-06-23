@@ -8,25 +8,25 @@ class WorldHolder;
 class SpatialWorldData;
 struct Vector2D;
 
-class TestUnitsCountControlSystem : public RaccoonEcs::System
+class TestUnitsCountControlSystem final : public RaccoonEcs::System
 {
 public:
-	TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept;
+	explicit TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 
 private:
-	void SpawnUnit(EntityManager& entityManager, const Vector2D& pos);
-	void SpawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData);
-	void SpawnUnits(SpatialWorldData& spatialData, int count, const Vector2D& pos);
+	static void SpawnUnit(EntityManager& entityManager, const Vector2D& pos);
+	static void SpawnJitteredUnit(const Vector2D& pos, const Vector2D& centerShifted, SpatialWorldData& spatialData);
+	static void SpawnUnits(SpatialWorldData& spatialData, int count, const Vector2D& pos);
 
 private:
 	WorldHolder& mWorldHolder;
 	int mTicksPassed = 0;
 
-	static inline const int jitterRand = 500;
-	static inline const float jitterMax = 30.0f;
-	static inline const float halfJitterMax = jitterMax / 2.0f;
-	static inline const float jitterDivider = jitterRand / jitterMax;
-	static inline const float distance = 50.0f;
+	static constexpr int jitterRand = 500;
+	static constexpr float jitterMax = 30.0f;
+	static constexpr float halfJitterMax = jitterMax / 2.0f;
+	static constexpr float jitterDivider = jitterRand / jitterMax;
+	static constexpr float distance = 50.0f;
 };

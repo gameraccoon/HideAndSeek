@@ -12,7 +12,7 @@ namespace HAL
 {
 	namespace Internal
 	{
-		Window::Window(int width, int height)
+		Window::Window(const int width, const int height)
 			: mSDLWindow(SDL_CreateWindow("Game"
 				, SDL_WINDOWPOS_UNDEFINED
 				, SDL_WINDOWPOS_UNDEFINED

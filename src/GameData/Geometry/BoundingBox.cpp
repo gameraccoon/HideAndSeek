@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-BoundingBox BoundingBox::operator+(Vector2D shift) const noexcept
+BoundingBox BoundingBox::operator+(const Vector2D shift) const noexcept
 {
 	return BoundingBox(minX + shift.x, minY + shift.y, maxX + shift.x, maxY + shift.y);
 }

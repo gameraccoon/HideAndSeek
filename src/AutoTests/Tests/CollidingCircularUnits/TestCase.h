@@ -1,18 +1,10 @@
 #pragma once
 
-#include <raccoon-ecs/component_factory.h>
-#include <raccoon-ecs/utils/systems_manager.h>
-
-#include "GameData/World.h"
-#include "GameData/GameData.h"
-
 #include "Utils/Application/ArgumentsParser.h"
-
-#include "GameLogic/SharedManagers/WorldHolder.h"
 
 #include "AutoTests/BaseTestCase.h"
 
-class CollidingCircularUnitsTestCase : public BaseTestCase
+class CollidingCircularUnitsTestCase final : public BaseTestCase
 {
 public:
 	using BaseTestCase::BaseTestCase;

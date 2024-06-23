@@ -2,7 +2,6 @@
 
 #include "GameLogic/Systems/ControlSystem.h"
 
-#include <SDL_keycode.h>
 #include <SDL_mouse.h>
 
 #include "GameData/World.h"
@@ -32,7 +31,7 @@ void ControlSystem::update()
 		return;
 	}
 
-	GameplayInputComponent* gameplayInput = world.getWorldComponents().getOrAddComponent<GameplayInputComponent>();
+	const GameplayInputComponent* gameplayInput = world.getWorldComponents().getOrAddComponent<GameplayInputComponent>();
 	const GameplayInput::FrameState& inputState = gameplayInput->getCurrentFrameState();
 
 	const bool isSprintPressed = inputState.isKeyActive(GameplayInput::InputKey::Sprint);

@@ -2,12 +2,10 @@
 
 #include "Utils/Geometry/Collide.h"
 
-#include <stdlib.h>
 #include <cmath>
 #include <limits>
 
 #include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
 
 #include "Base/Math/Float.h"
 
@@ -27,7 +25,7 @@ namespace Collide
 		// circle vs circle
 		if (hull1.type == HullType::Circular && hull2.type == HullType::Circular)
 		{
-			float dist = (center2 - center1).qSize() - (hull1.getQRadius() + hull2.getQRadius() + 2.0f * hull1.getRadius() * hull2.getRadius());
+			const float dist = (center2 - center1).qSize() - (hull1.getQRadius() + hull2.getQRadius() + 2.0f * hull1.getRadius() * hull2.getRadius());
 			if (Math::IsLessWithEpsilon(dist, 0.0f))
 			{
 				outResist = (center2 - center1) - (center2 - center1).unit() * (hull1.getRadius() + hull2.getRadius());
@@ -69,9 +67,9 @@ namespace Collide
 				{
 					ResistDir resistDir = ResistDir::Normal;
 
-					Vector2D borderB = *rCenter + border.getB();
-					float distA = (*cCenter - borderA).qSize();
-					float distB = (*cCenter - borderB).qSize();
+					const Vector2D borderB = *rCenter + border.getB();
+					const float distA = (*cCenter - borderA).qSize();
+					const float distB = (*cCenter - borderB).qSize();
 
 					// find nearest point
 					if (distA < distB)
@@ -129,13 +127,13 @@ namespace Collide
 				break;
 			case ResistDir::PointA:
 			{
-				Vector2D diffA = (*cCenter - *rCenter - nearestBorder->getA());
+				const Vector2D diffA = (*cCenter - *rCenter - nearestBorder->getA());
 				resist = diffA - diffA.unit() * cHull->getRadius();
 			}
 				break;
 			case ResistDir::PointB:
 			{
-				Vector2D diffB = (*cCenter - *rCenter - nearestBorder->getB());
+				const Vector2D diffB = (*cCenter - *rCenter - nearestBorder->getB());
 				resist = diffB - diffB.unit() * cHull->getRadius();
 				break;
 			}
@@ -145,11 +143,11 @@ namespace Collide
 
 			if (cHull == &hull1)
 			{
-				outResist=-resist;
+				outResist = -resist;
 			}
 			else
 			{
-				outResist=resist;
+				outResist = resist;
 			}
 			return true;
 		}
@@ -181,7 +179,7 @@ namespace Collide
 
 		if (geometry.type == HullType::Circular)
 		{
-			float radius = geometry.getRadius();
+			const float radius = geometry.getRadius();
 			collision->setBoundingBox(BoundingBox(Vector2D(-radius, -radius), Vector2D(radius, radius)));
 		}
 		else
@@ -191,7 +189,7 @@ namespace Collide
 			float minY = 1000000;
 			float maxY = -1000000;
 
-			for (auto point : geometry.points)
+			for (const auto point : geometry.points)
 			{
 				if (point.x < minX)
 				{
@@ -261,8 +259,8 @@ namespace Collide
 
 	bool AreLinesParallel(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2)
 	{
-		Vector2D diffA = a2 - a1;
-		Vector2D diffB = b2 - b1;
+		const Vector2D diffA = a2 - a1;
+		const Vector2D diffB = b2 - b1;
 		if (diffA.y == 0 || diffB.y == 0)
 		{
 			if (diffA.x == 0 || diffB.x == 0)
@@ -280,9 +278,9 @@ namespace Collide
 	bool IsLineIntersectAABB(const BoundingBox& box, const Vector2D& start, const Vector2D& finish)
 	{
 		// get Cohen's code for start point
-		int codeA = GetCohenCode(box, start);
+		const int codeA = GetCohenCode(box, start);
 		// get Cohen's code for end point
-		int codeB = GetCohenCode(box, finish);
+		const int codeB = GetCohenCode(box, finish);
 
 		// if the points on the same side of BB
 		if ((codeA & codeB) != 0)
@@ -302,15 +300,15 @@ namespace Collide
 			return true;
 		}
 
-		float l = box.minX;
-		float t = box.minY;
-		float r = box.maxX;
-		float b = box.maxY;
+		const float l = box.minX;
+		const float t = box.minY;
+		const float r = box.maxX;
+		const float b = box.maxY;
 
-		float x1 = start.x;
-		float y1 = start.y;
-		float x2 = finish.x;
-		float y2 = finish.y;
+		const float x1 = start.x;
+		const float y1 = start.y;
+		const float x2 = finish.x;
+		const float y2 = finish.y;
 
 		// ToDo: optimize it for axis-aligned borders
 		if (AreLinesIntersect(Vector2D(l, t), Vector2D(l, b), Vector2D(x1, y1), Vector2D(x2, y2))
@@ -336,20 +334,20 @@ namespace Collide
 
 	Vector2D GetPointIntersect2Lines(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2)
 	{
-		float da1 = a1.y - a2.y;
-		float db1 = a2.x - a1.x;
-		float dc1 = -da1 * a1.x - db1 * a1.y;
-		float da2 = b1.y - b2.y;
-		float db2 = b2.x - b1.x;
-		float dc2 = -da2 * b1.x - db2 * b1.y;
+		const float da1 = a1.y - a2.y;
+		const float db1 = a2.x - a1.x;
+		const float dc1 = -da1 * a1.x - db1 * a1.y;
+		const float da2 = b1.y - b2.y;
+		const float db2 = b2.x - b1.x;
+		const float dc2 = -da2 * b1.x - db2 * b1.y;
 
-		float zn = Det(da1, db1, da2, db2);
+		const float zn = Det(da1, db1, da2, db2);
 
 		// if lines are not parallel
 		if (zn < -EPS || zn > EPS)
 		{
-			float x = -Det(dc1, db1, dc2, db2) / zn;
-			float y = -Det(da1, dc1, da2, dc2) / zn;
+			const float x = -Det(dc1, db1, dc2, db2) / zn;
+			const float y = -Det(da1, dc1, da2, dc2) / zn;
 
 			return Vector2D(x, y);
 		}
@@ -358,7 +356,7 @@ namespace Collide
 		return ZERO_VECTOR;
 	}
 
-	float DistanceToLineSegmentSq(Vector2D lineA, Vector2D lineB, Vector2D point)
+	float DistanceToLineSegmentSq(const Vector2D lineA, const Vector2D lineB, const Vector2D point)
 	{
 		const float segmentLengthSq = (lineB - lineA).qSize();
 		if (segmentLengthSq == 0.0f) return (point - lineA).qSize();
@@ -367,7 +365,7 @@ namespace Collide
 		return (point - projection).qSize();
 	}
 
-	float FindDistanceToConvexHullSq(const std::vector<Vector2D>& hull, Vector2D point)
+	float FindDistanceToConvexHullSq(const std::vector<Vector2D>& hull, const Vector2D point)
 	{
 		float minDist = std::numeric_limits<float>::max();
 

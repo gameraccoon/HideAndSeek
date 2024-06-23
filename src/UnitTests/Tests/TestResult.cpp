@@ -98,7 +98,7 @@ TEST(Result, ResultWithNonCopyableValue_ConsumeValue_ValueIsExact)
 	Result<std::unique_ptr<int>, std::string> result = Result<std::unique_ptr<int>, std::string>::Ok(std::move(value));
 	ASSERT_EQ(nullptr, value);
 
-	std::unique_ptr<int> newValue = result.consumeValue();
+	const std::unique_ptr<int> newValue = result.consumeValue();
 	ASSERT_EQ(nullptr, result.getValue());
 	EXPECT_EQ(42, *newValue);
 }

@@ -7,10 +7,10 @@ class WorldHolder;
 /**
  * System that calculates AI
  */
-class AiSystem : public RaccoonEcs::System
+class AiSystem final : public RaccoonEcs::System
 {
 public:
-	AiSystem(WorldHolder& worldHolder) noexcept;
+	explicit AiSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 

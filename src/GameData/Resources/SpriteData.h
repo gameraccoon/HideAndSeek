@@ -6,7 +6,7 @@
 struct SpriteData
 {
 	SpriteData() = default;
-	SpriteData(SpriteParams params, ResourceHandle spriteHandle)
+	SpriteData(const SpriteParams params, const ResourceHandle spriteHandle)
 		: params(params)
 		, spriteHandle(spriteHandle)
 	{}

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include <nlohmann/json_fwd.hpp>
 
 struct AnimationClipParams

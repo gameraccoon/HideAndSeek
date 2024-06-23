@@ -1,7 +1,5 @@
 #pragma once
 
-#include <unordered_map>
-
 #include <raccoon-ecs/utils/system.h>
 
 class WorldHolder;
@@ -9,10 +7,10 @@ class WorldHolder;
 /**
  * System that process characters and objects movement
  */
-class MovementSystem : public RaccoonEcs::System
+class MovementSystem final : public RaccoonEcs::System
 {
 public:
-	MovementSystem(WorldHolder& worldHolder) noexcept;
+	explicit MovementSystem(WorldHolder& worldHolder) noexcept;
 
 	void update() override;
 

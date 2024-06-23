@@ -7,11 +7,11 @@
 #include "GameData/Resources/Resource.h"
 
 struct _Mix_Music;
-typedef struct _Mix_Music Mix_Music;
+typedef _Mix_Music Mix_Music;
 
 namespace Audio
 {
-	class Music : public Resource
+	class Music final : public Resource
 	{
 	public:
 		Music() = default;

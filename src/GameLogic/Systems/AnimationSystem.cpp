@@ -32,8 +32,8 @@ void AnimationSystem::update()
 	const auto [stateMachines] = gameData.getGameComponents().getComponents<const StateMachineComponent>();
 
 	const auto [worldCachedData] = world.getWorldComponents().getComponents<const WorldCachedDataComponent>();
-	Vector2D workingRect = worldCachedData->getScreenSize();
-	Vector2D cameraLocation = worldCachedData->getCameraPos();
+	const Vector2D workingRect = worldCachedData->getScreenSize();
+	const Vector2D cameraLocation = worldCachedData->getCameraPos();
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getCellManagersAround(cameraLocation, workingRect);
 

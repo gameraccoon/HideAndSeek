@@ -2,14 +2,9 @@
 
 #include "GameLogic/Game/HapGame.h"
 
-#include "Base/Types/TemplateHelpers.h"
-
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 
-#include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
-#include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
-#include "GameData/Components/StateMachineComponent.generated.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "HAL/Base/Engine.h"

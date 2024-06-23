@@ -22,14 +22,14 @@ public:
 	SimpleBitset& operator=(SimpleBitset&&) = default;
 	~SimpleBitset() = default;
 
-	size_t getBitCount() const noexcept { return BitCount; }
+	static size_t getBitCount()  noexcept { return BitCount; }
 
-	void set(size_t index, bool isSet) noexcept
+	void set(const size_t index, const bool isSet) noexcept
 	{
 		setInner(index, isSet);
 	}
 
-	bool get(size_t index) const noexcept
+	bool get(const size_t index) const noexcept
 	{
 		return getInner(index);
 	}
@@ -66,7 +66,7 @@ public:
 		}
 	}
 
-	size_t getByteCount() const noexcept { return ByteCount; }
+	static size_t getByteCount()  noexcept { return ByteCount; }
 	const std::byte* getRawData() const noexcept { return mBitset; }
 
 	void setRawData(const std::byte* data) noexcept
@@ -78,7 +78,7 @@ public:
 	}
 
 private:
-	void setInner(size_t index, bool isSet)
+	void setInner(const size_t index, const bool isSet)
 	{
 		if (index >= BitCount)
 		{
@@ -97,7 +97,7 @@ private:
 		}
 	}
 
-	bool getInner(size_t index) const noexcept
+	bool getInner(const size_t index) const noexcept
 	{
 		if (index >= BitCount)
 		{

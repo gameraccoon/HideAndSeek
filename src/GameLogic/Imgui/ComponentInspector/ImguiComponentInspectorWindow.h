@@ -15,14 +15,14 @@ class ImguiComponentInspectorWindow
 public:
 	ImguiComponentInspectorWindow();
 
-	void update(ImguiDebugData& debugData);
+	void update(const ImguiDebugData& debugData);
 
 	bool isVisible = false;
 
 private:
-	void applyFilters(ImguiDebugData& debugData);
+	void applyFilters(const ImguiDebugData& debugData);
 
-	void showEntityId();
+	void showEntityId() const;
 	void showFilteredEntities();
 	void showComponentsInspector();
 

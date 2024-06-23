@@ -14,10 +14,10 @@ namespace HAL
 /**
  * System that processes debug input
  */
-class DebugInputSystem : public RaccoonEcs::System
+class DebugInputSystem final : public RaccoonEcs::System
 {
 public:
-	DebugInputSystem(
+	explicit DebugInputSystem(
 		WorldHolder& worldHolder,
 		const HAL::InputControllersData& inputData,
 		bool& shouldPauseGame
@@ -26,7 +26,7 @@ public:
 	void update() override;
 
 private:
-	void processDebugInput();
+	void processDebugInput() const;
 
 private:
 	WorldHolder& mWorldHolder;

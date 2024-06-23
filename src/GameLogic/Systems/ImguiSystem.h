@@ -17,12 +17,13 @@ struct ImguiDebugData;
 /**
  * System that handles dear imgui debug tool
  */
-class ImguiSystem : public RaccoonEcs::System
+class ImguiSystem final : public RaccoonEcs::System
 {
 public:
-	ImguiSystem(
+	explicit ImguiSystem(
 		ImguiDebugData& debugData,
-		HAL::Engine& engine) noexcept;
+		HAL::Engine& engine
+	) noexcept;
 
 	void update() override;
 	void init() override;

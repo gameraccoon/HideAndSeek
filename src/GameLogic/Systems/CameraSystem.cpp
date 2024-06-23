@@ -47,11 +47,11 @@ void CameraSystem::update()
 				return;
 			}
 
-			GameplayInputComponent* gameplayInput = world.getWorldComponents().getOrAddComponent<GameplayInputComponent>();
+			const GameplayInputComponent* gameplayInput = world.getWorldComponents().getOrAddComponent<GameplayInputComponent>();
 			const GameplayInput::FrameState& inputState = gameplayInput->getCurrentFrameState();
 			const Vector2D aimDirection{inputState.getAxisValue(GameplayInput::InputAxis::AimHorizontal), inputState.getAxisValue(GameplayInput::InputAxis::AimVertical)};
 
-			const float cameraMobilityRate = 100.0f;
+			constexpr float cameraMobilityRate = 100.0f;
 
 			auto [controledEntityTransform] = controlledEntity->first.getComponents<TransformComponent>();
 

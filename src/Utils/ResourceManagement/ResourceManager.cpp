@@ -43,7 +43,7 @@ void ResourceManager::unlockResource(ResourceHandle handle)
 {
 	std::scoped_lock l(mDataMutex);
 	DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
-	auto locksCntIt = mStorage.resourceLocksCount.find(handle);
+	const auto locksCntIt = mStorage.resourceLocksCount.find(handle);
 	if (locksCntIt == mStorage.resourceLocksCount.end()) [[unlikely]]
 	{
 		ReportError("Unlocking non-locked resource");
@@ -58,7 +58,7 @@ void ResourceManager::unlockResource(ResourceHandle handle)
 	else
 	{
 		// release the resource
-		auto resourceIt = mStorage.resources.find(handle);
+		const auto resourceIt = mStorage.resources.find(handle);
 		if (resourceIt != mStorage.resources.end())
 		{
 			// unload and delete
@@ -114,7 +114,7 @@ void ResourceManager::loadAtlasesData(const RelativeResourcePath& listPath)
 	}
 }
 
-void ResourceManager::runThreadTasks(Resource::Thread currentThread)
+void ResourceManager::runThreadTasks(const Resource::Thread currentThread)
 {
 	SCOPED_PROFILER("ResourceManager::runThreadTasks");
 	std::unique_lock lock(mDataMutex);
@@ -180,7 +180,7 @@ void ResourceManager::runThreadTasks(Resource::Thread currentThread)
 		auto&& [handle, resourceData, steps] = **resourceIt;
 		while (!steps.empty())
 		{
-			Resource::DeinitStep& step = steps.front();
+			const Resource::DeinitStep& step = steps.front();
 			if (step.thread == currentThread || step.thread == Resource::Thread::Any)
 			{
 				resourceData = step.deinit(std::move(resourceData), *this, handle);
@@ -263,11 +263,11 @@ void ResourceManager::stopLoadingThread()
 	}
 }
 
-void ResourceManager::startResourceLoading(ResourceLoading::ResourceLoad::LoadingDataPtr&& loadingData, Resource::Thread currentThread)
+void ResourceManager::startResourceLoading(ResourceLoading::ResourceLoad::LoadingDataPtr&& loadingData, const Resource::Thread currentThread)
 {
 	SCOPED_PROFILER("ResourceManager::startResourceLoading");
 	std::unique_lock lock(mDataMutex);
-	auto deletionIt = std::ranges::find_if(
+	const auto deletionIt = std::ranges::find_if(
 		mLoading.resourcesWaitingDeinit,
 		[handle = loadingData->handle](const ResourceLoading::ResourceLoad::UnloadingDataPtr& resourceUnloadData)
 		{
@@ -388,7 +388,7 @@ void ResourceManager::loadOneAtlasData(const AbsoluteResourcePath& path)
 	}
 }
 
-void ResourceManager::setFirstResourceDependOnSecond(ResourceHandle dependentResource, ResourceHandle dependency, ResourceDependencyType::Type type)
+void ResourceManager::setFirstResourceDependOnSecond(ResourceHandle dependentResource, const ResourceHandle dependency, const ResourceDependencyType::Type type)
 {
 	DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 	if (type & ResourceDependencyType::Unload)
@@ -399,7 +399,7 @@ void ResourceManager::setFirstResourceDependOnSecond(ResourceHandle dependentRes
 	if (type & ResourceDependencyType::Load)
 	{
 		// add dependency only if the resource is not loaded yet
-		if (auto it = mStorage.resources.find(dependency); it == mStorage.resources.end() || it->second == nullptr)
+		if (const auto it = mStorage.resources.find(dependency); it == mStorage.resources.end() || it->second == nullptr)
 		{
 			mLoading.loadDependencies.setFirstDependOnSecond(dependentResource, dependency);
 			mLoading.resourcesWaitingDependencies.emplace(dependentResource, ResourceLoading::ResourceLoad::LoadingDataPtr{});
@@ -407,7 +407,7 @@ void ResourceManager::setFirstResourceDependOnSecond(ResourceHandle dependentRes
 	}
 }
 
-void ResourceManager::finalizeResourceLoading(ResourceHandle handle, Resource::Ptr&& resource)
+void ResourceManager::finalizeResourceLoading(const ResourceHandle handle, Resource::Ptr&& resource)
 {
 	DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 	SCOPED_PROFILER("ResourceManager::finalizeResourceLoading");

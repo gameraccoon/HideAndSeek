@@ -1,7 +1,5 @@
 #pragma once
 
-#include "HAL/Base/Engine.h"
-
 #include "Utils/Multithreading/ThreadPool.h"
 #include "Utils/ResourceManagement/ResourceManager.h"
 
@@ -25,10 +23,10 @@ public:
 	ResourceManager resourceManager;
 
 public:
-	ApplicationData(int threadsCount);
+	explicit ApplicationData(int threadsCount);
 
-	void writeProfilingData();
-	void threadSaveProfileData(size_t threadIndex);
+	static void writeProfilingData();
+	static void threadSaveProfileData(size_t threadIndex);
 	void shutdownThreads();
 
 private:

@@ -17,7 +17,7 @@ inline const char* FormatSprinfableArgument(std::string&& arg)
 	return arg.c_str();
 }
 
-inline const char* FormatSprinfableArgument(StringId arg)
+inline const char* FormatSprinfableArgument(const StringId arg)
 {
 	static_assert(std::is_same_v<std::invoke_result_t<decltype(&StringIdManager::getStringFromId), StringIdManager, StringId>, const std::string&>, "StringIdManager::getStringFromId should return const ref to std::string");
 	return StringIdManager::Instance().getStringFromId(arg).c_str();

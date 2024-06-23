@@ -28,14 +28,14 @@ static bool AreVisibilityPolygonsEqual(const std::vector<Vector2D>& a, const std
 
 	auto aCopy = a;
 
-	auto it = std::find_if(aCopy.begin(), aCopy.end(), [start = b.front()](Vector2D val){ return val.isNearlyEqualTo(start, allowedError); });
+	const auto it = std::ranges::find_if(aCopy, [start = b.front()](const Vector2D val){ return val.isNearlyEqualTo(start, allowedError); });
 	if (it == aCopy.end())
 	{
 		return false;
 	}
 
 	std::rotate(aCopy.begin(), it, aCopy.end());
-	return aCopy.size() == b.size() && std::equal(aCopy.begin(), aCopy.end(), b.begin(), [](Vector2D a, Vector2D b){ return a.isNearlyEqualTo(b, allowedError); });
+	return aCopy.size() == b.size() && std::equal(aCopy.begin(), aCopy.end(), b.begin(), [](const Vector2D a, const Vector2D b){ return a.isNearlyEqualTo(b, allowedError); });
 }
 
 static void FillTestLightBlockingGeometry(LightBlockingGeometryComponent& component, const Hull& geometry, const Vector2D& location)
@@ -60,8 +60,8 @@ TEST(VisibilityPolygon, TestPlygonsEqualityTest)
 TEST(VisibilityPolygon, Empty)
 {
 	VisibilityPolygonCalculator calc;
-	std::vector<const LightBlockingGeometryComponent*> components;
-	Vector2D pos(-10.0f, 20.0f);
+	constexpr std::vector<const LightBlockingGeometryComponent*> components;
+	constexpr Vector2D pos(-10.0f, 20.0f);
 
 	std::vector<Vector2D> result;
 	calc.calculateVisibilityPolygon(result, components, pos, Vector2D(600.0f, 600.0f));
@@ -71,13 +71,13 @@ TEST(VisibilityPolygon, Empty)
 TEST(VisibilityPolygon, OneBorder)
 {
 	VisibilityPolygonCalculator calc;
-	Vector2D pos(-10.0f, -40.0f);
+	constexpr Vector2D pos(-10.0f, -40.0f);
 
 	Hull geometry;
 	geometry.type = HullType::Angular;
 	geometry.points = {{-60.0f, -50.0f}, {60.0f, -50.0f}, {60.0f, 50.0f}, {-60.0f, 50.0f}};
 	geometry.generateBorders();
-	Vector2D location(-10.0f, -210.0f);
+	constexpr Vector2D location(-10.0f, -210.0f);
 	std::vector<const LightBlockingGeometryComponent*> components;
 	LightBlockingGeometryComponent component;
 	FillTestLightBlockingGeometry(component, geometry, location);
@@ -91,13 +91,13 @@ TEST(VisibilityPolygon, OneBorder)
 TEST(VisibilityPolygon, OneBorderEqualAngles)
 {
 	VisibilityPolygonCalculator calc;
-	Vector2D pos(308.0f, -33.0f);
+	constexpr Vector2D pos(308.0f, -33.0f);
 
 	Hull geometry;
 	geometry.type = HullType::Angular;
 	geometry.points = {{60.0f, -60.0f}, {60.0f, 60.0f}, {-60.0f, 60.0f}, {-60.0f, -60.0f}};
 	geometry.generateBorders();
-	Vector2D location(260.0f, 39.0f);
+	constexpr Vector2D location(260.0f, 39.0f);
 	std::vector<const LightBlockingGeometryComponent*> components;
 	LightBlockingGeometryComponent component;
 	FillTestLightBlockingGeometry(component, geometry, location);
@@ -111,7 +111,7 @@ TEST(VisibilityPolygon, OneBorderEqualAngles)
 TEST(VisibilityPolygon, ApertureDirection1)
 {
 	VisibilityPolygonCalculator calc;
-	Vector2D pos(0.0f, 0.0f);
+	constexpr Vector2D pos(0.0f, 0.0f);
 
 	std::vector<const LightBlockingGeometryComponent*> components;
 	LightBlockingGeometryComponent component;
@@ -119,11 +119,11 @@ TEST(VisibilityPolygon, ApertureDirection1)
 		Hull geometry;
 		geometry.type = HullType::Angular;
 		geometry.points = {{-110.0f, -10.0f}, {110.0f, -10.0f}, {110.0f, 10.0f}, {-110.0f, 10.0f}};
-		Vector2D location(-90.0f, -190.0f);
+		constexpr Vector2D location(-90.0f, -190.0f);
 		// create 8 blocks that makes a figure like aperture
 		for (int i = 0; i < 8; ++i)
 		{
-			Rotator rotator(0.25f * static_cast<float>(i) * PI);
+			const Rotator rotator(0.25f * static_cast<float>(i) * PI);
 			auto rotatedGeometry = geometry;
 			Vector2D rotatedLocation = location.getRotated(rotator);
 			// rotate around zero point
@@ -163,7 +163,7 @@ TEST(VisibilityPolygon, ApertureDirection1)
 TEST(VisibilityPolygon, ApertureDirection2)
 {
 	VisibilityPolygonCalculator calc;
-	Vector2D pos(0.0f, 0.0f);
+	constexpr Vector2D pos(0.0f, 0.0f);
 
 	std::vector<const LightBlockingGeometryComponent*> components;
 	LightBlockingGeometryComponent component;
@@ -171,11 +171,11 @@ TEST(VisibilityPolygon, ApertureDirection2)
 		Hull geometry;
 		geometry.type = HullType::Angular;
 		geometry.points = {{-110.0f, -10.0f}, {110.0f, -10.0f}, {110.0f, 10.0f}, {-110.0f, 10.0f}};
-		Vector2D location(90.0f, -190.0f);
+		constexpr Vector2D location(90.0f, -190.0f);
 		// create 8 blocks that makes a figure like aperture
 		for (int i = 0; i < 8; ++i)
 		{
-			Rotator rotator(-0.25f * static_cast<float>(i) * PI);
+			const Rotator rotator(-0.25f * static_cast<float>(i) * PI);
 			auto rotatedGeometry = geometry;
 			Vector2D rotatedLocation = location.getRotated(rotator);
 			// rotate around zero point

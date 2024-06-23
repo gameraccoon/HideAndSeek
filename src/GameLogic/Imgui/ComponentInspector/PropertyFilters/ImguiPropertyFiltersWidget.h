@@ -25,13 +25,13 @@ namespace ImguiPropertyFiltration
 	public:
 		~ImguiPropertyFiltersWidget();
 
-		void update(ImguiDebugData& debugData);
+		void update(const ImguiDebugData& debugData);
 
-		void getFilteredEntities(ImguiDebugData& debugData, TupleVector<WorldCell*, Entity>& inOutEntities);
+		void getFilteredEntities(const ImguiDebugData& debugData, TupleVector<WorldCell*, Entity>& inOutEntities);
 
 	private:
 		[[nodiscard]] std::vector<StringId> getFilteredComponentTypes() const;
-		void init(ImguiDebugData& debugData);
+		void init(const ImguiDebugData& debugData);
 
 	private:
 		static constexpr int MinimalSearchLen = 2;

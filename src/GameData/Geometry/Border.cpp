@@ -5,20 +5,20 @@
 #include <nlohmann/json.hpp>
 
 
-Border::Border(Vector2D a, Vector2D b) noexcept
+Border::Border(const Vector2D a, const Vector2D b) noexcept
 	: mPointA(a)
 	, mPointB(b)
 	, mNormal((b - a).normal())
 {
 }
 
-void Border::setA(Vector2D a) noexcept
+void Border::setA(const Vector2D a) noexcept
 {
 	mPointA = a;
 	calculateNormal();
 }
 
-void Border::setB(Vector2D b) noexcept
+void Border::setB(const Vector2D b) noexcept
 {
 	mPointB = b;
 	calculateNormal();

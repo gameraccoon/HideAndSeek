@@ -14,7 +14,7 @@ using ::testing::TestPartResult;
 using ::testing::UnitTest;
 using ::testing::Environment;
 
-class SGTestingEnvironment : public Environment
+class SGTestingEnvironment final : public Environment
 {
 public:
 
@@ -22,7 +22,7 @@ public:
 	void TearDown() override;
 };
 
-class TestInfoLogger : public EmptyTestEventListener
+class TestInfoLogger final : public EmptyTestEventListener
 {
 	// Called before a test starts
 	void OnTestStart(const TestInfo& test_info) override;
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 	TestEventListeners& listeners = UnitTest::GetInstance()->listeners();
 	listeners.Append(HS_NEW TestInfoLogger());
 
-	int retVal = RUN_ALL_TESTS();
+	const int retVal = RUN_ALL_TESTS();
 
 	return retVal;
 }

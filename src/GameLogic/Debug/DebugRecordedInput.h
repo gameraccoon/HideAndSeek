@@ -15,7 +15,7 @@ namespace HAL
 class DebugRecordedInput
 {
 public:
-	DebugRecordedInput(int instanceIndex);
+	explicit DebugRecordedInput(int instanceIndex);
 
 	~DebugRecordedInput();
 
@@ -33,7 +33,7 @@ private:
 	};
 
 private:
-	void appendInputDataToFile(const HAL::InputControllersData& inputData);
+	void appendInputDataToFile(const HAL::InputControllersData& inputData) const;
 	static std::vector<HAL::InputControllersData> loadInputDataFromFile(const std::string& path);
 
 private:

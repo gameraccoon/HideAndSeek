@@ -34,7 +34,7 @@ set(SDL_STATIC ON CACHE BOOL "" FORCE)
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(SDL2IMAGE_INSTALL OFF CACHE BOOL "" FORCE)
 
-file (STRINGS "${GAME_BASE_DIR}/VersionInfo" EXECUTABLE_VERSION)
+file(STRINGS "${GAME_BASE_DIR}/VersionInfo" EXECUTABLE_VERSION)
 file(STRINGS "${GAME_BASE_DIR}/BuildNum" BUILD_NUMBER)
 project(${APP_NAME} VERSION ${EXECUTABLE_VERSION})
 
@@ -93,7 +93,7 @@ execute_process(
 )
 
 # requirements
-find_package(PythonInterp 3.5 REQUIRED)
+find_package (Python3 REQUIRED)
 
 include_directories(include)
 

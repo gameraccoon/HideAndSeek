@@ -11,7 +11,7 @@ public:
 
 public:
 	ResourceHandle() = default;
-	explicit ResourceHandle(IndexType index) : resourceIndex(index) {}
+	explicit ResourceHandle(const IndexType index) : resourceIndex(index) {}
 
 	std::strong_ordering operator<=>(const ResourceHandle& other) const = default;
 
@@ -21,15 +21,13 @@ public:
 	IndexType resourceIndex = InvalidResourceIndex;
 };
 
-namespace std
+template<>
+struct std::hash<ResourceHandle>
 {
-	template<> struct hash<ResourceHandle>
+	size_t operator()(const ResourceHandle resourceHandle) const noexcept
 	{
-		size_t operator()(ResourceHandle resourceHandle) const noexcept
-		{
-			return hash<ResourceHandle::IndexType>()(resourceHandle.resourceIndex);
-		}
-	};
-}
+		return hash<ResourceHandle::IndexType>()(resourceHandle.resourceIndex);
+	}
+};
 
 static_assert(std::is_trivially_copyable<ResourceHandle>(), "ResourceHandle should be trivially copyable");

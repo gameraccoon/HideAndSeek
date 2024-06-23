@@ -7,9 +7,7 @@
 
 #include "GameData/Components/GameplayInputComponent.generated.h"
 #include "GameData/Components/ImguiComponent.generated.h"
-#include "GameData/Components/RenderModeComponent.generated.h"
 #include "GameData/Components/TimeComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/GameData.h"
 #include "GameData/Input/InputBindings.h"
 #include "GameData/World.h"
@@ -73,7 +71,7 @@ static Input::InputBindings GetDebugInputBindings()
 	return result;
 }
 
-void InputSystem::processGameplayInput()
+void InputSystem::processGameplayInput() const
 {
 	SCOPED_PROFILER("InputSystem::processGameplayInput");
 

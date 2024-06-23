@@ -44,7 +44,7 @@ TestChecklist BaseTestCase::start(const ArgumentsParser& arguments, RenderAccess
 	return std::move(mTestChecklist);
 }
 
-void BaseTestCase::fixedTimeUpdate(float dt)
+void BaseTestCase::fixedTimeUpdate(const float dt)
 {
 	do
 	{

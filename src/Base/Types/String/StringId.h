@@ -32,7 +32,7 @@ public:
 	[[nodiscard]] constexpr std::strong_ordering operator<=>(const StringId& other) const noexcept = default;
 
 private:
-	constexpr explicit StringId(KeyType hash) noexcept
+	constexpr explicit StringId(const KeyType hash) noexcept
 		: mHash(hash)
 	{
 	}
@@ -78,19 +78,17 @@ private:
 #define STR_TO_ID(strLiteral) StringIdManager::StringToId(strLiteral)
 #define ID_TO_STR(id) StringIdManager::Instance().getStringFromId(id)
 
-namespace std
+template<>
+struct std::hash<StringId>
 {
-	template<> struct hash<StringId>
+	size_t operator()(const StringId& stringId) const noexcept
 	{
-		size_t operator()(const StringId& stringId) const noexcept
-		{
-			// it's already a unique hash
-			return static_cast<size_t>(stringId.mHash);
-		}
-	};
-}
+		// it's already a unique hash
+		return stringId.mHash;
+	}
+};
 
-inline std::string to_string(StringId stringId)
+inline std::string to_string(const StringId stringId)
 {
 	return ID_TO_STR(stringId);
 }

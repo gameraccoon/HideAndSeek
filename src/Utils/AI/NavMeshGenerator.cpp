@@ -8,27 +8,25 @@
 
 #include "polypartition.h"
 
-#include "Base/Types/TemplateAliases.h"
-
 #include "GameData/Geometry/BoundingBox.h"
 
 #include "Utils/Geometry/Collide.h"
 
 namespace NavMeshGenerator
 {
-	static IntVector2D IntVecFromTPPLPoint(TPPLPoint point)
+	static IntVector2D IntVecFromTPPLPoint(const TPPLPoint point)
 	{
 		return IntVector2D(static_cast<int>(std::round(point.x)), static_cast<int>(std::round(point.y)));
 	}
 
 #ifdef DEBUG_CHECKS
-	static Vector2D VecFromTPPLPoint(TPPLPoint point)
+	static Vector2D VecFromTPPLPoint(const TPPLPoint point)
 	{
 		return Vector2D(point.x, point.y);
 	}
 #endif // DEBUG_CHECKS
 
-	void GenerateNavMeshGeometry(NavMesh::Geometry& outGeometry, const std::vector<std::vector<Vector2D>>& pathBlockingGeometry, Vector2D start, Vector2D size)
+	void GenerateNavMeshGeometry(NavMesh::Geometry& outGeometry, const std::vector<std::vector<Vector2D>>& pathBlockingGeometry, const Vector2D start, const Vector2D size)
 	{
 		SCOPED_PROFILER("GenerateNavMeshGeometry");
 
@@ -38,8 +36,8 @@ namespace NavMeshGenerator
 		outGeometry.verticesPerPoly = 3;
 		outGeometry.isCalculated = false;
 
-		IntVector2D halfSize(static_cast<int>(size.x * 0.5f), static_cast<int>(size.y * 0.5f));
-		IntVector2D centerPos(static_cast<int>(start.x) + halfSize.x, static_cast<int>(start.y) + halfSize.y);
+		const IntVector2D halfSize(static_cast<int>(size.x * 0.5f), static_cast<int>(size.y * 0.5f));
+		const IntVector2D centerPos(static_cast<int>(start.x) + halfSize.x, static_cast<int>(start.y) + halfSize.y);
 
 		std::vector<TPPLPoly> polygons;
 		std::vector<TPPLPoly> resultPolygons;
@@ -101,7 +99,7 @@ namespace NavMeshGenerator
 		for (const TPPLPoly& polygon : resultPolygons)
 		{
 #ifdef DEBUG_CHECKS
-			bool newOrder = (Collide::SignedArea(VecFromTPPLPoint(polygon[0]), VecFromTPPLPoint(polygon[1]), VecFromTPPLPoint(polygon[2])) >= 0);
+			const bool newOrder = (Collide::SignedArea(VecFromTPPLPoint(polygon[0]), VecFromTPPLPoint(polygon[1]), VecFromTPPLPoint(polygon[2])) >= 0);
 			if (inited && newOrder != order)
 			{
 				LogError("winding order changed");
@@ -137,7 +135,7 @@ namespace NavMeshGenerator
 		}
 	};
 
-	static SortedBorderPair MakeSortedPair(size_t first, size_t second)
+	static SortedBorderPair MakeSortedPair(const size_t first, const size_t second)
 	{
 		return (first < second) ? SortedBorderPair{first, second, false} : SortedBorderPair{second, first, true};
 	}
@@ -151,7 +149,7 @@ namespace NavMeshGenerator
 		std::unordered_map<SortedBorderPair, std::vector<size_t>, BorderPairHash> polysByBorders;
 		for (size_t p = 0, pSize = geometry.polygonsCount; p < pSize; ++p)
 		{
-			size_t pShift = p * geometry.verticesPerPoly;
+			const size_t pShift = p * geometry.verticesPerPoly;
 			FOR_EACH_BORDER(geometry.verticesPerPoly,
 			{
 				size_t indexA = geometry.indexes[pShift + i];
@@ -188,7 +186,7 @@ namespace NavMeshGenerator
 #ifdef DEBUG_CHECKS
 		for (size_t p = 0; p < geometry.polygonsCount; ++p)
 		{
-			size_t pShift = p * geometry.verticesPerPoly;
+			const size_t pShift = p * geometry.verticesPerPoly;
 			for (const NavMesh::InnerLinks::LinkData& link : outLinks.links[p])
 			{
 				bool found = false;
@@ -209,7 +207,7 @@ namespace NavMeshGenerator
 		outLinks.isCalculated = true;
 	}
 
-	static void UpdateAABB(BoundingBox& aabb, Vector2D vertex)
+	static void UpdateAABB(BoundingBox& aabb, const Vector2D vertex)
 	{
 		if (vertex.x < aabb.minX)
 		{
@@ -229,7 +227,7 @@ namespace NavMeshGenerator
 		}
 	}
 
-	static BoundingBox GetAABB(const NavMesh::Geometry& geometry, size_t polygonIdx)
+	static BoundingBox GetAABB(const NavMesh::Geometry& geometry, const size_t polygonIdx)
 	{
 		BoundingBox Result
 		(
@@ -247,14 +245,14 @@ namespace NavMeshGenerator
 		return Result;
 	}
 
-	static bool DoesConvexPolygonIntersectCell(std::vector<Vector2D>& inOutPolygon, size_t polygonIdx, size_t cellX, size_t cellY, const NavMesh::Geometry& geometry, float cellSize)
+	static bool DoesConvexPolygonIntersectCell(std::vector<Vector2D>& inOutPolygon, const size_t polygonIdx, const size_t cellX, const size_t cellY, const NavMesh::Geometry& geometry, const float cellSize)
 	{
 		for (size_t i = 0; i < geometry.verticesPerPoly; ++i)
 		{
 			inOutPolygon[i] = geometry.vertices[geometry.indexes[polygonIdx * geometry.verticesPerPoly + i]];
 		}
 
-		BoundingBox aabb
+		const BoundingBox aabb
 		(
 			geometry.navMeshStart.x + static_cast<float>(cellX) * cellSize,
 			geometry.navMeshStart.y + static_cast<float>(cellY) * cellSize,
@@ -276,7 +274,7 @@ namespace NavMeshGenerator
 			}
 		}
 
-		size_t lastIndex = geometry.verticesPerPoly - 1;
+		const size_t lastIndex = geometry.verticesPerPoly - 1;
 
 		if (inOutPolygon[lastIndex].x >= aabb.minX && inOutPolygon[lastIndex].x <= aabb.maxX
 			&& inOutPolygon[lastIndex].y >= aabb.minY && inOutPolygon[lastIndex].y <= aabb.maxY)
@@ -292,18 +290,17 @@ namespace NavMeshGenerator
 		return false;
 	}
 
-	void BuildSpatialHash(NavMesh::SpatialHash& outSpatialHash, const NavMesh::Geometry& geometry, HashGenerationType generationType)
+	void BuildSpatialHash(NavMesh::SpatialHash& outSpatialHash, const NavMesh::Geometry& geometry, const HashGenerationType generationType)
 	{
 		SCOPED_PROFILER("BuildSpatialHash");
 		Assert(geometry.isCalculated, "Geometry should be calculated before calculating spatial hash");
 
-		Vector2D cellsCountFloat = Vector2D::HadamardProduct(geometry.navMeshSize, Vector2D(1.0f / outSpatialHash.cellSize, 1.0f / outSpatialHash.cellSize));
+		const Vector2D cellsCountFloat = Vector2D::HadamardProduct(geometry.navMeshSize, Vector2D(1.0f / outSpatialHash.cellSize, 1.0f / outSpatialHash.cellSize));
 		outSpatialHash.hashSize = IntVector2D(static_cast<int>(std::ceil(cellsCountFloat.x)), static_cast<int>(std::ceil(cellsCountFloat.y)));
 
 		outSpatialHash.polygonsHash.resize(outSpatialHash.hashSize.x * outSpatialHash.hashSize.y);
-		std::for_each(
-			outSpatialHash.polygonsHash.begin(),
-			outSpatialHash.polygonsHash.end(),
+		std::ranges::for_each(
+			outSpatialHash.polygonsHash,
 			[](std::vector<size_t>& vector){ vector.clear(); }
 		);
 
@@ -311,15 +308,15 @@ namespace NavMeshGenerator
 
 		for (size_t polygonIdx = 0; polygonIdx < geometry.polygonsCount; ++polygonIdx)
 		{
-			BoundingBox aabb = GetAABB(geometry, polygonIdx);
-			size_t leftCellIdx = static_cast<size_t>((aabb.minX - geometry.navMeshStart.x) / outSpatialHash.cellSize);
-			size_t topCellIdx = static_cast<size_t>((aabb.minY - geometry.navMeshStart.y) / outSpatialHash.cellSize);
-			size_t rightCellIdx = std::min(static_cast<size_t>(aabb.maxX - geometry.navMeshStart.x / outSpatialHash.cellSize), static_cast<size_t>(outSpatialHash.hashSize.x - 1));
-			size_t bottomCellIdx = std::min(static_cast<size_t>(aabb.maxY - geometry.navMeshStart.y / outSpatialHash.cellSize), static_cast<size_t>(outSpatialHash.hashSize.y - 1));
+			const BoundingBox aabb = GetAABB(geometry, polygonIdx);
+			const size_t leftCellIdx = static_cast<size_t>((aabb.minX - geometry.navMeshStart.x) / outSpatialHash.cellSize);
+			const size_t topCellIdx = static_cast<size_t>((aabb.minY - geometry.navMeshStart.y) / outSpatialHash.cellSize);
+			const size_t rightCellIdx = std::min(static_cast<size_t>(aabb.maxX - geometry.navMeshStart.x / outSpatialHash.cellSize), static_cast<size_t>(outSpatialHash.hashSize.x - 1));
+			const size_t bottomCellIdx = std::min(static_cast<size_t>(aabb.maxY - geometry.navMeshStart.y / outSpatialHash.cellSize), static_cast<size_t>(outSpatialHash.hashSize.y - 1));
 
 			for (size_t y = topCellIdx; y <= bottomCellIdx; ++y)
 			{
-				size_t yShift = y * outSpatialHash.hashSize.x;
+				const size_t yShift = y * outSpatialHash.hashSize.x;
 				for (size_t x = leftCellIdx; x <= rightCellIdx; ++x)
 				{
 					if (generationType == HashGenerationType::Fast

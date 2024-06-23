@@ -15,16 +15,14 @@ public:
 	explicit TextString(const std::string& val) : std::string(val) {}
 };
 
-namespace std
+template<>
+struct std::hash<TextString>
 {
-	template<> struct hash<TextString>
+	std::size_t operator()(TextString const& path) const noexcept
 	{
-		std::size_t operator()(TextString const& path) const noexcept
-		{
-			return std::hash<std::string>{}(static_cast<std::string>(path));
-		}
-	};
-}
+		return std::hash<std::string>{}(static_cast<std::string>(path));
+	}
+};
 
 void to_json(nlohmann::json& outJson, const TextString& text);
 void from_json(const nlohmann::json& json, TextString& text);

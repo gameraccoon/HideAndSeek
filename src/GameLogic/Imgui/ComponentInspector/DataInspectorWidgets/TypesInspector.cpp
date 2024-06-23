@@ -6,8 +6,6 @@
 
 #include "GameLogic/Imgui/ComponentInspector/DataInspectorWidgets/TypesInspector.h"
 
-#include <cstring>
-
 namespace ImguiDataInspection
 {
 	template<>
