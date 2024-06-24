@@ -84,7 +84,7 @@ External libraries can be found in `external` folder.
 - git with git-lfs
 - CMake (see minimal supported version in [CMakeLists.txt](https://github.com/gameraccoon/hide-and-seek/blob/develop/CMakeLists.txt#L1=))
 - python3
-- gcc 13 (or higher), or clang-16 (or higher), or latest Visual Studio 2022 (or newer)
+- gcc 13 (or higher), or clang-17 (or higher), or latest Visual Studio 2022 (or newer)
 - for Linux you need to install sound libraries using your packet manager  
 e.g. for apt: `sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev`
 

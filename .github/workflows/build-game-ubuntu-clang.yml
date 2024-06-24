@@ -46,7 +46,7 @@ jobs:
     - name: Install LLVM and Clang
       uses: KyleMayes/install-llvm-action@v1
       with:
-        version: "16.0"
+        version: "17.0"
 
     - name: Install ninja-build tool
       uses: seanmiddleditch/gha-setup-ninja@v4
@@ -55,8 +55,8 @@ jobs:
       shell: bash
       working-directory: ${{github.workspace}}/build/game
       env:
-        CC: clang-16
-        CXX: clang++-16
+        CC: clang-17
+        CXX: clang++-17
       run: cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE --preset linux-ninja-clang
 
     - name: Build game
