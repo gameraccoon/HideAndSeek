@@ -60,8 +60,8 @@ TEST(VisibilityPolygon, TestPlygonsEqualityTest)
 TEST(VisibilityPolygon, Empty)
 {
 	VisibilityPolygonCalculator calc;
-	constexpr std::vector<const LightBlockingGeometryComponent*> components;
-	constexpr Vector2D pos(-10.0f, 20.0f);
+	const std::vector<const LightBlockingGeometryComponent*> components;
+	const Vector2D pos(-10.0f, 20.0f);
 
 	std::vector<Vector2D> result;
 	calc.calculateVisibilityPolygon(result, components, pos, Vector2D(600.0f, 600.0f));
