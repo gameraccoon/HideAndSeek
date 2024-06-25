@@ -78,6 +78,8 @@ bool ValidateChecklist(const TestChecklist& checklist)
 
 int main(const int argc, char** argv)
 {
+	INITIALIZE_STRING_IDS();
+
 	const ArgumentsParser arguments(argc, argv);
 
 	unsigned int seed = std::random_device()();

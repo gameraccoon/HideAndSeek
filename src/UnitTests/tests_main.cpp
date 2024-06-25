@@ -65,6 +65,8 @@ void TestInfoLogger::OnTestEnd(const TestInfo& /*test_info*/)
 
 int main(int argc, char* argv[])
 {
+	INITIALIZE_STRING_IDS();
+
 	InitGoogleTest(&argc, argv);
 
 	AddGlobalTestEnvironment(HS_NEW SGTestingEnvironment());
