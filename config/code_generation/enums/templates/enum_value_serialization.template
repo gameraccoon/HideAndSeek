@@ -1,1 +1,1 @@
-{{{enum_name}::{enum_value}, STR_TO_ID("{enum_value}")}}{delim_comma}{delim_endl}{delim_tab}
+{{{enum_name}::{enum_value}, STR_TO_ID("{enum_value}")}},{delim_endl}{delim_tab}
