@@ -1,11 +1,11 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameMain/ConsoleCommands.h"
 
 #include <algorithm>
 #include <iostream>
 
-#include "Utils/Application/ArgumentsParser.h"
+#include "GameUtils/Application/ArgumentsParser.h"
 
 namespace ConsoleCommands
 {

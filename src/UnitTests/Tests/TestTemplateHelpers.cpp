@@ -1,10 +1,10 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
 #include <vector>
 
-#include "Base/Types/TemplateHelpers.h"
+#include "EngineCommon/Types/TemplateHelpers.h"
 
 namespace TemplateHelperTestsInternal
 {

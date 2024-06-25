@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #ifndef DISABLE_SDL
 
@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glew/glew.h>
 
-#include "Base/Debug/ConcurrentAccessDetector.h"
+#include "EngineCommon/Debug/ConcurrentAccessDetector.h"
 
 #include "HAL/Graphics/SdlSurface.h"
 

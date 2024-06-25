@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/ComplexTypes/VectorUtils.h"
+#include "EngineCommon/Types/ComplexTypes/VectorUtils.h"
 
 class NonCopyableClassForRemoveIndexes
 {

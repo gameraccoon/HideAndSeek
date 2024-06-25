@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "AutoTests/Tests/WeaponShooting/Systems/TestSpawnShootableUnitsSystem.h"
 
-#include "Base/Random/Random.h"
+#include "EngineCommon/Random/Random.h"
 
 #include <SDL_keycode.h>
 

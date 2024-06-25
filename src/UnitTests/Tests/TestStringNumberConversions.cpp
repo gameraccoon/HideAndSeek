@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/String/StringNumberConversion.h"
+#include "EngineCommon/Types/String/StringNumberConversion.h"
 
 TEST(StringNumberConversions, ParseInt_CorrectInput)
 {

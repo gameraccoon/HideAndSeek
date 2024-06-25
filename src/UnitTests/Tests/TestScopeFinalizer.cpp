@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Utils/Functional/ScopeFinalizer.h"
+#include "GameUtils/Functional/ScopeFinalizer.h"
 
 TEST(ScopeFinalizer, CallLambda)
 {

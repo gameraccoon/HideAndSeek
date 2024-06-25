@@ -16,7 +16,7 @@
 		{
 			"name": "cachedVisibilityPolygon",
 			"type": "std::vector<Vector2D>",
-			"includes": ["<vector>", "\"GameData/Geometry/Vector2D.h\""],
+			"includes": ["<vector>", "\"EngineData/Geometry/Vector2D.h\""],
 			"flags": ["transient", "get_by_ref"]
 		}
 	]

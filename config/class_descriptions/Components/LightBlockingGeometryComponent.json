@@ -5,7 +5,7 @@
 		{
 			"name": "borders",
 			"type": "std::vector<SimpleBorder>",
-			"includes": ["\"GameData/Geometry/Border.h\"", "<vector>"],
+			"includes": ["\"EngineData/Geometry/Border.h\"", "<vector>"],
 			"flags": ["transient", "get_by_ref"]
 		}
 	]

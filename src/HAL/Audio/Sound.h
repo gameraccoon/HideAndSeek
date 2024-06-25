@@ -2,7 +2,7 @@
 
 #ifndef DISABLE_SDL
 
-#include "Base/Types/String/ResourcePath.h"
+#include "EngineCommon/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/Resource.h"
 

@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Systems/DeadEntitiesDestructionSystem.h"
 
-#include "Base/Types/TemplateAliases.h"
+#include "EngineCommon/Types/TemplateAliases.h"
 
 #include "GameData/World.h"
 #include "GameData/GameData.h"

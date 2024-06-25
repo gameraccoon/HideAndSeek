@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #ifndef DISABLE_SDL
 
@@ -7,11 +7,11 @@
 
 #include <nlohmann/json.hpp>
 
-#include "Base/Types/String/ResourcePath.h"
+#include "EngineCommon/Types/String/ResourcePath.h"
 
 #include "HAL/Graphics/Sprite.h"
 
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/Resources/SpriteAnimationClip.h"
 

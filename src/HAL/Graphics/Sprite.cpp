@@ -1,14 +1,14 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #ifndef DISABLE_SDL
 
-#include "Base/Types/String/ResourcePath.h"
+#include "EngineCommon/Types/String/ResourcePath.h"
 
 #include "HAL/Base/Types.h"
 #include "HAL/Graphics/SdlSurface.h"
 #include "HAL/Graphics/Sprite.h"
 
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 namespace Graphics
 {

@@ -71,22 +71,30 @@ SortIncludes: CaseInsensitive
 IncludeBlocks: Regroup
 IncludeCategories:
   # note that 0 is reserved for the current file header
-  - Regex: '^(<|")Base/precomp.h(>|")$'
+  - Regex: '^(<|")EngineCommon/precomp.h(>|")$'
     Priority: -1
-  - Regex: '^(<|")Base/.*$'
+  - Regex: '^(<|")EngineCommon/.*$'
     Priority: 3
-  - Regex: '^(<|")GameData/.*$'
+  - Regex: '^(<|")GameCommon/.*$'
     Priority: 4
-  - Regex: '^(<|")Utils/.*$'
-    Priority: 6
-  - Regex: '^(<|")HAL/.*$'
+  - Regex: '^(<|")EngineData/.*$'
     Priority: 5
-  - Regex: '^(<|")GameLogic/.*$'
+  - Regex: '^(<|")GameData/.*$'
+    Priority: 6
+  - Regex: '^(<|")EngineUtils/.*$'
     Priority: 7
-  - Regex: '^(<|")AutoTests/.*$'
+  - Regex: '^(<|")GameUtils/.*$'
     Priority: 8
-  - Regex: '^(<|")GameMain/.*$'
+  - Regex: '^(<|")HAL/.*$'
     Priority: 9
+  - Regex: '^(<|")EngineLogic/.*$'
+    Priority: 10
+  - Regex: '^(<|")GameLogic/.*$'
+    Priority: 11
+  - Regex: '^(<|")AutoTests/.*$'
+    Priority: 12
+  - Regex: '^(<|")GameMain/.*$'
+    Priority: 13
   - Regex: '^<[a-zA-Z0-9_/]+>$'
     Priority: 1
   - Regex: '.*'

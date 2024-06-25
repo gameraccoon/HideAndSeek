@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "Base/Types/String/StringId.h"
+#include "EngineCommon/Types/String/StringId.h"
 
 enum class {enum_name}
 {{

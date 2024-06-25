@@ -1,23 +1,25 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Game/Game.h"
 
-#include "Base/Types/TemplateHelpers.h"
+#include "EngineCommon/Types/TemplateHelpers.h"
 
 #include "GameData/Components/RenderAccessorComponent.generated.h"
 #include "GameData/Components/StateMachineComponent.generated.h"
 #include "GameData/Components/TimeComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 
-#include "Utils/Application/ArgumentsParser.h"
-#include "Utils/Multithreading/ThreadPool.h"
-#include "Utils/Profiling/ProfileDataWriter.h"
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "EngineUtils/Multithreading/ThreadPool.h"
+
+#include "GameUtils/Application/ArgumentsParser.h"
+#include "GameUtils/Profiling/ProfileDataWriter.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 #include "HAL/Base/Engine.h"
 
+#include "EngineLogic/Render/RenderAccessor.h"
+
 #include "GameLogic/Initialization/StateMachines.h"
-#include "GameLogic/Render/RenderAccessor.h"
 
 Game::Game(HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool)
 	: HAL::GameBase(engine, resourceManager)

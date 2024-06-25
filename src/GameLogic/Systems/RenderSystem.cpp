@@ -1,11 +1,11 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Systems/RenderSystem.h"
 
 #include <algorithm>
 
-#include "Base/Types/TemplateAliases.h"
-#include "Base/Types/TemplateHelpers.h"
+#include "EngineCommon/Types/TemplateAliases.h"
+#include "EngineCommon/Types/TemplateHelpers.h"
 
 #include "GameData/Components/BackgroundTextureComponent.generated.h"
 #include "GameData/Components/LightBlockingGeometryComponent.generated.h"
@@ -19,13 +19,15 @@
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
-#include "Utils/Geometry/VisibilityPolygon.h"
-#include "Utils/Multithreading/ThreadPool.h"
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "EngineUtils/Multithreading/ThreadPool.h"
+
+#include "GameUtils/Geometry/VisibilityPolygon.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 #include "HAL/Graphics/Sprite.h"
 
-#include "GameLogic/Render/RenderAccessor.h"
+#include "EngineLogic/Render/RenderAccessor.h"
+
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
 RenderSystem::RenderSystem(

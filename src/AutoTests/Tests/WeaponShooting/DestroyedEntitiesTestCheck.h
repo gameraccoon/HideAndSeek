@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base/Types/String/StringHelpers.h"
+#include "EngineCommon/Types/String/StringHelpers.h"
 
 #include "AutoTests/BasicTestChecks.h"
 

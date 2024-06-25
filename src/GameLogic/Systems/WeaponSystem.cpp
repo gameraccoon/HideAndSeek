@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Systems/WeaponSystem.h"
 
-#include "Base/TimeConstants.h"
+#include "EngineCommon/TimeConstants.h"
 
 #include "GameData/Components/CharacterStateComponent.generated.h"
 #include "GameData/Components/DeathComponent.generated.h"
@@ -14,7 +14,7 @@
 #include "GameData/Spatial/SpatialEntity.h"
 #include "GameData/World.h"
 
-#include "Utils/Geometry/RayTrace.h"
+#include "GameUtils/Geometry/RayTrace.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 

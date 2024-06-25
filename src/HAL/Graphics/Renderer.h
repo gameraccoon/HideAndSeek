@@ -7,7 +7,7 @@
 
 #include <glm/fwd.hpp>
 
-#include "GameData/Geometry/Vector2D.h"
+#include "EngineData/Geometry/Vector2D.h"
 
 #include "HAL/Base/Types.h"
 

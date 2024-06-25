@@ -1,12 +1,12 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Debug/DebugRecordedInput.h"
 
 #include <format>
 
-#include "Base/Types/Serialization.h"
+#include "EngineCommon/Types/Serialization.h"
 
-#include "Utils/Application/ArgumentsParser.h"
+#include "GameUtils/Application/ArgumentsParser.h"
 
 #include "HAL/InputControllersData.h"
 

@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/ComplexTypes/EnumBitset.h"
+#include "EngineCommon/Types/ComplexTypes/EnumBitset.h"
 
 TEST(EnumBitset, Usage)
 {

@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-#include "Base/Types/TemplateAliases.h"
+#include "EngineCommon/Types/TemplateAliases.h"
 
 #include "GameData/EcsDefinitions.h"
 #include "GameData/Debug/SubstringSearcher.h"

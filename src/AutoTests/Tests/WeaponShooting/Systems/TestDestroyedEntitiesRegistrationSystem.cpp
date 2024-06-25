@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "AutoTests/Tests/WeaponShooting/Systems/TestDestroyedEntitiesRegistrationSystem.h"
 

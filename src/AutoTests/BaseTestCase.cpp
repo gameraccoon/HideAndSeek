@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "AutoTests/BaseTestCase.h"
 
@@ -6,7 +6,7 @@
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
 
-#include "Utils/Application/ArgumentsParser.h"
+#include "GameUtils/Application/ArgumentsParser.h"
 
 #include "HAL/Base/Engine.h"
 #include "HAL/Base/GameLoop.h"

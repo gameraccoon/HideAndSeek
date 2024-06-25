@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #ifndef DISABLE_SDL
 
@@ -9,9 +9,9 @@
 #include <SDL_image.h>
 #include <SDL_surface.h>
 
-#include "Base/Debug/ConcurrentAccessDetector.h"
-#include "Base/Types/ComplexTypes/UniqueAny.h"
-#include "Base/Types/String/ResourcePath.h"
+#include "EngineCommon/Debug/ConcurrentAccessDetector.h"
+#include "EngineCommon/Types/ComplexTypes/UniqueAny.h"
+#include "EngineCommon/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/ResourceHandle.h"
 

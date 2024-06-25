@@ -1,6 +1,6 @@
 #include "componentreferenceutils.h"
 
-#include "Base/Debug/Assert.h"
+#include "EngineCommon/Debug/Assert.h"
 
 #include "GameData/World.h"
 

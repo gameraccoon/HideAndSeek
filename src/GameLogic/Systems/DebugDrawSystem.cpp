@@ -1,11 +1,11 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Systems/DebugDrawSystem.h"
 
 #include <algorithm>
 
-#include "Base/Random/Random.h"
-#include "Base/Types/TemplateHelpers.h"
+#include "EngineCommon/Random/Random.h"
+#include "EngineCommon/Types/TemplateHelpers.h"
 
 #include "GameData/Components/AiControllerComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
@@ -23,7 +23,7 @@
 #include "HAL/Graphics/Font.h"
 #include "HAL/Graphics/Sprite.h"
 
-#include "GameLogic/Render/RenderAccessor.h"
+#include "EngineLogic/Render/RenderAccessor.h"
 
 DebugDrawSystem::DebugDrawSystem(
 		WorldHolder& worldHolder,

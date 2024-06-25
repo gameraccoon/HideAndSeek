@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #ifndef DISABLE_SDL
 
@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "Base/Debug/ConcurrentAccessDetector.h"
+#include "EngineCommon/Debug/ConcurrentAccessDetector.h"
 
 namespace HAL
 {

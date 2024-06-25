@@ -112,15 +112,29 @@ link_directories(
 function(add_folder_as_library folder_path name)
 	file(GLOB_RECURSE TEMP_SRC RELATIVE "" FOLLOW_SYMLINKS "${folder_path}/*")
 	add_library(${name} ${TEMP_SRC})
-	target_precompile_headers(${name} PRIVATE "${GAME_SRC_DIR}/Base/precomp.h")
+	target_precompile_headers(${name} PRIVATE "${GAME_SRC_DIR}/EngineCommon/precomp.h")
 	set_target_properties(${name} PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
 	target_compile_options(${name} PRIVATE ${PROJECT_CXX_FLAGS})
 endfunction()
 
-add_folder_as_library(${GAME_SRC_DIR}/Base Base)
+# All the things that are going to be included anywhere and not related
+# to any specific game
+add_folder_as_library(${GAME_SRC_DIR}/EngineCommon EngineCommon)
+# Some game related data that can be included anywhere throughout the game
+add_folder_as_library(${GAME_SRC_DIR}/GameCommon GameCommon)
+# Data types that can be stored in engine components
+add_folder_as_library(${GAME_SRC_DIR}/EngineData EngineData)
+# Data types that can be stored in game-specific ECS components
 add_folder_as_library(${GAME_SRC_DIR}/GameData GameData)
-add_folder_as_library(${GAME_SRC_DIR}/Utils Utils)
+# Algorithms and types that don't have to be stored in ECS components (shared between games)
+add_folder_as_library(${GAME_SRC_DIR}/EngineUtils EngineUtils)
+# Algorithms and types that don't have to be stored in ECS components (specific to one game)
+add_folder_as_library(${GAME_SRC_DIR}/GameUtils GameUtils)
+# Hardware Access Layer (shared between games, can depend only on Engine common/data/utils)
 add_folder_as_library(${GAME_SRC_DIR}/HAL Hal)
+# ECS systems and glue code (engine specific)
+add_folder_as_library(${GAME_SRC_DIR}/EngineLogic EngineLogic)
+# ECS systems and glue code (specific to one game)
 add_folder_as_library(${GAME_SRC_DIR}/GameLogic GameLogic)
 
 file(GLOB_RECURSE APP_SRC RELATIVE "" FOLLOW_SYMLINKS "${GAME_SRC_DIR}/GameMain/*")
@@ -168,10 +182,14 @@ endif()
 
 set(GENERAL_PROJECT_LIBS
 	GameLogic
+	EngineLogic
 	Hal
-	Utils
+	GameUtils
+	EngineUtils
 	GameData
-	Base
+	EngineData
+	GameCommon
+	EngineCommon
 
 	Polypartition
 
@@ -252,4 +270,4 @@ add_custom_target(
 	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/scripts/build/precompile_code_generate.py ${GAME_BASE_DIR}
 	COMMENT "C++ pre-compile additional code generation"
 )
-add_dependencies(Base AdditionalCodeGeneration)
+add_dependencies(GameCommon AdditionalCodeGeneration)

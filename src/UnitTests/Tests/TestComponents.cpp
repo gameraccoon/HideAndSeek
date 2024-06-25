@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/TemplateAliases.h"
+#include "EngineCommon/Types/TemplateAliases.h"
 
 #include "GameData/EcsDefinitions.h"
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utils/Application/ArgumentsParser.h"
+#include "GameUtils/Application/ArgumentsParser.h"
 
 #include "AutoTests/BaseTestCase.h"
 

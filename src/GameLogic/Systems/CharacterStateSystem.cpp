@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Systems/CharacterStateSystem.h"
 
-#include "GameData/Geometry/Rotator.h"
+#include "EngineData/Geometry/Rotator.h"
 
 #include "GameData/Enums/MoveDirection4.generated.h"
 

@@ -1,11 +1,11 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
 #include <array>
 #include <algorithm>
 
-#include "Base/Types/ComplexTypes/SimpleBitset.h"
+#include "EngineCommon/Types/ComplexTypes/SimpleBitset.h"
 
 TEST(BitsetTraits, BitsetTraits_ByteCount_ReasonableAmountOfBytes)
 {

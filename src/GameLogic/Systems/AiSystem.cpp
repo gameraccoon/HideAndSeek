@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Systems/AiSystem.h"
 
-#include "Base/TimeConstants.h"
+#include "EngineCommon/TimeConstants.h"
 
 #include "GameData/Components/AiControllerComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
@@ -16,8 +16,8 @@
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
-#include "Utils/AI/NavMeshGenerator.h"
-#include "Utils/AI/PathFinding.h"
+#include "GameUtils/AI/NavMeshGenerator.h"
+#include "GameUtils/AI/PathFinding.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 

@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "AutoTests/Tests/WeaponShooting/TestCase.h"
 
@@ -22,7 +22,7 @@
 #include "GameLogic/Systems/ResourceStreamingSystem.h"
 #include "GameLogic/Systems/WeaponSystem.h"
 
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 #include "AutoTests/Tests/WeaponShooting/Systems/TestShootingControlSystem.h"
 #include "AutoTests/Tests/WeaponShooting/Systems/TestSpawnShootableUnitsSystem.h"

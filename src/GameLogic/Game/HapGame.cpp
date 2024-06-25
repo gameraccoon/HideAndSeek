@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Game/HapGame.h"
 
@@ -9,8 +9,8 @@
 
 #include "HAL/Base/Engine.h"
 
-#include "Utils/World/GameDataLoader.h"
-#include "Utils/Application/ArgumentsParser.h"
+#include "GameUtils/World/GameDataLoader.h"
+#include "GameUtils/Application/ArgumentsParser.h"
 
 #include "GameLogic/Systems/AiSystem.h"
 #include "GameLogic/Systems/AnimationSystem.h"

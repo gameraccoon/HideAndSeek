@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Utils/Geometry/Collide.h"
+#include "GameUtils/Geometry/Collide.h"
 
 TEST(CollisionUtils, AreLinesParallel)
 {

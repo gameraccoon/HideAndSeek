@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/String/StringHelpers.h"
+#include "EngineCommon/Types/String/StringHelpers.h"
 
 TEST(FormatString, NumericalFormats)
 {

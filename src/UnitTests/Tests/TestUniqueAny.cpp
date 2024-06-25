@@ -1,11 +1,11 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
 #include <type_traits>
 #include <vector>
 
-#include "Base/Types/ComplexTypes/UniqueAny.h"
+#include "EngineCommon/Types/ComplexTypes/UniqueAny.h"
 
 TEST(UniqueAny, DefaultConstructed)
 {

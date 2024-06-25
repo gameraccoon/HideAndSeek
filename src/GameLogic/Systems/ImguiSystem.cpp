@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Systems/ImguiSystem.h"
 
@@ -11,7 +11,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-#include "Base/Types/TemplateHelpers.h"
+#include "EngineCommon/Types/TemplateHelpers.h"
 
 #include "GameData/Components/ImguiComponent.generated.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
@@ -21,8 +21,9 @@
 
 #include "HAL/Base/Engine.h"
 
+#include "EngineLogic/Render/RenderAccessor.h"
+
 #include "GameLogic/Imgui/ImguiDebugData.h"
-#include "GameLogic/Render/RenderAccessor.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
 

@@ -6,7 +6,7 @@
 			"type": "std::vector<RelativeResourcePath>",
 			"includes": [
 				"<vector>",
-				"\"Base/Types/String/ResourcePath.h\""
+				"\"EngineCommon/Types/String/ResourcePath.h\""
 			],
 			"flags": ["get_by_ref"]
 		},

@@ -7,7 +7,7 @@
 #include "editorcommand.h"
 
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
-#include "GameData/Geometry/Vector2D.h"
+#include "EngineData/Geometry/Vector2D.h"
 #include "GameData/Spatial/SpatialEntity.h"
 
 class World;

@@ -4,14 +4,14 @@
 		{
 			"name": "geometry",
 			"type": "Hull",
-			"includes": ["\"GameData/Geometry/Hull.h\""],
+			"includes": ["\"EngineData/Geometry/Hull.h\""],
 			"flags": ["get_by_ref"]
 		},
 		{
 			"name": "boundingBox",
 			"type": "BoundingBox",
 			"default": " = BoundingBox(Vector2D(0.0f, 0.0f), Vector2D(0.0f, 0.0f))",
-			"includes": ["\"GameData/Geometry/BoundingBox.h\""],
+			"includes": ["\"EngineData/Geometry/BoundingBox.h\""],
 			"flags": ["transient", "get_by_ref"]
 		}
 	]

@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "HAL/GameBase.h"
 
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 namespace HAL
 {

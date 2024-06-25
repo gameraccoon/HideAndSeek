@@ -5,7 +5,7 @@
 #include <map>
 #include <memory>
 
-#include "Base/Types/String/ResourcePath.h"
+#include "EngineCommon/Types/String/ResourcePath.h"
 
 #include <QObject>
 #include <QLayout>

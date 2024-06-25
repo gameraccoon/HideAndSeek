@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Math/ValueCompression.h"
+#include "EngineCommon/Math/ValueCompression.h"
 
 
 TEST(ValueCompression, FloatToIntRL)

@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Systems/ResourceStreamingSystem.h"
 
@@ -12,7 +12,7 @@
 #include "GameData/Components/SpriteRenderComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 #include "HAL/Graphics/Sprite.h"
 

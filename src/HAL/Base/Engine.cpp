@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #ifndef DISABLE_SDL
 
@@ -10,7 +10,7 @@
 
 #include <SDL_mixer.h>
 
-#include "Base/Debug/ConcurrentAccessDetector.h"
+#include "EngineCommon/Debug/ConcurrentAccessDetector.h"
 
 #include "HAL/Base/GameLoop.h"
 #include "HAL/Graphics/Renderer.h"

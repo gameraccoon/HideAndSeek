@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 
-#include "Base/Types/String/StringId.h"
+#include "EngineCommon/Types/String/StringId.h"
 
 #include "GameData/Resources/ResourceHandle.h"
 

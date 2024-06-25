@@ -4,7 +4,7 @@
 #include <raccoon-ecs/error_handling.h>
 #include <atomic>
 
-#include "Base/Debug/Assert.h"
+#include "EngineCommon/Debug/Assert.h"
 
 inline void EnableFailOnAssert() noexcept
 {

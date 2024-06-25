@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #ifdef IMGUI_ENABLED
 
@@ -6,9 +6,9 @@
 
 #include <cstring>
 
-#include "Base/Types/String/StringId.h"
+#include "EngineCommon/Types/String/StringId.h"
 
-#include "GameData/Geometry/Vector2D.h"
+#include "EngineData/Geometry/Vector2D.h"
 
 namespace ImguiDataInspection
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base/Types/ComplexTypes/EnumBitset.h"
+#include "EngineCommon/Types/ComplexTypes/EnumBitset.h"
 
 #include "../editorutils/editoridgenerator.h"
 

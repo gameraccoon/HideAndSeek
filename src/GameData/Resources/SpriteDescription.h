@@ -2,7 +2,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "Base/Types/String/ResourcePath.h"
+#include "EngineCommon/Types/String/ResourcePath.h"
 
 #include "GameData/Resources/SpriteParams.h"
 

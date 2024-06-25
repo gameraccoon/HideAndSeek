@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
@@ -7,8 +7,8 @@
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 
-#include "Utils/Geometry/RayTrace.h"
-#include "Utils/Geometry/Collide.h"
+#include "GameUtils/Geometry/RayTrace.h"
+#include "GameUtils/Geometry/Collide.h"
 
 struct CollidableObjects
 {

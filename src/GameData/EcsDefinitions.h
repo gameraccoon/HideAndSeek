@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base/Types/String/StringId.h"
+#include "EngineCommon/Types/String/StringId.h"
 
 #include <raccoon-ecs/entity_manager.h>
 #include <raccoon-ecs/component_set_holder.h>

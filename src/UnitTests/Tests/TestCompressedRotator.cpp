@@ -1,10 +1,10 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/BasicTypes.h"
+#include "EngineCommon/Types/BasicTypes.h"
 
-#include "GameData/Geometry/CompressedRotator.h"
+#include "EngineData/Geometry/CompressedRotator.h"
 
 TEST(CompressedRotator, Value)
 {

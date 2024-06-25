@@ -3,8 +3,8 @@
 #include <QApplication>
 #include <raccoon-ecs/error_handling.h>
 
-#include "Base/Debug/Assert.h"
-#include "Base/Random/Random.h"
+#include "EngineCommon/Debug/Assert.h"
+#include "EngineCommon/Random/Random.h"
 
 int main(int argc, char *argv[])
 {

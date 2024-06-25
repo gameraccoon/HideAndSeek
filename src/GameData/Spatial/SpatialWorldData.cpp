@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameData/World.h"
 
@@ -7,7 +7,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "Base/Types/TemplateAliases.h"
+#include "EngineCommon/Types/TemplateAliases.h"
 
 #include "GameData/Components/TransformComponent.generated.h"
 

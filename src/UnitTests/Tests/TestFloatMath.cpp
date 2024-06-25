@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Math/Float.h"
+#include "EngineCommon/Math/Float.h"
 
 TEST(FloatMath, AreFloatsEqual)
 {

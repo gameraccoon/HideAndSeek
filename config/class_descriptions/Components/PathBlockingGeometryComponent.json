@@ -5,7 +5,7 @@
 		{
 			"name": "polygons",
 			"type": "std::vector<std::vector<Vector2D>>",
-			"includes": ["\"GameData/Geometry/Vector2D.h\"", "<vector>"],
+			"includes": ["\"EngineData/Geometry/Vector2D.h\"", "<vector>"],
 			"flags": ["transient", "get_by_ref"]
 		}
 	]

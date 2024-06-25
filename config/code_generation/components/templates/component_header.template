@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base/Types/String/StringId.h"
+#include "EngineCommon/Types/String/StringId.h"
 
 {attribute_includes}
 

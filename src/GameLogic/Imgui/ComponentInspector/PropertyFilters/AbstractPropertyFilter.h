@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-#include "Base/Types/TemplateAliases.h"
-#include "Base/Debug/Assert.h"
+#include "EngineCommon/Types/TemplateAliases.h"
+#include "EngineCommon/Debug/Assert.h"
 
 #include "GameData/Spatial/WorldCell.h"
 

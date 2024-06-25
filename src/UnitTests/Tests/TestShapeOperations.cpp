@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <algorithm>
 #include <numeric>
@@ -8,10 +8,10 @@
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/ComplexTypes/VectorUtils.h"
+#include "EngineCommon/Types/ComplexTypes/VectorUtils.h"
 
-#include "Utils/Geometry/Collide.h"
-#include "Utils/Geometry/ShapeOperations.h"
+#include "GameUtils/Geometry/Collide.h"
+#include "GameUtils/Geometry/ShapeOperations.h"
 
 enum class ShapeOrder
 {

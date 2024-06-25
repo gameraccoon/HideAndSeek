@@ -10,9 +10,9 @@
 #include "GameData/Components/LightBlockingGeometryComponent.generated.h"
 #include "GameData/Components/PathBlockingGeometryComponent.generated.h"
 
-#include "Utils/World/GameDataLoader.h"
-#include "Utils/Geometry/LightBlockingGeometry.h"
-#include "Utils/AI/PathBlockingGeometry.h"
+#include "GameUtils/World/GameDataLoader.h"
+#include "GameUtils/Geometry/LightBlockingGeometry.h"
+#include "GameUtils/AI/PathBlockingGeometry.h"
 
 namespace Utils
 {

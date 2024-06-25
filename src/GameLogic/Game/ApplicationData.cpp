@@ -1,9 +1,9 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameLogic/Game/ApplicationData.h"
 
 #ifdef ENABLE_SCOPED_PROFILER
-#include "Utils/Profiling/ProfileDataWriter.h"
+#include "GameUtils/Profiling/ProfileDataWriter.h"
 #endif // ENABLE_SCOPED_PROFILER
 
 ApplicationData::ApplicationData(const int threadsCount)

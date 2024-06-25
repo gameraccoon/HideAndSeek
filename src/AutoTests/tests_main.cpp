@@ -1,12 +1,12 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <iostream>
 
-#include "Base/Random/Random.h"
+#include "EngineCommon/Random/Random.h"
 
 #include <raccoon-ecs/error_handling.h>
 
-#include "Utils/Application/ArgumentsParser.h"
+#include "GameUtils/Application/ArgumentsParser.h"
 
 #include "HAL/Base/Engine.h"
 

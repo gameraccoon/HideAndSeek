@@ -1,10 +1,10 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
 #include <thread>
 
-#include "Utils/Multithreading/ThreadPool.h"
+#include "EngineUtils/Multithreading/ThreadPool.h"
 
 TEST(ThreadPool, CreateAndDestroyEmpty)
 {

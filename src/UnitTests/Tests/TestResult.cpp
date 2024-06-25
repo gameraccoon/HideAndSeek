@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Types/ComplexTypes/Result.h"
+#include "EngineCommon/Types/ComplexTypes/Result.h"
 
 TEST(Result, ResultWithValue_CheckForValue_ValueExists)
 {

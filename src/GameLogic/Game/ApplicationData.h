@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Utils/Multithreading/ThreadPool.h"
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "EngineUtils/Multithreading/ThreadPool.h"
 
-#include "GameLogic/Render/RenderThreadManager.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
+
+#include "EngineLogic/Render/RenderThreadManager.h"
 
 class ArgumentsParser;
 class ResourceManager;

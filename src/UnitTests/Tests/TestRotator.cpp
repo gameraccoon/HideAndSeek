@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "GameData/Geometry/Rotator.h"
+#include "EngineData/Geometry/Rotator.h"
 
 
 TEST(Rotator, Comparison)

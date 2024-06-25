@@ -1,15 +1,15 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
 #include <algorithm>
 
-#include "Base/Types/TemplateAliases.h"
+#include "EngineCommon/Types/TemplateAliases.h"
 
 #include "GameData/Components/LightBlockingGeometryComponent.generated.h"
-#include "GameData/Geometry/Hull.h"
+#include "EngineData/Geometry/Hull.h"
 
-#include "Utils/Geometry/VisibilityPolygon.h"
+#include "GameUtils/Geometry/VisibilityPolygon.h"
 
 
 static bool AreVisibilityPolygonsEqual(const std::vector<Vector2D>& a, const std::vector<Vector2D>& b)

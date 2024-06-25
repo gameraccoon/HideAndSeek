@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 

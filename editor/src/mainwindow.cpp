@@ -15,7 +15,7 @@
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 #include "GameData/World.h"
 
-#include "Utils/World/GameDataLoader.h"
+#include "GameUtils/World/GameDataLoader.h"
 
 #include "toolboxes/ComponentAttributesToolbox.h"
 #include "toolboxes/ComponentsListToolbox.h"

@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestUnitsCountControlSystem.h"
 
-#include "Base/Random/Random.h"
+#include "EngineCommon/Random/Random.h"
 
 #include "GameData/World.h"
 #include "GameData/Spatial/SpatialWorldData.h"

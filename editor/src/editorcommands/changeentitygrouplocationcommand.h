@@ -2,7 +2,7 @@
 
 #include "editorcommand.h"
 
-#include "GameData/Geometry/Vector2D.h"
+#include "EngineData/Geometry/Vector2D.h"
 #include "GameData/Spatial/CellPos.h"
 
 class ChangeEntityGroupLocationCommand : public EditorCommand

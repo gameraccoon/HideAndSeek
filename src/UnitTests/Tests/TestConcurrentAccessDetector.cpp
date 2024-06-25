@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Base/Debug/ConcurrentAccessDetector.h"
+#include "EngineCommon/Debug/ConcurrentAccessDetector.h"
 
 #include "UnitTests/TestAssertHelper.h"
 

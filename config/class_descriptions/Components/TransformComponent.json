@@ -5,14 +5,14 @@
 			"name": "location",
 			"type": "Vector2D",
 			"default": " = ZERO_VECTOR",
-			"includes": ["\"GameData/Geometry/Vector2D.h\""],
+			"includes": ["\"EngineData/Geometry/Vector2D.h\""],
 			"flags": ["custom_editor"]
 		},
 		{
 			"name": "rotation",
 			"type": "Rotator",
 			"default": " = Rotator(0.0f)",
-			"includes": ["\"GameData/Geometry/Rotator.h\""]
+			"includes": ["\"EngineData/Geometry/Rotator.h\""]
 		}
 	]
 }

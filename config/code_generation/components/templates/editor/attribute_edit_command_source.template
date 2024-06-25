@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "Change{class_name}{attribute_name_capital}Command.generated.h"
 

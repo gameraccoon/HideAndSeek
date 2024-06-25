@@ -1,13 +1,13 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
-#include "Base/Types/TemplateAliases.h"
+#include "EngineCommon/Types/TemplateAliases.h"
 
 #include "GameData/World.h"
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/MovementComponent.generated.h"
 
-#include "Utils/Geometry/Collide.h"
+#include "GameUtils/Geometry/Collide.h"
 
 #include "GameLogic/Systems/CollisionSystem.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"

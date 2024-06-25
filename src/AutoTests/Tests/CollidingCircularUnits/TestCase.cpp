@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "AutoTests/Tests/CollidingCircularUnits/TestCase.h"
 
@@ -8,7 +8,7 @@
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Spatial/SpatialWorldData.h"
 
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/Systems/CameraSystem.h"
 #include "GameLogic/Systems/CharacterStateSystem.h"

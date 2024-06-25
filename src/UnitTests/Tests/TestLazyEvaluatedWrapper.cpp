@@ -1,8 +1,8 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
-#include "Utils/Functional/LazyEvaluatedWrapper.h"
+#include "GameUtils/Functional/LazyEvaluatedWrapper.h"
 
 TEST(LazyEvaluatedWrapper, CallLambda)
 {

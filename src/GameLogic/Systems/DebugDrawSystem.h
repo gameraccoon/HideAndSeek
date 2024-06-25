@@ -2,7 +2,7 @@
 
 #include <raccoon-ecs/utils/system.h>
 
-#include "Utils/ResourceManagement/ResourceManager.h"
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 

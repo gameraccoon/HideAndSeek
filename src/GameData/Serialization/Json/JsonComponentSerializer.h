@@ -5,7 +5,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "Base/Types/String/StringId.h"
+#include "EngineCommon/Types/String/StringId.h"
 
 namespace Json
 {

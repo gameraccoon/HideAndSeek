@@ -1,4 +1,4 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include "AutoTests/Tests/CollidingCircularUnits/Systems/TestCircularUnitsSystem.h"
 

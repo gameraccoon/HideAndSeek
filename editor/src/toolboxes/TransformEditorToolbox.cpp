@@ -20,7 +20,7 @@
 #include <QPainter>
 #include <QSlider>
 
-#include "Base/Math/Float.h"
+#include "EngineCommon/Math/Float.h"
 
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 #include "GameData/Serialization/Json/EntityManager.h"

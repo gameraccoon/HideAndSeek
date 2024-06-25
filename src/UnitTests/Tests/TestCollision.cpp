@@ -1,11 +1,11 @@
-#include "Base/precomp.h"
+#include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
 
 #include "GameData/World.h"
-#include "GameData/Geometry/Hull.h"
+#include "EngineData/Geometry/Hull.h"
 
-#include "Utils/Geometry/Collide.h"
+#include "GameUtils/Geometry/Collide.h"
 
 #include "GameData/Components/CollisionComponent.generated.h"
 
