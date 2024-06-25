@@ -14,6 +14,7 @@ option(MEMLEAK_REDEFINE_NEW "Redefine default new (provide more detailed info bu
 set(GAME_BASE_DIR ${CMAKE_SOURCE_DIR}/..)
 set(EXTERNALS_DIR ${GAME_BASE_DIR}/external)
 set(GAME_SRC_DIR ${GAME_BASE_DIR}/src)
+set(ENGINE_SRC_DIR ${GAME_SRC_DIR}/Engine)
 set(GAME_BIN_DIR ${GAME_BASE_DIR}/bin)
 set(INTERMEDIATES_DIR ${GAME_BASE_DIR}/build/editor)
 
@@ -92,7 +93,7 @@ add_subdirectory(Qt-Advanced-Docking-System EXCLUDE_FROM_ALL)
 
 add_executable(${APP_NAME} WIN32 ${APP_SRCS})
 set_target_properties(${APP_NAME} PROPERTIES UNITY_BUILD ON)
-target_precompile_headers(${APP_NAME} PRIVATE "${GAME_SRC_DIR}/Base/precomp.h")
+target_precompile_headers(${APP_NAME} PRIVATE "${ENGINE_SRC_DIR}/EngineCommon/precomp.h")
 target_compile_options(${APP_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
 if(BUILD_STATIC)
 	set(APP_DEFINE ${APP_DEFINE} ADS_STATIC)
@@ -101,20 +102,24 @@ endif()
 function(add_folder_as_library folder_path name)
 	file(GLOB_RECURSE TEMP_SRC RELATIVE "" FOLLOW_SYMLINKS "${folder_path}/*")
 	add_library(${name} ${TEMP_SRC})
-	target_precompile_headers(${name} PRIVATE "${GAME_SRC_DIR}/Base/precomp.h")
+	target_precompile_headers(${name} PRIVATE "${ENGINE_SRC_DIR}/EngineCommon/precomp.h")
 	set_target_properties(${name} PROPERTIES UNITY_BUILD ON)
 	target_compile_options(${name} PRIVATE ${PROJECT_CXX_FLAGS})
 endfunction()
 
-add_folder_as_library(${GAME_SRC_DIR}/Base Base)
+add_folder_as_library(${ENGINE_SRC_DIR}/EngineCommon EngineCommon)
+add_folder_as_library(${GAME_SRC_DIR}/GameCommon GameCommon)
+add_folder_as_library(${ENGINE_SRC_DIR}/EngineData EngineData)
 add_folder_as_library(${GAME_SRC_DIR}/GameData GameData)
-add_folder_as_library(${GAME_SRC_DIR}/Utils Utils)
+add_folder_as_library(${ENGINE_SRC_DIR}/EngineUtils EngineUtils)
+add_folder_as_library(${GAME_SRC_DIR}/GameUtils GameUtils)
 
 include_directories(
 	${EXTERNALS_DIR}/include
 	${EXTERNALS_DIR}/sources
 	${EXTERNALS_DIR}/sources/soa-sort/include
 	${GAME_SRC_DIR}
+	${ENGINE_SRC_DIR}
 )
 
 link_directories(
@@ -132,9 +137,12 @@ target_compile_options(Polypartition PRIVATE ${EXTERNALS_CXX_FLAGS})
 
 set(APP_LIBS
 	${APP_LIBS}
-	Utils
+	GameUtils
+	EngineUtils
 	GameData
-	Base
+	EngineData
+	GameCommon
+	EngineCommon
 
 	Polypartition
 )
@@ -170,4 +178,4 @@ add_custom_target(
 	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/scripts/build/precompile_code_generate.py ${GAME_BASE_DIR}
 	COMMENT "C++ pre-compile additional code generation"
 )
-add_dependencies(Base AdditionalCodeGeneration)
+add_dependencies(GameData AdditionalCodeGeneration)
