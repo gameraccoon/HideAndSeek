@@ -36,6 +36,9 @@ std::vector<{enum_name}> get_all_enum_values()
 template<>
 std::vector<StringId> get_all_enum_value_names<{enum_name}>()
 {{
+	// to satisfy MSVC limitations for conseval function calls we need to split the declaration and the usage
+	{enum_string_id_declaration}
+
 	return {{
 		{enum_value_string}
 	}};

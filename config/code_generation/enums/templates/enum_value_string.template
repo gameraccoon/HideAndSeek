@@ -1,1 +1,1 @@
-STR_TO_ID("{enum_value}"),{delim_endl}{delim_tab}{delim_tab}
+value{enum_value},{delim_endl}{delim_tab}{delim_tab}

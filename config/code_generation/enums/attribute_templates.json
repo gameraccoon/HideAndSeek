@@ -2,6 +2,7 @@
 	"enum_to_string_case",
 	"string_to_enum_case",
 	"enum_value",
+	"enum_string_id_declaration",
 	"enum_value_string",
 	"enum_value_with_type",
 	"enum_value_serialization"

@@ -1,0 +1,1 @@
+constexpr StringId value{enum_value} = STR_TO_ID("{enum_value}");{delim_endl}{delim_tab}
