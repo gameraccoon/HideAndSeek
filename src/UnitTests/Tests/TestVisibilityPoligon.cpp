@@ -7,7 +7,7 @@
 #include "EngineCommon/Types/TemplateAliases.h"
 
 #include "GameData/Components/LightBlockingGeometryComponent.generated.h"
-#include "EngineData/Geometry/Hull.h"
+#include "GameData/Geometry/Hull.h"
 
 #include "GameUtils/Geometry/VisibilityPolygon.h"
 

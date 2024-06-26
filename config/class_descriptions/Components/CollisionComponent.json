@@ -4,7 +4,7 @@
 		{
 			"name": "geometry",
 			"type": "Hull",
-			"includes": ["\"EngineData/Geometry/Hull.h\""],
+			"includes": ["\"GameData/Geometry/Hull.h\""],
 			"flags": ["get_by_ref"]
 		},
 		{
