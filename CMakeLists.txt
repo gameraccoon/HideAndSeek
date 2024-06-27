@@ -67,6 +67,8 @@ endif(CONCURRENT_ACCESS_DETECTION)
 
 add_definitions(-DGLEW_NO_GLU)
 add_definitions(-DGLM_FORCE_RADIANS)
+# Real network requires GameNetworkingSockets library, so we disable it until we need it
+add_definitions(-DFAKE_NETWORK)
 
 # compiler parameters
 if (MSVC)
