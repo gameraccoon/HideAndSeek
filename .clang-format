@@ -71,30 +71,33 @@ SortIncludes: CaseInsensitive
 IncludeBlocks: Regroup
 IncludeCategories:
   # note that 0 is reserved for the current file header
-  - Regex: '^(<|")EngineCommon/precomp.h(>|")$'
+  - Regex: '^[<"]EngineCommon/precomp.h[>"]$'
     Priority: -1
-  - Regex: '^(<|")EngineCommon/.*$'
+  - Regex: '^[<"]EngineCommon/.*$'
     Priority: 3
-  - Regex: '^(<|")GameCommon/.*$'
+  - Regex: '^[<"]GameCommon/.*$'
     Priority: 4
-  - Regex: '^(<|")EngineData/.*$'
+  - Regex: '^[<"]EngineData/.*$'
     Priority: 5
-  - Regex: '^(<|")GameData/.*$'
+  - Regex: '^[<"]GameData/.*$'
     Priority: 6
-  - Regex: '^(<|")EngineUtils/.*$'
+  - Regex: '^[<"]HAL/.*$'
     Priority: 7
-  - Regex: '^(<|")GameUtils/.*$'
+  - Regex: '^[<"]EngineUtils/.*$'
     Priority: 8
-  - Regex: '^(<|")HAL/.*$'
+  - Regex: '^[<"]GameUtils/.*$'
     Priority: 9
-  - Regex: '^(<|")EngineLogic/.*$'
+  - Regex: '^[<"]EngineLogic/.*$'
     Priority: 10
-  - Regex: '^(<|")GameLogic/.*$'
+  - Regex: '^[<"]GameLogic/.*$'
     Priority: 11
-  - Regex: '^(<|")AutoTests/.*$'
+  - Regex: '^[<"]AutoTests/.*$'
     Priority: 12
-  - Regex: '^(<|")GameMain/.*$'
+  - Regex: '^[<"]GameMain/.*$'
     Priority: 13
+  - Regex: '^[<"]UnitTests/.*$'
+    Priority: 14
+    # STL includes that don't contain .h go right after precomp and current file include
   - Regex: '^<[a-zA-Z0-9_/]+>$'
     Priority: 1
   - Regex: '.*'
