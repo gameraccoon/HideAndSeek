@@ -1,8 +1,8 @@
 #include "EngineCommon/precomp.h"
 
-#include <limits>
-
 #include "AutoTests/Tests/WeaponShooting/Systems/TestShootingControlSystem.h"
+
+#include <limits>
 
 #include "GameData/Components/CharacterStateComponent.generated.h"
 #include "GameData/Components/HealthComponent.generated.h"
@@ -12,7 +12,6 @@
 #include "GameData/World.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
-
 
 TestShootingControlSystem::TestShootingControlSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
@@ -40,15 +39,15 @@ void TestShootingControlSystem::update()
 	float closestQDist = std::numeric_limits<float>::max();
 
 	world.getSpatialData().getAllCellManagers().forEachComponentSet<const HealthComponent, const TransformComponent>(
-			[playerLocation, &closestTarget, &closestQDist](const HealthComponent* health, const TransformComponent* transform)
-	{
-		const float qDist = (transform->getLocation() - playerLocation).qSize();
-		if (health->getHealthValue() > 0.0f && qDist < closestQDist)
-		{
-			closestQDist = qDist;
-			closestTarget = transform->getLocation();
+		[playerLocation, &closestTarget, &closestQDist](const HealthComponent* health, const TransformComponent* transform) {
+			const float qDist = (transform->getLocation() - playerLocation).qSize();
+			if (health->getHealthValue() > 0.0f && qDist < closestQDist)
+			{
+				closestQDist = qDist;
+				closestTarget = transform->getLocation();
+			}
 		}
-	});
+	);
 
 	const float weaponShootDistance = playerWeapon->getShotDistance();
 

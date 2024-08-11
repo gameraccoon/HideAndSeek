@@ -2,19 +2,18 @@
 
 #include <iostream>
 
-#include "EngineCommon/Random/Random.h"
-
 #include <raccoon-ecs/error_handling.h>
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineCommon/Random/Random.h"
 
 #include "HAL/Base/Engine.h"
+
+#include "GameUtils/Application/ArgumentsParser.h"
 
 #include "GameLogic/Game/ApplicationData.h"
 
 #include "AutoTests/BaseTestCase.h"
 #include "AutoTests/TestCheckList.h"
-
 #include "AutoTests/Tests/CollidingCircularUnits/TestCase.h"
 #include "AutoTests/Tests/WeaponShooting/TestCase.h"
 
@@ -42,7 +41,7 @@ static CasesMap GetCases()
 bool ValidateChecklist(const TestChecklist& checklist)
 {
 	size_t failedChecksCount = 0;
-	for(const auto& check : checklist.getChecks())
+	for (const auto& check : checklist.getChecks())
 	{
 		if (!check->hasPassed())
 		{
@@ -105,7 +104,7 @@ int main(const int argc, char** argv)
 	RaccoonEcs::gErrorHandler = [](const std::string& error) { ReportFatalError(error); };
 #endif // RACCOON_ECS_DEBUG_CHECKS_ENABLED
 
-	gGlobalAssertHandler = []{ std::terminate(); };
+	gGlobalAssertHandler = [] { std::terminate(); };
 
 	auto cases = GetCases();
 
@@ -138,8 +137,7 @@ int main(const int argc, char** argv)
 
 			// switch render context to render thread
 			engine->releaseRenderContext();
-			applicationData.renderThread.startThread(applicationData.resourceManager, *engine, [&engine]
-			{ engine->acquireRenderContext(); });
+			applicationData.renderThread.startThread(applicationData.resourceManager, *engine, [&engine] { engine->acquireRenderContext(); });
 		}
 		const std::unique_ptr<BaseTestCase> testCase = caseIt->second(engine.get(), applicationData.resourceManager, applicationData.threadPool);
 		const TestChecklist checklist = testCase->start(arguments, RenderAccessorGameRef(applicationData.renderThread.getAccessor(), 0));

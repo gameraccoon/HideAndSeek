@@ -35,7 +35,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 	getGameLogicSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
 	getGameLogicSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getResourceManager(), getThreadPool());
 
-	Vector2D playerPos{ZERO_VECTOR};
+	Vector2D playerPos{ ZERO_VECTOR };
 
 	EntityView playerEntity = getWorldHolder().getWorld().createTrackedSpatialEntity(STR_TO_ID("ControlledEntity"), SpatialWorldData::GetCellForPos(playerPos));
 
@@ -58,7 +58,7 @@ void CollidingCircularUnitsTestCase::initTestCase(const ArgumentsParser& /*argum
 	}
 	playerEntity.addComponent<MovementComponent>();
 
-	Vector2D cameraPos{ZERO_VECTOR};
+	Vector2D cameraPos{ ZERO_VECTOR };
 	EntityView camera = getWorldHolder().getWorld().createTrackedSpatialEntity(STR_TO_ID("CameraEntity"), SpatialWorldData::GetCellForPos(cameraPos));
 
 	{

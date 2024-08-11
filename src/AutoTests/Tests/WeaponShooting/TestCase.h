@@ -3,8 +3,8 @@
 #include <raccoon-ecs/component_factory.h>
 #include <raccoon-ecs/utils/systems_manager.h>
 
-#include "GameData/World.h"
 #include "GameData/GameData.h"
+#include "GameData/World.h"
 
 #include "GameUtils/Application/ArgumentsParser.h"
 

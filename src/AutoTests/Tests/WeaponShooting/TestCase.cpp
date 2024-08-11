@@ -2,8 +2,6 @@
 
 #include "AutoTests/Tests/WeaponShooting/TestCase.h"
 
-#include "GameData/Spatial/SpatialWorldData.h"
-
 #include "GameData/Components/CharacterStateComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/MovementComponent.generated.h"
@@ -11,6 +9,9 @@
 #include "GameData/Components/StateMachineComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/WeaponComponent.generated.h"
+#include "GameData/Spatial/SpatialWorldData.h"
+
+#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/Systems/CameraSystem.h"
 #include "GameLogic/Systems/CharacterStateSystem.h"
@@ -22,11 +23,9 @@
 #include "GameLogic/Systems/ResourceStreamingSystem.h"
 #include "GameLogic/Systems/WeaponSystem.h"
 
-#include "GameUtils/ResourceManagement/ResourceManager.h"
-
+#include "AutoTests/Tests/WeaponShooting/Systems/TestDestroyedEntitiesRegistrationSystem.h"
 #include "AutoTests/Tests/WeaponShooting/Systems/TestShootingControlSystem.h"
 #include "AutoTests/Tests/WeaponShooting/Systems/TestSpawnShootableUnitsSystem.h"
-#include "AutoTests/Tests/WeaponShooting/Systems/TestDestroyedEntitiesRegistrationSystem.h"
 
 void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 {
@@ -49,7 +48,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 
 	World& world = getWorldHolder().getWorld();
 
-	Vector2D playerPos{ZERO_VECTOR};
+	Vector2D playerPos{ ZERO_VECTOR };
 	EntityView playerEntity = world.createTrackedSpatialEntity(STR_TO_ID("ControlledEntity"), SpatialWorldData::GetCellForPos(playerPos));
 
 	{
@@ -78,7 +77,7 @@ void WeaponShootingTestCase::initTestCase(const ArgumentsParser& /*arguments*/)
 	}
 	playerEntity.addComponent<CharacterStateComponent>();
 
-	Vector2D cameraPos{ZERO_VECTOR};
+	Vector2D cameraPos{ ZERO_VECTOR };
 	EntityView camera = world.createTrackedSpatialEntity(STR_TO_ID("CameraEntity"), SpatialWorldData::GetCellForPos(cameraPos));
 
 	{

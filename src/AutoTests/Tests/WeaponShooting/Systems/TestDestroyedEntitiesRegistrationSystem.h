@@ -10,7 +10,8 @@ class TestDestroyedEntitiesRegistrationSystem final : public RaccoonEcs::System
 public:
 	TestDestroyedEntitiesRegistrationSystem(
 		WorldHolder& worldHolder,
-		DestroyedEntitiesTestCheck& testCheck) noexcept;
+		DestroyedEntitiesTestCheck& testCheck
+	) noexcept;
 
 	void update() override;
 

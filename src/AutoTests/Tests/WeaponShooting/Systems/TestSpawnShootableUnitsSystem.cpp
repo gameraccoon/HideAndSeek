@@ -2,19 +2,18 @@
 
 #include "AutoTests/Tests/WeaponShooting/Systems/TestSpawnShootableUnitsSystem.h"
 
-#include "EngineCommon/Random/Random.h"
-
 #include <SDL_keycode.h>
 
-#include "GameData/World.h"
-#include "GameData/Spatial/SpatialWorldData.h"
-#include "GameData/Components/SpriteCreatorComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
+#include "EngineCommon/Random/Random.h"
+
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/HealthComponent.generated.h"
+#include "GameData/Components/SpriteCreatorComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Spatial/SpatialWorldData.h"
+#include "GameData/World.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
-
 
 TestSpawnShootableUnitsSystem::TestSpawnShootableUnitsSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)

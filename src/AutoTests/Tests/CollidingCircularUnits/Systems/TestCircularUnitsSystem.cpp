@@ -12,7 +12,6 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-
 TestCircularUnitsSystem::TestCircularUnitsSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
@@ -41,8 +40,7 @@ void TestCircularUnitsSystem::update()
 
 	SpatialEntityManager spatialManager = world.getSpatialData().getAllCellManagers();
 	spatialManager.forEachComponentSet<const AiControllerComponent, const TransformComponent, MovementComponent>(
-		[targetLocation, dt](const AiControllerComponent* /*aiController*/, const TransformComponent* transform, MovementComponent* movement)
-		{
+		[targetLocation, dt](const AiControllerComponent* /*aiController*/, const TransformComponent* transform, MovementComponent* movement) {
 			Vector2D nextStep = targetLocation - transform->getLocation();
 			movement->setMoveDirection(nextStep);
 			movement->setNextStep(nextStep * movement->getOriginalSpeed() * dt);

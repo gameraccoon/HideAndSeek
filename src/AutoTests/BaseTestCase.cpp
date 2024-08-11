@@ -6,10 +6,10 @@
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
-
 #include "HAL/Base/Engine.h"
 #include "HAL/Base/GameLoop.h"
+
+#include "GameUtils/Application/ArgumentsParser.h"
 
 TestChecklist BaseTestCase::start(const ArgumentsParser& arguments, RenderAccessorGameRef renderAccessor)
 {
@@ -50,8 +50,7 @@ void BaseTestCase::fixedTimeUpdate(const float dt)
 	{
 		Game::fixedTimeUpdate(dt);
 		++mTicksCount;
-	}
-	while (mOneFrame && mTicksCount < mTicksToFinish);
+	} while (mOneFrame && mTicksCount < mTicksToFinish);
 
 	if (mTicksCount >= mTicksToFinish)
 	{

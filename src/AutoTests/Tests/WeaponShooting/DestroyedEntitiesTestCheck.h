@@ -24,4 +24,3 @@ private:
 	int mDestroyedEntities = 0;
 	int mExpectedDestroyedEntities;
 };
-

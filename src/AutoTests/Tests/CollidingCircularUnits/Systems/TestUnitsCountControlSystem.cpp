@@ -4,17 +4,16 @@
 
 #include "EngineCommon/Random/Random.h"
 
-#include "GameData/World.h"
-#include "GameData/Spatial/SpatialWorldData.h"
-#include "GameData/Components/SpriteCreatorComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/MovementComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/AiControllerComponent.generated.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/SpriteCreatorComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Spatial/SpatialWorldData.h"
+#include "GameData/World.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
-
 
 TestUnitsCountControlSystem::TestUnitsCountControlSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)

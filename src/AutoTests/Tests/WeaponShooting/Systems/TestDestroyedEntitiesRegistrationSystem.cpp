@@ -10,8 +10,9 @@
 #include "AutoTests/Tests/WeaponShooting/DestroyedEntitiesTestCheck.h"
 
 TestDestroyedEntitiesRegistrationSystem::TestDestroyedEntitiesRegistrationSystem(
-		WorldHolder& worldHolder,
-		DestroyedEntitiesTestCheck& testCheck) noexcept
+	WorldHolder& worldHolder,
+	DestroyedEntitiesTestCheck& testCheck
+) noexcept
 	: mWorldHolder(worldHolder)
 	, mTestCheck(testCheck)
 {
@@ -22,8 +23,7 @@ void TestDestroyedEntitiesRegistrationSystem::update()
 	World& world = mWorldHolder.getWorld();
 
 	int count = 0;
-	world.getSpatialData().getAllCellManagers().forEachComponentSet<const DeathComponent>([&count](const DeathComponent*)
-	{
+	world.getSpatialData().getAllCellManagers().forEachComponentSet<const DeathComponent>([&count](const DeathComponent*) {
 		++count;
 	});
 
