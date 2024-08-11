@@ -23,8 +23,8 @@ CellPos CellPos::operator+(const CellPosDiff& diff) const
 void to_json(nlohmann::json& outJson, const CellPos& pos)
 {
 	outJson = nlohmann::json{
-		{"x", pos.x},
-		{"y", pos.y}
+		{ "x", pos.x },
+		{ "y", pos.y }
 	};
 }
 

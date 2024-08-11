@@ -8,12 +8,12 @@ struct AnimationClipParams
 	bool isLooped = false;
 };
 
-inline bool operator ==(const AnimationClipParams& a, const AnimationClipParams& b)
+inline bool operator==(const AnimationClipParams& a, const AnimationClipParams& b)
 {
 	return a.speed == b.speed && a.isLooped == b.isLooped;
 }
 
-inline bool operator !=(const AnimationClipParams& a, const AnimationClipParams& b)
+inline bool operator!=(const AnimationClipParams& a, const AnimationClipParams& b)
 {
 	return !(a == b);
 }

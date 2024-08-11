@@ -7,7 +7,7 @@
 
 #include "GameData/Resources/ResourceHandle.h"
 
-template <typename StateIdType>
+template<typename StateIdType>
 class AnimationGroup
 {
 public:

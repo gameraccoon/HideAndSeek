@@ -4,8 +4,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 #include "GameData/Components/SpatialTrackComponent.generated.h"
+#include "GameData/Components/TrackedSpatialEntitiesComponent.generated.h"
 #include "GameData/Serialization/Json/ComponentSetHolder.h"
 #include "GameData/Serialization/Json/EntityManager.h"
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
@@ -20,9 +20,9 @@ World::World(const ComponentFactory& componentFactory)
 nlohmann::json World::toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
 	return nlohmann::json{
-		{"entity_manager", SerializeEntityManager(mEntityManager, jsonSerializerHolder)},
-		{"world_components", SerializeComponentSetHolder(mWorldComponents, jsonSerializerHolder)},
-		{"spatial_data", mSpatialData.toJson(jsonSerializerHolder)}
+		{ "entity_manager", SerializeEntityManager(mEntityManager, jsonSerializerHolder) },
+		{ "world_components", SerializeComponentSetHolder(mWorldComponents, jsonSerializerHolder) },
+		{ "spatial_data", mSpatialData.toJson(jsonSerializerHolder) }
 	};
 }
 
@@ -34,19 +34,19 @@ static void InitSpatialTrackedEntities(SpatialWorldData& spatialData, ComponentS
 	for (auto& [_, cell] : cells)
 	{
 		cell.getEntityManager().forEachComponentSetWithEntity<const SpatialTrackComponent>(
-			[trackedSpatialEntities, cell = &cell](const Entity entity, const SpatialTrackComponent* spatialTrack)
-		{
-			auto it = trackedSpatialEntities->getEntitiesRef().find(spatialTrack->getId());
-			if (it != trackedSpatialEntities->getEntitiesRef().end())
-			{
-				it->second.entity = entity;
-				it->second.cell = cell->getPos();
+			[trackedSpatialEntities, cell = &cell](const Entity entity, const SpatialTrackComponent* spatialTrack) {
+				auto it = trackedSpatialEntities->getEntitiesRef().find(spatialTrack->getId());
+				if (it != trackedSpatialEntities->getEntitiesRef().end())
+				{
+					it->second.entity = entity;
+					it->second.cell = cell->getPos();
+				}
+				else
+				{
+					ReportError("No tracked spatial entity record found for entity %d", spatialTrack->getId());
+				}
 			}
-			else
-			{
-				ReportError("No tracked spatial entity record found for entity %d", spatialTrack->getId());
-			}
-		});
+		);
 	}
 }
 

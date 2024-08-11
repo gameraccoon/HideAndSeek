@@ -11,7 +11,8 @@ public:
 
 public:
 	ResourceHandle() = default;
-	explicit ResourceHandle(const IndexType index) : resourceIndex(index) {}
+	explicit ResourceHandle(const IndexType index)
+		: resourceIndex(index) {}
 
 	std::strong_ordering operator<=>(const ResourceHandle& other) const = default;
 

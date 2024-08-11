@@ -125,4 +125,4 @@ namespace Json
 			}
 		}
 	}
-}
+} // namespace Json

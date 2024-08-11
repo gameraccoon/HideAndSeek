@@ -1,6 +1,7 @@
 #pragma once
 
 #include <limits>
+
 #include <nlohmann/json_fwd.hpp>
 
 #include "EngineCommon/Types/BasicTypes.h"
@@ -12,7 +13,8 @@ public:
 
 public:
 	constexpr GameplayTimestamp() = default;
-	explicit constexpr GameplayTimestamp(TimeValueType time) noexcept : mTimestamp(time) {}
+	explicit constexpr GameplayTimestamp(TimeValueType time) noexcept
+		: mTimestamp(time) {}
 
 	[[nodiscard]] bool isInitialized() const noexcept;
 

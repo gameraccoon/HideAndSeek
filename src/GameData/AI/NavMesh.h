@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "EngineData/Geometry/Vector2D.h"
 #include "EngineData/Geometry/IntVector2D.h"
+#include "EngineData/Geometry/Vector2D.h"
 
 struct NavMesh
 {
@@ -18,8 +18,8 @@ struct NavMesh
 		std::vector<size_t> indexes;
 		size_t verticesPerPoly = 3;
 		size_t polygonsCount = 0;
-		Vector2D navMeshStart{ZERO_VECTOR};
-		Vector2D navMeshSize{ZERO_VECTOR};
+		Vector2D navMeshStart{ ZERO_VECTOR };
+		Vector2D navMeshSize{ ZERO_VECTOR };
 		bool isCalculated = false;
 	};
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <map>
 #include <memory>
+#include <vector>
 
 #include "EngineCommon/Debug/Assert.h"
 
@@ -25,7 +25,7 @@ namespace FSM
 	 * The same behavior can be achieved with StateMachine class (and in some cases more efficient),
 	 * but it will result in links duplication and will be harder to reason about.
 	 */
-	template <typename StateIdType, typename BlackboardKeyType>
+	template<typename StateIdType, typename BlackboardKeyType>
 	class StateMachine
 	{
 	public:
@@ -61,7 +61,7 @@ namespace FSM
 		struct StateLinkRules
 		{
 			// less verbose emplace function
-			template <template<typename...> typename LinkRuleType, typename... Types, typename... Args>
+			template<template<typename...> typename LinkRuleType, typename... Types, typename... Args>
 			void emplaceLink(StateIdType state, Args&&... args)
 			{
 				links.emplace_back(std::move(state), std::make_unique<LinkRuleType<BlackboardKeyType, Types...>>(std::forward<Args>(args)...));
@@ -177,7 +177,7 @@ namespace FSM
 		{
 			typename std::map<StateIdType, StateIdType>::const_iterator childIt;
 
-			while(true)
+			while (true)
 			{
 				childIt = mParentToChildLinks.find(state);
 				if (childIt == mParentToChildLinks.end())
@@ -193,4 +193,4 @@ namespace FSM
 		std::map<StateIdType, StateIdType> mChildToParentLinks;
 		std::map<StateIdType, StateIdType> mParentToChildLinks;
 	};
-}
+} // namespace FSM

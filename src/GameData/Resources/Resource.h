@@ -23,7 +23,7 @@ public:
 		None
 	};
 
-	using InitFn = UniqueAny(*)(UniqueAny&&, ResourceManager&, ResourceHandle);
+	using InitFn = UniqueAny (*)(UniqueAny&&, ResourceManager&, ResourceHandle);
 
 	struct InitStep
 	{

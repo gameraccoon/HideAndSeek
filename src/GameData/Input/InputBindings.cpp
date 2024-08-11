@@ -174,4 +174,4 @@ namespace Input
 
 		return maxPositive - maxNegative;
 	}
-}
+} // namespace Input

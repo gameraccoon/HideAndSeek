@@ -68,4 +68,4 @@ namespace Input
 			gamepadState.clearLastFrameState();
 		}
 	};
-}
+} // namespace Input

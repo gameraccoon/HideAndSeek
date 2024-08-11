@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 #include "GameData/Input/GameplayInputFrameState.h"
 #include "GameData/Input/PlayerControllerStates.h"
@@ -62,6 +62,7 @@ namespace Input
 	public:
 		PositiveButtonAxisBinding(ControllerType controllerType, int button);
 		virtual float getAxisValue(const PlayerControllerStates& controllerStates) const override;
+
 	private:
 		const ControllerType mControllerType;
 		const int mButton;
@@ -75,6 +76,7 @@ namespace Input
 	public:
 		NegativeButtonAxisBinding(ControllerType controllerType, int button);
 		virtual float getAxisValue(const PlayerControllerStates& controllerStates) const override;
+
 	private:
 		const ControllerType mControllerType;
 		const int mButton;
@@ -88,6 +90,7 @@ namespace Input
 	public:
 		DirectAxisToAxisBinding(ControllerType controllerType, int axis);
 		virtual float getAxisValue(const PlayerControllerStates& controllerStates) const override;
+
 	private:
 		const ControllerType mControllerType;
 		const int mAxis;
@@ -114,4 +117,4 @@ namespace Input
 		 */
 		static float GetBlendedAxisValue(const std::vector<std::unique_ptr<AxisBinding>>& bindings, const PlayerControllerStates& controllerStates);
 	};
-}
+} // namespace Input

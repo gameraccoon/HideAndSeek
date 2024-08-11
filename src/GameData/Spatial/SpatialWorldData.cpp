@@ -1,7 +1,5 @@
 #include "EngineCommon/precomp.h"
 
-#include "GameData/World.h"
-
 #include <algorithm>
 #include <cmath>
 
@@ -10,6 +8,7 @@
 #include "EngineCommon/Types/TemplateAliases.h"
 
 #include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/World.h"
 
 SpatialWorldData::SpatialWorldData(const ComponentFactory& componentFactory)
 	: mComponentFactory(componentFactory)
@@ -163,8 +162,7 @@ nlohmann::json SpatialWorldData::toJson(const Json::ComponentSerializationHolder
 	std::ranges::sort(sortedCells, [](const auto& cellPairA, const auto& cellPairB) -> bool {
 		return (
 			cellPairA.first.x < cellPairB.first.x
-			||
-			(cellPairA.first.x == cellPairB.first.x && cellPairA.first.y < cellPairB.first.y)
+			|| (cellPairA.first.x == cellPairB.first.x && cellPairA.first.y < cellPairB.first.y)
 		);
 	});
 
@@ -177,8 +175,8 @@ nlohmann::json SpatialWorldData::toJson(const Json::ComponentSerializationHolder
 	}
 
 	return nlohmann::json{
-		{"cells", cellsJson},
-		{"cell_size", CellSizeInt}
+		{ "cells", cellsJson },
+		{ "cell_size", CellSizeInt }
 	};
 }
 

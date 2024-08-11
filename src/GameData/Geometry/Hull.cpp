@@ -15,10 +15,7 @@ void Hull::generateBorders() noexcept
 
 bool Hull::operator==(const Hull& other) const noexcept
 {
-	return type == other.type &&
-		((type == HullType::Angular && points == other.points)
-		||
-		(type == HullType::Circular && mRadius == other.mRadius));
+	return type == other.type && ((type == HullType::Angular && points == other.points) || (type == HullType::Circular && mRadius == other.mRadius));
 }
 
 bool Hull::operator!=(const Hull& other) const noexcept
@@ -35,9 +32,9 @@ void Hull::setRadius(const float newRadius) noexcept
 void to_json(nlohmann::json& outJson, const Hull& hull)
 {
 	outJson = nlohmann::json{
-		{"points", hull.points},
-		{"radius", hull.mRadius},
-		{"type", hull.type}
+		{ "points", hull.points },
+		{ "radius", hull.mRadius },
+		{ "type", hull.type }
 	};
 }
 

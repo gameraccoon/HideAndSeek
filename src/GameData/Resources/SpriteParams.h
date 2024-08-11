@@ -8,12 +8,12 @@ struct SpriteParams
 	Vector2D anchor = Vector2D(0.5f, 0.5f);
 };
 
-inline bool operator ==(const SpriteParams& a, const SpriteParams& b)
+inline bool operator==(const SpriteParams& a, const SpriteParams& b)
 {
 	return a.size == b.size && a.anchor == b.anchor;
 }
 
-inline bool operator !=(const SpriteParams& a, const SpriteParams& b)
+inline bool operator!=(const SpriteParams& a, const SpriteParams& b)
 {
 	return !(a == b);
 }

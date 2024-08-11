@@ -4,8 +4,9 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "EngineData/Geometry/Vector2D.h"
 #include "EngineData/Geometry/Border.h"
+#include "EngineData/Geometry/Vector2D.h"
+
 #include "GameData/Enums/HullType.generated.h"
 
 class Hull

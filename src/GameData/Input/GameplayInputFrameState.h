@@ -2,8 +2,8 @@
 
 #include <array>
 
-#include "GameData/Time/GameplayTimestamp.h"
 #include "GameData/Input/GameplayInputConstants.h"
+#include "GameData/Time/GameplayTimestamp.h"
 
 namespace GameplayInput
 {
@@ -61,4 +61,4 @@ namespace GameplayInput
 		RawAxesData mAxes{};
 		RawKeysData mKeys;
 	};
-}
+} // namespace GameplayInput

@@ -1,9 +1,10 @@
 #include "EngineCommon/precomp.h"
 
 #include "GameData/GameData.h"
-#include "GameData/Serialization/Json/ComponentSetHolder.h"
 
 #include <nlohmann/json.hpp>
+
+#include "GameData/Serialization/Json/ComponentSetHolder.h"
 
 GameData::GameData(const ComponentFactory& componentFactory)
 	: mGameComponents(componentFactory)
@@ -12,7 +13,7 @@ GameData::GameData(const ComponentFactory& componentFactory)
 nlohmann::json GameData::toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder) const
 {
 	return nlohmann::json{
-		{"game_components", Json::SerializeComponentSetHolder(mGameComponents, jsonSerializerHolder)}
+		{ "game_components", Json::SerializeComponentSetHolder(mGameComponents, jsonSerializerHolder) }
 	};
 }
 

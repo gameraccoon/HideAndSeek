@@ -91,7 +91,6 @@ namespace Input
 
 		void updatePressedButtonsFromRawData(const std::array<std::byte, BitsetTraits<HardwareButtonsCount>::ByteCount>& pressedButtons) noexcept
 		{
-
 			SimpleBitset<HardwareButtonsCount> pressedButtonsThisFrame;
 			pressedButtonsThisFrame.setRawData(pressedButtons.data());
 
@@ -113,4 +112,4 @@ namespace Input
 
 		std::array<float, HardwareAxesCount> mAxes = {};
 	};
-}
+} // namespace Input

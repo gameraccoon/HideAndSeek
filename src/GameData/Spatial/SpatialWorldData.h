@@ -1,12 +1,12 @@
 #pragma once
 
-#include "EngineData/Geometry/Vector2D.h"
 #include "EngineData/Geometry/BoundingBox.h"
+#include "EngineData/Geometry/Vector2D.h"
 
 #include "GameData/EcsDefinitions.h"
+#include "GameData/Spatial/CellPos.h"
 #include "GameData/Spatial/SpatialEntityManager.h"
 #include "GameData/Spatial/WorldCell.h"
-#include "GameData/Spatial/CellPos.h"
 
 class SpatialWorldData
 {
@@ -53,11 +53,11 @@ public:
 public:
 	static constexpr int CellSizeInt = 200;
 	static constexpr float CellSize = static_cast<float>(CellSizeInt);
-	static constexpr Vector2D CellSizeVector{CellSize, CellSize};
+	static constexpr Vector2D CellSizeVector{ CellSize, CellSize };
 	static constexpr float MaxObjectSize = CellSize * 0.5f;
 
 private:
-	CellPos mBaseCell{0, 0};
+	CellPos mBaseCell{ 0, 0 };
 	std::unordered_map<CellPos, WorldCell> mCells;
 
 	const ComponentFactory& mComponentFactory;

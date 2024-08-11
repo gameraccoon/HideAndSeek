@@ -1,10 +1,11 @@
 #include "EngineCommon/precomp.h"
 
 #include "GameData/Spatial/WorldCell.h"
-#include "GameData/Serialization/Json/ComponentSetHolder.h"
-#include "GameData/Serialization/Json/EntityManager.h"
 
 #include <nlohmann/json.hpp>
+
+#include "GameData/Serialization/Json/ComponentSetHolder.h"
+#include "GameData/Serialization/Json/EntityManager.h"
 
 WorldCell::WorldCell(const CellPos& pos, const ComponentFactory& componentFactory)
 	: mEntityManager(componentFactory)
@@ -16,8 +17,8 @@ WorldCell::WorldCell(const CellPos& pos, const ComponentFactory& componentFactor
 nlohmann::json WorldCell::toJson(const Json::ComponentSerializationHolder& jsonSerializerHolder)
 {
 	return nlohmann::json{
-		{"entity_manager", Json::SerializeEntityManager(mEntityManager, jsonSerializerHolder)},
-		{"cell_components", Json::SerializeComponentSetHolder(mCellComponents, jsonSerializerHolder)},
+		{ "entity_manager", Json::SerializeEntityManager(mEntityManager, jsonSerializerHolder) },
+		{ "cell_components", Json::SerializeComponentSetHolder(mCellComponents, jsonSerializerHolder) },
 	};
 }
 

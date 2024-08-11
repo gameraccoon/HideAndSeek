@@ -24,4 +24,4 @@ namespace TrackedSpatialEntitiesComponentCustomSerialization
 			outEntities[entity.get<StringId>()] = SpatialEntity();
 		}
 	}
-}
+} // namespace TrackedSpatialEntitiesComponentCustomSerialization

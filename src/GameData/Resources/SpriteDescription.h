@@ -12,12 +12,12 @@ struct SpriteDescription
 	RelativeResourcePath path;
 };
 
-inline bool operator ==(const SpriteDescription& a, const SpriteDescription& b)
+inline bool operator==(const SpriteDescription& a, const SpriteDescription& b)
 {
 	return a.params == b.params && a.path == b.path;
 }
 
-inline bool operator !=(const SpriteDescription& a, const SpriteDescription& b)
+inline bool operator!=(const SpriteDescription& a, const SpriteDescription& b)
 {
 	return !(a == b);
 }

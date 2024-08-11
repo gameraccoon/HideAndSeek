@@ -3,6 +3,7 @@
 #include "GameData/Time/GameplayTimestamp.h"
 
 #include <type_traits>
+
 #include <nlohmann/json.hpp>
 
 bool GameplayTimestamp::isInitialized() const noexcept

@@ -1,22 +1,22 @@
 #pragma once
 
-#include <unordered_map>
 #include <any>
 #include <typeindex>
+#include <unordered_map>
 
 namespace FSM
 {
-	template <typename KeyType>
+	template<typename KeyType>
 	class Blackboard
 	{
 	public:
-		template <typename T>
+		template<typename T>
 		void setValue(KeyType key, std::common_type_t<T> value)
 		{
 			mValues.insert_or_assign(std::forward<KeyType>(key), std::forward<T>(value));
 		}
 
-		template <typename T>
+		template<typename T>
 		T getValue(KeyType key) const
 		{
 			auto it = mValues.find(std::forward<KeyType>(key));
@@ -29,7 +29,7 @@ namespace FSM
 			return T();
 		}
 
-		template <typename T>
+		template<typename T>
 		T getValue(KeyType key, std::common_type_t<T> def) const
 		{
 			auto it = mValues.find(std::forward<KeyType>(key));
@@ -45,4 +45,4 @@ namespace FSM
 	private:
 		std::unordered_map<KeyType, std::any> mValues;
 	};
-}
+} // namespace FSM

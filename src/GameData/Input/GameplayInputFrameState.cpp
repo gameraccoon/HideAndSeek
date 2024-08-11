@@ -68,8 +68,8 @@ namespace GameplayInput
 
 	void FrameState::setRawKeyState(const size_t keyIdx, const KeyState state, const GameplayTimestamp lastFlipTimestamp)
 	{
-		mKeys[keyIdx] = {state, lastFlipTimestamp};
+		mKeys[keyIdx] = { state, lastFlipTimestamp };
 	}
-}
+} // namespace GameplayInput
 
 static_assert(std::is_trivially_copyable<GameplayInput::FrameState>(), "GameplayInput should be trivially copyable");
