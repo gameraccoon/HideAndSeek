@@ -1,9 +1,9 @@
 #include "EngineCommon/precomp.h"
 
-#include <gtest/gtest.h>
-
-#include <array>
 #include <algorithm>
+#include <array>
+
+#include <gtest/gtest.h>
 
 #include "EngineCommon/Types/ComplexTypes/SimpleBitset.h"
 

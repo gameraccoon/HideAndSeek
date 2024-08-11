@@ -42,8 +42,7 @@ TEST(ConcurrentAccessDetector, AccessedFromMultipleThreads)
 		{
 			DETECT_CONCURRENT_ACCESS(detectorInstance);
 
-			auto thread = std::thread([&detectorInstance]()
-			{
+			auto thread = std::thread([&detectorInstance]() {
 				DETECT_CONCURRENT_ACCESS(detectorInstance);
 			});
 			thread.join();
@@ -61,8 +60,7 @@ TEST(ConcurrentAccessDetector, UnlockableGuard_UnlockedWhenAccessedFromMultipleT
 			DETECT_CONCURRENT_ACCESS_UNLOCKABLE(detectorInstance, detectorMain);
 
 			CONCURRENT_ACCESS_DETECTOR_MANUAL_UNLOCK(detectorMain);
-			auto thread = std::thread([&detectorInstance]()
-			{
+			auto thread = std::thread([&detectorInstance]() {
 				DETECT_CONCURRENT_ACCESS(detectorInstance);
 			});
 			thread.join();
@@ -80,8 +78,7 @@ TEST(ConcurrentAccessDetector, UnlockableGuard_AccessedFromMultipleThreads)
 		{
 			DETECT_CONCURRENT_ACCESS_UNLOCKABLE(detectorInstance, detectorMain);
 
-			auto thread = std::thread([&detectorInstance]()
-			{
+			auto thread = std::thread([&detectorInstance]() {
 				DETECT_CONCURRENT_ACCESS(detectorInstance);
 			});
 			thread.join();
@@ -89,8 +86,7 @@ TEST(ConcurrentAccessDetector, UnlockableGuard_AccessedFromMultipleThreads)
 			CONCURRENT_ACCESS_DETECTOR_MANUAL_UNLOCK(detectorMain);
 			CONCURRENT_ACCESS_DETECTOR_MANUAL_LOCK(detectorMain);
 
-			auto thread2 = std::thread([&detectorInstance]()
-			{
+			auto thread2 = std::thread([&detectorInstance]() {
 				DETECT_CONCURRENT_ACCESS(detectorInstance);
 			});
 			thread2.join();

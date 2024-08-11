@@ -4,9 +4,9 @@
 
 #include "EngineCommon/Types/TemplateAliases.h"
 
-#include "GameData/EcsDefinitions.h"
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/EcsDefinitions.h"
 
 TEST(Components, EntityCreationAndRemovement)
 {

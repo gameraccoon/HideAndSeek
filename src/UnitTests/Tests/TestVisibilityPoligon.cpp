@@ -1,8 +1,8 @@
 #include "EngineCommon/precomp.h"
 
-#include <gtest/gtest.h>
-
 #include <algorithm>
+
+#include <gtest/gtest.h>
 
 #include "EngineCommon/Types/TemplateAliases.h"
 
@@ -10,7 +10,6 @@
 #include "GameData/Geometry/Hull.h"
 
 #include "GameUtils/Geometry/VisibilityPolygon.h"
-
 
 static bool AreVisibilityPolygonsEqual(const std::vector<Vector2D>& a, const std::vector<Vector2D>& b)
 {
@@ -28,14 +27,14 @@ static bool AreVisibilityPolygonsEqual(const std::vector<Vector2D>& a, const std
 
 	auto aCopy = a;
 
-	const auto it = std::ranges::find_if(aCopy, [start = b.front()](const Vector2D val){ return val.isNearlyEqualTo(start, allowedError); });
+	const auto it = std::ranges::find_if(aCopy, [start = b.front()](const Vector2D val) { return val.isNearlyEqualTo(start, allowedError); });
 	if (it == aCopy.end())
 	{
 		return false;
 	}
 
 	std::rotate(aCopy.begin(), it, aCopy.end());
-	return aCopy.size() == b.size() && std::equal(aCopy.begin(), aCopy.end(), b.begin(), [](const Vector2D a, const Vector2D b){ return a.isNearlyEqualTo(b, allowedError); });
+	return aCopy.size() == b.size() && std::equal(aCopy.begin(), aCopy.end(), b.begin(), [](const Vector2D a, const Vector2D b) { return a.isNearlyEqualTo(b, allowedError); });
 }
 
 static void FillTestLightBlockingGeometry(LightBlockingGeometryComponent& component, const Hull& geometry, const Vector2D& location)
@@ -49,12 +48,12 @@ static void FillTestLightBlockingGeometry(LightBlockingGeometryComponent& compon
 
 TEST(VisibilityPolygon, TestPlygonsEqualityTest)
 {
-	EXPECT_TRUE(AreVisibilityPolygonsEqual({{30.0f, 30.0f}, {-50.0f, 50.0f}, {-10.0f, -10.0f}}, {{30.0f, 30.0f}, {-50.0f, 50.0f}, {-10.0f, -10.0f}}));
-	EXPECT_TRUE(AreVisibilityPolygonsEqual({{30.0f, 30.0f}, {-50.0f, 50.0f}, {-10.0f, -10.0f}}, {{-50.0f, 50.0f}, {-10.0f, -10.0f}, {30.0f, 30.0f}}));
-	EXPECT_TRUE(AreVisibilityPolygonsEqual({{30.0f, 30.0f}, {-50.0f, 50.0f}, {-10.0f, -10.0f}}, {{-10.0f, -10.0f}, {30.0f, 30.0f}, {-50.0f, 50.0f}}));
-	EXPECT_FALSE(AreVisibilityPolygonsEqual({{30.0f, 30.0f}, {-50.0f, 50.0f}, {-10.0f, -10.0f}}, {{-10.0f, -10.0f}, {-50.0f, 50.0f}, {30.0f, 30.0f}}));
-	EXPECT_FALSE(AreVisibilityPolygonsEqual({{30.0f, 30.0f}, {-50.0f, 50.0f}, {-10.0f, -10.0f}}, {{30.0f, 30.0f}, {-50.0f, 50.0f}}));
-	EXPECT_FALSE(AreVisibilityPolygonsEqual({{30.0f, 30.0f}, {-50.0f, 50.0f}}, {{30.0f, 30.0f}, {-50.0f, 50.0f}, {-10.0f, -10.0f}}));
+	EXPECT_TRUE(AreVisibilityPolygonsEqual({ { 30.0f, 30.0f }, { -50.0f, 50.0f }, { -10.0f, -10.0f } }, { { 30.0f, 30.0f }, { -50.0f, 50.0f }, { -10.0f, -10.0f } }));
+	EXPECT_TRUE(AreVisibilityPolygonsEqual({ { 30.0f, 30.0f }, { -50.0f, 50.0f }, { -10.0f, -10.0f } }, { { -50.0f, 50.0f }, { -10.0f, -10.0f }, { 30.0f, 30.0f } }));
+	EXPECT_TRUE(AreVisibilityPolygonsEqual({ { 30.0f, 30.0f }, { -50.0f, 50.0f }, { -10.0f, -10.0f } }, { { -10.0f, -10.0f }, { 30.0f, 30.0f }, { -50.0f, 50.0f } }));
+	EXPECT_FALSE(AreVisibilityPolygonsEqual({ { 30.0f, 30.0f }, { -50.0f, 50.0f }, { -10.0f, -10.0f } }, { { -10.0f, -10.0f }, { -50.0f, 50.0f }, { 30.0f, 30.0f } }));
+	EXPECT_FALSE(AreVisibilityPolygonsEqual({ { 30.0f, 30.0f }, { -50.0f, 50.0f }, { -10.0f, -10.0f } }, { { 30.0f, 30.0f }, { -50.0f, 50.0f } }));
+	EXPECT_FALSE(AreVisibilityPolygonsEqual({ { 30.0f, 30.0f }, { -50.0f, 50.0f } }, { { 30.0f, 30.0f }, { -50.0f, 50.0f }, { -10.0f, -10.0f } }));
 }
 
 TEST(VisibilityPolygon, Empty)
@@ -65,7 +64,7 @@ TEST(VisibilityPolygon, Empty)
 
 	std::vector<Vector2D> result;
 	calc.calculateVisibilityPolygon(result, components, pos, Vector2D(600.0f, 600.0f));
-	EXPECT_TRUE(AreVisibilityPolygonsEqual(result, {{-300.0f, -300.0f}, {300.0f, -300.0f}, {300.0f, 300.0f}, {-300.0f, 300.0f}}));
+	EXPECT_TRUE(AreVisibilityPolygonsEqual(result, { { -300.0f, -300.0f }, { 300.0f, -300.0f }, { 300.0f, 300.0f }, { -300.0f, 300.0f } }));
 }
 
 TEST(VisibilityPolygon, OneBorder)
@@ -75,7 +74,7 @@ TEST(VisibilityPolygon, OneBorder)
 
 	Hull geometry;
 	geometry.type = HullType::Angular;
-	geometry.points = {{-60.0f, -50.0f}, {60.0f, -50.0f}, {60.0f, 50.0f}, {-60.0f, 50.0f}};
+	geometry.points = { { -60.0f, -50.0f }, { 60.0f, -50.0f }, { 60.0f, 50.0f }, { -60.0f, 50.0f } };
 	geometry.generateBorders();
 	constexpr Vector2D location(-10.0f, -210.0f);
 	std::vector<const LightBlockingGeometryComponent*> components;
@@ -85,7 +84,7 @@ TEST(VisibilityPolygon, OneBorder)
 
 	std::vector<Vector2D> result;
 	calc.calculateVisibilityPolygon(result, components, pos, Vector2D(600.0f, 600.0f));
-	EXPECT_TRUE(AreVisibilityPolygonsEqual(result, {{-300, -300}, {-150,-300}, {-60, -120}, {60, -120}, {150,-300}, {300, -300}, {300, 300}, {-300, 300}}));
+	EXPECT_TRUE(AreVisibilityPolygonsEqual(result, { { -300, -300 }, { -150, -300 }, { -60, -120 }, { 60, -120 }, { 150, -300 }, { 300, -300 }, { 300, 300 }, { -300, 300 } }));
 }
 
 TEST(VisibilityPolygon, OneBorderEqualAngles)
@@ -95,7 +94,7 @@ TEST(VisibilityPolygon, OneBorderEqualAngles)
 
 	Hull geometry;
 	geometry.type = HullType::Angular;
-	geometry.points = {{60.0f, -60.0f}, {60.0f, 60.0f}, {-60.0f, 60.0f}, {-60.0f, -60.0f}};
+	geometry.points = { { 60.0f, -60.0f }, { 60.0f, 60.0f }, { -60.0f, 60.0f }, { -60.0f, -60.0f } };
 	geometry.generateBorders();
 	constexpr Vector2D location(260.0f, 39.0f);
 	std::vector<const LightBlockingGeometryComponent*> components;
@@ -105,7 +104,7 @@ TEST(VisibilityPolygon, OneBorderEqualAngles)
 
 	std::vector<Vector2D> result;
 	calc.calculateVisibilityPolygon(result, components, pos, Vector2D(600.0f, 600.0f));
-	EXPECT_TRUE(AreVisibilityPolygonsEqual(result, {{-300.0f, -300.0f}, {300.0f, -300.0f}, {300.0f, 300.0f}, {12.0f, 12.0f}, {-108.0f, 12.0f}, {-300.0f, 33.3333f}}));
+	EXPECT_TRUE(AreVisibilityPolygonsEqual(result, { { -300.0f, -300.0f }, { 300.0f, -300.0f }, { 300.0f, 300.0f }, { 12.0f, 12.0f }, { -108.0f, 12.0f }, { -300.0f, 33.3333f } }));
 }
 
 TEST(VisibilityPolygon, ApertureDirection1)
@@ -118,7 +117,7 @@ TEST(VisibilityPolygon, ApertureDirection1)
 	{
 		Hull geometry;
 		geometry.type = HullType::Angular;
-		geometry.points = {{-110.0f, -10.0f}, {110.0f, -10.0f}, {110.0f, 10.0f}, {-110.0f, 10.0f}};
+		geometry.points = { { -110.0f, -10.0f }, { 110.0f, -10.0f }, { 110.0f, 10.0f }, { -110.0f, 10.0f } };
 		constexpr Vector2D location(-90.0f, -190.0f);
 		// create 8 blocks that makes a figure like aperture
 		for (int i = 0; i < 8; ++i)
@@ -170,7 +169,7 @@ TEST(VisibilityPolygon, ApertureDirection2)
 	{
 		Hull geometry;
 		geometry.type = HullType::Angular;
-		geometry.points = {{-110.0f, -10.0f}, {110.0f, -10.0f}, {110.0f, 10.0f}, {-110.0f, 10.0f}};
+		geometry.points = { { -110.0f, -10.0f }, { 110.0f, -10.0f }, { 110.0f, 10.0f }, { -110.0f, 10.0f } };
 		constexpr Vector2D location(90.0f, -190.0f);
 		// create 8 blocks that makes a figure like aperture
 		for (int i = 0; i < 8; ++i)

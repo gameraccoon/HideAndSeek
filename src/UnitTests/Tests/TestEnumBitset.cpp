@@ -8,11 +8,13 @@ TEST(EnumBitset, Usage)
 {
 	enum class TestEnum
 	{
-		One, Two, Three
+		One,
+		Two,
+		Three
 	};
 
 	{
-		EnumBitset<TestEnum> test{TestEnum::One};
+		EnumBitset<TestEnum> test{ TestEnum::One };
 		EXPECT_TRUE(test.has(TestEnum::One));
 		EXPECT_FALSE(test.has(TestEnum::Two));
 		EXPECT_FALSE(test.has(TestEnum::Three));
@@ -30,7 +32,7 @@ TEST(EnumBitset, Usage)
 	}
 
 	{
-		EnumBitset<TestEnum> test{TestEnum::One, TestEnum::Three};
+		EnumBitset<TestEnum> test{ TestEnum::One, TestEnum::Three };
 		EXPECT_TRUE(test.has(TestEnum::One));
 		EXPECT_FALSE(test.has(TestEnum::Two));
 		EXPECT_TRUE(test.has(TestEnum::Three));

@@ -229,7 +229,7 @@ TEST(InputBindings, PressButtonChordKeyBinding_OneKeyFromTwoIsPressed)
 	using namespace Input;
 
 	InputBindings bindings;
-	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{0, 1}));
+	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{ 0, 1 }));
 	PlayerControllerStates controllerState;
 
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
@@ -243,7 +243,7 @@ TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressed)
 	using namespace Input;
 
 	InputBindings bindings;
-	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{0, 1}));
+	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{ 0, 1 }));
 	PlayerControllerStates controllerState;
 
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
@@ -257,7 +257,7 @@ TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressedAndOneReleased)
 	using namespace Input;
 
 	InputBindings bindings;
-	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{0, 1}));
+	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{ 0, 1 }));
 	PlayerControllerStates controllerState;
 
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
@@ -274,7 +274,7 @@ TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressedOneReleasedAndPress
 	using namespace Input;
 
 	InputBindings bindings;
-	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{0, 1}));
+	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{ 0, 1 }));
 	PlayerControllerStates controllerState;
 
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
@@ -294,7 +294,7 @@ TEST(InputBindings, PressButtonChordKeyBinding_AllExceptOnePressedThenLastPresse
 	using namespace Input;
 
 	InputBindings bindings;
-	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{0, 1}));
+	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{ 0, 1 }));
 	PlayerControllerStates controllerState;
 
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
@@ -312,7 +312,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_AllExceptOnePressedThenPressAndR
 	using namespace Input;
 
 	InputBindings bindings;
-	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{0, 1}));
+	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{ 0, 1 }));
 	PlayerControllerStates controllerState;
 
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
@@ -330,7 +330,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_AllPressedThenReleaseAndPressOne
 	using namespace Input;
 
 	InputBindings bindings;
-	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{0, 1}));
+	bindings.keyBindings[GameplayInput::InputKey::Shoot].emplace_back(std::make_unique<PressButtonChordKeyBinding>(ControllerType::Gamepad, std::vector<int>{ 0, 1 }));
 	PlayerControllerStates controllerState;
 
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);

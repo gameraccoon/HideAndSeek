@@ -117,7 +117,7 @@ TEST(BasicTypesSerialization, AppendNumber_Size)
 TEST(BasicTypesSerialization, WriteNumber_ReadNumber)
 {
 	std::vector<std::byte> stream;
-	stream.resize(1+2+4+8+1+2+4+8+4+8);
+	stream.resize(1 + 2 + 4 + 8 + 1 + 2 + 4 + 8 + 4 + 8);
 
 	const s8 testSignedInt8 = -4;
 	const s16 testSignedInt16 = -3;
@@ -180,7 +180,7 @@ TEST(BasicTypesSerialization, AppendNumber_ReadNumber)
 	Serialization::AppendNumber<u64>(stream, testUnsignedInt64);
 	Serialization::AppendNumber<f32>(stream, testFloat32);
 	Serialization::AppendNumber<f64>(stream, testFloat64);
-	EXPECT_EQ(size_t(1+2+4+8+1+2+4+8+4+8), stream.size());
+	EXPECT_EQ(size_t(1 + 2 + 4 + 8 + 1 + 2 + 4 + 8 + 4 + 8), stream.size());
 
 	size_t cursorPos = 0;
 	EXPECT_EQ(static_cast<s8>(-4), Serialization::ReadNumber<s8>(stream, cursorPos));

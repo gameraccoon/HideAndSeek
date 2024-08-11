@@ -25,7 +25,6 @@ TEST(Result, ResultWithValue_GetValueOr_ValueReturned)
 	EXPECT_EQ(42, result.getValueOr(12));
 }
 
-
 TEST(Result, ResultWithValue_CompareWithOther_OnlyTheSameValueEquals)
 {
 	const Result<int, std::string> result = Result<int, std::string>::Ok(42);
@@ -90,7 +89,6 @@ TEST(Result, ResultWithError_GetValueOr_DefaultReturned)
 
 	EXPECT_EQ(42, result.getValueOr(42));
 }
-
 
 TEST(Result, ResultWithNonCopyableValue_ConsumeValue_ValueIsExact)
 {

@@ -1,9 +1,7 @@
 #include "EngineCommon/precomp.h"
 
 #include <gtest/gtest.h>
-
 #include <raccoon-ecs/delegates.h>
-
 
 TEST(Delegates, SingleCast)
 {
@@ -14,8 +12,7 @@ TEST(Delegates, SingleCast)
 	delegate.callSafe(2);
 	ASSERT_THROW(delegate.callUnsafe(2), std::exception);
 
-	delegate.assign([&testVal](const int test)
-	{
+	delegate.assign([&testVal](const int test) {
 		testVal = test;
 	});
 
@@ -48,8 +45,7 @@ TEST(Delegates, MultiCast)
 
 	delegate.broadcast(2);
 
-	const RaccoonEcs::Delegates::Handle handle = delegate.bind([&testVal1](const int test)
-	{
+	const RaccoonEcs::Delegates::Handle handle = delegate.bind([&testVal1](const int test) {
 		testVal1 += test;
 	});
 	delegate.broadcast(3);
@@ -57,8 +53,7 @@ TEST(Delegates, MultiCast)
 	ASSERT_EQ(4, testVal1);
 	ASSERT_EQ(1, testVal2);
 
-	delegate.bind([&testVal2](const int test)
-	{
+	delegate.bind([&testVal2](const int test) {
 		testVal2 += test;
 	});
 

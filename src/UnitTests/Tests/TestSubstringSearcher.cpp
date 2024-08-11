@@ -7,7 +7,8 @@
 class TestSubstringSearchData
 {
 public:
-	explicit TestSubstringSearchData(const int val) : value(val) {} // implicit
+	explicit TestSubstringSearchData(const int val)
+		: value(val) {} // implicit
 	TestSubstringSearchData(const TestSubstringSearchData&) = delete;
 	TestSubstringSearchData& operator=(const TestSubstringSearchData&) = delete;
 	TestSubstringSearchData(TestSubstringSearchData&&) = default;
@@ -22,9 +23,9 @@ TEST(SubstringSearcher, BasicUsageVal)
 
 	std::vector<std::pair<std::vector<std::string>, int>> data;
 
-	data.emplace_back(std::vector<std::string>{"testvalue"}, 10);
-	data.emplace_back(std::vector<std::string>{"test.value"}, 20);
-	data.emplace_back(std::vector<std::string>{"tes.tvalue"}, 30);
+	data.emplace_back(std::vector<std::string>{ "testvalue" }, 10);
+	data.emplace_back(std::vector<std::string>{ "test.value" }, 20);
+	data.emplace_back(std::vector<std::string>{ "tes.tvalue" }, 30);
 
 	searcher.construct(std::move(data));
 
@@ -46,9 +47,9 @@ TEST(SubstringSearcher, BasicUsageRef)
 
 	std::vector<std::pair<std::vector<std::string>, TestSubstringSearchData>> data;
 
-	data.emplace_back(std::vector<std::string>{"testvalue"}, TestSubstringSearchData(10));
-	data.emplace_back(std::vector<std::string>{"test.value"}, TestSubstringSearchData(20));
-	data.emplace_back(std::vector<std::string>{"tes.tvalue"}, TestSubstringSearchData(30));
+	data.emplace_back(std::vector<std::string>{ "testvalue" }, TestSubstringSearchData(10));
+	data.emplace_back(std::vector<std::string>{ "test.value" }, TestSubstringSearchData(20));
+	data.emplace_back(std::vector<std::string>{ "tes.tvalue" }, TestSubstringSearchData(30));
 
 	searcher.construct(std::move(data));
 
@@ -70,9 +71,9 @@ TEST(SubstringSearcher, MultipleKeys)
 
 	std::vector<std::pair<std::vector<std::string>, int>> data;
 
-	data.emplace_back(std::vector<std::string>{"value1", "value1alias1", "value1alias2"}, 10);
-	data.emplace_back(std::vector<std::string>{"value2"}, 20);
-	data.emplace_back(std::vector<std::string>{"value3", "value3alias1"}, 30);
+	data.emplace_back(std::vector<std::string>{ "value1", "value1alias1", "value1alias2" }, 10);
+	data.emplace_back(std::vector<std::string>{ "value2" }, 20);
+	data.emplace_back(std::vector<std::string>{ "value3", "value3alias1" }, 30);
 
 	searcher.construct(std::move(data));
 

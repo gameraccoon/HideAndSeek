@@ -2,12 +2,11 @@
 
 #include <gtest/gtest.h>
 
-#include "GameData/World.h"
+#include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Geometry/Hull.h"
+#include "GameData/World.h"
 
 #include "GameUtils/Geometry/Collide.h"
-
-#include "GameData/Components/CollisionComponent.generated.h"
 
 static void prepareCollision(CollisionComponent& collision, const Hull& hull)
 {

@@ -4,7 +4,6 @@
 
 #include "EngineCommon/Math/ValueCompression.h"
 
-
 TEST(ValueCompression, FloatToIntRL)
 {
 	constexpr float zero = 0;

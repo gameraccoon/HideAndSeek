@@ -2,13 +2,13 @@
 
 #include <gtest/gtest.h>
 
-#include "GameData/World.h"
-#include "GameData/Components/TransformComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
+#include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/World.h"
 
-#include "GameUtils/Geometry/RayTrace.h"
 #include "GameUtils/Geometry/Collide.h"
+#include "GameUtils/Geometry/RayTrace.h"
 
 struct CollidableObjects
 {
@@ -31,7 +31,7 @@ CollidableObjects FillCollidableObjects(World& world)
 		CollisionComponent* collision = cellEntityManager.addComponent<CollisionComponent>(entity);
 		Hull geometry;
 		geometry.type = HullType::Angular;
-		geometry.points = {{-10.0f, -10.0f}, {10.0f, -10.0f}, {10.0f, 10.0f}, {-10.0f, 10.0f}};
+		geometry.points = { { -10.0f, -10.0f }, { 10.0f, -10.0f }, { 10.0f, 10.0f }, { -10.0f, 10.0f } };
 		geometry.generateBorders();
 		collision->setGeometry(geometry);
 		Collide::UpdateBoundingBox(collision);

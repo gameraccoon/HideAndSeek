@@ -1,9 +1,9 @@
 #include "EngineCommon/precomp.h"
 
-#include <gtest/gtest.h>
-
 #include <type_traits>
 #include <vector>
+
+#include <gtest/gtest.h>
 
 #include "EngineCommon/Types/ComplexTypes/UniqueAny.h"
 
@@ -17,7 +17,7 @@ TEST(UniqueAny, DefaultConstructed)
 TEST(UniqueAny, MoveCopyConstructed)
 {
 	{
-		UniqueAny any{UniqueAny::Create<int>(10)};
+		UniqueAny any{ UniqueAny::Create<int>(10) };
 		ASSERT_NE(nullptr, any.cast<int>());
 		EXPECT_EQ(nullptr, any.cast<float>());
 		EXPECT_EQ(10, *any.cast<int>());
@@ -25,10 +25,10 @@ TEST(UniqueAny, MoveCopyConstructed)
 
 	{
 		// use vector constuctor that takes size and default value
-		UniqueAny any{UniqueAny::Create<std::vector<int>>(3, 2)};
+		UniqueAny any{ UniqueAny::Create<std::vector<int>>(3, 2) };
 		ASSERT_NE(nullptr, any.cast<std::vector<int>>());
 		EXPECT_EQ(nullptr, any.cast<int>());
-		EXPECT_EQ(std::vector<int>({2, 2, 2}), *any.cast<std::vector<int>>());
+		EXPECT_EQ(std::vector<int>({ 2, 2, 2 }), *any.cast<std::vector<int>>());
 	}
 }
 
@@ -45,9 +45,8 @@ TEST(UniqueAny, MoveAssignConstructed)
 	any = UniqueAny::Create<std::vector<int>>(3, 2);
 	ASSERT_NE(nullptr, any.cast<std::vector<int>>());
 	EXPECT_EQ(nullptr, any.cast<int>());
-	EXPECT_EQ(std::vector<int>({2, 2, 2}), *any.cast<std::vector<int>>());
+	EXPECT_EQ(std::vector<int>({ 2, 2, 2 }), *any.cast<std::vector<int>>());
 }
-
 
 TEST(UniqueAny, CastFromConst)
 {

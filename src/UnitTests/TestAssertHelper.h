@@ -1,25 +1,26 @@
 #pragma once
 
+#include <atomic>
+
 #include <gtest/gtest.h>
 #include <raccoon-ecs/error_handling.h>
-#include <atomic>
 
 #include "EngineCommon/Debug/Assert.h"
 
 inline void EnableFailOnAssert() noexcept
 {
 #ifdef DEBUG_CHECKS
-	gGlobalAssertHandler = [](){
+	gGlobalAssertHandler = []() {
 		GTEST_FAIL();
 	};
-	gGlobalFatalAssertHandler = [](){
+	gGlobalFatalAssertHandler = []() {
 		GTEST_FAIL();
 	};
 	gGlobalAllowAssertLogs = true;
 #endif // DEBUG_CHECKS
 
 #ifdef RACCOON_ECS_DEBUG_CHECKS_ENABLED
-	RaccoonEcs::gErrorHandler = [](const std::string& error){
+	RaccoonEcs::gErrorHandler = [](const std::string& error) {
 		ReportFatalError(error);
 	};
 #endif // RACCOON_ECS_DEBUG_CHECKS_ENABLED
@@ -28,8 +29,8 @@ inline void EnableFailOnAssert() noexcept
 inline void DisableFailOnAssert() noexcept
 {
 #ifdef DEBUG_CHECKS
-	gGlobalAssertHandler = [](){};
-	gGlobalFatalAssertHandler = [](){};
+	gGlobalAssertHandler = []() {};
+	gGlobalFatalAssertHandler = []() {};
 	gGlobalAllowAssertLogs = false;
 #endif // DEBUG_CHECKS
 }
