@@ -6,6 +6,8 @@
 
 #include "GameData/Components/{class_name}.generated.h"
 
+#include "imgui/imgui.h"
+
 #include "GameLogic/Imgui/ComponentInspector/DataInspectorWidgets/TypesInspector.h"
 
 void {class_name}ImguiWidget::update(void* component)

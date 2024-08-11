@@ -23,14 +23,16 @@ namespace ImguiPropertyFiltration
 		return result;
 	}}
 
-	std::any {class_name}{attribute_name_capital}PropertyDescriptor::getPropertyValue(EntityManager& entityManager, const Entity entity)
+	std::any {class_name}{attribute_name_capital}PropertyDescriptor::getPropertyValue(EntityManager& entityManager, Entity entity)
 	{{
 		if (auto [{component_name}] = entityManager.getEntityComponents<{class_name}>(entity); {component_name} != nullptr)
 		{{
 			return {component_name}->get{attribute_name_capital}();
 		}}
-
-		return nullptr;
+		else
+		{{
+			return nullptr;
+		}}
 	}}
 
 	StringId {class_name}{attribute_name_capital}PropertyDescriptor::getComponentType() const

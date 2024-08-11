@@ -6,7 +6,7 @@
 
 namespace ImguiPropertyFiltration
 {{
-	class {class_name}{attribute_name_capital}PropertyDescriptor final : public AbstractPropertyDescriptor
+	class {class_name}{attribute_name_capital}PropertyDescriptor : public AbstractPropertyDescriptor
 	{{
 	public:
 		{class_name}{attribute_name_capital}PropertyDescriptor();
