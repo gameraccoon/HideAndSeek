@@ -1,13 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
+include(CMakeDependentOption)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-
-set(APP_NAME GameMain)
-project(${APP_NAME})
-
-set(EXECUTABLE_NAME Game)
 
 # parameters
 option(DEBUG_CHECKS "Enable debug checks and assertions" ON)
@@ -17,6 +13,9 @@ option(MEMLEAK_REDEFINE_NEW "Redefine default new (provide more detailed info bu
 option(CONCURRENT_ACCESS_DETECTION "Enable concurrent access detection" ON)
 option(IMGUI_ENABLED "Enable imgui in the build" ON)
 option(ENABLE_UNITY_BUILD "Should the sources be built with unity build" ON)
+
+set(APP_NAME GameMain)
+set(EXECUTABLE_NAME Game)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -42,26 +41,26 @@ project(${APP_NAME} VERSION ${EXECUTABLE_VERSION})
 file(MAKE_DIRECTORY ${GAME_BIN_DIR})
 
 # definitions
-if (DEBUG_CHECKS)
+if(DEBUG_CHECKS)
 	add_definitions(-DDEBUG_CHECKS -DRACCOON_ECS_DEBUG_CHECKS_ENABLED)
 endif(DEBUG_CHECKS)
 
-if (ENABLE_SCOPED_PROFILER)
+if(ENABLE_SCOPED_PROFILER)
 	add_definitions(-DENABLE_SCOPED_PROFILER)
 endif(ENABLE_SCOPED_PROFILER)
 
-if (MEMLEAK_DETECTION)
+if(MEMLEAK_DETECTION)
 	add_definitions(-DDETECT_MEMORY_LEAKS)
-	if (MEMLEAK_REDEFINE_NEW)
+	if(MEMLEAK_REDEFINE_NEW)
 		add_definitions(-DREDEFINE_NEW)
 	endif()
 endif()
 
-if (IMGUI_ENABLED)
+if(IMGUI_ENABLED)
 	add_definitions(-DIMGUI_ENABLED)
 endif()
 
-if (CONCURRENT_ACCESS_DETECTION)
+if(CONCURRENT_ACCESS_DETECTION)
 	add_definitions(-DCONCURRENT_ACCESS_DETECTION)
 endif(CONCURRENT_ACCESS_DETECTION)
 
@@ -71,8 +70,8 @@ add_definitions(-DGLM_FORCE_RADIANS)
 add_definitions(-DFAKE_NETWORK)
 
 # compiler parameters
-if (MSVC)
-	if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+if(MSVC)
+	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
 		string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 	endif()
 	set(PROJECT_CXX_FLAGS /W4 /std:c++latest /wd4996)
@@ -90,15 +89,15 @@ else()
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
 endif()
 
+# requirements
+find_package(Python3 COMPONENTS Interpreter)
+
 # code generation
 execute_process(
-	COMMAND ${PYTHON_EXECUTABLE} "${GAME_BASE_DIR}/scripts/build/code_generate.py" WORKING_DIRECTORY "${GAME_BASE_DIR}"
+	COMMAND ${Python3_EXECUTABLE} "${GAME_BASE_DIR}/scripts/build/code_generate.py"
+	WORKING_DIRECTORY ${GAME_BASE_DIR}
+	COMMAND_ERROR_IS_FATAL ANY
 )
-
-# requirements
-find_package (Python3 REQUIRED)
-
-include_directories(include)
 
 include_directories(
 	${EXTERNALS_DIR}/include
@@ -124,8 +123,6 @@ endfunction()
 # All the things that are going to be included anywhere and not related
 # to any specific game
 add_folder_as_library(${ENGINE_SRC_DIR}/EngineCommon EngineCommon)
-# Some game related data that can be included anywhere throughout the game
-add_folder_as_library(${GAME_SRC_DIR}/GameCommon GameCommon)
 # Data types that can be stored in engine components
 add_folder_as_library(${ENGINE_SRC_DIR}/EngineData EngineData)
 # Data types that can be stored in game-specific ECS components
@@ -146,7 +143,7 @@ add_executable(${APP_NAME} "${APP_SRC}")
 target_compile_options(${APP_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
 
 # configure VS specific project parameters
-if (MSVC)
+if(MSVC)
 	set_target_properties(${APP_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${GAME_BIN_DIR}")
 	set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
 endif()
@@ -170,7 +167,7 @@ include_directories(${EXTERNALS_DIR}/sources/polypartition/include)
 target_compile_options(Polypartition PRIVATE ${EXTERNALS_CXX_FLAGS})
 
 # ImGui
-if (IMGUI_ENABLED)
+if(IMGUI_ENABLED)
 	add_library(Imgui EXCLUDE_FROM_ALL
 		${EXTERNALS_DIR}/sources/imgui/imgui.cpp
 		${EXTERNALS_DIR}/sources/imgui/imgui_demo.cpp
@@ -192,7 +189,6 @@ set(GENERAL_PROJECT_LIBS
 	EngineUtils
 	GameData
 	EngineData
-	GameCommon
 	EngineCommon
 
 	Polypartition
@@ -203,19 +199,19 @@ set(GENERAL_PROJECT_LIBS
 	SDL2main
 )
 
-if (IMGUI_ENABLED)
+if(IMGUI_ENABLED)
 	set(GENERAL_PROJECT_LIBS
 		${GENERAL_PROJECT_LIBS}
 		Imgui
 	)
 endif()
 
-if (WIN32)
+if(WIN32)
 	set(GENERAL_PROJECT_LIBS
 		${GENERAL_PROJECT_LIBS}
 		opengl32
 	)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set(GENERAL_PROJECT_LIBS
 		${GENERAL_PROJECT_LIBS}
 		GL
@@ -264,14 +260,17 @@ set_target_properties(${AUTOTESTS_NAME} PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BU
 target_link_libraries(${AUTOTESTS_NAME} ${GENERAL_PROJECT_LIBS})
 
 # symlink resources dir
-if (NOT EXISTS "${GAME_BIN_DIR}/resources")
-	execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/resources" "${GAME_BIN_DIR}/resources")
+if(NOT EXISTS "${GAME_BIN_DIR}/resources")
+	execute_process(
+		COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/resources" "${GAME_BIN_DIR}/resources"
+		COMMAND_ERROR_IS_FATAL ANY
+	)
 endif()
 
 # pre-compile additional code generation
 add_custom_target(
 	AdditionalCodeGeneration
-	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/scripts/build/precompile_code_generate.py ${GAME_BASE_DIR}
+	COMMAND ${Python3_EXECUTABLE} ${GAME_BASE_DIR}/scripts/build/precompile_code_generate.py ${GAME_BASE_DIR}
 	COMMENT "C++ pre-compile additional code generation"
 )
-add_dependencies(GameCommon AdditionalCodeGeneration)
+add_dependencies(EngineCommon AdditionalCodeGeneration)

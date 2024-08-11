@@ -75,28 +75,26 @@ IncludeCategories:
     Priority: -1
   - Regex: '^[<"]EngineCommon/.*$'
     Priority: 3
-  - Regex: '^[<"]GameCommon/.*$'
-    Priority: 4
   - Regex: '^[<"]EngineData/.*$'
-    Priority: 5
+    Priority: 4
   - Regex: '^[<"]GameData/.*$'
-    Priority: 6
+    Priority: 5
   - Regex: '^[<"]HAL/.*$'
-    Priority: 7
+    Priority: 6
   - Regex: '^[<"]EngineUtils/.*$'
-    Priority: 8
+    Priority: 7
   - Regex: '^[<"]GameUtils/.*$'
-    Priority: 9
+    Priority: 8
   - Regex: '^[<"]EngineLogic/.*$'
-    Priority: 10
+    Priority: 9
   - Regex: '^[<"]GameLogic/.*$'
-    Priority: 11
+    Priority: 10
   - Regex: '^[<"]AutoTests/.*$'
-    Priority: 12
+    Priority: 11
   - Regex: '^[<"]GameMain/.*$'
-    Priority: 13
+    Priority: 12
   - Regex: '^[<"]UnitTests/.*$'
-    Priority: 14
+    Priority: 13
     # STL includes that don't contain .h go right after precomp and current file include
   - Regex: '^<[a-zA-Z0-9_/]+>$'
     Priority: 1
