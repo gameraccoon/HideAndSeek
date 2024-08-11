@@ -2,10 +2,15 @@ import os
 
 
 allowed_extensions = [".cpp", ".h", ".hpp", ".c", ".cc", ".hh", ".cxx", ".hxx"]
+ignored_extensions = [".generated.cpp", ".generated.h"]
 
 
 def is_valid_file(file):
-    return any(file.endswith(ext) for ext in allowed_extensions)
+    if any(file.endswith(ext) for ext in allowed_extensions):
+        if not any(file.endswith(ext) for ext in ignored_extensions):
+            return True
+
+    return False
 
 
 def format_one_file(clang_format_path, file):
