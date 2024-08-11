@@ -18,7 +18,7 @@ namespace ConsoleCommands
 
 	bool TryExecuteQuickConsoleCommands(const ArgumentsParser& arguments)
 	{
-		const std::vector<CommandInfo> commands {
+		const std::vector<CommandInfo> commands{
 			{ "world", "world file", "start the game from the given world" },
 			{ "gameData", "gameData path", "start the game with loading the given game data" },
 			{ "disable-input", "disable-input", "disable keyboard/mouse/controller input" },
@@ -35,10 +35,10 @@ namespace ConsoleCommands
 		// check that the given commands are valid
 		for (const std::string& argument : arguments.getAllArguments())
 		{
-			if (std::ranges::find_if(commands, [&argument](const CommandInfo& commandInfo)
-			{
-				return commandInfo.command == argument;
-			}) == commands.end())
+			if (std::ranges::find_if(commands, [&argument](const CommandInfo& commandInfo) {
+					return commandInfo.command == argument;
+				})
+				== commands.end())
 			{
 				std::cout << "Command --" << argument << " not found, use --help to see the list of available commands" << std::endl;
 				return true;

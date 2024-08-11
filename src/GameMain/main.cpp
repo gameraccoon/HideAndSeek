@@ -6,13 +6,13 @@
 
 #include "EngineCommon/Random/Random.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
-
 #include "HAL/Base/Engine.h"
 #include "HAL/Base/GameLoop.h"
 
-#include "GameLogic/Game/HapGame.h"
+#include "GameUtils/Application/ArgumentsParser.h"
+
 #include "GameLogic/Game/ApplicationData.h"
+#include "GameLogic/Game/HapGame.h"
 
 #include "GameMain/ConsoleCommands.h"
 
@@ -42,8 +42,7 @@ int main(const int argc, char** argv)
 
 		// switch render context to render thread
 		engine->releaseRenderContext();
-		applicationData.renderThread.startThread(applicationData.resourceManager, *engine, [&engine]
-		{
+		applicationData.renderThread.startThread(applicationData.resourceManager, *engine, [&engine] {
 			engine->acquireRenderContext();
 		});
 	}
