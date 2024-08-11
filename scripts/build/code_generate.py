@@ -27,8 +27,9 @@ if os.path.isfile(previously_generated_files_file_path):
 
         removed_files = old_generated_files_set - generated_files_set
         for file in removed_files:
-            os.remove(file)
-            print("Removed file: " + file)
+            if os.path.isfile(file):
+                os.remove(file)
+                print("Removed file: " + file)
 
         with open(previously_generated_files_file_path, "w") as f:
             f.write("\n".join(generated_files))
