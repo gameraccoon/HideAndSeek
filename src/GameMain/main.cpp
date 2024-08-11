@@ -9,7 +9,7 @@
 #include "HAL/Base/Engine.h"
 #include "HAL/Base/GameLoop.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineUtils/Application/ArgumentsParser.h"
 
 #include "GameLogic/Game/ApplicationData.h"
 #include "GameLogic/Game/HapGame.h"

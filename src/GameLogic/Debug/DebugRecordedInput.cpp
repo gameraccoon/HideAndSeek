@@ -8,7 +8,7 @@
 
 #include "HAL/InputControllersData.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineUtils/Application/ArgumentsParser.h"
 
 DebugRecordedInput::DebugRecordedInput(const int instanceIndex)
 	: mInstanceIndex(instanceIndex)

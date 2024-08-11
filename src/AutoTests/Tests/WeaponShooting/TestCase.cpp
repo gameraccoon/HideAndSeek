@@ -11,7 +11,7 @@
 #include "GameData/Components/WeaponComponent.generated.h"
 #include "GameData/Spatial/SpatialWorldData.h"
 
-#include "GameUtils/ResourceManagement/ResourceManager.h"
+#include "EngineUtils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/Systems/CameraSystem.h"
 #include "GameLogic/Systems/CharacterStateSystem.h"

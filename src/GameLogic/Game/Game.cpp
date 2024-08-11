@@ -11,11 +11,12 @@
 
 #include "HAL/Base/Engine.h"
 
+#include "EngineUtils/Application/ArgumentsParser.h"
 #include "EngineUtils/Multithreading/ThreadPool.h"
-
-#include "GameUtils/Application/ArgumentsParser.h"
-#include "GameUtils/Profiling/ProfileDataWriter.h"
-#include "GameUtils/ResourceManagement/ResourceManager.h"
+#include "EngineUtils/ResourceManagement/ResourceManager.h"
+#ifdef ENABLE_SCOPED_PROFILER
+#include "EngineUtils/Profiling/ProfileDataWriter.h"
+#endif // ENABLE_SCOPED_PROFILER
 
 #include "EngineLogic/Render/RenderAccessor.h"
 

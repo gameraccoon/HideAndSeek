@@ -5,8 +5,8 @@
 #include <raccoon-ecs/utils/system.h>
 
 #include "EngineData/Geometry/Vector2D.h"
+#include "EngineData/Resources/ResourceHandle.h"
 
-#include "GameData/Resources/ResourceHandle.h"
 #include "GameData/Spatial/SpatialEntityManager.h"
 
 class GameplayTimestamp;

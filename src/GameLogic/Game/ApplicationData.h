@@ -1,8 +1,7 @@
 #pragma once
 
 #include "EngineUtils/Multithreading/ThreadPool.h"
-
-#include "GameUtils/ResourceManagement/ResourceManager.h"
+#include "EngineUtils/ResourceManagement/ResourceManager.h"
 
 #include "EngineLogic/Render/RenderThreadManager.h"
 

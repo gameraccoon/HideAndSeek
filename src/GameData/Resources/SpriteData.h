@@ -1,6 +1,7 @@
 #pragma once
 
-#include "GameData/Resources/ResourceHandle.h"
+#include "EngineData/Resources/ResourceHandle.h"
+
 #include "GameData/Resources/SpriteParams.h"
 
 struct SpriteData

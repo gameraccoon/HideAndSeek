@@ -2,7 +2,7 @@
 
 #include "GameLogic/Debug/DebugGameBehavior.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineUtils/Application/ArgumentsParser.h"
 
 #include "GameLogic/Game/Game.h"
 

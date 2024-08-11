@@ -2,7 +2,7 @@
 
 #include <raccoon-ecs/utils/system.h>
 
-#include "GameUtils/ResourceManagement/ResourceManager.h"
+#include "EngineUtils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
@@ -11,9 +11,6 @@
  */
 class DebugDrawSystem final : public RaccoonEcs::System
 {
-public:
-	using KeyStatesMap = std::unordered_map<int, bool>;
-
 public:
 	explicit DebugDrawSystem(
 		WorldHolder& worldHolder,

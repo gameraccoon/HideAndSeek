@@ -5,7 +5,7 @@
 
 #include "EngineCommon/Types/String/StringId.h"
 
-#include "GameData/Resources/ResourceHandle.h"
+#include "EngineData/Resources/ResourceHandle.h"
 
 template<typename StateIdType>
 class AnimationGroup

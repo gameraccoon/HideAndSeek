@@ -6,7 +6,7 @@
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineUtils/Application/ArgumentsParser.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 

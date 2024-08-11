@@ -8,7 +8,8 @@
 
 #include "HAL/Base/Engine.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineUtils/Application/ArgumentsParser.h"
+
 #include "GameUtils/World/GameDataLoader.h"
 
 #include "GameLogic/Systems/AiSystem.h"

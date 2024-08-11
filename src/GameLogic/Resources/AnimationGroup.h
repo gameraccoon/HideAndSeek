@@ -7,8 +7,8 @@
 
 #include "EngineCommon/Types/String/StringId.h"
 
-#include "GameData/Resources/Resource.h"
-#include "GameData/Resources/ResourceHandle.h"
+#include "EngineData/Resources/Resource.h"
+#include "EngineData/Resources/ResourceHandle.h"
 
 class RelativeResourcePath;
 

@@ -14,7 +14,7 @@
 
 #include "HAL/Graphics/Sprite.h"
 
-#include "GameUtils/ResourceManagement/ResourceManager.h"
+#include "EngineUtils/ResourceManagement/ResourceManager.h"
 
 #include "GameLogic/Resources/AnimationGroup.h"
 #include "GameLogic/Resources/SpriteAnimationClip.h"

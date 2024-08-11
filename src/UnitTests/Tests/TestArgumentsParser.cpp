@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineUtils/Application/ArgumentsParser.h"
 
 TEST(ArgumentsParser, EmptyArguments_CheckSpecificFlag_NotFound)
 {

@@ -8,7 +8,7 @@
 
 #include "HAL/Base/Engine.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineUtils/Application/ArgumentsParser.h"
 
 #include "GameLogic/Game/ApplicationData.h"
 
@@ -21,21 +21,16 @@ using CasesMap = std::map<std::string, std::function<std::unique_ptr<BaseTestCas
 
 static CasesMap GetCases()
 {
-	return CasesMap
-	({
-		{
-			"CollidingCircularUnits", [](HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool)
-			{
-				return std::make_unique<CollidingCircularUnitsTestCase>(engine, resourceManager, threadPool);
-			}
-		},
-		{
-			"WeaponShooting", [](HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool)
-			{
-				return std::make_unique<WeaponShootingTestCase>(engine, resourceManager, threadPool);
-			}
-		}
+	CasesMap cases;
+
+	cases.emplace("CollidingCircularUnits", [](HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool) {
+		return std::make_unique<CollidingCircularUnitsTestCase>(engine, resourceManager, threadPool);
 	});
+	cases.emplace("WeaponShooting", [](HAL::Engine* engine, ResourceManager& resourceManager, ThreadPool& threadPool) {
+		return std::make_unique<WeaponShootingTestCase>(engine, resourceManager, threadPool);
+	});
+
+	return cases;
 }
 
 bool ValidateChecklist(const TestChecklist& checklist)
@@ -145,7 +140,7 @@ int main(const int argc, char** argv)
 
 		applicationData.shutdownThreads(); // this call waits for the threads to be joined
 
-		applicationData.writeProfilingData(); // this call waits for the data to be written to the files
+		ApplicationData::writeProfilingData(); // this call waits for the data to be written to the files
 
 		std::cout << "Test run " << (isSuccessful ? "was successful" : "failed, see the full log for errors") << "\n";
 		return isSuccessful ? 0 : 1;

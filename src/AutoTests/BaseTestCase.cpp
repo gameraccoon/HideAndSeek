@@ -9,7 +9,7 @@
 #include "HAL/Base/Engine.h"
 #include "HAL/Base/GameLoop.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineUtils/Application/ArgumentsParser.h"
 
 TestChecklist BaseTestCase::start(const ArgumentsParser& arguments, RenderAccessorGameRef renderAccessor)
 {

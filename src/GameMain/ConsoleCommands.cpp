@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "GameUtils/Application/ArgumentsParser.h"
+#include "EngineUtils/Application/ArgumentsParser.h"
 
 namespace ConsoleCommands
 {
@@ -49,11 +49,10 @@ namespace ConsoleCommands
 		{
 			std::cout << "Options:";
 
-			const size_t longestCommand = std::ranges::max_element(commands,
-				[](const CommandInfo& a, const CommandInfo& b){
+			const size_t longestCommand =
+				std::ranges::max_element(commands, [](const CommandInfo& a, const CommandInfo& b) {
 					return a.syntax.size() < b.syntax.size();
-				}
-			)->syntax.size();
+				})->syntax.size();
 
 			for (const CommandInfo& commandInfo : commands)
 			{

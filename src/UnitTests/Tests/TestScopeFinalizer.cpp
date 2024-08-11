@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "GameUtils/Functional/ScopeFinalizer.h"
+#include "EngineCommon/Types/ComplexTypes/ScopeFinalizer.h"
 
 TEST(ScopeFinalizer, CallLambda)
 {

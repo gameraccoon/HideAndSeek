@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "GameUtils/Functional/LazyEvaluatedWrapper.h"
+#include "EngineCommon/Types/ComplexTypes/LazyEvaluatedWrapper.h"
 
 TEST(LazyEvaluatedWrapper, CallLambda)
 {

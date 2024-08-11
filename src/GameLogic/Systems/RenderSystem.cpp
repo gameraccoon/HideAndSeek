@@ -22,9 +22,9 @@
 #include "HAL/Graphics/Sprite.h"
 
 #include "EngineUtils/Multithreading/ThreadPool.h"
+#include "EngineUtils/ResourceManagement/ResourceManager.h"
 
 #include "GameUtils/Geometry/VisibilityPolygon.h"
-#include "GameUtils/ResourceManagement/ResourceManager.h"
 
 #include "EngineLogic/Render/RenderAccessor.h"
 
