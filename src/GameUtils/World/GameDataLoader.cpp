@@ -128,8 +128,8 @@ namespace GameDataLoader
 		if (pathBlockingGeometry)
 		{
 			nlohmann::json geometryJson({
-				{"version", version},
-				{"geometry", pathBlockingGeometry->getPolygons()}
+				{ "version", version },
+				{ "geometry", pathBlockingGeometry->getPolygons() },
 			});
 
 			geometryFile << std::setw(4) << geometryJson << std::endl;
@@ -203,8 +203,8 @@ namespace GameDataLoader
 		{
 			std::ofstream mapFile(levelPath);
 			nlohmann::json mapJson({
-				{"version", levelVersion},
-				{"world", world.toJson(jsonSerializerHolder)}
+				{ "version", levelVersion },
+				{ "world", world.toJson(jsonSerializerHolder) },
 			});
 
 			mapFile << std::setw(4) << mapJson << std::endl;

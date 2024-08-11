@@ -139,24 +139,27 @@ TEST(VisibilityPolygon, ApertureDirection1)
 	std::vector<Vector2D> result;
 	calc.calculateVisibilityPolygon(result, components, pos, Vector2D(600.0f, 600.0f));
 	// a saw-like pattern
-	EXPECT_TRUE(AreVisibilityPolygonsEqual(result, {
-		{-180.0f, -20.0f},
-		{-229.1026f, -25.4558f},
-		{-113.137f, -141.42137f},
-		{-144.0f, -180.0f},
-		{20.0f, -180.0f},
-		{25.4558f, -229.1026f},
-		{141.42137f, -113.137f},
-		{180.0f, -144.0f},
-		{180.0f, 20.0f},
-		{229.1026f, 25.4558f},
-		{113.137f, 141.42137f},
-		{144.0f, 180.0f},
-		{-20.0f, 180.0f},
-		{-25.4558f, 229.1026f},
-		{-141.42137f, 113.137f},
-		{-180.0f, 144.0f}
-	}));
+	EXPECT_TRUE(AreVisibilityPolygonsEqual(
+		result,
+		{
+			{ -180.0f, -20.0f },
+			{ -229.1026f, -25.4558f },
+			{ -113.137f, -141.42137f },
+			{ -144.0f, -180.0f },
+			{ 20.0f, -180.0f },
+			{ 25.4558f, -229.1026f },
+			{ 141.42137f, -113.137f },
+			{ 180.0f, -144.0f },
+			{ 180.0f, 20.0f },
+			{ 229.1026f, 25.4558f },
+			{ 113.137f, 141.42137f },
+			{ 144.0f, 180.0f },
+			{ -20.0f, 180.0f },
+			{ -25.4558f, 229.1026f },
+			{ -141.42137f, 113.137f },
+			{ -180.0f, 144.0f },
+		}
+	));
 }
 
 TEST(VisibilityPolygon, ApertureDirection2)
@@ -191,22 +194,25 @@ TEST(VisibilityPolygon, ApertureDirection2)
 	std::vector<Vector2D> result;
 	calc.calculateVisibilityPolygon(result, components, pos, Vector2D(600.0f, 600.0f));
 	// a saw-like pattern
-	EXPECT_TRUE(AreVisibilityPolygonsEqual(result, {
-		{180.0f, 144.0f},
-		{141.42137f, 113.137f},
-		{25.4558f, 229.1026f},
-		{20.0f, 180.0f},
-		{-144.0f, 180.0f},
-		{-113.137f, 141.42137f},
-		{-229.1026f, 25.4558f},
-		{-180.0f, 20.0f},
-		{-180.0f, -144.0f},
-		{-141.42137f, -113.137f},
-		{-25.4558f, -229.1026f},
-		{-20.0f, -180.0f},
-		{144.0f, -180.0f},
-		{113.137f, -141.42137f},
-		{229.1026f, -25.4558f},
-		{180.0f, -20.0f}
-	}));
+	EXPECT_TRUE(AreVisibilityPolygonsEqual(
+		result,
+		{
+			{ 180.0f, 144.0f },
+			{ 141.42137f, 113.137f },
+			{ 25.4558f, 229.1026f },
+			{ 20.0f, 180.0f },
+			{ -144.0f, 180.0f },
+			{ -113.137f, 141.42137f },
+			{ -229.1026f, 25.4558f },
+			{ -180.0f, 20.0f },
+			{ -180.0f, -144.0f },
+			{ -141.42137f, -113.137f },
+			{ -25.4558f, -229.1026f },
+			{ -20.0f, -180.0f },
+			{ 144.0f, -180.0f },
+			{ 113.137f, -141.42137f },
+			{ 229.1026f, -25.4558f },
+			{ 180.0f, -20.0f },
+		}
+	));
 }

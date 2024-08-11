@@ -32,7 +32,7 @@ GameplayTimestamp GameplayTimestamp::getDecreasedByUpdateCount(s32 updatesAgo) c
 void to_json(nlohmann::json& outJson, const GameplayTimestamp timestamp)
 {
 	outJson = nlohmann::json::object({
-		{"value", timestamp.mTimestamp}
+		{ "value", timestamp.mTimestamp },
 	});
 }
 

@@ -7,9 +7,9 @@
 void to_json(nlohmann::json& outJson, const AnimationClipDescription& animationDescription)
 {
 	outJson = nlohmann::json::object({
-		{"params", animationDescription.params},
-		{"spriteParams", animationDescription.spriteParams},
-		{"path", animationDescription.path}
+		{ "params", animationDescription.params },
+		{ "spriteParams", animationDescription.spriteParams },
+		{ "path", animationDescription.path },
 	});
 }
 

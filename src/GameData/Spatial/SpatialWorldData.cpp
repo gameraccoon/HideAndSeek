@@ -169,8 +169,8 @@ nlohmann::json SpatialWorldData::toJson(const Json::ComponentSerializationHolder
 	for (auto& cell : sortedCells)
 	{
 		cellsJson.push_back({
-			{"pos", cell.first},
-			{"cell", cell.second->toJson(jsonSerializerHolder)}
+			{ "pos", cell.first },
+			{ "cell", cell.second->toJson(jsonSerializerHolder) },
 		});
 	}
 

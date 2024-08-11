@@ -7,8 +7,8 @@
 void to_json(nlohmann::json& outJson, const AnimationClipParams& animationParams)
 {
 	outJson = nlohmann::json::object({
-		{"isLooped", animationParams.isLooped},
-		{"speed", animationParams.speed}
+		{ "isLooped", animationParams.isLooped },
+		{ "speed", animationParams.speed },
 	});
 }
 

@@ -7,8 +7,8 @@
 void to_json(nlohmann::json& outJson, const SpriteDescription& spriteDescription)
 {
 	outJson = nlohmann::json::object({
-		{"params", spriteDescription.params},
-		{"path", spriteDescription.path}
+		{ "params", spriteDescription.params },
+		{ "path", spriteDescription.path },
 	});
 }
 
