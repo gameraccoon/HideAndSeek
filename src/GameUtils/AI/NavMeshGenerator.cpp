@@ -2,9 +2,9 @@
 
 #include "GameUtils/AI/NavMeshGenerator.h"
 
+#include <algorithm>
 #include <cmath>
 #include <unordered_map>
-#include <algorithm>
 
 #include "polypartition.h"
 
@@ -129,7 +129,7 @@ namespace NavMeshGenerator
 
 	struct BorderPairHash
 	{
-		std::size_t operator() (const SortedBorderPair& p) const
+		std::size_t operator()(const SortedBorderPair& p) const
 		{
 			return std::hash<size_t>()(p.first) ^ std::rotl(std::hash<size_t>()(p.second), 7);
 		}
@@ -137,7 +137,7 @@ namespace NavMeshGenerator
 
 	static SortedBorderPair MakeSortedPair(const size_t first, const size_t second)
 	{
-		return (first < second) ? SortedBorderPair{first, second, false} : SortedBorderPair{second, first, true};
+		return (first < second) ? SortedBorderPair{ first, second, false } : SortedBorderPair{ second, first, true };
 	}
 
 	void LinkNavMesh(NavMesh::InnerLinks& outLinks, const NavMesh::Geometry& geometry)
@@ -150,8 +150,7 @@ namespace NavMeshGenerator
 		for (size_t p = 0, pSize = geometry.polygonsCount; p < pSize; ++p)
 		{
 			const size_t pShift = p * geometry.verticesPerPoly;
-			FOR_EACH_BORDER(geometry.verticesPerPoly,
-			{
+			FOR_EACH_BORDER(geometry.verticesPerPoly, {
 				size_t indexA = geometry.indexes[pShift + i];
 				size_t indexB = geometry.indexes[pShift + j];
 				SortedBorderPair sortedPair = MakeSortedPair(indexA, indexB);
@@ -190,8 +189,7 @@ namespace NavMeshGenerator
 			for (const NavMesh::InnerLinks::LinkData& link : outLinks.links[p])
 			{
 				bool found = false;
-				FOR_EACH_BORDER(geometry.verticesPerPoly,
-				{
+				FOR_EACH_BORDER(geometry.verticesPerPoly, {
 					size_t index1 = pShift + i;
 					size_t index2 = pShift + j;
 					if (geometry.indexes[index1] == link.borderPoint1 && geometry.indexes[index2] == link.borderPoint2)
@@ -229,8 +227,7 @@ namespace NavMeshGenerator
 
 	static BoundingBox GetAABB(const NavMesh::Geometry& geometry, const size_t polygonIdx)
 	{
-		BoundingBox Result
-		(
+		BoundingBox Result(
 			std::numeric_limits<float>::max(),
 			std::numeric_limits<float>::max(),
 			std::numeric_limits<float>::min(),
@@ -252,8 +249,7 @@ namespace NavMeshGenerator
 			inOutPolygon[i] = geometry.vertices[geometry.indexes[polygonIdx * geometry.verticesPerPoly + i]];
 		}
 
-		const BoundingBox aabb
-		(
+		const BoundingBox aabb(
 			geometry.navMeshStart.x + static_cast<float>(cellX) * cellSize,
 			geometry.navMeshStart.y + static_cast<float>(cellY) * cellSize,
 			geometry.navMeshStart.x + static_cast<float>(cellX + 1) * cellSize,
@@ -301,7 +297,7 @@ namespace NavMeshGenerator
 		outSpatialHash.polygonsHash.resize(outSpatialHash.hashSize.x * outSpatialHash.hashSize.y);
 		std::ranges::for_each(
 			outSpatialHash.polygonsHash,
-			[](std::vector<size_t>& vector){ vector.clear(); }
+			[](std::vector<size_t>& vector) { vector.clear(); }
 		);
 
 		std::vector<Vector2D> reusablePolygon(geometry.verticesPerPoly);

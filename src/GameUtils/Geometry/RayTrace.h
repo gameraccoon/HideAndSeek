@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EngineData/Geometry/Vector2D.h"
+
 #include "GameData/Spatial/SpatialEntity.h"
 
 class World;
@@ -9,7 +10,8 @@ class BoundingBox;
 
 namespace RayTrace
 {
-	struct TraceResult {
+	struct TraceResult
+	{
 		bool hasHit = false;
 		SpatialEntity hitEntity;
 		Vector2D hitPoint;

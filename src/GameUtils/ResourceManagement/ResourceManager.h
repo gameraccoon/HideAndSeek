@@ -64,7 +64,7 @@ public:
 		DETECT_CONCURRENT_ACCESS(gResourceManagerAccessDetector);
 		const std::string id = T::GetUniqueId(args...);
 
-		if (const auto it = mStorage.idsMap.find(id);it != mStorage.idsMap.end())
+		if (const auto it = mStorage.idsMap.find(id); it != mStorage.idsMap.end())
 		{
 			++mStorage.resourceLocksCount[it->second];
 			return ResourceHandle(it->second);

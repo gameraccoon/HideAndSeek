@@ -33,4 +33,4 @@ namespace ResourceLoading
 		std::unordered_map<RelativeResourcePath, AtlasFrameData> atlasFrames;
 		ResourceHandle::IndexType handleIdx = 0;
 	};
-}
+} // namespace ResourceLoading

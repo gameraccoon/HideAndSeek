@@ -1,13 +1,13 @@
 #pragma once
 
-#include <string>
 #include <filesystem>
+#include <string>
 
 class World;
 class GameData;
 
-
-namespace Json {
+namespace Json
+{
 	class ComponentSerializationHolder;
 }
 

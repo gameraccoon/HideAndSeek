@@ -2,11 +2,12 @@
 
 #ifdef ENABLE_SCOPED_PROFILER
 
-#include "GameUtils/Profiling/ProfileDataWriter.h"
-
 #include <fstream>
 #include <iomanip>
+
 #include <nlohmann/json.hpp>
+
+#include "GameUtils/Profiling/ProfileDataWriter.h"
 
 void ProfileDataWriter::PrintScopedProfileToFile(const std::string& fileName, const ProfileData& profileData)
 {
@@ -71,8 +72,7 @@ void ProfileDataWriter::PrintScopedProfile(std::ostream& outStream, const Profil
 	std::sort(
 		events.begin(),
 		events.end(),
-		[](const nlohmann::json& eventJsonL, const nlohmann::json& eventJsonR)
-		{
+		[](const nlohmann::json& eventJsonL, const nlohmann::json& eventJsonR) {
 			return eventJsonL.at("ts").get<double>() < eventJsonR.at("ts").get<double>();
 		}
 	);
@@ -82,7 +82,7 @@ void ProfileDataWriter::PrintScopedProfile(std::ostream& outStream, const Profil
 	std::for_each(
 		events.begin(),
 		events.end(),
-		[minTime](nlohmann::json& eventJson){
+		[minTime](nlohmann::json& eventJson) {
 			eventJson["ts"] = eventJson["ts"].get<double>() - minTime;
 		}
 	);
@@ -90,16 +90,10 @@ void ProfileDataWriter::PrintScopedProfile(std::ostream& outStream, const Profil
 	for (size_t i = 0; i < profileData.threadNames.size(); ++i)
 	{
 		const std::string& threadName = profileData.threadNames[i];
-		events.insert(events.begin(), nlohmann::json{
-			{ "name", "thread_name" },
-			{ "ph", "M" },
-			{ "pid", 1 },
-			{ "tid", i },
-			{ "args", nlohmann::json{ {"name", threadName} }}
-		});
+		events.insert(events.begin(), nlohmann::json{ { "name", "thread_name" }, { "ph", "M" }, { "pid", 1 }, { "tid", i }, { "args", nlohmann::json{ { "name", threadName } } } });
 	}
 
-	outStream << std::setw(4) <<  result;
+	outStream << std::setw(4) << result;
 }
 
 void ProfileDataWriter::PrintFrameDurationStatsToFile(const std::string& fileName, const FrameDurations& frameTimes)

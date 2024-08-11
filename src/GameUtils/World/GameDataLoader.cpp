@@ -2,25 +2,25 @@
 
 #include "GameUtils/World/GameDataLoader.h"
 
-#include <fstream>
-#include <map>
-#include <iomanip>
-
 #include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <map>
+
 #include <nlohmann/json.hpp>
 
 #include "EngineCommon/Random/RandomStrings.h"
 
-#include "GameData/World.h"
-#include "GameData/GameData.h"
+#include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/LightBlockingGeometryComponent.generated.h"
 #include "GameData/Components/PathBlockingGeometryComponent.generated.h"
-#include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/GameData.h"
 #include "GameData/Spatial/SpatialWorldData.h"
+#include "GameData/World.h"
 
-#include "GameUtils/Geometry/LightBlockingGeometry.h"
 #include "GameUtils/AI/PathBlockingGeometry.h"
+#include "GameUtils/Geometry/LightBlockingGeometry.h"
 
 namespace GameDataLoader
 {
@@ -106,7 +106,7 @@ namespace GameDataLoader
 		for (auto& [key, cellData] : geometryJson["geometry"].items())
 		{
 			const size_t delimiterPos = key.find(',');
-			const CellPos pos{std::atoi(key.substr(0, delimiterPos).c_str()), std::atoi(key.substr(delimiterPos + 1).c_str())};
+			const CellPos pos{ std::atoi(key.substr(0, delimiterPos).c_str()), std::atoi(key.substr(delimiterPos + 1).c_str()) };
 			LightBlockingGeometryComponent* lightBlockingComponent = spatialData.getCell(pos)->getCellComponents().getOrAddComponent<LightBlockingGeometryComponent>();
 			cellData.get_to(lightBlockingComponent->getBordersRef());
 		}
@@ -246,11 +246,11 @@ namespace GameDataLoader
 			LoadLightBlockingGeometry(world, levelPath, levelVersion);
 			LoadPathBlockingGeometry(world, levelPath, levelVersion);
 		}
-		catch(const nlohmann::detail::exception& e)
+		catch (const nlohmann::detail::exception& e)
 		{
 			LogError("Can't parse world '%s': %s", levelPath.c_str(), e.what());
 		}
-		catch(const std::exception& e)
+		catch (const std::exception& e)
 		{
 			LogError("Can't open world '%s': %s", levelPath.c_str(), e.what());
 		}
@@ -277,7 +277,7 @@ namespace GameDataLoader
 		try
 		{
 			std::ofstream mapFile(gameDataPath);
-			nlohmann::json mapJson({{"gameData", gameData.toJson(jsonSerializerHolder)}});
+			nlohmann::json mapJson({ { "gameData", gameData.toJson(jsonSerializerHolder) } });
 
 			mapFile << std::setw(4) << mapJson << std::endl;
 		}
@@ -309,13 +309,13 @@ namespace GameDataLoader
 				gameData.fromJson(worldObject, jsonSerializerHolder);
 			}
 		}
-		catch(const nlohmann::detail::exception& e)
+		catch (const nlohmann::detail::exception& e)
 		{
 			LogError("Can't parse gameData '%s': %s", gameDataPath.c_str(), e.what());
 		}
-		catch(const std::exception& e)
+		catch (const std::exception& e)
 		{
 			LogError("Can't open gameData '%s': %s", gameDataPath.c_str(), e.what());
 		}
 	}
-}
+} // namespace GameDataLoader

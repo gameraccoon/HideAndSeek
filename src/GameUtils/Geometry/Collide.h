@@ -12,8 +12,7 @@ namespace Collide
 		return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 	}
 
-	bool DoCollide(const CollisionComponent* collisionA, const Vector2D& locationA,
-		const CollisionComponent* collisionB, const Vector2D& locationB, Vector2D& outResist);
+	bool DoCollide(const CollisionComponent* collisionA, const Vector2D& locationA, const CollisionComponent* collisionB, const Vector2D& locationB, Vector2D& outResist);
 
 	void UpdateBoundingBox(CollisionComponent* collision);
 
@@ -25,20 +24,21 @@ namespace Collide
 	Vector2D GetPointIntersect2Lines(const Vector2D& a1, const Vector2D& a2, const Vector2D& b1, const Vector2D& b2);
 	float DistanceToLineSegmentSq(Vector2D lineA, Vector2D lineB, Vector2D point);
 	float FindDistanceToConvexHullSq(const std::vector<Vector2D>& hull, Vector2D point);
-}
+} // namespace Collide
 
 // macro that calls CODE for each border, where i and j are indexes of the vertices of this border
-#define FOR_EACH_BORDER(size, CODE) { \
-	do { \
-		for (size_t i = 0; i + 1 < (size); ++i) \
-		{ \
-			size_t j = i + 1; \
-			CODE \
-		} \
-		{ \
-			size_t i = (size) - 1; \
-			size_t j = 0; \
-			CODE \
-		} \
-	} while(false); \
-}
+#define FOR_EACH_BORDER(size, CODE) \
+	{ \
+		do { \
+			for (size_t i = 0; i + 1 < (size); ++i) \
+			{ \
+				size_t j = i + 1; \
+				CODE \
+			} \
+			{ \
+				size_t i = (size) - 1; \
+				size_t j = 0; \
+				CODE \
+			} \
+		} while (false); \
+	}

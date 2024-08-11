@@ -2,9 +2,9 @@
 
 #ifdef ENABLE_SCOPED_PROFILER
 
+#include <chrono>
 #include <string>
 #include <vector>
-#include <chrono>
 
 #include "EngineCommon/Profile/ScopedProfiler.h"
 

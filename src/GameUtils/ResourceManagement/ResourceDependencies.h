@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "GameData/Resources/ResourceHandle.h"
 
@@ -36,4 +36,4 @@ namespace ResourceLoading
 		// returns all dependent resources that don't have dependencies anymore
 		std::vector<ResourceHandle> resolveDependency(ResourceHandle dependency);
 	};
-}
+} // namespace ResourceLoading

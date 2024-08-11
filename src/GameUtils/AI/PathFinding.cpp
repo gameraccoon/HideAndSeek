@@ -1,9 +1,9 @@
 #include "EngineCommon/precomp.h"
 
-#include <unordered_map>
-#include <array>
-
 #include "GameUtils/AI/PathFinding.h"
+
+#include <array>
+#include <unordered_map>
 
 #include "GameData/AI/NavMesh.h"
 
@@ -16,8 +16,7 @@ namespace PathFinding
 	bool IsPointInsideConvexHull(const Vector2D point, const std::vector<Vector2D>& hull)
 	{
 		const size_t hullSize = hull.size();
-		FOR_EACH_BORDER(hullSize,
-		{
+		FOR_EACH_BORDER(hullSize, {
 			if (Collide::SignedArea(point, hull[i], hull[j]) < 0.0f)
 			{
 				return false;
@@ -32,8 +31,7 @@ namespace PathFinding
 		const Vector2D cellPointFloat = (point - navMesh.geometry.navMeshStart) / navMesh.spatialHash.cellSize;
 		const IntVector2D cellPoint(static_cast<int>(cellPointFloat.x), static_cast<int>(cellPointFloat.y));
 		if (cellPoint.x < 0 || cellPoint.x >= navMesh.spatialHash.hashSize.x
-			||
-			cellPoint.y < 0 || cellPoint.y >= navMesh.spatialHash.hashSize.y)
+			|| cellPoint.y < 0 || cellPoint.y >= navMesh.spatialHash.hashSize.y)
 		{
 			return INVALID_POLYGON;
 		}
@@ -64,8 +62,7 @@ namespace PathFinding
 			{
 				const int pointY = cellPoint.y + dy;
 				if (pointX >= 0 && pointX < navMesh.spatialHash.hashSize.x
-					&&
-					pointY >= 0 && pointY < navMesh.spatialHash.hashSize.y)
+					&& pointY >= 0 && pointY < navMesh.spatialHash.hashSize.y)
 				{
 					const std::vector<size_t>& cellPolygons = navMesh.spatialHash.polygonsHash[cellPoint.x + cellPoint.y * navMesh.spatialHash.hashSize.x];
 					for (const size_t polygon : cellPolygons)
@@ -221,7 +218,7 @@ namespace PathFinding
 		size_t bestLeft = start;
 		for (; bestLeft < portals.size() - 1; ++bestLeft)
 		{
-			if (portals[bestLeft][0] != portals[bestLeft+1][0])
+			if (portals[bestLeft][0] != portals[bestLeft + 1][0])
 			{
 				++bestLeft;
 				break;
@@ -231,7 +228,7 @@ namespace PathFinding
 		size_t bestRight = start;
 		for (; bestRight < portals.size() - 1; ++bestRight)
 		{
-			if (portals[bestRight][1] != portals[bestRight+1][1])
+			if (portals[bestRight][1] != portals[bestRight + 1][1])
 			{
 				++bestRight;
 				break;
@@ -261,7 +258,7 @@ namespace PathFinding
 			{
 				if (link.neighbor == path[i + 1].polygon)
 				{
-					portals.push_back(std::array<Vector2D, 2>{navMesh.geometry.vertices[link.borderPoint1], navMesh.geometry.vertices[link.borderPoint2]});
+					portals.push_back(std::array<Vector2D, 2>{ navMesh.geometry.vertices[link.borderPoint1], navMesh.geometry.vertices[link.borderPoint2] });
 					break;
 				}
 			}

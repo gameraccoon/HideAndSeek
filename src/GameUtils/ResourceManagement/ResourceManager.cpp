@@ -2,11 +2,11 @@
 
 #include "GameUtils/ResourceManagement/ResourceManager.h"
 
-#include <fstream>
-#include <vector>
 #include <filesystem>
-#include <string>
+#include <fstream>
 #include <ranges>
+#include <string>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 
@@ -78,7 +78,8 @@ void ResourceManager::unlockResource(ResourceHandle handle)
 
 			// unlock all dependencies (do after unloading to resolve any cyclic depenencies)
 			std::vector<ResourceHandle> resourcesToUnlock = mDependencies.removeResource(handle);
-			for (ResourceHandle resourceHandle : resourcesToUnlock) {
+			for (ResourceHandle resourceHandle : resourcesToUnlock)
+			{
 				unlockResource(ResourceHandle(resourceHandle));
 			}
 		}
@@ -104,11 +105,11 @@ void ResourceManager::loadAtlasesData(const RelativeResourcePath& listPath)
 			loadOneAtlasData(getAbsoluteResourcePath(RelativeResourcePath(std::string(atlasPath.value()))));
 		}
 	}
-	catch(const nlohmann::detail::exception& e)
+	catch (const nlohmann::detail::exception& e)
 	{
 		LogError("Can't parse atlas list '%s': %s", listPath.getRelativePath().c_str(), e.what());
 	}
-	catch(const std::exception& e)
+	catch (const std::exception& e)
 	{
 		LogError("Can't open atlas list '%s': %s", listPath.getRelativePath().c_str(), e.what());
 	}
@@ -222,12 +223,12 @@ const std::unordered_map<RelativeResourcePath, ResourceLoading::ResourceStorage:
 void ResourceManager::startLoadingThread(std::function<void()>&& threadFinalizerFn)
 {
 	AssertFatal(!mLoadingThread.joinable(), "Tried to start already started thread");
-	mLoadingThread = std::thread([this, finalizeFn = std::move(threadFinalizerFn)]{
+	mLoadingThread = std::thread([this, finalizeFn = std::move(threadFinalizerFn)] {
 		while (true)
 		{
 			{
 				std::unique_lock lock(mDataMutex);
-				mNotifyLoadingThread.wait(lock, [this]{ return mShouldStopLoadingThread || !mLoading.resourcesWaitingInit.empty(); });
+				mNotifyLoadingThread.wait(lock, [this] { return mShouldStopLoadingThread || !mLoading.resourcesWaitingInit.empty(); });
 
 				if (mShouldStopLoadingThread)
 				{
@@ -269,8 +270,7 @@ void ResourceManager::startResourceLoading(ResourceLoading::ResourceLoad::Loadin
 	std::unique_lock lock(mDataMutex);
 	const auto deletionIt = std::ranges::find_if(
 		mLoading.resourcesWaitingDeinit,
-		[handle = loadingData->handle](const ResourceLoading::ResourceLoad::UnloadingDataPtr& resourceUnloadData)
-		{
+		[handle = loadingData->handle](const ResourceLoading::ResourceLoad::UnloadingDataPtr& resourceUnloadData) {
 			return resourceUnloadData->handle == handle;
 		}
 	);
@@ -378,11 +378,11 @@ void ResourceManager::loadOneAtlasData(const AbsoluteResourcePath& path)
 			mStorage.atlasFrames.emplace(fileName, std::move(frameData));
 		}
 	}
-	catch(const nlohmann::detail::exception& e)
+	catch (const nlohmann::detail::exception& e)
 	{
 		LogError("Can't parse atlas data '%s': %s", path.getAbsolutePath().c_str(), e.what());
 	}
-	catch(const std::exception& e)
+	catch (const std::exception& e)
 	{
 		LogError("Can't open atlas data '%s': %s", path.getAbsolutePath().c_str(), e.what());
 	}

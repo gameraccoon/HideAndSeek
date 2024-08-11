@@ -2,9 +2,9 @@
 
 #include "GameUtils/Application/ArgumentsParser.h"
 
-#include "EngineCommon/Types/String/StringNumberConversion.h"
-
 #include <format>
+
+#include "EngineCommon/Types/String/StringNumberConversion.h"
 
 ArgumentsParser::ArgumentsParser(const int argc, const char** argv, const std::string& argumentSwitch)
 	: mArgumentSwitch(argumentSwitch)

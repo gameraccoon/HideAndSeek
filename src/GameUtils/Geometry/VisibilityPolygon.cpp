@@ -26,23 +26,23 @@ static bool NormalizePoint(Vector2D& point, const Vector2D& pair, const float le
 {
 	if (point.x < left)
 	{
-		point = pair + std::fabs((left - pair.x)/(point.x - pair.x)) * (point-pair);
+		point = pair + std::fabs((left - pair.x) / (point.x - pair.x)) * (point - pair);
 		return true;
 	}
 	else if (point.x > right)
 	{
-		point = pair + std::fabs((pair.x - right)/(pair.x - point.x)) * (point-pair);
+		point = pair + std::fabs((pair.x - right) / (pair.x - point.x)) * (point - pair);
 		return true;
 	}
 
 	if (point.y < top)
 	{
-		point = pair + std::fabs((top - pair.y)/(point.y - pair.y)) * (point-pair);
+		point = pair + std::fabs((top - pair.y) / (point.y - pair.y)) * (point - pair);
 		return true;
 	}
 	else if (point.y > bottom)
 	{
-		point = pair + std::fabs((pair.y - bottom)/(pair.y - point.y)) * (point-pair);
+		point = pair + std::fabs((pair.y - bottom) / (pair.y - point.y)) * (point - pair);
 		return true;
 	}
 	return false;
@@ -53,8 +53,7 @@ static void FilterOutPotentialContinuations(std::vector<size_t>& outPotentialCon
 	// filter out the continuations that are not longer stick out of the end of the closest border
 	std::erase_if(
 		outPotentialContinuations,
-		[&boardersToTrace, maxAngle](const size_t idx)
-		{
+		[&boardersToTrace, maxAngle](const size_t idx) {
 			return (Rotator::NormalizeRawAngle(maxAngle - boardersToTrace[idx].angleB) >= 0.0f);
 		}
 	);
@@ -114,10 +113,10 @@ void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2
 			border.b -= sourcePos;
 
 			// keep only borders inside the draw area and facing the light source
-			const bool isVisible = (
-				(border.a.x > left && border.a.x < right && border.a.y > top && border.a.y < bottom)
-				|| (border.b.x > left && border.b.x < right && border.b.y > top && border.b.y < bottom)
-			) && CalcClockwiseDirection(border.a, border.b) < 0.0f;
+			const bool isVisible = ((border.a.x > left && border.a.x < right && border.a.y > top && border.a.y < bottom)
+									|| (border.b.x > left && border.b.x < right && border.b.y > top && border.b.y < bottom)
+								   )
+				&& CalcClockwiseDirection(border.a, border.b) < 0.0f;
 
 			if (isVisible)
 			{
@@ -203,7 +202,8 @@ void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2
 					// find the best candidate to cast the shadow to
 					Vector2D closestIntersectionPoint;
 					std::tie(closestBorderIdx, closestIntersectionPoint) = getNextClosestBorderFromCandidates(
-						potentialContinuations, closestBorder, maxExtent);
+						potentialContinuations, closestBorder, maxExtent
+					);
 
 					outVisibilityPolygon.push_back(closestIntersectionPoint);
 				}
@@ -270,7 +270,8 @@ void VisibilityPolygonCalculator::calculateVisibilityPolygon(std::vector<Vector2
 		AngledBorder& closestBorder = mCaches.bordersToTrace[closestBorderIdx];
 		outVisibilityPolygon.push_back(closestBorder.coords.b);
 		std::tie(closestBorderIdx, closestIntersectionPoint) = getNextClosestBorderFromCandidates(
-			potentialContinuations, closestBorder, maxExtent);
+			potentialContinuations, closestBorder, maxExtent
+		);
 		outVisibilityPolygon.push_back(closestIntersectionPoint);
 		FilterOutPotentialContinuations(potentialContinuations, mCaches.bordersToTrace, mCaches.bordersToTrace[closestBorderIdx].angleB);
 	}

@@ -1,17 +1,17 @@
 #pragma once
 
-#include "EngineCommon/Types/ComplexTypes/Result.h"
-
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <vector>
-#include <filesystem>
+
+#include "EngineCommon/Types/ComplexTypes/Result.h"
 
 class ArgumentsParser
 {
 public:
-	explicit ArgumentsParser(int argc, const char **argv, const std::string& argumentSwitch = "--");
-	explicit ArgumentsParser(int argc, char **argv, const std::string& argumentSwitch = "--");
+	explicit ArgumentsParser(int argc, const char** argv, const std::string& argumentSwitch = "--");
+	explicit ArgumentsParser(int argc, char** argv, const std::string& argumentSwitch = "--");
 
 	[[nodiscard]] bool hasArgument(const std::string& argument) const;
 	[[nodiscard]] std::optional<std::string> getArgumentValue(const std::string& argument) const;

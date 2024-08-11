@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
 #include <limits>
+#include <vector>
 
-#include "EngineData/Geometry/Vector2D.h"
 #include "EngineData/Geometry/Border.h"
 #include "EngineData/Geometry/BoundingBox.h"
+#include "EngineData/Geometry/Vector2D.h"
 
 namespace ShapeOperations
 {
@@ -24,8 +24,7 @@ namespace ShapeOperations
 		void updateAABB();
 
 		Shape borders;
-		BoundingBox aabb
-		{
+		BoundingBox aabb{
 			std::numeric_limits<float>::max(),
 			std::numeric_limits<float>::max(),
 			std::numeric_limits<float>::lowest(),
@@ -43,4 +42,4 @@ namespace ShapeOperations
 	std::vector<size_t> SortBorders(Shape& inOutShape);
 
 	void ExtendGeometry(Shape& outResultingShape, const std::vector<Vector2D>& geometry, float radius);
-}
+} // namespace ShapeOperations

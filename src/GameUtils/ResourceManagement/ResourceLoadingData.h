@@ -55,4 +55,4 @@ namespace ResourceLoading
 		std::list<UnloadingDataPtr> resourcesWaitingDeinit;
 		LoadDependencies loadDependencies;
 	};
-}
+} // namespace ResourceLoading

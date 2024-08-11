@@ -1,9 +1,9 @@
 #include "EngineCommon/precomp.h"
 
+#include "GameUtils/AI/PathBlockingGeometry.h"
+
 #include <algorithm>
 #include <ranges>
-
-#include "GameUtils/AI/PathBlockingGeometry.h"
 
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
@@ -26,8 +26,7 @@ namespace PathBlockingGeometry
 			{
 				std::vector<SimpleBorder> borders;
 				ShapeOperations::ExtendGeometry(borders, hull.points, GEOMETRY_EXTENT);
-				std::ranges::for_each(borders, [location = transform->getLocation()](SimpleBorder& border)
-				{
+				std::ranges::for_each(borders, [location = transform->getLocation()](SimpleBorder& border) {
 					border.a += location;
 					border.b += location;
 				});
@@ -41,17 +40,14 @@ namespace PathBlockingGeometry
 
 		outGeometry.clear();
 		outGeometry.reserve(mergedGeometry.size());
-		std::ranges::for_each(mergedGeometry,
-			[&outGeometry](ShapeOperations::MergedGeometry& geometry)
+		std::ranges::for_each(mergedGeometry, [&outGeometry](ShapeOperations::MergedGeometry& geometry) {
+			ShapeOperations::SortBorders(geometry.borders);
+			outGeometry.emplace_back(geometry.borders.size());
+			std::vector<Vector2D>& newGeometry = outGeometry.back();
+			for (size_t i = 0; i < geometry.borders.size(); ++i)
 			{
-				ShapeOperations::SortBorders(geometry.borders);
-				outGeometry.emplace_back(geometry.borders.size());
-				std::vector<Vector2D>& newGeometry = outGeometry.back();
-				for (size_t i = 0; i < geometry.borders.size(); ++i)
-				{
-					newGeometry[geometry.borders.size() - i - 1] = geometry.borders[i].a;
-				}
+				newGeometry[geometry.borders.size() - i - 1] = geometry.borders[i].a;
 			}
-		);
+		});
 	}
 } // namespace PathBlockingGeometry

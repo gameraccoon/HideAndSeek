@@ -2,8 +2,8 @@
 
 #include "GameUtils/Geometry/ShapeOperations.h"
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <numeric>
 #include <unordered_map>
 #include <unordered_set>
@@ -143,9 +143,9 @@ namespace ShapeOperations
 
 	static std::array<float, 4> InverseMatrix(const std::array<float, 4> matrix)
 	{
-		const float determinant = matrix[0]*matrix[3] - matrix[1]*matrix[2];
+		const float determinant = matrix[0] * matrix[3] - matrix[1] * matrix[2];
 		Assert(determinant != 0.0f, "Determinant should never be equal to zero");
-		const float inverseDeterminant = 1/determinant;
+		const float inverseDeterminant = 1 / determinant;
 
 		return { matrix[3] * inverseDeterminant, -matrix[1] * inverseDeterminant, -matrix[2] * inverseDeterminant, matrix[0] * inverseDeterminant };
 	}
@@ -173,17 +173,18 @@ namespace ShapeOperations
 	}
 
 	static void AddOverlappingLinesIntersectionPoints(
-			const SimpleBorder& borderA,
-			const SimpleBorder& borderB,
-			std::unordered_set<Vector2DKey<>>& intersectionPointsSet,
-			std::vector<Vector2DKey<>>& intersectionPoints,
-			std::vector<BorderIntersection>& borderAIntersections,
-			std::vector<BorderIntersection>& borderBIntersections)
+		const SimpleBorder& borderA,
+		const SimpleBorder& borderB,
+		std::unordered_set<Vector2DKey<>>& intersectionPointsSet,
+		std::vector<Vector2DKey<>>& intersectionPoints,
+		std::vector<BorderIntersection>& borderAIntersections,
+		std::vector<BorderIntersection>& borderBIntersections
+	)
 	{
 		// project borderB into coordinate system based on a borderA
 		const Vector2D basisX = (borderA.b - borderA.a).unit();
 		const Vector2D basisY = -basisX.normal();
-		const std::array<float, 4> basisTransformMatrix = InverseMatrix({basisX.x, basisY.x, basisX.y, basisY.y});
+		const std::array<float, 4> basisTransformMatrix = InverseMatrix({ basisX.x, basisY.x, basisX.y, basisY.y });
 		const SimpleBorder transformedA = ChangeBorderBasis(basisTransformMatrix, borderA);
 		const SimpleBorder transformedB = ChangeBorderBasis(basisTransformMatrix, borderB);
 		Assert(transformedA.a.x < transformedA.b.x, "The line segment should have the same direction with the 0X origin");
@@ -334,13 +335,11 @@ namespace ShapeOperations
 
 	static CutDirection CalcBetterCutDirection(const CutDirection oldDirection, const CutDirection newDirection)
 	{
-		auto firstSidePredicate = [newPos = newDirection.otherBorderPointPosition, oldPos = oldDirection.otherBorderPointPosition]
-		{
+		auto firstSidePredicate = [newPos = newDirection.otherBorderPointPosition, oldPos = oldDirection.otherBorderPointPosition] {
 			return !IsFirstBorderGoesFirst(newPos, oldPos);
 		};
 
-		auto secondSidePredicate = [newPos = newDirection.otherBorderPointPosition, oldPos = oldDirection.otherBorderPointPosition]
-		{
+		auto secondSidePredicate = [newPos = newDirection.otherBorderPointPosition, oldPos = oldDirection.otherBorderPointPosition] {
 			return IsFirstBorderGoesFirst(newPos, oldPos);
 		};
 
@@ -382,8 +381,7 @@ namespace ShapeOperations
 		std::vector<IndexPair> shape2Borders;
 		shape2Borders.reserve(shape2.size());
 
-		auto getKeyIndex = [&shapePoints, &shapePointsMap](const Vector2D pos) -> size_t
-		{
+		auto getKeyIndex = [&shapePoints, &shapePointsMap](const Vector2D pos) -> size_t {
 			const VectorKey key(pos);
 			const auto it = shapePointsMap.find(key);
 			if (it != shapePointsMap.end())
@@ -414,13 +412,13 @@ namespace ShapeOperations
 		for (size_t i = 0; i < shape1Borders.size(); ++i)
 		{
 			IndexPair borderIdxs = shape1Borders[i];
-			SimpleBorder border{shapePoints[borderIdxs.first].calcRoundedValue(), shapePoints[borderIdxs.second].calcRoundedValue()};
+			SimpleBorder border{ shapePoints[borderIdxs.first].calcRoundedValue(), shapePoints[borderIdxs.second].calcRoundedValue() };
 			// create items even for the borders without intersections
 			std::vector<BorderIntersection>& intersections = borderIntersections[i];
 			for (size_t j = 0; j < shape2.size(); ++j)
 			{
 				IndexPair otherBorderIdxs = shape2Borders[j];
-				SimpleBorder otherBorder{shapePoints[otherBorderIdxs.first].calcRoundedValue(), shapePoints[otherBorderIdxs.second].calcRoundedValue()};
+				SimpleBorder otherBorder{ shapePoints[otherBorderIdxs.first].calcRoundedValue(), shapePoints[otherBorderIdxs.second].calcRoundedValue() };
 				if (!Collide::AreLinesIntersect(border.a, border.b, otherBorder.a, otherBorder.b))
 				{
 					continue;
@@ -482,11 +480,9 @@ namespace ShapeOperations
 		{
 			const SimpleBorder& border = (borderIndex < shape1BordersCount) ? shape1[borderIndex] : shape2[borderIndex - shape1BordersCount];
 
-			std::vector<BorderPoint> borderPoints({
-				BorderPoint(border.a),
-				BorderPoint(border.b)
-			});
-			std::vector<float> borderPointFractions({0.0f, (border.a - border.b).size()});
+			std::vector<BorderPoint> borderPoints({ BorderPoint(border.a),
+													BorderPoint(border.b) });
+			std::vector<float> borderPointFractions({ 0.0f, (border.a - border.b).size() });
 			for (auto [intersectionIdx, cutDirection] : intersections)
 			{
 				const VectorKey& intersectionPoint = intersectionPoints[intersectionIdx];
@@ -533,7 +529,7 @@ namespace ShapeOperations
 				if (fracturedBorders[startBorderIdx].first == intersectionPoint)
 				{
 					size_t borderIdx = startBorderIdx;
-					while(true) // exit in the middle
+					while (true) // exit in the middle
 					{
 						bordersToRemove.push_back(borderIdx);
 						VectorKey nextPoint(fracturedBorders[borderIdx].second);
@@ -578,7 +574,7 @@ namespace ShapeOperations
 			fracturedBorders.begin(),
 			fracturedBorders.end(),
 			resultingBorders.begin(),
-			[](const KeyPair& k){
+			[](const KeyPair& k) {
 				return SimpleBorder{ k.first.value, k.second.value };
 			}
 		);
@@ -702,7 +698,7 @@ namespace ShapeOperations
 					}
 				}
 			}
-			pair_loop_exit:
+		pair_loop_exit:
 
 			points.erase(points.begin());
 		}
@@ -865,7 +861,7 @@ namespace ShapeOperations
 			for (size_t i = 0, iSize = polygon.GetNumPoints(); i < iSize; ++i)
 			{
 				const TPPLPoint& point = polygon[i];
-				inOutShapes.back()[i] = {point.x, point.y};
+				inOutShapes.back()[i] = { point.x, point.y };
 			}
 		}
 	}
@@ -879,20 +875,16 @@ namespace ShapeOperations
 		};
 
 		const float oneBorderFraction = 1.0f / static_cast<float>(inOutShape.size());
-		Vector2D middlePos = std::accumulate(inOutShape.begin(), inOutShape.end(), ZERO_VECTOR,
-			[oneBorderFraction](const Vector2D accumulatedValue, const SimpleBorder& border) -> Vector2D
-			{
-				return accumulatedValue + border.a * oneBorderFraction;
-			}
-		);
+		Vector2D middlePos = std::accumulate(inOutShape.begin(), inOutShape.end(), ZERO_VECTOR, [oneBorderFraction](const Vector2D accumulatedValue, const SimpleBorder& border) -> Vector2D {
+			return accumulatedValue + border.a * oneBorderFraction;
+		});
 
 		std::vector<AngledBorder> sortedBorders(inOutShape.size());
 
 		std::ranges::transform(
 			inOutShape,
 			sortedBorders.begin(),
-			[middlePos](const SimpleBorder& border)
-			{
+			[middlePos](const SimpleBorder& border) {
 				return AngledBorder{
 					border,
 					(border.a - middlePos).rotation().getValue()
@@ -901,15 +893,13 @@ namespace ShapeOperations
 		);
 		inOutShape.clear();
 
-		auto lessPointAngle = [](const AngledBorder& a, const AngledBorder& b) -> bool
-		{
+		auto lessPointAngle = [](const AngledBorder& a, const AngledBorder& b) -> bool {
 			return a.angleA < b.angleA;
 		};
 
 		std::ranges::sort(sortedBorders, lessPointAngle);
 
-		auto moveSortedBorders = [](std::vector<SimpleBorder>& inOutResult, std::vector<AngledBorder>& inOutSource, const size_t sourceIndex)
-		{
+		auto moveSortedBorders = [](std::vector<SimpleBorder>& inOutResult, std::vector<AngledBorder>& inOutSource, const size_t sourceIndex) {
 			inOutResult.push_back(inOutSource[sourceIndex].coords);
 			inOutSource.erase(inOutSource.begin() + static_cast<ptrdiff_t>(sourceIndex));
 		};
@@ -931,7 +921,8 @@ namespace ShapeOperations
 						break;
 					}
 
-					if (sortedBorders.empty()) [[unlikely]] {
+					if (sortedBorders.empty()) [[unlikely]]
+					{
 						ReportError("sortedBorders should not be empty here, the shape was invalid");
 						break;
 					}
@@ -954,8 +945,7 @@ namespace ShapeOperations
 
 		std::vector<Vector2D> points(geometry.size());
 
-		auto getNeighboringPoints = [size = points.size()](const size_t i) -> std::pair<size_t, size_t>
-		{
+		auto getNeighboringPoints = [size = points.size()](const size_t i) -> std::pair<size_t, size_t> {
 			return { (i > 0) ? i - 1 : size - 1, (i < size - 1) ? i + 1 : 0 };
 		};
 
@@ -970,4 +960,4 @@ namespace ShapeOperations
 			outResultingShape.emplace_back(points[i], points[j]);
 		});
 	}
-}
+} // namespace ShapeOperations

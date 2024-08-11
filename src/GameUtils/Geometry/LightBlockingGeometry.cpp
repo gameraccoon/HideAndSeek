@@ -4,7 +4,6 @@
 
 #include "GameData/Components/CollisionComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
-
 #include "GameData/Spatial/SpatialWorldData.h"
 
 #include "GameUtils/Geometry/ShapeOperations.h"
@@ -127,4 +126,4 @@ namespace LightBlockingGeometry
 			FillGeometryInCell(outGeometry[pos], oneCellGeometry, cellAABB);
 		}
 	}
-}
+} // namespace LightBlockingGeometry

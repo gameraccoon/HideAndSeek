@@ -12,7 +12,7 @@
 // * only single-thread usage
 //
 // check out the tests to see how it can be used
-template<typename CallableType, typename ReturnType =  std::invoke_result_t<CallableType>>
+template<typename CallableType, typename ReturnType = std::invoke_result_t<CallableType>>
 class LazyEvaluated
 {
 public:
