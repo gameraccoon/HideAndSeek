@@ -15,7 +15,7 @@
 			"name": "blackboard",
 			"type": "FSM::Blackboard<StringId>",
 			"includes": [
-				"\"GameData/FSM/Blackboard.h\""
+				"\"EngineData/FSM/Blackboard.h\""
 			],
 			"flags": ["transient", "get_by_ref"]
 		}

@@ -5,7 +5,7 @@
 			"name": "characterSM",
 			"type": "FSM::StateMachine<CharacterState, CharacterStateBlackboardKeys>",
 			"includes": [
-				"\"GameData/FSM/StateMachine.h\"",
+				"\"EngineData/FSM/StateMachine.h\"",
 				"\"GameData/Enums/CharacterState.generated.h\"",
 				"\"GameData/Enums/CharacterStateBlackboardKeys.generated.h\""
 			],
@@ -15,7 +15,7 @@
 			"name": "animationSMs",
 			"type": "std::map<StringId, FSM::StateMachine<StringId, StringId>>",
 			"includes": [
-				"\"GameData/FSM/StateMachine.h\"",
+				"\"EngineData/FSM/StateMachine.h\"",
 				"<map>"
 			],
 			"flags": ["get_by_ref", "transient"]

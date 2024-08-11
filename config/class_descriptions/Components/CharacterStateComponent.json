@@ -12,7 +12,7 @@
 			"type": "FSM::Blackboard<CharacterStateBlackboardKeys>",
 			"includes": [
 				"\"GameData/Enums/CharacterStateBlackboardKeys.generated.h\"",
-				"\"GameData/FSM/Blackboard.h\""
+				"\"EngineData/FSM/Blackboard.h\""
 			],
 			"flags": ["transient", "get_by_ref"]
 		}
