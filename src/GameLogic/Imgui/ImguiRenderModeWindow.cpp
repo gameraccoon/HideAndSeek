@@ -2,15 +2,14 @@
 
 #ifdef IMGUI_ENABLED
 
-#include "GameLogic/Imgui/ImguiRenderModeWindow.h"
-
 #include "imgui/imgui.h"
 
-#include "GameData/GameData.h"
 #include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/GameData.h"
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
 #include "GameLogic/Imgui/ImguiDebugData.h"
+#include "GameLogic/Imgui/ImguiRenderModeWindow.h"
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 void ImguiRenderModeWindow::update(const ImguiDebugData& debugData)
 {

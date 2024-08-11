@@ -2,9 +2,9 @@
 
 #ifdef IMGUI_ENABLED
 
+#include "GameLogic/Imgui/ComponentInspector/ImguiComponentInspectorWindow.h"
 #include "GameLogic/Imgui/ImguiRenderModeWindow.h"
 #include "GameLogic/Imgui/ImguiSystemsTimeReportWindow.h"
-#include "GameLogic/Imgui/ComponentInspector/ImguiComponentInspectorWindow.h"
 
 class ImguiMainMenu
 {

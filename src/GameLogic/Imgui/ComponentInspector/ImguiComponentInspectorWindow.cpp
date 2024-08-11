@@ -13,9 +13,8 @@
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
-#include "GameLogic/Imgui/ImguiDebugData.h"
-
 #include "GameLogic/Imgui/ComponentInspector/ComponentWidgetsRegistration.h"
+#include "GameLogic/Imgui/ImguiDebugData.h"
 
 ImguiComponentInspectorWindow::ImguiComponentInspectorWindow()
 {
@@ -37,7 +36,7 @@ static void HelpMarker(const char* desc)
 
 void ImguiComponentInspectorWindow::applyFilters(const ImguiDebugData& debugData)
 {
-	 mPropertyFiltersWidget.getFilteredEntities(debugData, mFilteredEntities);
+	mPropertyFiltersWidget.getFilteredEntities(debugData, mFilteredEntities);
 }
 
 void ImguiComponentInspectorWindow::showEntityId() const
@@ -62,7 +61,7 @@ void ImguiComponentInspectorWindow::showFilteredEntities()
 		if (ImGui::TreeNode("Filtered entities"))
 		{
 			ImGui::BeginGroup();
-			const auto scrollBoxSize = ImVec2(200.0f, std::min(180.0f, static_cast<float>(mFilteredEntities.size()) * 17.0f + ImGui::GetStyle().FramePadding.y*4));
+			const auto scrollBoxSize = ImVec2(200.0f, std::min(180.0f, static_cast<float>(mFilteredEntities.size()) * 17.0f + ImGui::GetStyle().FramePadding.y * 4));
 			if (ImGui::BeginChild("FilteredEntities", scrollBoxSize, true))
 			{
 				for (auto& filteredEntity : mFilteredEntities)
@@ -93,8 +92,7 @@ void ImguiComponentInspectorWindow::showComponentsInspector()
 
 		std::vector<TypedComponent> components;
 		cell->getEntityManager().getAllEntityComponents(entity, components);
-		std::ranges::sort(components, [](const auto& a, const auto& b)
-		{
+		std::ranges::sort(components, [](const auto& a, const auto& b) {
 			return a.typeId < b.typeId;
 		});
 
@@ -119,7 +117,8 @@ void ImguiComponentInspectorWindow::showComponentsInspector()
 	if (!hasFoundAnything && mSelectedEntity.has_value())
 	{
 		ImGui::Text("No inspectable entity with such ID found");
-		ImGui::SameLine(); HelpMarker("An entity without any components also can't be inspectable");
+		ImGui::SameLine();
+		HelpMarker("An entity without any components also can't be inspectable");
 	}
 }
 

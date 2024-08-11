@@ -19,22 +19,22 @@
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
+#include "HAL/Graphics/Sprite.h"
+
 #include "EngineUtils/Multithreading/ThreadPool.h"
 
 #include "GameUtils/Geometry/VisibilityPolygon.h"
 #include "GameUtils/ResourceManagement/ResourceManager.h"
-
-#include "HAL/Graphics/Sprite.h"
 
 #include "EngineLogic/Render/RenderAccessor.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
 RenderSystem::RenderSystem(
-		WorldHolder& worldHolder,
-		ResourceManager& resourceManager,
-		ThreadPool& threadPool
-	) noexcept
+	WorldHolder& worldHolder,
+	ResourceManager& resourceManager,
+	ThreadPool& threadPool
+) noexcept
 	: mWorldHolder(worldHolder)
 	, mResourceManager(resourceManager)
 	, mThreadPool(threadPool)
@@ -89,21 +89,21 @@ void RenderSystem::update()
 	{
 		SCOPED_PROFILER("draw visible entities");
 		spatialManager.forEachComponentSet<const SpriteRenderComponent, const TransformComponent>(
-			[&drawShift, &renderData](const SpriteRenderComponent* spriteRender, const TransformComponent* transform)
-		{
-			Vector2D location = transform->getLocation() + drawShift;
-			float rotation = transform->getRotation().getValue();
-			for (const auto& data : spriteRender->getSpriteDatas())
-			{
-				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
-				quadData.spriteHandle = data.spriteHandle;
-				quadData.position = location;
-				quadData.size = data.params.size;
-				quadData.anchor = data.params.anchor;
-				quadData.rotation = rotation;
-				quadData.alpha = 1.0f;
+			[&drawShift, &renderData](const SpriteRenderComponent* spriteRender, const TransformComponent* transform) {
+				Vector2D location = transform->getLocation() + drawShift;
+				float rotation = transform->getRotation().getValue();
+				for (const auto& data : spriteRender->getSpriteDatas())
+				{
+					QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+					quadData.spriteHandle = data.spriteHandle;
+					quadData.position = location;
+					quadData.size = data.params.size;
+					quadData.anchor = data.params.anchor;
+					quadData.rotation = rotation;
+					quadData.alpha = 1.0f;
+				}
 			}
-		});
+		);
 	}
 
 	renderAccessor.submitData(std::move(renderData));
@@ -168,7 +168,8 @@ static std::vector<VisibilityPolygonCalculationResult> processVisibilityPolygons
 	const TupleVector<LightComponent*, const TransformComponent*>& componentsToProcess,
 	Vector2D maxFov,
 	const LightBlockingComponents& lightBlockingComponents,
-	const GameplayTimestamp& timestamp)
+	const GameplayTimestamp& timestamp
+)
 {
 	SCOPED_PROFILER("processVisibilityPolygonsGroup()");
 
@@ -227,8 +228,7 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 	// exclude lights that are too far to be visible
 	std::erase_if(
 		lightComponentSets,
-		[emitterPositionBordersLT, emitterPositionBordersRB](auto& componentSet)
-		{
+		[emitterPositionBordersLT, emitterPositionBordersRB](auto& componentSet) {
 			return !std::get<1>(componentSet)->getLocation().isInsideRect(emitterPositionBordersLT, emitterPositionBordersRB);
 		}
 	);
@@ -240,8 +240,7 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 		allResults.reserve(lightComponentSets.size());
 
 		// prepare function that will collect the calculated data
-		auto finalizeFn = [&allResults](std::any&& result)
-		{
+		auto finalizeFn = [&allResults](std::any&& result) {
 			SCOPED_PROFILER("finalizeFn()");
 			std::ranges::move(
 				std::any_cast<std::vector<VisibilityPolygonCalculationResult>&>(result),
@@ -271,8 +270,7 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 			);
 
 			jobs.emplace_back(
-				[components = std::move(oneTaskComponents), maxFov, &lightBlockingComponents, timestampNow]()
-				{
+				[components = std::move(oneTaskComponents), maxFov, &lightBlockingComponents, timestampNow]() {
 					return processVisibilityPolygonsGroup(components, maxFov, lightBlockingComponents, timestampNow);
 				},
 				finalizeFn
@@ -285,12 +283,10 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 		mThreadPool.processAndFinalizeTasks(1u);
 
 		// sort lights in some deterministic order
-		std::ranges::sort(allResults, [](auto& a, auto& b)
-		{
+		std::ranges::sort(allResults, [](auto& a, auto& b) {
 			return (
 				a.location.x < b.location.x
-				||
-				(a.location.x == b.location.x && a.location.y < b.location.y)
+				|| (a.location.x == b.location.x && a.location.y < b.location.y)
 			);
 		});
 

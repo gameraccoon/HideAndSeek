@@ -2,9 +2,9 @@
 
 #ifdef IMGUI_ENABLED
 
-#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/HasComponentPropertyFilter.h"
-
 #include "imgui.h"
+
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/HasComponentPropertyFilter.h"
 
 namespace ImguiPropertyFiltration
 {

@@ -2,8 +2,8 @@
 
 #ifdef IMGUI_ENABLED
 
-#include <mutex>
 #include <memory>
+#include <mutex>
 
 #include <raccoon-ecs/utils/system.h>
 

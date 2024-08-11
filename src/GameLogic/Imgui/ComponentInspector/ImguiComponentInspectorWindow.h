@@ -1,7 +1,8 @@
 #pragma once
 
-#include <raccoon-ecs/entity.h>
 #include <map>
+
+#include <raccoon-ecs/entity.h>
 
 #include "GameLogic/Imgui/ComponentInspector/AbstractComponentImguiWidget.h"
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/ImguiPropertyFiltersWidget.h"

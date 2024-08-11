@@ -122,7 +122,7 @@ namespace StateMachines
 		}
 	}
 
-	void RegisterStateMachines(StateMachineComponent *stateMachine)
+	void RegisterStateMachines(StateMachineComponent* stateMachine)
 	{
 		if (!stateMachine)
 		{
@@ -133,4 +133,4 @@ namespace StateMachines
 		RegisterCharacterAnimationSM(stateMachine->getAnimationSMsRef()[STR_TO_ID("handgun")]);
 		RegisterCharacterLegsAnimationSM(stateMachine->getAnimationSMsRef()[STR_TO_ID("feet")]);
 	}
-}
+} // namespace StateMachines

@@ -11,7 +11,6 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-
 MovementSystem::MovementSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
@@ -40,29 +39,29 @@ void MovementSystem::update()
 	std::vector<CellScheduledTransfers> transfers;
 
 	world.getSpatialData().getAllCellManagers().forEachComponentSetWithEntityAndExtraData<MovementComponent, TransformComponent>(
-		[timestampNow, &transfers](const WorldCell& cell, EntityView entityView, MovementComponent* movement, TransformComponent* transform)
-	{
-		if (!movement->getNextStep().isZeroLength())
-		{
-			Vector2D pos = transform->getLocation() + movement->getNextStep();
-			transform->setLocation(pos);
-
-			CellPos cellPos = cell.getPos();
-			const bool isCellChanged = SpatialWorldData::TransformCellForPos(cellPos, pos);
-			if (isCellChanged)
+		[timestampNow, &transfers](const WorldCell& cell, EntityView entityView, MovementComponent* movement, TransformComponent* transform) {
+			if (!movement->getNextStep().isZeroLength())
 			{
-				transfers.emplace_back(cellPos, entityView);
-			}
-			movement->setUpdateTimestamp(timestampNow);
-			movement->setNextStep(ZERO_VECTOR);
-		}
+				Vector2D pos = transform->getLocation() + movement->getNextStep();
+				transform->setLocation(pos);
 
-		if (transform->getRotation() != movement->getSightDirection().rotation())
-		{
-			transform->setRotation(movement->getSightDirection().rotation());
-			movement->setUpdateTimestamp(timestampNow);
+				CellPos cellPos = cell.getPos();
+				const bool isCellChanged = SpatialWorldData::TransformCellForPos(cellPos, pos);
+				if (isCellChanged)
+				{
+					transfers.emplace_back(cellPos, entityView);
+				}
+				movement->setUpdateTimestamp(timestampNow);
+				movement->setNextStep(ZERO_VECTOR);
+			}
+
+			if (transform->getRotation() != movement->getSightDirection().rotation())
+			{
+				transform->setRotation(movement->getSightDirection().rotation());
+				movement->setUpdateTimestamp(timestampNow);
+			}
 		}
-	});
+	);
 
 	for (auto& transfer : transfers)
 	{

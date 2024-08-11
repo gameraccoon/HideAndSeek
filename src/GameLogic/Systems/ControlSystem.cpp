@@ -4,14 +4,13 @@
 
 #include <SDL_mouse.h>
 
-#include "GameData/World.h"
 #include "GameData/Components/CharacterStateComponent.generated.h"
 #include "GameData/Components/GameplayInputComponent.generated.h"
 #include "GameData/Components/MovementComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/World.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
-
 
 ControlSystem::ControlSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)

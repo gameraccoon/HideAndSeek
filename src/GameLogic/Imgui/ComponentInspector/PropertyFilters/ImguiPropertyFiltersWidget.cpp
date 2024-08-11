@@ -2,43 +2,36 @@
 
 #ifdef IMGUI_ENABLED
 
-#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/ImguiPropertyFiltersWidget.h"
-
 #include <algorithm>
 #include <cstring>
-#include <string>
 #include <sstream>
+#include <string>
 
 #include "imgui.h"
-
-#include <raccoon-ecs/entity_manager.h>
 #include <raccoon-ecs/component_factory.h>
+#include <raccoon-ecs/entity_manager.h>
 
 #include "GameData/Spatial/SpatialEntityManager.h"
 #include "GameData/World.h"
 
-#include "GameLogic/SharedManagers/WorldHolder.h"
-
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/AbstractPropertyDescriptor.h"
-
-#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/FilterRegistration/FilterRegistration.h"
-#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptorsRegistration.h"
-
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/ImguiPropertyFiltersWidget.h"
 #include "GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptors/ComponentAvailabilityPropertyDescriptor.h"
-
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptorsRegistration.h"
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/FilterRegistration/FilterRegistration.h"
 #include "GameLogic/Imgui/ImguiDebugData.h"
+#include "GameLogic/SharedManagers/WorldHolder.h"
 
 namespace ImguiPropertyFiltration
 {
 	void ImguiPropertyFiltersWidget::init(const ImguiDebugData& debugData)
 	{
 		auto propertyDescriptions = PropertyDescriptorsRegistration::GetDescriptions();
-		debugData.componentFactory.forEachComponentType([&propertyDescriptions](const StringId className)
-		{
+		debugData.componentFactory.forEachComponentType([&propertyDescriptions](const StringId className) {
 			const std::string componentName = ID_TO_STR(className);
 			std::string lowerComponentName = componentName;
-			std::transform(lowerComponentName.begin(), lowerComponentName.end(), lowerComponentName.begin(), [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
-			propertyDescriptions.emplace_back(std::vector<std::string>{lowerComponentName}, ComponentAvailabilityPropertyDescriptor::Create(componentName, className));
+			std::transform(lowerComponentName.begin(), lowerComponentName.end(), lowerComponentName.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+			propertyDescriptions.emplace_back(std::vector<std::string>{ lowerComponentName }, ComponentAvailabilityPropertyDescriptor::Create(componentName, className));
 		});
 		mPropertyDescriptors.construct(std::move(propertyDescriptions));
 	}
@@ -70,33 +63,33 @@ namespace ImguiPropertyFiltration
 
 		if (ImGui::InputTextWithHint("##FilterSearch", "Search Query", mFilterQueryBuffer, IM_ARRAYSIZE(mFilterQueryBuffer)))
 		{
-//			{
-//				Entity::RawId id = 0;
-//				std::string_view strId(mFilterQueryBuffer, IM_ARRAYSIZE(mFilterQueryBuffer));
-//				std::stringstream ss;
-//				if (strId[0] == '0' && strId[1] == 'x') {
-//					ss << std::hex;
-//				}
-//				ss << strId;
-//				ss >> id;
-//				Entity entity = Entity{id, 0};
-//
-//				std::unordered_map<CellPos, WorldCell>& allCells = debugData.worldHolder.getWorld().getSpatialData().getAllCells();
-//				WorldCell* cell = findEntityCell(allCells, entity);
-//				if (cell != nullptr)
-//				{
-//					mExplicitlySetEntity = std::make_tuple(cell, entity);
-//					return;
-//				}
-//				else
-//				{
-//					mExplicitlySetEntity = std::nullopt;
-//				}
-//			}
+			//			{
+			//				Entity::RawId id = 0;
+			//				std::string_view strId(mFilterQueryBuffer, IM_ARRAYSIZE(mFilterQueryBuffer));
+			//				std::stringstream ss;
+			//				if (strId[0] == '0' && strId[1] == 'x') {
+			//					ss << std::hex;
+			//				}
+			//				ss << strId;
+			//				ss >> id;
+			//				Entity entity = Entity{id, 0};
+			//
+			//				std::unordered_map<CellPos, WorldCell>& allCells = debugData.worldHolder.getWorld().getSpatialData().getAllCells();
+			//				WorldCell* cell = findEntityCell(allCells, entity);
+			//				if (cell != nullptr)
+			//				{
+			//					mExplicitlySetEntity = std::make_tuple(cell, entity);
+			//					return;
+			//				}
+			//				else
+			//				{
+			//					mExplicitlySetEntity = std::nullopt;
+			//				}
+			//			}
 
 			std::string strId(mFilterQueryBuffer, std::strlen(mFilterQueryBuffer));
 			// tolower
-			std::transform(strId.begin(), strId.end(), strId.begin(), [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
+			std::transform(strId.begin(), strId.end(), strId.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 
 			if (strId.size() >= MinimalSearchLen)
 			{
@@ -181,8 +174,7 @@ namespace ImguiPropertyFiltration
 				entities.begin(),
 				entities.end(),
 				std::back_inserter(inOutEntities),
-				[&cell](Entity entity)
-				{
+				[&cell](Entity entity) {
 					return std::make_tuple(&cell, entity);
 				}
 			);

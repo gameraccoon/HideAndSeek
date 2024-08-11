@@ -2,9 +2,9 @@
 
 #ifdef IMGUI_ENABLED
 
-#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/Vector2DPropertyFIlters.h"
-
 #include "imgui.h"
+
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/Vector2DPropertyFIlters.h"
 
 namespace ImguiPropertyFiltration
 {
@@ -49,6 +49,6 @@ namespace ImguiPropertyFiltration
 		const Vector2D val = std::any_cast<Vector2D>(getDescriptor()->getPropertyValue(manager, entity));
 		return mLT.x < val.x && val.x < mRB.x && mLT.y < val.y && val.y < mRB.y;
 	}
-}
+} // namespace ImguiPropertyFiltration
 
 #endif // IMGUI_ENABLED

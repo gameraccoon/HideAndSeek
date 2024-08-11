@@ -2,8 +2,8 @@
 
 #include "GameLogic/Systems/InputSystem.h"
 
-#include <SDL_scancode.h>
 #include <SDL_mouse.h>
+#include <SDL_scancode.h>
 
 #include "GameData/Components/GameplayInputComponent.generated.h"
 #include "GameData/Components/ImguiComponent.generated.h"
@@ -15,7 +15,6 @@
 #include "HAL/InputControllersData.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
-
 
 InputSystem::InputSystem(WorldHolder& worldHolder, const HAL::InputControllersData& inputData) noexcept
 	: mWorldHolder(worldHolder)

@@ -17,14 +17,14 @@ DebugInputSystem::DebugInputSystem(
 	WorldHolder& worldHolder,
 	const HAL::InputControllersData& inputData,
 	bool& shouldPauseGame
-	) noexcept
+) noexcept
 	: mWorldHolder(worldHolder)
 	, mInputData(inputData)
 	, mShouldPauseGame(shouldPauseGame)
 {
 }
 
-static void UpdateRenderStateOnPressed(const Input::PlayerControllerStates::KeyboardState &keyboardState, const int button, bool& value)
+static void UpdateRenderStateOnPressed(const Input::PlayerControllerStates::KeyboardState& keyboardState, const int button, bool& value)
 {
 	if (keyboardState.isButtonJustPressed(button))
 	{

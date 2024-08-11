@@ -2,9 +2,9 @@
 
 #ifdef IMGUI_ENABLED
 
-#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/FloatPropertyFilters.h"
-
 #include "imgui.h"
+
+#include "GameLogic/Imgui/ComponentInspector/PropertyFilters/TypeFilters/FloatPropertyFilters.h"
 
 namespace ImguiPropertyFiltration
 {
@@ -57,6 +57,6 @@ namespace ImguiPropertyFiltration
 		const float val = std::any_cast<float>(getDescriptor()->getPropertyValue(manager, entity));
 		return val < mMaxValue;
 	}
-}
+} // namespace ImguiPropertyFiltration
 
 #endif // IMGUI_ENABLED

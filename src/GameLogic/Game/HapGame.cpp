@@ -4,13 +4,12 @@
 
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
-
 #include "GameData/Components/RenderAccessorComponent.generated.h"
 
 #include "HAL/Base/Engine.h"
 
-#include "GameUtils/World/GameDataLoader.h"
 #include "GameUtils/Application/ArgumentsParser.h"
+#include "GameUtils/World/GameDataLoader.h"
 
 #include "GameLogic/Systems/AiSystem.h"
 #include "GameLogic/Systems/AnimationSystem.h"

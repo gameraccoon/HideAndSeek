@@ -49,8 +49,7 @@ void AiSystem::update()
 	bool needUpdate = !navMeshComponent->getNavMesh().geometry.isCalculated;
 	if (!needUpdate)
 	{
-		needUpdate = std::any_of(std::begin(collisions), std::end(collisions), [lastUpdateTimestamp = navMeshComponent->getUpdateTimestamp()](const std::tuple<const MovementComponent*, const CollisionComponent*>& set)
-		{
+		needUpdate = std::any_of(std::begin(collisions), std::end(collisions), [lastUpdateTimestamp = navMeshComponent->getUpdateTimestamp()](const std::tuple<const MovementComponent*, const CollisionComponent*>& set) {
 			GameplayTimestamp objectUpdateTimestamp = std::get<0>(set)->getUpdateTimestamp();
 			return objectUpdateTimestamp > lastUpdateTimestamp && std::get<1>(set)->getGeometry().type == HullType::Angular;
 		});
@@ -88,44 +87,43 @@ void AiSystem::update()
 	const NavMesh& navMesh = navMeshComponent->getNavMesh();
 
 	world.getSpatialData().getAllCellManagers().forEachComponentSet<AiControllerComponent, CharacterStateComponent, MovementComponent, const TransformComponent>(
-		[targetLocation, &navMesh, timestampNow, navmeshUpdateTimestamp, debugDraw]
-			(AiControllerComponent* aiController, CharacterStateComponent* characterState, MovementComponent* movement, const TransformComponent* transform)
-	{
-		SCOPED_PROFILER("AiSystem::update update one character");
-		Vector2D currentLocation = transform->getLocation();
+		[targetLocation, &navMesh, timestampNow, navmeshUpdateTimestamp, debugDraw](AiControllerComponent* aiController, CharacterStateComponent* characterState, MovementComponent* movement, const TransformComponent* transform) {
+			SCOPED_PROFILER("AiSystem::update update one character");
+			Vector2D currentLocation = transform->getLocation();
 
-		TravelPath& pathData = aiController->getPathRef();
-		std::vector<Vector2D> &path = pathData.smoothPath;
-		if (path.empty() || pathData.targetPos != targetLocation || pathData.updateTimestamp < navmeshUpdateTimestamp)
-		{
-			PathFinding::FindPath(path, navMesh, currentLocation, targetLocation);
-
-			for (size_t i = 1; i < path.size(); ++i)
+			TravelPath& pathData = aiController->getPathRef();
+			std::vector<Vector2D>& path = pathData.smoothPath;
+			if (path.empty() || pathData.targetPos != targetLocation || pathData.updateTimestamp < navmeshUpdateTimestamp)
 			{
-				debugDraw->getWorldLineSegmentsRef().emplace_back(path[i - 1], path[i], timestampNow.getIncreasedByUpdateCount(TimeConstants::ONE_SECOND_TICKS * 10));
+				PathFinding::FindPath(path, navMesh, currentLocation, targetLocation);
+
+				for (size_t i = 1; i < path.size(); ++i)
+				{
+					debugDraw->getWorldLineSegmentsRef().emplace_back(path[i - 1], path[i], timestampNow.getIncreasedByUpdateCount(TimeConstants::ONE_SECOND_TICKS * 10));
+				}
+
+				characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::TryingToMove, path.size() > 1);
+				pathData.targetPos = targetLocation;
+				pathData.updateTimestamp = timestampNow;
 			}
 
-			characterState->getBlackboardRef().setValue<bool>(CharacterStateBlackboardKeys::TryingToMove, path.size() > 1);
-			pathData.targetPos = targetLocation;
-			pathData.updateTimestamp = timestampNow;
-		}
-
-		if (!path.empty())
-		{
-			if ((path[0] - currentLocation).qSize() < 20.0f)
+			if (!path.empty())
 			{
-				path.erase(path.begin());
+				if ((path[0] - currentLocation).qSize() < 20.0f)
+				{
+					path.erase(path.begin());
+				}
+			}
+
+			if (!path.empty())
+			{
+				Vector2D diff = path[0] - currentLocation;
+				movement->setMoveDirection(diff);
+			}
+			else
+			{
+				movement->setMoveDirection(ZERO_VECTOR);
 			}
 		}
-
-		if (!path.empty())
-		{
-			Vector2D diff = path[0] - currentLocation;
-			movement->setMoveDirection(diff);
-		}
-		else
-		{
-			movement->setMoveDirection(ZERO_VECTOR);
-		}
-	});
+	);
 }

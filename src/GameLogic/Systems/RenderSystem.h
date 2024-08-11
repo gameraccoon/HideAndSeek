@@ -5,6 +5,7 @@
 #include <raccoon-ecs/utils/system.h>
 
 #include "EngineData/Geometry/Vector2D.h"
+
 #include "GameData/Resources/ResourceHandle.h"
 #include "GameData/Spatial/SpatialEntityManager.h"
 
@@ -24,7 +25,8 @@ public:
 	explicit RenderSystem(
 		WorldHolder& worldHolder,
 		ResourceManager& resourceManager,
-		ThreadPool& threadPool) noexcept;
+		ThreadPool& threadPool
+	) noexcept;
 
 	void update() override;
 

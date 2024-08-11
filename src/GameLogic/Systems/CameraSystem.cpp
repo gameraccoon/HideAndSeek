@@ -13,7 +13,6 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-
 CameraSystem::CameraSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
@@ -49,7 +48,7 @@ void CameraSystem::update()
 
 			const GameplayInputComponent* gameplayInput = world.getWorldComponents().getOrAddComponent<GameplayInputComponent>();
 			const GameplayInput::FrameState& inputState = gameplayInput->getCurrentFrameState();
-			const Vector2D aimDirection{inputState.getAxisValue(GameplayInput::InputAxis::AimHorizontal), inputState.getAxisValue(GameplayInput::InputAxis::AimVertical)};
+			const Vector2D aimDirection{ inputState.getAxisValue(GameplayInput::InputAxis::AimHorizontal), inputState.getAxisValue(GameplayInput::InputAxis::AimVertical) };
 
 			constexpr float cameraMobilityRate = 100.0f;
 

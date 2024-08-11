@@ -9,13 +9,13 @@
 #include "GameData/Components/TimeComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
 
+#include "HAL/Base/Engine.h"
+
 #include "EngineUtils/Multithreading/ThreadPool.h"
 
 #include "GameUtils/Application/ArgumentsParser.h"
 #include "GameUtils/Profiling/ProfileDataWriter.h"
 #include "GameUtils/ResourceManagement/ResourceManager.h"
-
-#include "HAL/Base/Engine.h"
 
 #include "EngineLogic/Render/RenderAccessor.h"
 
@@ -96,7 +96,8 @@ void Game::dynamicTimePostFrameUpdate(const float dt, const int processedFixedTi
 	mDebugBehavior.postInnerUpdate(*this);
 }
 
-void Game::notPausablePostFrameUpdate(const float dt) {
+void Game::notPausablePostFrameUpdate(const float dt)
+{
 	SCOPED_PROFILER("Game::notPausablePostFrameUpdate");
 
 	auto [time] = mWorld.getWorldComponents().getComponents<TimeComponent>();

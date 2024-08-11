@@ -30,6 +30,6 @@ private:
 	bool mShouldQuit = false;
 
 #ifdef IMGUI_ENABLED
-	ImguiDebugData mImguiDebugData{getWorldHolder(), getComponentFactory(), {}, {}};
+	ImguiDebugData mImguiDebugData{ getWorldHolder(), getComponentFactory(), {}, {} };
 #endif // IMGUI_ENABLED
 };

@@ -4,9 +4,9 @@
 
 #include "EngineCommon/Types/TemplateAliases.h"
 
-#include "GameData/World.h"
-#include "GameData/GameData.h"
 #include "GameData/Components/DeathComponent.generated.h"
+#include "GameData/GameData.h"
+#include "GameData/World.h"
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 

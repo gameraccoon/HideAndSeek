@@ -24,7 +24,7 @@ void ImguiSystemsTimeReportWindow::update(ImguiDebugData& /*debugData*/)
 {
 	if (isVisible)
 	{
-/*		std::vector<RaccoonEcs::AsyncSystemsFrameTime>& records = debugData.systemRecords.getFramesRef();
+		/*		std::vector<RaccoonEcs::AsyncSystemsFrameTime>& records = debugData.systemRecords.getFramesRef();
 
 		if (records.empty())
 		{

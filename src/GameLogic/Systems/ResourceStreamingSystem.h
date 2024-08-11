@@ -13,7 +13,8 @@ class ResourceStreamingSystem final : public RaccoonEcs::System
 public:
 	explicit ResourceStreamingSystem(
 		WorldHolder& worldHolder,
-		ResourceManager& resourceManager) noexcept;
+		ResourceManager& resourceManager
+	) noexcept;
 
 	void update() override;
 

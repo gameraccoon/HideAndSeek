@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <any>
+#include <memory>
 
 #include "GameData/EcsDefinitions.h"
 
@@ -12,7 +12,8 @@ namespace ImguiPropertyFiltration
 	class AbstractPropertyDescriptor
 	{
 	public:
-		explicit AbstractPropertyDescriptor(const std::string& name) : mName(name) {}
+		explicit AbstractPropertyDescriptor(const std::string& name)
+			: mName(name) {}
 		virtual ~AbstractPropertyDescriptor() = default;
 
 		[[nodiscard]] virtual std::any getPropertyValue(EntityManager& entityManager, Entity entity) = 0;

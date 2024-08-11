@@ -1,17 +1,17 @@
 #include "EngineCommon/precomp.h"
 
+#include "GameLogic/Systems/CollisionSystem.h"
+
 #include "EngineCommon/Types/TemplateAliases.h"
 
-#include "GameData/World.h"
 #include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/MovementComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/World.h"
 
 #include "GameUtils/Geometry/Collide.h"
 
-#include "GameLogic/Systems/CollisionSystem.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
-
 
 CollisionSystem::CollisionSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
@@ -54,32 +54,32 @@ void CollisionSystem::update()
 
 	SCOPED_PROFILER("resolve collisions");
 	world.getSpatialData().getAllCellManagers().forEachComponentSet<const CollisionComponent, const TransformComponent, MovementComponent>(
-			[&collidableComponentGroups](const CollisionComponent* collisionComponent, const TransformComponent* transformComponent, MovementComponent* movementComponent)
-	{
-		Vector2D resist = ZERO_VECTOR;
-		for (auto& pair : collidableComponentGroups)
-		{
-			for (auto [entity, collision, transform] : pair.components)
+		[&collidableComponentGroups](const CollisionComponent* collisionComponent, const TransformComponent* transformComponent, MovementComponent* movementComponent) {
+			Vector2D resist = ZERO_VECTOR;
+			for (auto& pair : collidableComponentGroups)
 			{
-				if (collision != collisionComponent)
+				for (auto [entity, collision, transform] : pair.components)
 				{
-					const bool doCollide = Collide::DoCollide(collisionComponent, transformComponent->getLocation() + movementComponent->getNextStep(), collision, transform->getLocation(), resist);
-
-					if (doCollide)
+					if (collision != collisionComponent)
 					{
-						auto [movement] = pair.cell->getEntityManager().getEntityComponents<MovementComponent>(entity);
-						if (movement)
+						const bool doCollide = Collide::DoCollide(collisionComponent, transformComponent->getLocation() + movementComponent->getNextStep(), collision, transform->getLocation(), resist);
+
+						if (doCollide)
 						{
-							movementComponent->setNextStep(movementComponent->getNextStep() + resist/2);
-							movement->setNextStep(movement->getNextStep() - resist/2);
-						}
-						else
-						{
-							movementComponent->setNextStep(movementComponent->getNextStep() + resist);
+							auto [movement] = pair.cell->getEntityManager().getEntityComponents<MovementComponent>(entity);
+							if (movement)
+							{
+								movementComponent->setNextStep(movementComponent->getNextStep() + resist / 2);
+								movement->setNextStep(movement->getNextStep() - resist / 2);
+							}
+							else
+							{
+								movementComponent->setNextStep(movementComponent->getNextStep() + resist);
+							}
 						}
 					}
 				}
 			}
 		}
-	});
+	);
 }

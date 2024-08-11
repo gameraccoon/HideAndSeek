@@ -16,4 +16,3 @@ namespace ImguiDataInspection
 }
 
 #endif // IMGUI_ENABLED
-

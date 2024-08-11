@@ -18,7 +18,7 @@ namespace ImguiPropertyFiltration
 		bool isConditionPassed(EntityManager& manager, Entity entity) const override;
 
 	private:
-		Vector2D mLT{0.0f, 0.0f};
-		Vector2D mRB{0.0f, 0.0f};
+		Vector2D mLT{ 0.0f, 0.0f };
+		Vector2D mRB{ 0.0f, 0.0f };
 	};
-}
+} // namespace ImguiPropertyFiltration

@@ -18,7 +18,6 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-
 WeaponSystem::WeaponSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
@@ -26,7 +25,8 @@ WeaponSystem::WeaponSystem(WorldHolder& worldHolder) noexcept
 
 struct ShotInfo
 {
-	explicit ShotInfo(const Entity instigator) : instigator(instigator) {}
+	explicit ShotInfo(const Entity instigator)
+		: instigator(instigator) {}
 
 	Entity instigator;
 	WorldCell* instigatorCell = nullptr;
@@ -36,7 +36,8 @@ struct ShotInfo
 
 struct HitInfo
 {
-	explicit HitInfo(const Entity instigator) : instigator(instigator) {}
+	explicit HitInfo(const Entity instigator)
+		: instigator(instigator) {}
 
 	Entity instigator;
 	WorldCell* instigatorCell = nullptr;
@@ -55,22 +56,22 @@ void WeaponSystem::update()
 
 	std::vector<ShotInfo> shotsToMake;
 	world.getSpatialData().getAllCellManagers().forEachComponentSetWithEntityAndExtraData<WeaponComponent, const CharacterStateComponent>(
-		[currentTime, &shotsToMake](WorldCell& cell, const EntityView entityView, WeaponComponent* weapon, const CharacterStateComponent* characterState)
-	{
-		if (characterState->getState() == CharacterState::Shoot || characterState->getState() == CharacterState::WalkAndShoot)
-		{
-			if (currentTime > weapon->getShotFinishTimestamp())
+		[currentTime, &shotsToMake](WorldCell& cell, const EntityView entityView, WeaponComponent* weapon, const CharacterStateComponent* characterState) {
+			if (characterState->getState() == CharacterState::Shoot || characterState->getState() == CharacterState::WalkAndShoot)
 			{
-				ShotInfo shot(entityView.getEntity());
-				shot.instigatorCell = &cell;
-				shot.distance = weapon->getShotDistance();
-				shot.damage = weapon->getDamageValue();
-				shotsToMake.push_back(shot);
+				if (currentTime > weapon->getShotFinishTimestamp())
+				{
+					ShotInfo shot(entityView.getEntity());
+					shot.instigatorCell = &cell;
+					shot.distance = weapon->getShotDistance();
+					shot.damage = weapon->getDamageValue();
+					shotsToMake.push_back(shot);
 
-				weapon->setShotFinishTimestamp(currentTime.getIncreasedByUpdateCount(static_cast<s32>(weapon->getShotPeriod() / TimeConstants::ONE_FIXED_UPDATE_SEC)));
+					weapon->setShotFinishTimestamp(currentTime.getIncreasedByUpdateCount(static_cast<s32>(weapon->getShotPeriod() / TimeConstants::ONE_FIXED_UPDATE_SEC)));
+				}
 			}
 		}
-	});
+	);
 
 	std::vector<HitInfo> hitsDone;
 	for (const ShotInfo& shotInfo : shotsToMake)

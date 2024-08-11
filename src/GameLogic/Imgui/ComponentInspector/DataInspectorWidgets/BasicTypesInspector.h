@@ -51,6 +51,6 @@ namespace ImguiDataInspection
 			ImGui::Separator();
 		}
 	}
-}
+} // namespace ImguiDataInspection
 
 #endif // IMGUI_ENABLED

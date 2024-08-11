@@ -17,4 +17,4 @@ namespace ImguiPropertyFiltration
 	private:
 		StringId mTypeId;
 	};
-}
+} // namespace ImguiPropertyFiltration

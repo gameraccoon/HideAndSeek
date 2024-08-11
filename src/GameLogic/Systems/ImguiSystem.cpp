@@ -4,10 +4,9 @@
 
 #ifdef IMGUI_ENABLED
 
-#include "imgui/imgui.h"
-#include "imgui/examples/imgui_impl_sdl.h"
 #include "imgui/examples/imgui_impl_opengl2.h"
-
+#include "imgui/examples/imgui_impl_sdl.h"
+#include "imgui/imgui.h"
 #include <SDL.h>
 #include <SDL_opengl.h>
 
@@ -26,10 +25,10 @@
 #include "GameLogic/Imgui/ImguiDebugData.h"
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-
 ImguiSystem::ImguiSystem(
-		ImguiDebugData& debugData,
-		HAL::Engine& engine) noexcept
+	ImguiDebugData& debugData,
+	HAL::Engine& engine
+) noexcept
 	: mEngine(engine)
 	, mDebugData(debugData)
 	, mHasPreviousFrameProcessedOnRenderThread(std::make_shared<bool>(true))
@@ -91,8 +90,7 @@ void ImguiSystem::update()
 	const RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
 	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
 	CustomRenderFunction& syncData = TemplateHelpers::EmplaceVariant<CustomRenderFunction>(renderData->layers);
-	syncData.renderThreadFn = [&mutex = mRenderDataMutex, previousFrameProcessed = mHasPreviousFrameProcessedOnRenderThread]
-	{
+	syncData.renderThreadFn = [&mutex = mRenderDataMutex, previousFrameProcessed = mHasPreviousFrameProcessedOnRenderThread] {
 		std::lock_guard l(mutex);
 		ImGui_ImplOpenGL2_NewFrame();
 		const ImGuiIO& io = ImGui::GetIO();

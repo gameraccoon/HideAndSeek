@@ -14,9 +14,9 @@
 #include "GameData/Components/NavMeshComponent.generated.h"
 #include "GameData/Components/RenderAccessorComponent.generated.h"
 #include "GameData/Components/RenderModeComponent.generated.h"
+#include "GameData/Components/TimeComponent.generated.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/WorldCachedDataComponent.generated.h"
-#include "GameData/Components/TimeComponent.generated.h"
 #include "GameData/GameData.h"
 #include "GameData/World.h"
 
@@ -26,8 +26,9 @@
 #include "EngineLogic/Render/RenderAccessor.h"
 
 DebugDrawSystem::DebugDrawSystem(
-		WorldHolder& worldHolder,
-		ResourceManager& resourceManager) noexcept
+	WorldHolder& worldHolder,
+	ResourceManager& resourceManager
+) noexcept
 	: mWorldHolder(worldHolder)
 	, mResourceManager(resourceManager)
 {
@@ -38,7 +39,7 @@ void RemoveOldDrawElement(std::vector<T>& vector, GameplayTimestamp now)
 {
 	std::erase_if(
 		vector,
-		[now](const T& val){ return val.isLifeTimeExceeded(now); }
+		[now](const T& val) { return val.isLifeTimeExceeded(now); }
 	);
 }
 
@@ -61,8 +62,8 @@ static void DrawPath(RenderData& renderData, const std::vector<Vector2D>& path, 
 
 			const Vector2D normal = (path[1] - path[0]).normal() * 3;
 
-			stripData.points.push_back(Graphics::DrawPoint{path[0] + normal, {u1, v1}});
-			stripData.points.push_back(Graphics::DrawPoint{path[0] - normal, {u2, v2}});
+			stripData.points.push_back(Graphics::DrawPoint{ path[0] + normal, { u1, v1 } });
+			stripData.points.push_back(Graphics::DrawPoint{ path[0] - normal, { u2, v2 } });
 		}
 
 		for (size_t i = 1; i < path.size(); ++i)
@@ -72,10 +73,10 @@ static void DrawPath(RenderData& renderData, const std::vector<Vector2D>& path, 
 			float u2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 			float v2 = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
-			const Vector2D normal = (path[i] - path[i-1]).normal() * 3;
+			const Vector2D normal = (path[i] - path[i - 1]).normal() * 3;
 
-			stripData.points.push_back(Graphics::DrawPoint{path[i] + normal, {u1, v1}});
-			stripData.points.push_back(Graphics::DrawPoint{path[i] - normal, {u2, v2}});
+			stripData.points.push_back(Graphics::DrawPoint{ path[i] + normal, { u1, v1 } });
+			stripData.points.push_back(Graphics::DrawPoint{ path[i] - normal, { u2, v2 } });
 		}
 	}
 }
@@ -113,7 +114,7 @@ void DebugDrawSystem::update()
 
 	if (renderMode && renderMode->getIsDrawDebugCellInfoEnabled())
 	{
-		SpatialEntityManager::RecordsVector cellsAround = world.getSpatialData().getCellsAround(cameraLocation, screenHalfSize*2.0f);
+		SpatialEntityManager::RecordsVector cellsAround = world.getSpatialData().getCellsAround(cameraLocation, screenHalfSize * 2.0f);
 
 		for (SpatialEntityManager::Record& record : cellsAround)
 		{
@@ -125,9 +126,9 @@ void DebugDrawSystem::update()
 			quadData.spriteHandle = mCollisionSpriteHandle;
 
 			TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
-			textData.color = {255, 255, 255, 255};
+			textData.color = { 255, 255, 255, 255 };
 			textData.fontHandle = mFontHandle;
-			textData.pos = SpatialWorldData::CellSizeVector*0.5 + SpatialWorldData::GetCellRealDistance(cellPos - cameraCell) - cameraLocation + screenHalfSize;
+			textData.pos = SpatialWorldData::CellSizeVector * 0.5 + SpatialWorldData::GetCellRealDistance(cellPos - cameraCell) - cameraLocation + screenHalfSize;
 			textData.text = FormatString("(%d, %d)", cellPos.x, cellPos.y);
 		}
 	}
@@ -135,17 +136,16 @@ void DebugDrawSystem::update()
 	if (renderMode && renderMode->getIsDrawDebugCollisionsEnabled())
 	{
 		spatialManager.forEachComponentSet<const CollisionComponent, const TransformComponent>(
-			[&renderData, &collisionSpriteHandle = mCollisionSpriteHandle, drawShift](const CollisionComponent* collision, const TransformComponent* transform)
-		{
-			const Vector2D location = transform->getLocation() + drawShift;
-			QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
-			quadData.position = Vector2D(collision->getBoundingBox().minX + location.x, collision->getBoundingBox().minY + location.y);
-			quadData.rotation = 0.0f;
-			quadData.size = Vector2D(collision->getBoundingBox().maxX-collision->getBoundingBox().minX,
-				collision->getBoundingBox().maxY-collision->getBoundingBox().minY);
-			quadData.spriteHandle = collisionSpriteHandle;
-			quadData.anchor = ZERO_VECTOR;
-		});
+			[&renderData, &collisionSpriteHandle = mCollisionSpriteHandle, drawShift](const CollisionComponent* collision, const TransformComponent* transform) {
+				const Vector2D location = transform->getLocation() + drawShift;
+				QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
+				quadData.position = Vector2D(collision->getBoundingBox().minX + location.x, collision->getBoundingBox().minY + location.y);
+				quadData.rotation = 0.0f;
+				quadData.size = Vector2D(collision->getBoundingBox().maxX - collision->getBoundingBox().minX, collision->getBoundingBox().maxY - collision->getBoundingBox().minY);
+				quadData.spriteHandle = collisionSpriteHandle;
+				quadData.anchor = ZERO_VECTOR;
+			}
+		);
 	}
 
 	if (renderMode && renderMode->getIsDrawDebugAiDataEnabled())
@@ -165,8 +165,8 @@ void DebugDrawSystem::update()
 					float u = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 					float v = static_cast<float>(Random::gGlobalGenerator()) * 1.0f / static_cast<float>(Random::GlobalGeneratorType::max());
 
-					const Vector2D pos = navMeshGeometry.vertices[navMeshGeometry.indexes[k*navMeshGeometry.verticesPerPoly + j]];
-					polygon.points.push_back(Graphics::DrawPoint{pos, {u, v}});
+					const Vector2D pos = navMeshGeometry.vertices[navMeshGeometry.indexes[k * navMeshGeometry.verticesPerPoly + j]];
+					polygon.points.push_back(Graphics::DrawPoint{ pos, { u, v } });
 				}
 
 				polygon.spriteHandle = mNavmeshSpriteHandle;
@@ -176,10 +176,10 @@ void DebugDrawSystem::update()
 		}
 
 		spatialManager.forEachComponentSet<const AiControllerComponent>(
-			[&navMeshSpriteHandle = mNavmeshSpriteHandle, &renderData, drawShift](const AiControllerComponent* aiController)
-		{
-			DrawPath(*renderData, aiController->getPath().smoothPath, navMeshSpriteHandle, drawShift);
-		});
+			[&navMeshSpriteHandle = mNavmeshSpriteHandle, &renderData, drawShift](const AiControllerComponent* aiController) {
+				DrawPath(*renderData, aiController->getPath().smoothPath, navMeshSpriteHandle, drawShift);
+			}
+		);
 	}
 
 	if (renderMode && renderMode->getIsDrawDebugPrimitivesEnabled())
@@ -197,7 +197,7 @@ void DebugDrawSystem::update()
 				if (!screenPoint.name.empty())
 				{
 					TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
-					textData.color = {255, 255, 255, 255};
+					textData.color = { 255, 255, 255, 255 };
 					textData.fontHandle = mFontHandle;
 					textData.pos = screenPoint.screenPos;
 					textData.text = screenPoint.name;
@@ -216,7 +216,7 @@ void DebugDrawSystem::update()
 				if (!worldPoint.name.empty())
 				{
 					TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
-					textData.color = {255, 255, 255, 255};
+					textData.color = { 255, 255, 255, 255 };
 					textData.fontHandle = mFontHandle;
 					textData.pos = screenPos;
 					textData.text = worldPoint.name;
@@ -231,7 +231,7 @@ void DebugDrawSystem::update()
 				Vector2D diff = screenPosEnd - screenPosStart;
 				quadData.position = (screenPosStart + screenPosEnd) * 0.5f;
 				quadData.rotation = diff.rotation().getValue();
-				quadData.size = {diff.size(), pointSize.y};
+				quadData.size = { diff.size(), pointSize.y };
 				quadData.spriteHandle = mLineTextureHandle;
 			}
 		}
@@ -240,14 +240,14 @@ void DebugDrawSystem::update()
 	if (renderMode && renderMode->getIsDrawDebugCharacterInfoEnabled())
 	{
 		spatialManager.forEachComponentSet<const CharacterStateComponent, const TransformComponent>(
-			[&renderData, fontHandle = mFontHandle, drawShift](const CharacterStateComponent* characterState, const TransformComponent* transform)
-		{
-			TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
-			textData.color = {255, 255, 255, 255};
-			textData.fontHandle = fontHandle;
-			textData.pos = transform->getLocation() + drawShift;
-			textData.text = ID_TO_STR(enum_to_string(characterState->getState()));
-		});
+			[&renderData, fontHandle = mFontHandle, drawShift](const CharacterStateComponent* characterState, const TransformComponent* transform) {
+				TextRenderData& textData = TemplateHelpers::EmplaceVariant<TextRenderData>(renderData->layers);
+				textData.color = { 255, 255, 255, 255 };
+				textData.fontHandle = fontHandle;
+				textData.pos = transform->getLocation() + drawShift;
+				textData.text = ID_TO_STR(enum_to_string(characterState->getState()));
+			}
+		);
 	}
 
 	auto [debugDraw] = gameData.getGameComponents().getComponents<DebugDrawComponent>();

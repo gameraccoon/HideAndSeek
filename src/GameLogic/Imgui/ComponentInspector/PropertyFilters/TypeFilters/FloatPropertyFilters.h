@@ -33,4 +33,4 @@ namespace ImguiPropertyFiltration
 	private:
 		float mMaxValue = 0.0f;
 	};
-}
+} // namespace ImguiPropertyFiltration

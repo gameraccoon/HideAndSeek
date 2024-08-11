@@ -17,7 +17,8 @@ public:
 public:
 	explicit DebugDrawSystem(
 		WorldHolder& worldHolder,
-		ResourceManager& resourceManager) noexcept;
+		ResourceManager& resourceManager
+	) noexcept;
 
 	void update() override;
 	void init() override;

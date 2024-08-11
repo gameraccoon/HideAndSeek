@@ -2,13 +2,13 @@
 
 #ifndef DISABLE_SDL
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #include "EngineCommon/Types/String/StringId.h"
 
-#include "GameData/Resources/ResourceHandle.h"
 #include "GameData/Resources/Resource.h"
+#include "GameData/Resources/ResourceHandle.h"
 
 class RelativeResourcePath;
 
@@ -34,6 +34,6 @@ namespace Graphics
 		StringId mStateMachineId;
 		StringId mDefaultState;
 	};
-}
+} // namespace Graphics
 
 #endif // !DISABLE_SDL

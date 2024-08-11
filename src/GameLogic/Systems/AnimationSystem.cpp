@@ -39,46 +39,46 @@ void AnimationSystem::update()
 
 	// update animation clip from FSM
 	spatialManager.forEachComponentSet<AnimationGroupsComponent, AnimationClipsComponent>(
-		[stateMachines](AnimationGroupsComponent* animationGroups, AnimationClipsComponent* animationClips)
-	{
-		for (auto& data : animationGroups->getDataRef())
-		{
-			auto smIt = stateMachines->getAnimationSMs().find(data.stateMachineId);
-			Assert(smIt != stateMachines->getAnimationSMs().end(), "State machine not found %s", data.stateMachineId);
-			auto newState = smIt->second.getNextState(animationGroups->getBlackboard(), data.currentState);
-			if (newState != data.currentState)
+		[stateMachines](AnimationGroupsComponent* animationGroups, AnimationClipsComponent* animationClips) {
+			for (auto& data : animationGroups->getDataRef())
 			{
-				data.currentState = newState;
-				animationClips->getDatasRef()[data.animationClipIdx].sprites = data.animationClips.find(newState)->second;
+				auto smIt = stateMachines->getAnimationSMs().find(data.stateMachineId);
+				Assert(smIt != stateMachines->getAnimationSMs().end(), "State machine not found %s", data.stateMachineId);
+				auto newState = smIt->second.getNextState(animationGroups->getBlackboard(), data.currentState);
+				if (newState != data.currentState)
+				{
+					data.currentState = newState;
+					animationClips->getDatasRef()[data.animationClipIdx].sprites = data.animationClips.find(newState)->second;
+				}
 			}
 		}
-	});
+	);
 
 	// update animation frame
 	spatialManager.forEachComponentSet<AnimationClipsComponent, SpriteRenderComponent>(
-			[dt](AnimationClipsComponent* animationClips, SpriteRenderComponent* spriteRender)
-	{
-		std::vector<AnimationClip>& animationDatas = animationClips->getDatasRef();
-		for (auto& data : animationDatas)
-		{
-			data.progress += data.params.speed * dt;
-			if (data.progress >= 1.0f && data.params.isLooped)
+		[dt](AnimationClipsComponent* animationClips, SpriteRenderComponent* spriteRender) {
+			std::vector<AnimationClip>& animationDatas = animationClips->getDatasRef();
+			for (auto& data : animationDatas)
 			{
-				data.progress -= 1.0f;
-			}
-
-			size_t spriteIdx = 0;
-
-			const auto& ids = spriteRender->getSpriteIds();
-			for (size_t i = 0; i < spriteRender->getSpriteIds().size(); ++i)
-			{
-				if (ids[i] == data.spriteId)
+				data.progress += data.params.speed * dt;
+				if (data.progress >= 1.0f && data.params.isLooped)
 				{
-					spriteIdx = i;
+					data.progress -= 1.0f;
 				}
-			}
 
-			spriteRender->getSpriteDatasRef()[spriteIdx].spriteHandle = data.sprites[std::min(static_cast<size_t>(data.sprites.size() * data.progress), data.sprites.size())];
+				size_t spriteIdx = 0;
+
+				const auto& ids = spriteRender->getSpriteIds();
+				for (size_t i = 0; i < spriteRender->getSpriteIds().size(); ++i)
+				{
+					if (ids[i] == data.spriteId)
+					{
+						spriteIdx = i;
+					}
+				}
+
+				spriteRender->getSpriteDatasRef()[spriteIdx].spriteHandle = data.sprites[std::min(static_cast<size_t>(data.sprites.size() * data.progress), data.sprites.size())];
+			}
 		}
-	});
+	);
 }

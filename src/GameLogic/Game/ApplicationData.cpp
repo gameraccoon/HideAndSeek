@@ -10,9 +10,9 @@ ApplicationData::ApplicationData(const int threadsCount)
 	: WorkerThreadsCount(threadsCount)
 	, RenderThreadId(threadsCount + 1)
 	, ResourceLoadingThreadId(threadsCount + 2)
-	, threadPool(threadsCount, []{ threadSaveProfileData(ThreadPool::GetThisThreadId()); })
+	, threadPool(threadsCount, [] { threadSaveProfileData(ThreadPool::GetThisThreadId()); })
 {
-	resourceManager.startLoadingThread([this]{ threadSaveProfileData(ResourceLoadingThreadId); });
+	resourceManager.startLoadingThread([this] { threadSaveProfileData(ResourceLoadingThreadId); });
 }
 
 void ApplicationData::writeProfilingData()
@@ -45,7 +45,7 @@ void ApplicationData::writeProfilingData()
 		for (int i = 0; i < WorkerThreadsCount; ++i)
 		{
 			// zero is reserved for main thread
-			data.threadNames[1 + i] = std::string("Worker Thread #") + std::to_string(i+1);
+			data.threadNames[1 + i] = std::string("Worker Thread #") + std::to_string(i + 1);
 		}
 
 		ProfileDataWriter::PrintScopedProfileToFile(ScopedProfileOutputPath, data);

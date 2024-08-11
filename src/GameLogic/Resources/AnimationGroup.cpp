@@ -48,7 +48,7 @@ namespace Graphics
 			animJson.at("stateMachineID").get_to(result.stateMachineID);
 			animJson.at("defaultState").get_to(result.defaultState);
 		}
-		catch(const std::exception& e)
+		catch (const std::exception& e)
 		{
 			LogError("Can't open animation group data '%s': %s", path.getAbsolutePath().c_str(), e.what());
 		}
@@ -141,6 +141,6 @@ namespace Graphics
 	{
 		return {};
 	}
-}
+} // namespace Graphics
 
 #endif // !DISABLE_SDL

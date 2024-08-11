@@ -6,9 +6,9 @@
 
 #include "EngineCommon/Types/Serialization.h"
 
-#include "GameUtils/Application/ArgumentsParser.h"
-
 #include "HAL/InputControllersData.h"
+
+#include "GameUtils/Application/ArgumentsParser.h"
 
 DebugRecordedInput::DebugRecordedInput(const int instanceIndex)
 	: mInstanceIndex(instanceIndex)

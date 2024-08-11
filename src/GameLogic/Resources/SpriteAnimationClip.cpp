@@ -34,7 +34,7 @@ namespace Graphics
 			animJson.at("path").get_to(pathBase);
 			animJson.at("frames").get_to(framesCount);
 		}
-		catch(const std::exception& e)
+		catch (const std::exception& e)
 		{
 			LogError("Can't open animation data '%s': %s", path.getAbsolutePath().c_str(), e.what());
 		}
@@ -85,10 +85,10 @@ namespace Graphics
 
 	const ResourceHandle& SpriteAnimationClip::getSprite(const float progress) const
 	{
-		return mSprites[std::min(mSprites.size()*static_cast<size_t>(progress), mSprites.size() - 1)];
+		return mSprites[std::min(mSprites.size() * static_cast<size_t>(progress), mSprites.size() - 1)];
 	}
 
-	const std::vector<ResourceHandle> &SpriteAnimationClip::getSprites() const
+	const std::vector<ResourceHandle>& SpriteAnimationClip::getSprites() const
 	{
 		return mSprites;
 	}
@@ -112,6 +112,6 @@ namespace Graphics
 	{
 		return {};
 	}
-}
+} // namespace Graphics
 
 #endif // !DISABLE_SDL
