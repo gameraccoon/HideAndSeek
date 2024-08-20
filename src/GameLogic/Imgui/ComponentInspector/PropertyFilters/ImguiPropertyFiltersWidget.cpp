@@ -6,6 +6,7 @@
 #include <cstring>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 #include "imgui.h"
 #include <raccoon-ecs/component_factory.h>

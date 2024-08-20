@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "EngineData/Geometry/BoundingBox.h"
 #include "EngineData/Geometry/Vector2D.h"
 
