@@ -11,6 +11,8 @@
 #include "GameData/GameData.h"
 #include "GameData/Input/ControllerState.h"
 
+#include "GameLogic/SharedManagers/WorldHolder.h"
+
 #include "HAL/InputControllersData.h"
 
 DebugInputSystem::DebugInputSystem(
