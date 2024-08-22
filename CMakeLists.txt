@@ -13,6 +13,7 @@ option(MEMLEAK_REDEFINE_NEW "Redefine default new (provide more detailed info bu
 option(CONCURRENT_ACCESS_DETECTION "Enable concurrent access detection" ON)
 option(IMGUI_ENABLED "Enable imgui in the build" ON)
 option(ENABLE_UNITY_BUILD "Should the sources be built with unity build" ON)
+option(BUILD_AUTO_TESTS "Build automatic tests" ON)
 
 set(APP_NAME GameMain)
 set(EXECUTABLE_NAME Game)
@@ -63,6 +64,10 @@ endif()
 if(CONCURRENT_ACCESS_DETECTION)
 	add_definitions(-DCONCURRENT_ACCESS_DETECTION)
 endif(CONCURRENT_ACCESS_DETECTION)
+
+if(BUILD_AUTO_TESTS)
+	add_definitions(-DBUILD_AUTO_TESTS)
+endif()
 
 add_definitions(-DGLEW_NO_GLU)
 add_definitions(-DGLM_FORCE_RADIANS)
@@ -137,6 +142,10 @@ add_folder_as_library(${ENGINE_SRC_DIR}/HAL Hal)
 add_folder_as_library(${ENGINE_SRC_DIR}/EngineLogic EngineLogic)
 # ECS systems and glue code (specific to one game)
 add_folder_as_library(${GAME_SRC_DIR}/GameLogic GameLogic)
+if(BUILD_AUTO_TESTS)
+	# Automatic tests that run predefined scenarios and validate against checklists
+	add_folder_as_library(${GAME_SRC_DIR}/AutoTests AutoTests)
+endif()
 
 file(GLOB_RECURSE APP_SRC RELATIVE "" FOLLOW_SYMLINKS "${GAME_SRC_DIR}/GameMain/*")
 add_executable(${APP_NAME} "${APP_SRC}")
@@ -199,6 +208,13 @@ set(GENERAL_PROJECT_LIBS
 	SDL2main
 )
 
+if (BUILD_AUTO_TESTS)
+	set(GENERAL_PROJECT_LIBS
+			${GENERAL_PROJECT_LIBS}
+			AutoTests
+	)
+endif()
+
 if(IMGUI_ENABLED)
 	set(GENERAL_PROJECT_LIBS
 		${GENERAL_PROJECT_LIBS}
@@ -250,14 +266,6 @@ add_executable(${UNITTESTS_NAME} ${UNITTESTS_SRC})
 target_compile_definitions(${UNITTESTS_NAME} PRIVATE -DRACCOON_ECS_TOOLMODE)
 target_compile_options(${UNITTESTS_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
 target_link_libraries(${UNITTESTS_NAME} ${GENERAL_PROJECT_LIBS})
-
-# Autotests
-set(AUTOTESTS_NAME AutoTests)
-file(GLOB_RECURSE AUTOTESTS_SRC RELATIVE "" FOLLOW_SYMLINKS "${GAME_SRC_DIR}/AutoTests/*")
-add_executable(${AUTOTESTS_NAME} ${AUTOTESTS_SRC})
-target_compile_options(${AUTOTESTS_NAME} PRIVATE ${PROJECT_CXX_FLAGS})
-set_target_properties(${AUTOTESTS_NAME} PROPERTIES UNITY_BUILD ${ENABLE_UNITY_BUILD})
-target_link_libraries(${AUTOTESTS_NAME} ${GENERAL_PROJECT_LIBS})
 
 # symlink resources dir
 if(NOT EXISTS "${GAME_BIN_DIR}/resources")

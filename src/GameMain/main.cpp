@@ -11,10 +11,11 @@
 
 #include "EngineUtils/Application/ArgumentsParser.h"
 
+#include "GameLogic/Application/ConsoleCommands.h"
 #include "GameLogic/Game/ApplicationData.h"
 #include "GameLogic/Game/HapGame.h"
 
-#include "GameMain/ConsoleCommands.h"
+#include "AutoTests/AutoTests.h"
 
 int main(const int argc, char** argv)
 {
@@ -31,6 +32,19 @@ int main(const int argc, char** argv)
 	{
 		return 0;
 	}
+
+#ifdef BUILD_AUTO_TESTS
+	if (arguments.hasArgument("autotests"))
+	{
+		return AutoTests::RunTests(arguments) ? 0 : 1;
+	}
+#else
+	if (arguments.hasArgument("autotests"))
+	{
+		LogError("Autotests are not built in this configuration");
+		return 1;
+	}
+#endif // BUILD_AUTO_TESTS
 
 	const bool isRenderEnabled = !arguments.hasArgument("no-render");
 

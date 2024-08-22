@@ -1,6 +1,6 @@
 #include "EngineCommon/precomp.h"
 
-#include "GameMain/ConsoleCommands.h"
+#include "GameLogic/Application/ConsoleCommands.h"
 
 #include <algorithm>
 #include <iostream>
@@ -19,6 +19,7 @@ namespace ConsoleCommands
 	bool TryExecuteQuickConsoleCommands(const ArgumentsParser& arguments)
 	{
 		const std::vector<CommandInfo> commands{
+			{ "help", "help", "show this help" },
 			{ "world", "world file", "start the game from the given world" },
 			{ "gameData", "gameData path", "start the game with loading the given game data" },
 			{ "disable-input", "disable-input", "disable keyboard/mouse/controller input" },
@@ -29,7 +30,9 @@ namespace ConsoleCommands
 			{ "continue-after-input-end", "continue-after-input-end", "When replaying input, don't quit after recording is finished" },
 			{ "randseed", "randseed n", "seed the gameplay random with the given seed" },
 			{ "threads-count", "threads-count n", "set amount of extra worker threads to n" },
-			{ "help", "help", "show this help" },
+			{ "autotests", "autotests", "run autotests" },
+			{ "list", "list", "used together with --autotests, list all available tests" },
+			{ "case", "case <test_name>", "used together with --autotests, run the test case with the given name" },
 		};
 
 		// check that the given commands are valid
