@@ -12,6 +12,7 @@ ContinuationIndentWidth: 4
 AlignAfterOpenBracket: BlockIndent
 AlignConsecutiveAssignments: None
 AlignEscapedNewlines: DontAlign
+AlignTrailingComments: Never
 AlignOperands: DontAlign
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false

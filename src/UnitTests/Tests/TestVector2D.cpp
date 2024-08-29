@@ -37,9 +37,9 @@ TEST(Vector2D, Comparison)
 	constexpr Vector2D testVectorC(5.199998f, -0.390001f);
 	constexpr Vector2D testVectorD(5.3f, -0.39f);
 
-	EXPECT_TRUE(testVectorA == testVectorB);                // A == B
-	EXPECT_TRUE(testVectorA.isNearlyEqualTo(testVectorB));  // A == B
-	EXPECT_TRUE(testVectorA.isNearlyEqualTo(testVectorC));  // A == C
+	EXPECT_TRUE(testVectorA == testVectorB); // A == B
+	EXPECT_TRUE(testVectorA.isNearlyEqualTo(testVectorB)); // A == B
+	EXPECT_TRUE(testVectorA.isNearlyEqualTo(testVectorC)); // A == C
 	EXPECT_FALSE(testVectorA.isNearlyEqualTo(testVectorD)); // A != D
 }
 
