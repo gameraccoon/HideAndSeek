@@ -19,10 +19,10 @@ StringId enum_to_string(const {enum_name} value)
 }}
 
 template<>
-{enum_name} string_to_enum(const StringId value)
+std::optional<{enum_name}> string_to_enum(const StringId value)
 {{
 	{string_to_enum_case}
-	return static_cast<{enum_name}>(0);
+	return std::nullopt;
 }}
 
 template<>
@@ -36,7 +36,7 @@ std::vector<{enum_name}> get_all_enum_values()
 template<>
 std::vector<StringId> get_all_enum_value_names<{enum_name}>()
 {{
-	// to satisfy MSVC limitations for conseval function calls we need to split the declaration and the usage
+	// to satisfy MSVC limitations for consteval function calls we need to split the declaration and the usage
 	{enum_string_id_declaration}
 
 	return {{

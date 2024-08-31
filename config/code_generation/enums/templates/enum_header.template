@@ -6,27 +6,27 @@
 
 #include "EngineCommon/Types/String/StringId.h"
 
+#include "EngineData/TypeUtils/EnumUtils.h"
+
 enum class {enum_name}
 {{
 	{enum_value}
 }};
 
-template<typename T>
-StringId get_enum_name();
 template<>
 StringId get_enum_name<{enum_name}>();
 
-template<typename T>
-StringId enum_to_string(T value);
+template<>
+StringId enum_to_string<{enum_name}>({enum_name} value);
 
-template<typename T>
-T string_to_enum(StringId value);
+template<>
+std::optional<{enum_name}> string_to_enum<{enum_name}>(StringId value);
 
-template<typename T>
-std::vector<T> get_all_enum_values();
+template<>
+std::vector<{enum_name}> get_all_enum_values();
 
-template<typename T>
-std::vector<StringId> get_all_enum_value_names();
+template<>
+std::vector<StringId> get_all_enum_value_names<{enum_name}>();
 
 NLOHMANN_JSON_SERIALIZE_ENUM({enum_name}, {{
 	{enum_value_serialization}
