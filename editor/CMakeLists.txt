@@ -68,7 +68,7 @@ endif()
 
 # code generation
 execute_process(
-	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/scripts/build/code_generate.py ${GAME_BASE_DIR}
+	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/tools/build/code_generate.py ${GAME_BASE_DIR}
 )
 
 set(APP_SRCS
@@ -175,7 +175,7 @@ set_target_properties(${APP_NAME} PROPERTIES
 # pre-compile additional code generation
 add_custom_target(
 	AdditionalCodeGeneration
-	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/scripts/build/precompile_code_generate.py ${GAME_BASE_DIR}
+	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/tools/build/precompile_code_generate.py ${GAME_BASE_DIR}
 	COMMENT "C++ pre-compile additional code generation"
 )
 add_dependencies(GameData AdditionalCodeGeneration)

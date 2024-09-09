@@ -41,7 +41,7 @@ jobs:
     - name: Build and generate the report
       working-directory: ${{github.workspace}}
       shell: bash
-      run: ./scripts/perf/build_time_trace_linux.sh
+      run: ./tools/perf/build_time_trace_linux.sh
 
     - uses: actions/upload-artifact@v3
       with:

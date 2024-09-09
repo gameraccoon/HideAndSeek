@@ -181,7 +181,7 @@
         "uid": "32b09b0b-5a00-42f0-97d4-9e02e100745b",
         "name": "Switch & Prepare",
         "icon": {
-          "path": "scripts/scripter/icons/preset.png",
+          "path": "tools/scripter/icons/preset.png",
           "path_type": "WorkingDirRelative"
         },
         "items": [
@@ -228,7 +228,7 @@
         "uid": "007fe372-b89d-4f43-bf54-141dd9e69574",
         "name": "Pull & Prepare",
         "icon": {
-          "path": "scripts/scripter/icons/preset.png",
+          "path": "tools/scripter/icons/preset.png",
           "path_type": "WorkingDirRelative"
         },
         "items": [
@@ -275,11 +275,11 @@
         "uid": "b5d53eee-8b27-4396-b3a2-8dbb1c71746b",
         "name": "Switch Branch",
         "icon": {
-          "path": "scripts/scripter/icons/git.png",
+          "path": "tools/scripter/icons/git.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/linux/switch_branch.sh",
+          "path": "tools/scripter/linux/switch_branch.sh",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -298,11 +298,11 @@
         "uid": "e119791a-f4c1-4217-8c17-5aa1150452b5",
         "name": "Update Submodules",
         "icon": {
-          "path": "scripts/scripter/icons/git.png",
+          "path": "tools/scripter/icons/git.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/linux/update_submodules.sh",
+          "path": "tools/scripter/linux/update_submodules.sh",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -321,11 +321,11 @@
         "uid": "0ee11768-69ef-4390-9016-5e4dd1dfc00f",
         "name": "Generate",
         "icon": {
-          "path": "scripts/scripter/icons/cmake.png",
+          "path": "tools/scripter/icons/cmake.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/linux/generate_cmake_project.sh",
+          "path": "tools/scripter/linux/generate_cmake_project.sh",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -344,11 +344,11 @@
         "uid": "802ce303-567e-41e8-aafc-abfa5e55d3f4",
         "name": "Build",
         "icon": {
-          "path": "scripts/scripter/icons/cmake.png",
+          "path": "tools/scripter/icons/cmake.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/linux/build_project.sh",
+          "path": "tools/scripter/linux/build_project.sh",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -367,11 +367,11 @@
         "uid": "0a48c3b8-c7c6-46d4-b316-8f8ef4f39cb4",
         "name": "Open Clion",
         "icon": {
-          "path": "scripts/scripter/icons/clion.png",
+          "path": "tools/scripter/icons/clion.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/linux/open_clion.sh",
+          "path": "tools/scripter/linux/open_clion.sh",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -390,11 +390,11 @@
         "uid": "abf27876-bc8e-484f-8863-b1b9810f3c29",
         "name": "Generate Editor",
         "icon": {
-          "path": "scripts/scripter/icons/cmake.png",
+          "path": "tools/scripter/icons/cmake.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/linux/generate_editor_cmake_project.sh",
+          "path": "tools/scripter/linux/generate_editor_cmake_project.sh",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -413,11 +413,11 @@
         "uid": "71afc78b-7c75-4633-ad28-af248ffe0da4",
         "name": "Build Editor",
         "icon": {
-          "path": "scripts/scripter/icons/cmake.png",
+          "path": "tools/scripter/icons/cmake.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/linux/build_editor_project.sh",
+          "path": "tools/scripter/linux/build_editor_project.sh",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -436,7 +436,7 @@
         "uid": "70058ab1-aefb-48d4-9b92-b4751b01dad0",
         "name": "Start Editor",
         "icon": {
-          "path": "scripts/scripter/icons/play.png",
+          "path": "tools/scripter/icons/play.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
@@ -459,11 +459,11 @@
         "uid": "43f57be7-2a9d-48ec-b4b9-df75c6836197",
         "name": "Open Editor in Clion",
         "icon": {
-          "path": "scripts/scripter/icons/clion.png",
+          "path": "tools/scripter/icons/clion.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/linux/open_editor_clion.sh",
+          "path": "tools/scripter/linux/open_editor_clion.sh",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -482,11 +482,11 @@
         "uid": "1614450e-ee7b-4503-8e5b-6c7b6d1bc9cc",
         "name": "Clean Reset",
         "icon": {
-          "path": "scripts/scripter/icons/trash.png",
+          "path": "tools/scripter/icons/trash.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/linux/clean_reset.sh",
+          "path": "tools/scripter/linux/clean_reset.sh",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -505,7 +505,7 @@
         "uid": "0ca50748-c6e8-442c-8c15-5f72211022cb",
         "name": "Custom Git Command",
         "icon": {
-          "path": "scripts/scripter/icons/git.png",
+          "path": "tools/scripter/icons/git.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {

@@ -33,7 +33,7 @@ CMakeUserPresets.json
 .idea/
 
 # temporary files
-/scripts/temp_data
+/tools/temp_data
 
 # other
 /.scripter_config.local.json

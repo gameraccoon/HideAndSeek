@@ -8,7 +8,7 @@ on:
       - config/**
       - external/**
       - src/**
-      - scripts/**
+      - tools/**
       - CMakeLists.txt
       - CMakePresets.json
   workflow_dispatch:
@@ -37,7 +37,7 @@ jobs:
     - name: Generate project
       shell: cmd
       working-directory: ${{github.workspace}}
-      run: scripts/scripter/windows/generate_vs_project.cmd
+      run: tools/scripter/windows/generate_vs_project.cmd
 
     - name: Build
       working-directory: ${{github.workspace}}/build/game

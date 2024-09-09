@@ -181,7 +181,7 @@
         "uid": "32b09b0b-5a00-42f0-97d4-9e02e100745b",
         "name": "Switch & Prepare",
         "icon": {
-          "path": "scripts/scripter/icons/preset.png",
+          "path": "tools/scripter/icons/preset.png",
           "path_type": "WorkingDirRelative"
         },
         "items": [
@@ -228,7 +228,7 @@
         "uid": "007fe372-b89d-4f43-bf54-141dd9e69574",
         "name": "Pull & Prepare",
         "icon": {
-          "path": "scripts/scripter/icons/preset.png",
+          "path": "tools/scripter/icons/preset.png",
           "path_type": "WorkingDirRelative"
         },
         "items": [
@@ -275,7 +275,7 @@
         "uid": "b5d53eee-8b27-4396-b3a2-8dbb1c71746b",
         "name": "Switch Branch",
         "icon": {
-          "path": "scripts/scripter/icons/git.png",
+          "path": "tools/scripter/icons/git.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
@@ -298,7 +298,7 @@
         "uid": "e119791a-f4c1-4217-8c17-5aa1150452b5",
         "name": "Update Submodules",
         "icon": {
-          "path": "scripts/scripter/icons/git.png",
+          "path": "tools/scripter/icons/git.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
@@ -321,11 +321,11 @@
         "uid": "0ee11768-69ef-4390-9016-5e4dd1dfc00f",
         "name": "Generate Project",
         "icon": {
-          "path": "scripts/scripter/icons/vs.png",
+          "path": "tools/scripter/icons/vs.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/windows/generate_vs_project.cmd",
+          "path": "tools/scripter/windows/generate_vs_project.cmd",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -344,7 +344,7 @@
         "uid": "802ce303-567e-41e8-aafc-abfa5e55d3f4",
         "name": "Build Project (debug)",
         "icon": {
-          "path": "scripts/scripter/icons/vs.png",
+          "path": "tools/scripter/icons/vs.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
@@ -367,7 +367,7 @@
         "uid": "0a48c3b8-c7c6-46d4-b316-8f8ef4f39cb4",
         "name": "Open Solution",
         "icon": {
-          "path": "scripts/scripter/icons/vs.png",
+          "path": "tools/scripter/icons/vs.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
@@ -390,7 +390,7 @@
         "uid": "f992a9f3-d542-483b-aff7-65f1eb78c521",
         "name": "Run unit tests",
         "icon": {
-          "path": "scripts/scripter/icons/tests.webp",
+          "path": "tools/scripter/icons/tests.webp",
           "path_type": "WorkingDirRelative"
         },
         "command": {
@@ -413,11 +413,11 @@
         "uid": "1614450e-ee7b-4503-8e5b-6c7b6d1bc9cc",
         "name": "Clean Reset",
         "icon": {
-          "path": "scripts/scripter/icons/trash.png",
+          "path": "tools/scripter/icons/trash.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
-          "path": "scripts/scripter/windows/clean_reset.cmd",
+          "path": "tools/scripter/windows/clean_reset.cmd",
           "path_type": "WorkingDirRelative"
         },
         "working_directory": {
@@ -436,7 +436,7 @@
         "uid": "0ca50748-c6e8-442c-8c15-5f72211022cb",
         "name": "Custom Git Command",
         "icon": {
-          "path": "scripts/scripter/icons/git.png",
+          "path": "tools/scripter/icons/git.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
@@ -459,7 +459,7 @@
         "uid": "a417d29d-ce2c-440e-b875-084254a5c93e",
         "name": "Play sound",
         "icon": {
-          "path": "scripts/scripter/icons/sound.png",
+          "path": "tools/scripter/icons/sound.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {
@@ -482,7 +482,7 @@
         "uid": "a1a3ba04-7053-4a4b-98b0-b762deee402a",
         "name": "Run game (Debug)",
         "icon": {
-          "path": "scripts/scripter/icons/play.png",
+          "path": "tools/scripter/icons/play.png",
           "path_type": "WorkingDirRelative"
         },
         "command": {

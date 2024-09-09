@@ -9,7 +9,7 @@ on:
       - external/**
       - src/**
       - editor/**
-      - scripts/**
+      - tools/**
       - CMakeLists.txt
       - CMakePresets.json
 jobs:

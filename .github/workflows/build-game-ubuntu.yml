@@ -8,7 +8,7 @@ on:
       - config/**
       - external/**
       - src/**
-      - scripts/**
+      - tools/**
       - CMakeLists.txt
       - CMakePresets.json
   workflow_dispatch:
@@ -71,5 +71,5 @@ jobs:
 
     - name: Run autotests
       working-directory: ${{github.workspace}}
-      run: ./scripts/tests/run_all_autotests.sh --no-render
+      run: ./tools/tests/run_all_autotests.sh --no-render
 
