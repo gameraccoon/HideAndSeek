@@ -9,15 +9,15 @@
 int main(int argc, char *argv[])
 {
 	INITIALIZE_STRING_IDS();
-	Random::gGlobalGenerator = std::mt19937(time(nullptr));
+	Random::gGlobalGenerator = Random::GlobalGeneratorType(std::random_device()());
 
 #ifdef RACCOON_ECS_DEBUG_CHECKS_ENABLED
 	RaccoonEcs::gErrorHandler = [](const std::string& error) { ReportFatalError(error); };
 #endif // RACCOON_ECS_DEBUG_CHECKS_ENABLED
 
-	QApplication a(argc, argv);
-	MainWindow w;
-	w.show();
+	QApplication app(argc, argv);
+	MainWindow window;
+	window.show();
 
-	return a.exec();
+	return app.exec();
 }

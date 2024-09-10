@@ -49,15 +49,15 @@ namespace TypesEditConstructor
 	template<>
 	Edit<RelativeResourcePath>::Ptr FillEdit<RelativeResourcePath>::Call(QLayout* layout, const QString& label, const RelativeResourcePath& initialValue);
 
-	// partial specilization for enums
+	// partial specialization for enums
 	template<typename T>
-	struct FillEdit<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+	struct FillEdit<T, std::enable_if_t<std::is_enum_v<T>>> {
 		static typename Edit<T>::Ptr Call(QLayout* layout, const QString& label, const T& initialValue)
 		{
 			FillLabel(layout, label);
 
 			QComboBox* stringList = HS_NEW QComboBox();
-			for (StringId value : get_all_enum_value_names<T>())
+			for (const StringId value : get_all_enum_value_names<T>())
 			{
 				stringList->addItem(QString::fromStdString(ID_TO_STR(value)));
 			}
@@ -85,9 +85,9 @@ namespace TypesEditConstructor
 	template <typename T>
 	using is_vector = std::is_same<T, std::vector<typename T::value_type, typename T::allocator_type>>;
 
-	// partial specilization for vectors
+	// partial specialization for vectors
 	template<typename T>
-	struct FillEdit<T, typename std::enable_if<is_vector<T>::value>::type> {
+	struct FillEdit<T, std::enable_if_t<is_vector<T>::value>> {
 		static typename Edit<T>::Ptr Call(QLayout* layout, const QString& label, const T& initialValue)
 		{
 			using item_type = typename T::value_type;
@@ -151,9 +151,9 @@ namespace TypesEditConstructor
 	template <typename T>
 	using is_map = std::is_same<T, std::map<typename T::key_type, typename T::mapped_type, typename T::key_compare>>;
 
-	// partial specilization for maps
+	// partial specialization for maps
 	template<typename T>
-	struct FillEdit<T, typename std::enable_if<is_map<T>::value>::type> {
+	struct FillEdit<T, std::enable_if_t<is_map<T>::value>> {
 		static typename Edit<T>::Ptr Call(QLayout* layout, const QString& label, const T& initialValue)
 		{
 			using key_type = typename T::key_type;

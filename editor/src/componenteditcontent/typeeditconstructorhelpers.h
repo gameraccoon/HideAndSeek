@@ -22,7 +22,7 @@ namespace TypesEditConstructor
 		using OnChangeFn = std::function<void(const T&, const T&, bool)>;
 
 	public:
-		Edit(T initialValue)
+		explicit Edit(T initialValue)
 			: mPrevValue(std::forward<T>(initialValue))
 		{
 		}
@@ -49,9 +49,9 @@ namespace TypesEditConstructor
 			}
 		}
 
-		void addChild(BaseEdit::Ptr child)
+		void addChild(BaseEdit::Ptr&& child)
 		{
-			mChildObjects.emplace_back(child);
+			mChildObjects.emplace_back(std::move(child));
 		}
 
 		QObject* getOwner() { return mOwner; }
