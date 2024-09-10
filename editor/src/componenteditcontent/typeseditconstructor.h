@@ -7,6 +7,8 @@
 
 #include "EngineCommon/Types/String/ResourcePath.h"
 
+#include "EngineData/TypeUtils/EnumUtils.h"
+
 #include <QObject>
 #include <QLayout>
 #include <QString>
@@ -15,18 +17,6 @@
 #include <QComboBox>
 
 #include "typeeditconstructorhelpers.h"
-
-template <typename T>
-StringId enum_to_string(T value);
-
-template <typename T>
-T string_to_enum(StringId value);
-
-template <typename T>
-std::vector<T> get_all_enum_values();
-
-template <typename T>
-std::vector<StringId> get_all_enum_value_names();
 
 namespace TypesEditConstructor
 {
@@ -80,7 +70,10 @@ namespace TypesEditConstructor
 			{
 				if (typename Edit<T>::Ptr edit = editWeakPtr.lock())
 				{
-					edit->transmitValueChange(string_to_enum<T>(STR_TO_ID(newValue.toStdString())));
+					if (std::optional<T> value = string_to_enum<T>(STR_TO_ID(newValue.toStdString())))
+					{
+						edit->transmitValueChange(*value);
+					}
 				}
 			});
 
