@@ -8,6 +8,7 @@
 
 int main(int argc, char *argv[])
 {
+	INITIALIZE_STRING_IDS();
 	Random::gGlobalGenerator = std::mt19937(time(nullptr));
 
 #ifdef RACCOON_ECS_DEBUG_CHECKS_ENABLED
