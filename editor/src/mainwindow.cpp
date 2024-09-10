@@ -1,30 +1,27 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
+#include <QFileDialog>
+#include <QProcess>
+
+#include "DockAreaWidget.h"
+#include "DockManager.h"
+#include "DockWidget.h"
 #include "src/componenteditcontent/componentcontentfactory.h"
-
 #include "src/editorcommands/addentitycommand.h"
 #include "src/editorcommands/addspatialentitycommand.h"
 #include "src/editorutils/worldsaveutils.h"
-
-#include "DockManager.h"
-#include "DockWidget.h"
-#include "DockAreaWidget.h"
+#include "toolboxes/ComponentAttributesToolbox.h"
+#include "toolboxes/ComponentsListToolbox.h"
+#include "toolboxes/EntitiesListToolbox.h"
+#include "toolboxes/PrefabListToolbox.h"
+#include "toolboxes/TransformEditorToolbox.h"
+#include "ui_mainwindow.h"
 
 #include "GameData/ComponentRegistration/ComponentFactoryRegistration.h"
 #include "GameData/ComponentRegistration/ComponentJsonSerializerRegistration.h"
 #include "GameData/World.h"
 
 #include "GameUtils/World/GameDataLoader.h"
-
-#include "toolboxes/ComponentAttributesToolbox.h"
-#include "toolboxes/ComponentsListToolbox.h"
-#include "toolboxes/EntitiesListToolbox.h"
-#include "toolboxes/PrefabListToolbox.h"
-#include "toolboxes/TransformEditorToolbox.h"
-
-#include <QFileDialog>
-#include <QProcess>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -52,7 +49,7 @@ MainWindow::~MainWindow()
 
 CommandExecutionContext MainWindow::getCommandExecutionContext()
 {
-	return CommandExecutionContext{mCurrentWorld.get(), mEditorIdGenerator};
+	return CommandExecutionContext{ mCurrentWorld.get(), mEditorIdGenerator };
 }
 
 void MainWindow::registerFactories()
@@ -64,8 +61,7 @@ void MainWindow::registerFactories()
 
 void MainWindow::initCommandStack()
 {
-	mCommandStack.bindFunctionToCommandChange([this](EditorCommand::EffectBitset effects, bool originalCall)
-	{
+	mCommandStack.bindFunctionToCommandChange([this](EditorCommand::EffectBitset effects, bool originalCall) {
 		this->updateUndoRedo();
 		OnCommandEffectApplied.broadcast(effects, originalCall);
 	});
@@ -117,8 +113,7 @@ void MainWindow::initActions()
 void MainWindow::bindEvents()
 {
 	// on selected entity change broadcast selected component source change automatically
-	OnSelectedEntityChanged.bind([this](const std::optional<EditorEntityReference>& ref)
-	{
+	OnSelectedEntityChanged.bind([this](const std::optional<EditorEntityReference>& ref) {
 		if (ref.has_value())
 		{
 			ComponentSourceReference componentSourceReference;
@@ -146,8 +141,7 @@ void MainWindow::actionNewPrefabLibraryTriggered()
 
 void MainWindow::actionLoadPrefabLibraryTriggered()
 {
-	QString fileName = QFileDialog::getOpenFileName(this,
-		tr("Load Prefab"), "../resources/prefabs", tr("Prefab Files (*.json)"));
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Load Prefab"), "../resources/prefabs", tr("Prefab Files (*.json)"));
 
 	if (fileName.isEmpty())
 	{
@@ -164,8 +158,7 @@ void MainWindow::actionSavePrefabLibraryTriggered()
 
 void MainWindow::actionSavePrefabLibraryAsTriggered()
 {
-	QString fileName = QFileDialog::getSaveFileName(this,
-		tr("Save Prefab"), "../resources/prefabs", tr("Prefab Files (*.json)"));
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Prefab"), "../resources/prefabs", tr("Prefab Files (*.json)"));
 
 	if (fileName.isEmpty())
 	{
@@ -187,8 +180,7 @@ void MainWindow::on_actionNew_World_triggered()
 
 void MainWindow::on_actionOpen_World_triggered()
 {
-	std::string fileName = QFileDialog::getOpenFileName(this,
-		tr("Open World"), "../resources/maps", tr("Stealth Game World Files (*.json)")).toStdString();
+	std::string fileName = QFileDialog::getOpenFileName(this, tr("Open World"), "../resources/maps", tr("Stealth Game World Files (*.json)")).toStdString();
 
 	if (fileName.empty())
 	{
@@ -206,8 +198,7 @@ void MainWindow::on_actionOpen_World_triggered()
 
 void MainWindow::on_actionSave_World_As_triggered()
 {
-	std::string fileName = QFileDialog::getSaveFileName(this,
-		tr("Save World"), "../resources/maps", tr("Stealth Game World Files (*.json)")).toStdString();
+	std::string fileName = QFileDialog::getSaveFileName(this, tr("Save World"), "../resources/maps", tr("Stealth Game World Files (*.json)")).toStdString();
 
 	if (fileName.empty())
 	{
@@ -242,7 +233,7 @@ void MainWindow::on_actionRun_Game_triggered()
 	}
 	static std::string tempWorldName = "./tmp/temp-editor-world.json";
 	Utils::SaveWorld(*mCurrentWorld.get(), tempWorldName, mComponentSerializationHolder);
-	QProcess::startDetached("./GameMain", {"--world", QString::fromStdString(tempWorldName)});
+	QProcess::startDetached("./GameMain", { "--world", QString::fromStdString(tempWorldName) });
 }
 
 void MainWindow::on_actionUndo_triggered()

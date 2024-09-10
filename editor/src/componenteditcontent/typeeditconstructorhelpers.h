@@ -1,8 +1,8 @@
-#ifndef TYPEEDITCONSTRUCTORHELPERS_H
-#define TYPEEDITCONSTRUCTORHELPERS_H
+#pragma once
 
-#include <memory>
 #include <functional>
+#include <memory>
+
 #include <QObject>
 
 namespace TypesEditConstructor
@@ -66,6 +66,4 @@ namespace TypesEditConstructor
 		QObject* mOwner = HS_NEW QObject();
 		std::vector<BaseEdit::Ptr> mChildObjects;
 	};
-}
-
-#endif // TYPEEDITCONSTRUCTORHELPERS_H
+} // namespace TypesEditConstructor

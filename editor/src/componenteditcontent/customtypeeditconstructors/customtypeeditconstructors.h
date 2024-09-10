@@ -1,20 +1,19 @@
 #pragma once
 
-#include <raccoon-ecs/entity.h>
-
 #include "src/componenteditcontent/typeseditconstructor.h"
+#include <raccoon-ecs/entity.h>
 
 #include "EngineData/Geometry/Border.h"
 #include "EngineData/Geometry/Rotator.h"
 #include "EngineData/Geometry/Vector2D.h"
 
-#include "GameData/Resources/AnimationClipParams.h"
-#include "GameData/Resources/AnimationClipDescription.h"
-#include "GameData/Spatial/CellPos.h"
 #include "GameData/Geometry/Hull.h"
-#include "GameData/Spatial/SpatialEntity.h"
+#include "GameData/Resources/AnimationClipDescription.h"
+#include "GameData/Resources/AnimationClipParams.h"
 #include "GameData/Resources/SpriteDescription.h"
 #include "GameData/Resources/SpriteParams.h"
+#include "GameData/Spatial/CellPos.h"
+#include "GameData/Spatial/SpatialEntity.h"
 
 namespace TypesEditConstructor
 {
@@ -53,4 +52,4 @@ namespace TypesEditConstructor
 
 	template<>
 	Edit<Vector2D>::Ptr FillEdit<Vector2D>::Call(QLayout* layout, const QString& label, const Vector2D& initialValue);
-}
+} // namespace TypesEditConstructor

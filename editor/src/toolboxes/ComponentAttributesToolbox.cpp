@@ -1,26 +1,23 @@
 #include "ComponentAttributesToolbox.h"
 
-#include "src/mainwindow.h"
+#include <QVBoxLayout>
 
 #include "DockManager.h"
 #include "DockWidget.h"
-#include "DockAreaWidget.h"
-
-#include <QVBoxLayout>
-
 #include "src/editorutils/componentreferenceutils.h"
+#include "src/mainwindow.h"
 
 const QString ComponentAttributesToolbox::WidgetName = "ComponentAttributes";
-const QString ComponentAttributesToolbox::ToolboxName = ComponentAttributesToolbox::WidgetName + "Toolbox";
-const QString ComponentAttributesToolbox::ContainerName = ComponentAttributesToolbox::WidgetName + "Container";
-const QString ComponentAttributesToolbox::ContainerContentName = ComponentAttributesToolbox::ContainerName + "Content";
+const QString ComponentAttributesToolbox::ToolboxName = WidgetName + "Toolbox";
+const QString ComponentAttributesToolbox::ContainerName = WidgetName + "Container";
+const QString ComponentAttributesToolbox::ContainerContentName = ContainerName + "Content";
 
 ComponentAttributesToolbox::ComponentAttributesToolbox(MainWindow* mainWindow, ads::CDockManager* dockManager)
 	: mMainWindow(mainWindow)
 	, mDockManager(dockManager)
 {
-	mOnComponentChangedHandle = mMainWindow->OnSelectedComponentChanged.bind([this](const auto& val){ onSelectedComponentChange(val); });
-	mOnCommandEffectHandle = mMainWindow->OnCommandEffectApplied.bind([this](EditorCommand::EffectBitset effects, bool originalCall){ updateContent(effects, originalCall); });
+	mOnComponentChangedHandle = mMainWindow->OnSelectedComponentChanged.bind([this](const auto& val) { onSelectedComponentChange(val); });
+	mOnCommandEffectHandle = mMainWindow->OnCommandEffectApplied.bind([this](EditorCommand::EffectBitset effects, bool originalCall) { updateContent(effects, originalCall); });
 }
 
 ComponentAttributesToolbox::~ComponentAttributesToolbox()
@@ -37,10 +34,7 @@ void ComponentAttributesToolbox::show()
 		{
 			return;
 		}
-		else
-		{
-			mDockManager->layout()->removeWidget(dockWidget);
-		}
+		mDockManager->layout()->removeWidget(dockWidget);
 	}
 
 	QWidget* containerWidget = HS_NEW QWidget();
@@ -60,14 +54,11 @@ void ComponentAttributesToolbox::show()
 
 bool ComponentAttributesToolbox::isShown() const
 {
-	if (ads::CDockWidget* dockWidget = mDockManager->findDockWidget(ToolboxName))
+	if (const ads::CDockWidget* dockWidget = mDockManager->findDockWidget(ToolboxName))
 	{
 		return dockWidget->isVisible();
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 void ComponentAttributesToolbox::updateContent(EditorCommand::EffectBitset effects, bool originalCall)

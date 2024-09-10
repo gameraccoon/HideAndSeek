@@ -3,12 +3,8 @@
 #include <QString>
 #include <QWidget>
 
-#include <raccoon-ecs/delegates.h>
-#include <raccoon-ecs/entity.h>
-
-#include "GameData/Spatial/SpatialEntity.h"
-
 #include "src/editorutils/editorentityreference.h"
+#include <raccoon-ecs/delegates.h>
 
 class MainWindow;
 
@@ -21,11 +17,11 @@ class QListWidgetItem;
 class QMenu;
 class QPoint;
 
-class EntitiesListToolbox : public QWidget
+class EntitiesListToolbox final : public QWidget
 {
 public:
 	EntitiesListToolbox(MainWindow* mainWindow, ads::CDockManager* dockManager);
-	~EntitiesListToolbox();
+	~EntitiesListToolbox() override;
 	void show();
 
 	static const QString WidgetName;

@@ -4,16 +4,14 @@
 
 #include "editorcommand.h"
 
-#include "../editorutils/editorentityreference.h"
-
 #include "EngineData/Geometry/Vector2D.h"
 
 class World;
 
-class AddSpatialEntityCommand : public EditorCommand
+class AddSpatialEntityCommand final : public EditorCommand
 {
 public:
-	AddSpatialEntityCommand(const CellPos cellPos, const Vector2D& location);
+	AddSpatialEntityCommand(CellPos cellPos, const Vector2D& location);
 
 	void doCommand(CommandExecutionContext& context) override;
 	void undoCommand(CommandExecutionContext& context) override;

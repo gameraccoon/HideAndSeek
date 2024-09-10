@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 class World;

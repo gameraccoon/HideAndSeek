@@ -3,12 +3,11 @@
 #include <limits>
 #include <string>
 
-#include <QLabel>
-#include <QLineEdit>
+#include <QCheckBox>
 #include <QDoubleValidator>
 #include <QIntValidator>
-#include <QCheckBox>
-#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
 
 namespace TypesEditConstructor
 {
@@ -26,7 +25,7 @@ namespace TypesEditConstructor
 
 		QLineEdit* floatEdit = HS_NEW QLineEdit();
 
-		auto dv = HS_NEW QDoubleValidator(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max(), 10);
+		const auto dv = HS_NEW QDoubleValidator(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max(), 10);
 		dv->setNotation(QDoubleValidator::StandardNotation);
 		floatEdit->setValidator(dv);
 
@@ -35,12 +34,11 @@ namespace TypesEditConstructor
 		Edit<float>::Ptr edit = std::make_shared<Edit<float>>(initialValue);
 		Edit<float>::WeakPtr editWeakPtr = edit;
 
-		QObject::connect(floatEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValueStr)
-		{
-			if (Edit<float>::Ptr edit = editWeakPtr.lock())
+		QObject::connect(floatEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValueStr) {
+			if (const Edit<float>::Ptr edit = editWeakPtr.lock())
 			{
 				bool ok;
-				float newValue = newValueStr.toFloat(&ok);
+				const float newValue = newValueStr.toFloat(&ok);
 				if (ok)
 				{
 					edit->transmitValueChange(newValue);
@@ -59,7 +57,7 @@ namespace TypesEditConstructor
 
 		QLineEdit* intEdit = HS_NEW QLineEdit();
 
-		auto iv = HS_NEW QIntValidator(std::numeric_limits<int>::lowest(), std::numeric_limits<int>::max());
+		const auto iv = HS_NEW QIntValidator(std::numeric_limits<int>::lowest(), std::numeric_limits<int>::max());
 		intEdit->setValidator(iv);
 
 		intEdit->setText(QString::number(initialValue));
@@ -67,12 +65,11 @@ namespace TypesEditConstructor
 		Edit<int>::Ptr edit = std::make_shared<Edit<int>>(initialValue);
 		Edit<int>::WeakPtr editWeakPtr = edit;
 
-		QObject::connect(intEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValueStr)
-		{
-			if (Edit<int>::Ptr edit = editWeakPtr.lock())
+		QObject::connect(intEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValueStr) {
+			if (const Edit<int>::Ptr edit = editWeakPtr.lock())
 			{
 				bool ok;
-				int newValue = newValueStr.toInt(&ok);
+				const int newValue = newValueStr.toInt(&ok);
 				if (ok)
 				{
 					edit->transmitValueChange(newValue);
@@ -96,12 +93,11 @@ namespace TypesEditConstructor
 		Edit<unsigned int>::Ptr edit = std::make_shared<Edit<unsigned int>>(initialValue);
 		Edit<unsigned int>::WeakPtr editWeakPtr = edit;
 
-		QObject::connect(intEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValueStr)
-		{
-			if (Edit<unsigned int>::Ptr edit = editWeakPtr.lock())
+		QObject::connect(intEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValueStr) {
+			if (const Edit<unsigned int>::Ptr edit = editWeakPtr.lock())
 			{
 				bool ok;
-				unsigned int newValue = newValueStr.toUInt(&ok);
+				const unsigned int newValue = newValueStr.toUInt(&ok);
 				if (ok)
 				{
 					edit->transmitValueChange(newValue);
@@ -125,12 +121,11 @@ namespace TypesEditConstructor
 		Edit<unsigned long>::Ptr edit = std::make_shared<Edit<unsigned long>>(initialValue);
 		Edit<unsigned long>::WeakPtr editWeakPtr = edit;
 
-		QObject::connect(longEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValueStr)
-		{
-			if (Edit<unsigned long>::Ptr edit = editWeakPtr.lock())
+		QObject::connect(longEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValueStr) {
+			if (const Edit<unsigned long>::Ptr edit = editWeakPtr.lock())
 			{
 				bool ok;
-				unsigned long newValue = newValueStr.toUInt(&ok);
+				const unsigned long newValue = newValueStr.toUInt(&ok);
 				if (ok)
 				{
 					edit->transmitValueChange(newValue);
@@ -153,9 +148,8 @@ namespace TypesEditConstructor
 		Edit<bool>::Ptr edit = std::make_shared<Edit<bool>>(initialValue);
 		Edit<bool>::WeakPtr editWeakPtr = edit;
 
-		QObject::connect(checkbox, &QCheckBox::stateChanged, edit->getOwner(), [editWeakPtr](int newValue)
-		{
-			if (Edit<bool>::Ptr edit = editWeakPtr.lock())
+		QObject::connect(checkbox, &QCheckBox::stateChanged, edit->getOwner(), [editWeakPtr](int newValue) {
+			if (const Edit<bool>::Ptr edit = editWeakPtr.lock())
 			{
 				edit->transmitValueChange(static_cast<bool>(newValue));
 			}
@@ -176,9 +170,8 @@ namespace TypesEditConstructor
 		Edit<std::string>::Ptr edit = std::make_shared<Edit<std::string>>(initialValue);
 		Edit<std::string>::WeakPtr editWeakPtr = edit;
 
-		QObject::connect(stringEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValue)
-		{
-			if (Edit<std::string>::Ptr edit = editWeakPtr.lock())
+		QObject::connect(stringEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValue) {
+			if (const Edit<std::string>::Ptr edit = editWeakPtr.lock())
 			{
 				edit->transmitValueChange(newValue.toStdString());
 			}
@@ -199,9 +192,8 @@ namespace TypesEditConstructor
 		Edit<RelativeResourcePath>::Ptr edit = std::make_shared<Edit<RelativeResourcePath>>(initialValue);
 		Edit<RelativeResourcePath>::WeakPtr editWeakPtr = edit;
 
-		QObject::connect(stringEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValue)
-		{
-			if (Edit<RelativeResourcePath>::Ptr edit = editWeakPtr.lock())
+		QObject::connect(stringEdit, &QLineEdit::textChanged, edit->getOwner(), [editWeakPtr](const QString& newValue) {
+			if (const Edit<RelativeResourcePath>::Ptr edit = editWeakPtr.lock())
 			{
 				edit->transmitValueChange(static_cast<RelativeResourcePath>(newValue.toStdString()));
 			}
@@ -210,4 +202,4 @@ namespace TypesEditConstructor
 		layout->addWidget(stringEdit);
 		return edit;
 	}
-}
+} // namespace TypesEditConstructor

@@ -75,32 +75,35 @@ IncludeCategories:
   - Regex: '^[<"]EngineCommon/precomp.h[>"]$'
     Priority: -1
   - Regex: '^[<"]EngineCommon/.*$'
-    Priority: 3
-  - Regex: '^[<"]EngineData/.*$'
     Priority: 4
-  - Regex: '^[<"]GameData/.*$'
+  - Regex: '^[<"]EngineData/.*$'
     Priority: 5
-  - Regex: '^[<"]HAL/.*$'
+  - Regex: '^[<"]GameData/.*$'
     Priority: 6
-  - Regex: '^[<"]EngineUtils/.*$'
+  - Regex: '^[<"]HAL/.*$'
     Priority: 7
-  - Regex: '^[<"]GameUtils/.*$'
+  - Regex: '^[<"]EngineUtils/.*$'
     Priority: 8
-  - Regex: '^[<"]EngineLogic/.*$'
+  - Regex: '^[<"]GameUtils/.*$'
     Priority: 9
-  - Regex: '^[<"]GameLogic/.*$'
+  - Regex: '^[<"]EngineLogic/.*$'
     Priority: 10
-  - Regex: '^[<"]AutoTests/.*$'
+  - Regex: '^[<"]GameLogic/.*$'
     Priority: 11
-  - Regex: '^[<"]GameMain/.*$'
+  - Regex: '^[<"]AutoTests/.*$'
     Priority: 12
-  - Regex: '^[<"]UnitTests/.*$'
+  - Regex: '^[<"]GameMain/.*$'
     Priority: 13
+  - Regex: '^[<"]UnitTests/.*$'
+    Priority: 14
+    # these are out of order on purpose, the rules are short-circuiting from top to bottom
+  - Regex: '^<Q[A-Z][a-z]+>$' # Qt includes go right after external includes
+    Priority: 2
     # STL includes that don't contain .h go right after precomp and current file include
   - Regex: '^<[a-zA-Z0-9_/]+>$'
     Priority: 1
   - Regex: '.*'
-    Priority: 2
+    Priority: 3
 
 # spaces
 ObjCSpaceAfterProperty: false

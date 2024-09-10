@@ -2,12 +2,10 @@
 
 #include <iostream>
 
-#include <QtWidgets/qcombobox.h>
-
 #include "../editorutils/editoridutils.h"
 
-#include "GameData/World.h"
 #include "GameData/Serialization/Json/EntityManager.h"
+#include "GameData/World.h"
 
 RemoveEntitiesCommand::RemoveEntitiesCommand(const std::vector<EditorEntityReference>& entities, const Json::ComponentSerializationHolder& jsonSerializerHolder)
 	: EditorCommand(EffectBitset(EffectType::Entities))
@@ -88,7 +86,7 @@ void RemoveEntitiesCommand::undoCommand(CommandExecutionContext& context)
 		WorldCell& cell = context.world->getSpatialData().getOrCreateCell(*mEntities[i].cellPos);
 		EntityManager& cellEntityManager = cell.getEntityManager();
 
-		Entity recreatedEntity = cellEntityManager.addEntity();
+		const Entity recreatedEntity = cellEntityManager.addEntity();
 		Utils::SetEntityId(recreatedEntity, mEntities[i].editorUniqueId, cellEntityManager);
 
 		Json::ApplyPrefabToExistentEntity(cellEntityManager, mSerializedComponents[i], recreatedEntity, mComponentSerializerHolder);

@@ -10,7 +10,8 @@ struct EditorEntityReference
 	/** nullopt indicates that the component is bound to game-global entity manager */
 	std::optional<CellPos> cellPos;
 
-	explicit EditorEntityReference(const size_t editorId) : editorUniqueId(editorId) {}
+	explicit EditorEntityReference(const size_t editorId)
+		: editorUniqueId(editorId) {}
 
 	explicit EditorEntityReference(const size_t editorId, const CellPos cellPos)
 		: editorUniqueId(editorId)

@@ -1,12 +1,9 @@
-#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
-
 #include <string>
 
-#include <QLabel>
-#include <QLineEdit>
-#include <QDoubleValidator>
 #include <QCheckBox>
 #include <QHBoxLayout>
+
+#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
 namespace TypesEditConstructor
 {
@@ -15,15 +12,14 @@ namespace TypesEditConstructor
 	{
 		FillLabel(layout, label);
 
-		QHBoxLayout *innerLayout = HS_NEW QHBoxLayout;
+		QHBoxLayout* innerLayout = HS_NEW QHBoxLayout;
 
 		Edit<StringId>::Ptr edit = std::make_shared<Edit<StringId>>(initialValue);
 		Edit<StringId>::WeakPtr editWeakPtr = edit;
 
-		Edit<std::string>::Ptr editX = FillEdit<std::string>::Call(innerLayout, "id", ID_TO_STR(initialValue));
-		editX->bindOnChange([editWeakPtr](std::string /*oldValue*/, std::string newValue, bool)
-		{
-			if (Edit<StringId>::Ptr edit = editWeakPtr.lock())
+		const Edit<std::string>::Ptr editX = FillEdit<std::string>::Call(innerLayout, "id", ID_TO_STR(initialValue));
+		editX->bindOnChange([editWeakPtr](std::string /*oldValue*/, std::string newValue, bool) {
+			if (const Edit<StringId>::Ptr edit = editWeakPtr.lock())
 			{
 				edit->transmitValueChange(STR_TO_ID(newValue));
 			}
@@ -36,4 +32,4 @@ namespace TypesEditConstructor
 		layout->addWidget(container);
 		return edit;
 	}
-}
+} // namespace TypesEditConstructor

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "EngineCommon/Types/ComplexTypes/EnumBitset.h"
-
 #include "../editorutils/editoridgenerator.h"
+
+#include "EngineCommon/Types/ComplexTypes/EnumBitset.h"
 
 class MainWindow;
 class World;
@@ -38,7 +38,7 @@ public:
 
 	virtual void doCommand(CommandExecutionContext& context) = 0;
 	virtual void undoCommand(CommandExecutionContext& context) = 0;
-	EffectBitset getEffects() { return mEffects; }
+	EffectBitset getEffects() const { return mEffects; }
 
 private:
 	EffectBitset mEffects;

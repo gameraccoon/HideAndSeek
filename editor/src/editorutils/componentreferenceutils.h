@@ -1,12 +1,12 @@
 #pragma once
 
-#include <variant>
 #include <iostream>
-
-#include "GameData/EcsDefinitions.h"
+#include <variant>
 
 #include "componentreference.h"
 #include "editoridutils.h"
+
+#include "GameData/EcsDefinitions.h"
 
 class World;
 
@@ -22,10 +22,10 @@ namespace Utils
 	template<typename T>
 	T* GetComponent(const ComponentSourceReference& source, World* world)
 	{
-		auto componentHolderOrEntityManager = GetBoundComponentHolderOrEntityManager(source, world);
-		if (auto entityManager = std::get_if<EntityManager*>(&componentHolderOrEntityManager))
+		const auto componentHolderOrEntityManager = GetBoundComponentHolderOrEntityManager(source, world);
+		if (const auto entityManager = std::get_if<EntityManager*>(&componentHolderOrEntityManager))
 		{
-			OptionalEntity entity = Utils::GetEntityFromId(*source.editorUniqueId, **entityManager);
+			const OptionalEntity entity = Utils::GetEntityFromId(*source.editorUniqueId, **entityManager);
 			if (!entity.isValid())
 			{
 				std::cout << "Could not find entity with id " << *source.editorUniqueId << "\n";
@@ -33,13 +33,10 @@ namespace Utils
 			}
 			return std::get<0>((*entityManager)->getEntityComponents<T>(entity.getEntity()));
 		}
-		else if (auto componentHolder = std::get_if<ComponentSetHolder*>(&componentHolderOrEntityManager))
+		if (const auto componentHolder = std::get_if<ComponentSetHolder*>(&componentHolderOrEntityManager))
 		{
 			return std::get<0>((*componentHolder)->getComponents<T>());
 		}
-		else
-		{
-			return nullptr;
-		}
+		return nullptr;
 	}
-}
+} // namespace Utils

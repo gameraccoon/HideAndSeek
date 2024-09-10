@@ -1,7 +1,5 @@
 #include "addspatialentitycommand.h"
 
-#include <QtWidgets/qcombobox.h>
-
 #include "../editorutils/editoridutils.h"
 
 #include "GameData/Components/TransformComponent.generated.h"
@@ -36,14 +34,14 @@ void AddSpatialEntityCommand::undoCommand(CommandExecutionContext& context)
 {
 	if (WorldCell* cell = context.world->getSpatialData().getCell(mCellPos))
 	{
-		EntityManager& cellEnttiyManager = cell->getEntityManager();
-		const OptionalEntity entity = Utils::GetEntityFromId(*mEditorEntityId, cellEnttiyManager);
+		EntityManager& cellEntityManager = cell->getEntityManager();
+		const OptionalEntity entity = Utils::GetEntityFromId(*mEditorEntityId, cellEntityManager);
 		if (!entity.isValid())
 		{
 			std::cout << "AddSpatialEntityCommand::undoCommand: entity with id " << *mEditorEntityId << " not found\n";
 			return;
 		}
 
-		cellEnttiyManager.removeEntity(entity.getEntity());
+		cellEntityManager.removeEntity(entity.getEntity());
 	}
 }

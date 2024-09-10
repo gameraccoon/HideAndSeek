@@ -1,22 +1,20 @@
-#ifndef TYPESEDITCONSTRUCTOR_H
-#define TYPESEDITCONSTRUCTOR_H
+#pragma once
 
-#include <vector>
 #include <map>
 #include <memory>
+#include <vector>
+
+#include <QComboBox>
+#include <QLayout>
+#include <QObject>
+#include <QPushButton>
+#include <QString>
+
+#include "typeeditconstructorhelpers.h"
 
 #include "EngineCommon/Types/String/ResourcePath.h"
 
 #include "EngineData/TypeUtils/EnumUtils.h"
-
-#include <QObject>
-#include <QLayout>
-#include <QString>
-#include <QPushButton>
-
-#include <QComboBox>
-
-#include "typeeditconstructorhelpers.h"
 
 namespace TypesEditConstructor
 {
@@ -24,7 +22,8 @@ namespace TypesEditConstructor
 	void FillLabel(QLayout* layout, const QString& label);
 
 	template<typename T, class Enable = void>
-	struct FillEdit {
+	struct FillEdit
+	{
 		static typename Edit<T>::Ptr Call(QLayout* layout, const QString& label, const T& initialValue);
 	};
 
@@ -51,7 +50,8 @@ namespace TypesEditConstructor
 
 	// partial specialization for enums
 	template<typename T>
-	struct FillEdit<T, std::enable_if_t<std::is_enum_v<T>>> {
+	struct FillEdit<T, std::enable_if_t<std::is_enum_v<T>>>
+	{
 		static typename Edit<T>::Ptr Call(QLayout* layout, const QString& label, const T& initialValue)
 		{
 			FillLabel(layout, label);
@@ -66,8 +66,7 @@ namespace TypesEditConstructor
 			typename Edit<T>::Ptr edit = std::make_shared<Edit<T>>(initialValue);
 			typename Edit<T>::WeakPtr editWeakPtr = edit;
 
-			QObject::connect(stringList, &QComboBox::currentTextChanged, edit->getOwner(), [editWeakPtr](const QString& newValue)
-			{
+			QObject::connect(stringList, &QComboBox::currentTextChanged, edit->getOwner(), [editWeakPtr](const QString& newValue) {
 				if (typename Edit<T>::Ptr edit = editWeakPtr.lock())
 				{
 					if (std::optional<T> value = string_to_enum<T>(STR_TO_ID(newValue.toStdString())))
@@ -82,12 +81,13 @@ namespace TypesEditConstructor
 		}
 	};
 
-	template <typename T>
+	template<typename T>
 	using is_vector = std::is_same<T, std::vector<typename T::value_type, typename T::allocator_type>>;
 
 	// partial specialization for vectors
 	template<typename T>
-	struct FillEdit<T, std::enable_if_t<is_vector<T>::value>> {
+	struct FillEdit<T, std::enable_if_t<is_vector<T>::value>>
+	{
 		static typename Edit<T>::Ptr Call(QLayout* layout, const QString& label, const T& initialValue)
 		{
 			using item_type = typename T::value_type;
@@ -101,8 +101,7 @@ namespace TypesEditConstructor
 			for (const item_type& item : initialValue)
 			{
 				typename Edit<item_type>::Ptr editItem = FillEdit<item_type>::Call(layout, QString("[%1]").arg(index), item);
-				editItem->bindOnChange([editWeakPtr, index](const item_type& /*oldValue*/, const item_type& newValue, bool)
-				{
+				editItem->bindOnChange([editWeakPtr, index](const item_type& /*oldValue*/, const item_type& newValue, bool) {
 					if (typename Edit<T>::Ptr edit = editWeakPtr.lock())
 					{
 						T container = edit->getPreviousValue();
@@ -115,8 +114,7 @@ namespace TypesEditConstructor
 				QPushButton* removeButton = HS_NEW QPushButton();
 				removeButton->setText("x");
 				Edit<bool>::Ptr removeItem = std::make_shared<Edit<bool>>(false);
-				QObject::connect(removeButton, &QPushButton::pressed, edit->getOwner(), [editWeakPtr, index]()
-				{
+				QObject::connect(removeButton, &QPushButton::pressed, edit->getOwner(), [editWeakPtr, index]() {
 					if (typename Edit<T>::Ptr edit = editWeakPtr.lock())
 					{
 						T container = edit->getPreviousValue();
@@ -132,8 +130,7 @@ namespace TypesEditConstructor
 			QPushButton* addButton = HS_NEW QPushButton();
 			addButton->setText("add item");
 			Edit<bool>::Ptr addItem = std::make_shared<Edit<bool>>(false);
-			QObject::connect(addButton, &QPushButton::pressed, edit->getOwner(), [editWeakPtr]()
-			{
+			QObject::connect(addButton, &QPushButton::pressed, edit->getOwner(), [editWeakPtr]() {
 				if (typename Edit<T>::Ptr edit = editWeakPtr.lock())
 				{
 					T container = edit->getPreviousValue();
@@ -148,12 +145,13 @@ namespace TypesEditConstructor
 		}
 	};
 
-	template <typename T>
+	template<typename T>
 	using is_map = std::is_same<T, std::map<typename T::key_type, typename T::mapped_type, typename T::key_compare>>;
 
 	// partial specialization for maps
 	template<typename T>
-	struct FillEdit<T, std::enable_if_t<is_map<T>::value>> {
+	struct FillEdit<T, std::enable_if_t<is_map<T>::value>>
+	{
 		static typename Edit<T>::Ptr Call(QLayout* layout, const QString& label, const T& initialValue)
 		{
 			using key_type = typename T::key_type;
@@ -167,8 +165,7 @@ namespace TypesEditConstructor
 			for (const auto& pair : initialValue)
 			{
 				typename Edit<key_type>::Ptr editKey = FillEdit<key_type>::Call(layout, "key", pair.first);
-				editKey->bindOnChange([editWeakPtr, value = pair.second](const key_type& oldKey, const key_type& newKey, bool)
-				{
+				editKey->bindOnChange([editWeakPtr, value = pair.second](const key_type& oldKey, const key_type& newKey, bool) {
 					if (typename Edit<T>::Ptr edit = editWeakPtr.lock())
 					{
 						T container = edit->getPreviousValue();
@@ -183,8 +180,7 @@ namespace TypesEditConstructor
 				edit->addChild(editKey);
 
 				typename Edit<value_type>::Ptr editValue = FillEdit<value_type>::Call(layout, "value", pair.second);
-				editValue->bindOnChange([editWeakPtr, key = pair.first](const value_type& /*oldValue*/, const value_type& newValue, bool)
-				{
+				editValue->bindOnChange([editWeakPtr, key = pair.first](const value_type& /*oldValue*/, const value_type& newValue, bool) {
 					if (typename Edit<T>::Ptr edit = editWeakPtr.lock())
 					{
 						T container = edit->getPreviousValue();
@@ -197,8 +193,7 @@ namespace TypesEditConstructor
 				QPushButton* removeButton = HS_NEW QPushButton();
 				removeButton->setText("x");
 				Edit<bool>::Ptr removeItem = std::make_shared<Edit<bool>>(false);
-				QObject::connect(removeButton, &QPushButton::pressed, edit->getOwner(), [editWeakPtr, key = pair.first]()
-				{
+				QObject::connect(removeButton, &QPushButton::pressed, edit->getOwner(), [editWeakPtr, key = pair.first]() {
 					if (typename Edit<T>::Ptr edit = editWeakPtr.lock())
 					{
 						T container = edit->getPreviousValue();
@@ -213,8 +208,7 @@ namespace TypesEditConstructor
 			QPushButton* addButton = new QPushButton();
 			addButton->setText("add item");
 			Edit<bool>::Ptr addItem = std::make_shared<Edit<bool>>(false);
-			QObject::connect(addButton, &QPushButton::pressed, edit->getOwner(), [editWeakPtr]()
-			{
+			QObject::connect(addButton, &QPushButton::pressed, edit->getOwner(), [editWeakPtr]() {
 				if (typename Edit<T>::Ptr edit = editWeakPtr.lock())
 				{
 					T container = edit->getPreviousValue();
@@ -228,6 +222,4 @@ namespace TypesEditConstructor
 			return edit;
 		}
 	};
-}
-
-#endif // TYPESEDITCONSTRUCTOR_H
+} // namespace TypesEditConstructor

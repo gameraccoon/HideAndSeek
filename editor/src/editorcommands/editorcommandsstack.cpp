@@ -1,12 +1,11 @@
 #include "editorcommandsstack.h"
 
-
 void EditorCommandsStack::undo(CommandExecutionContext context)
 {
 	if (haveSomethingToUndo())
 	{
 		mCommands[static_cast<size_t>(mCurrentHeadIndex)]->undoCommand(context);
-		EditorCommand::EffectBitset effects = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffects();
+		const EditorCommand::EffectBitset effects = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffects();
 		--mCurrentHeadIndex;
 
 		mLastExecutedCommandIdx = mCurrentHeadIndex;
@@ -25,7 +24,7 @@ void EditorCommandsStack::redo(CommandExecutionContext context)
 	{
 		++mCurrentHeadIndex;
 		mCommands[static_cast<size_t>(mCurrentHeadIndex)]->doCommand(context);
-		EditorCommand::EffectBitset effects = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffects();
+		const EditorCommand::EffectBitset effects = mCommands[static_cast<size_t>(mCurrentHeadIndex)]->getEffects();
 
 		mLastExecutedCommandIdx = mCurrentHeadIndex;
 		mIsLastExecutedUndo = false;
@@ -64,10 +63,7 @@ std::weak_ptr<const EditorCommand> EditorCommandsStack::getLastExecutedCommand()
 	{
 		return mCommands[mLastExecutedCommandIdx];
 	}
-	else
-	{
-		return std::weak_ptr<const EditorCommand>();
-	}
+	return std::weak_ptr<const EditorCommand>();
 }
 
 bool EditorCommandsStack::isLastExecutedUndo() const

@@ -1,10 +1,9 @@
 #include "componentcontentfactory.h"
 
+#include <QLayout>
 #include <QPushButton>
-#include <QSpacerItem>
 
 #include "componentregistration.h"
-
 #include "src/editorutils/componentreference.h"
 
 void ComponentContentFactory::registerComponents()
@@ -12,9 +11,9 @@ void ComponentContentFactory::registerComponents()
 	ComponentRegistration::RegisterToEditFactory(mFactories);
 }
 
-void ComponentContentFactory::replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, TypedComponent componentData, EditorCommandsStack& commandStack, CommandExecutionContext& context)
+void ComponentContentFactory::replaceEditContent(QLayout* layout, const ComponentSourceReference& sourceReference, const TypedComponent componentData, EditorCommandsStack& commandStack, CommandExecutionContext& context)
 {
-	auto it = mFactories.find(componentData.typeId);
+	const auto it = mFactories.find(componentData.typeId);
 
 	QWidget* newContent = nullptr;
 	if (it != mFactories.end())
@@ -56,7 +55,7 @@ void ComponentContentFactory::replaceEditContent(QLayout* layout, const Componen
 
 void ComponentContentFactory::removeEditContent(QLayout* layout)
 {
-	if (mContentWidget)
+	if (mContentWidget != nullptr)
 	{
 		mContentWidget->hide();
 		layout->removeWidget(mContentWidget);
@@ -65,7 +64,7 @@ void ComponentContentFactory::removeEditContent(QLayout* layout)
 	}
 }
 
-bool ComponentContentFactory::isComponentEditable(StringId componentType) const
+bool ComponentContentFactory::isComponentEditable(const StringId componentType) const
 {
-	return mFactories.find(componentType) != mFactories.end();
+	return mFactories.contains(componentType);
 }

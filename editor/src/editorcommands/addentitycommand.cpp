@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include <QtWidgets/qcombobox.h>
-
 #include "../editorutils/editoridutils.h"
 
 #include "GameData/World.h"

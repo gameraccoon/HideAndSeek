@@ -2,17 +2,16 @@
 
 #include <vector>
 
+#include "editorcommand.h"
 #include <nlohmann/json.hpp>
 
-#include "editorcommand.h"
+#include "EngineData/Geometry/Vector2D.h"
 
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
-#include "EngineData/Geometry/Vector2D.h"
-#include "GameData/Spatial/SpatialEntity.h"
 
 class World;
 
-class AddEntityGroupCommand : public EditorCommand
+class AddEntityGroupCommand final : public EditorCommand
 {
 public:
 	AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, const Json::ComponentSerializationHolder& jsonSerializerHolder, const Vector2D& shift);

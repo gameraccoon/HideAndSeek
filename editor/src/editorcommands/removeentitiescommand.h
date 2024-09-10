@@ -1,17 +1,14 @@
 #pragma once
 
-#include "editorcommand.h"
-
 #include "../editorutils/editorentityreference.h"
+#include "editorcommand.h"
+#include <nlohmann/json.hpp>
 
 #include "GameData/Serialization/Json/JsonComponentSerializer.h"
-#include "GameData/Spatial/SpatialEntity.h"
-
-#include <nlohmann/json.hpp>
 
 class World;
 
-class RemoveEntitiesCommand : public EditorCommand
+class RemoveEntitiesCommand final : public EditorCommand
 {
 public:
 	RemoveEntitiesCommand(const std::vector<EditorEntityReference>& entities, const Json::ComponentSerializationHolder& serializerHolder);

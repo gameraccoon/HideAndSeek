@@ -1,10 +1,8 @@
 #include "addentitygroupcommand.h"
 
-#include <QtWidgets/qcombobox.h>
-
-#include "GameData/World.h"
 #include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Serialization/Json/EntityManager.h"
+#include "GameData/World.h"
 
 AddEntityGroupCommand::AddEntityGroupCommand(const std::vector<nlohmann::json>& entities, const Json::ComponentSerializationHolder& jsonSerializerHolder, const Vector2D& shift)
 	: EditorCommand(EffectBitset(EffectType::Entities))
@@ -16,8 +14,7 @@ AddEntityGroupCommand::AddEntityGroupCommand(const std::vector<nlohmann::json>& 
 
 void AddEntityGroupCommand::doCommand(CommandExecutionContext& context)
 {
-	auto addEntity = [](EntityManager& entityManager, size_t editorId, const nlohmann::json& serializedObject, const Json::ComponentSerializationHolder& serializationHolder)
-	{
+	auto addEntity = [](EntityManager& entityManager, size_t editorId, const nlohmann::json& serializedObject, const Json::ComponentSerializationHolder& serializationHolder) {
 		const Entity entity = Json::CreatePrefabInstance(entityManager, serializedObject, serializationHolder);
 		Utils::SetEntityId(entity, editorId, entityManager);
 		return entity;

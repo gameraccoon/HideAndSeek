@@ -1,34 +1,32 @@
 #include "ComponentsListToolbox.h"
 
-#include "src/mainwindow.h"
-
-#include "DockManager.h"
-#include "DockWidget.h"
-#include "DockAreaWidget.h"
-
-#include <QVBoxLayout>
-#include <QMenu>
 #include <QAction>
 #include <QInputDialog>
+#include <QMenu>
 #include <QPushButton>
+#include <QVBoxLayout>
 
+#include "DockAreaWidget.h"
+#include "DockManager.h"
+#include "DockWidget.h"
 #include "src/componenteditcontent/editablecomponentsset.h"
+#include "src/editorcommands/addcomponentcommand.h"
 #include "src/editorcommands/removecomponentcommand.h"
 #include "src/editorutils/componentreferenceutils.h"
-#include "src/editorcommands/addcomponentcommand.h"
+#include "src/mainwindow.h"
 
 const QString ComponentsListToolbox::WidgetName = "ComponentsList";
-const QString ComponentsListToolbox::ToolboxName = ComponentsListToolbox::WidgetName + "Toolbox";
-const QString ComponentsListToolbox::ContainerName = ComponentsListToolbox::WidgetName + "Container";
-const QString ComponentsListToolbox::ContainerContentName = ComponentsListToolbox::ContainerName + "Content";
+const QString ComponentsListToolbox::ToolboxName = WidgetName + "Toolbox";
+const QString ComponentsListToolbox::ContainerName = WidgetName + "Container";
+const QString ComponentsListToolbox::ContainerContentName = ContainerName + "Content";
 const QString ComponentsListToolbox::ListName = "ComponentList";
 
 ComponentsListToolbox::ComponentsListToolbox(MainWindow* mainWindow, ads::CDockManager* dockManager)
 	: mMainWindow(mainWindow)
 	, mDockManager(dockManager)
 {
-	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{ updateContent(); });
-	mOnComponentSourceChangedHandle = mMainWindow->OnSelectedComponentSourceChanged.bind([this](const auto& val){ onSelectedComponentSourceChanged(val); });
+	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this] { updateContent(); });
+	mOnComponentSourceChangedHandle = mMainWindow->OnSelectedComponentSourceChanged.bind([this](const auto& val) { onSelectedComponentSourceChanged(val); });
 }
 
 ComponentsListToolbox::~ComponentsListToolbox()
@@ -118,7 +116,7 @@ void ComponentsListToolbox::onSelectedComponentSourceChanged(const std::optional
 
 void ComponentsListToolbox::showContextMenu(const QPoint& pos)
 {
-	QListWidget* componentsList = mDockManager->findChild<QListWidget*>(ListName);
+	const QListWidget* componentsList = mDockManager->findChild<QListWidget*>(ListName);
 	if (componentsList == nullptr)
 	{
 		return;
@@ -140,19 +138,19 @@ void ComponentsListToolbox::showContextMenu(const QPoint& pos)
 
 void ComponentsListToolbox::removeSelectedComponent()
 {
-	QListWidget* componentsList = mDockManager->findChild<QListWidget*>(ListName);
+	const QListWidget* componentsList = mDockManager->findChild<QListWidget*>(ListName);
 	if (componentsList == nullptr)
 	{
 		return;
 	}
 
-	QListWidgetItem* currentItem = componentsList->currentItem();
+	const QListWidgetItem* currentItem = componentsList->currentItem();
 	if (currentItem == nullptr)
 	{
 		return;
 	}
 
-	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	const CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
 	if (context.world == nullptr)
 	{
 		return;
@@ -183,8 +181,7 @@ void ComponentsListToolbox::addComponentCommand()
 	QStringList items;
 	std::vector<std::string> componentNames;
 	std::unordered_set<StringId> editableComponents = Editor::getEditableComponents();
-	mMainWindow->getComponentFactory().forEachComponentType([&componentNames, &editableComponents](StringId name)
-	{
+	mMainWindow->getComponentFactory().forEachComponentType([&componentNames, &editableComponents](StringId name) {
 		if (editableComponents.contains(name))
 		{
 			componentNames.push_back(ID_TO_STR(name));
@@ -205,13 +202,13 @@ void ComponentsListToolbox::addComponentCommand()
 
 void ComponentsListToolbox::addComponent(const QString& typeName)
 {
-	QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
+	const QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
 	if (entitiesList == nullptr)
 	{
 		return;
 	}
 
-	World* currentWorld = mMainWindow->getCurrentWorld();
+	const World* currentWorld = mMainWindow->getCurrentWorld();
 	if (currentWorld == nullptr)
 	{
 		return;

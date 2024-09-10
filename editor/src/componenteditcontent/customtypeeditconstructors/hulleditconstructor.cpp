@@ -1,13 +1,6 @@
-#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
-
-#include <string>
-
-#include <QLabel>
-#include <QLineEdit>
-#include <QDoubleValidator>
 #include <QCheckBox>
-#include <QHBoxLayout>
-#include <QPushButton>
+
+#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
 namespace TypesEditConstructor
 {
@@ -19,10 +12,9 @@ namespace TypesEditConstructor
 		Edit<Hull>::Ptr edit = std::make_shared<Edit<Hull>>(initialValue);
 		Edit<Hull>::WeakPtr editWeakPtr = edit;
 
-		Edit<HullType>::Ptr editType = FillEdit<HullType>::Call(layout, "type", initialValue.type);
-		editType->bindOnChange([editWeakPtr](HullType /*oldValue*/, HullType newValue, bool)
-		{
-			if (Edit<Hull>::Ptr edit = editWeakPtr.lock())
+		const Edit<HullType>::Ptr editType = FillEdit<HullType>::Call(layout, "type", initialValue.type);
+		editType->bindOnChange([editWeakPtr](HullType /*oldValue*/, const HullType newValue, bool) {
+			if (const Edit<Hull>::Ptr edit = editWeakPtr.lock())
 			{
 				Hull hull = edit->getPreviousValue();
 				hull.type = newValue;
@@ -31,10 +23,9 @@ namespace TypesEditConstructor
 		});
 		edit->addChild(editType);
 
-		Edit<float>::Ptr editRadius = FillEdit<float>::Call(layout, "radius", initialValue.getRadius());
-		editRadius->bindOnChange([editWeakPtr](float /*oldValue*/, float newValue, bool)
-		{
-			if (Edit<Hull>::Ptr edit = editWeakPtr.lock())
+		const Edit<float>::Ptr editRadius = FillEdit<float>::Call(layout, "radius", initialValue.getRadius());
+		editRadius->bindOnChange([editWeakPtr](float /*oldValue*/, const float newValue, bool) {
+			if (const Edit<Hull>::Ptr edit = editWeakPtr.lock())
 			{
 				Hull hull = edit->getPreviousValue();
 				hull.setRadius(newValue);
@@ -43,10 +34,9 @@ namespace TypesEditConstructor
 		});
 		edit->addChild(editRadius);
 
-		Edit<std::vector<Vector2D>>::Ptr editPoints = FillEdit<std::vector<Vector2D>>::Call(layout, "points", initialValue.points);
-		editPoints->bindOnChange([editWeakPtr](const std::vector<Vector2D>& /*oldValue*/, const std::vector<Vector2D>& newValue, bool needLayoutUpdate)
-		{
-			if (Edit<Hull>::Ptr edit = editWeakPtr.lock())
+		const Edit<std::vector<Vector2D>>::Ptr editPoints = FillEdit<std::vector<Vector2D>>::Call(layout, "points", initialValue.points);
+		editPoints->bindOnChange([editWeakPtr](const std::vector<Vector2D>& /*oldValue*/, const std::vector<Vector2D>& newValue, const bool needLayoutUpdate) {
+			if (const Edit<Hull>::Ptr edit = editWeakPtr.lock())
 			{
 				Hull hull = edit->getPreviousValue();
 				hull.points = newValue;
@@ -58,4 +48,4 @@ namespace TypesEditConstructor
 
 		return edit;
 	}
-}
+} // namespace TypesEditConstructor

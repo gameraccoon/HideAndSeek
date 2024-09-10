@@ -1,13 +1,5 @@
 #include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
-#include <string>
-
-#include <QLabel>
-#include <QLineEdit>
-#include <QDoubleValidator>
-#include <QCheckBox>
-#include <QHBoxLayout>
-
 namespace TypesEditConstructor
 {
 	template<>
@@ -20,10 +12,9 @@ namespace TypesEditConstructor
 		EditType::Ptr edit = std::make_shared<EditType>(initialValue);
 		EditType::WeakPtr editWeakPtr = edit;
 		{
-			Edit<RelativeResourcePath>::Ptr editPath = FillEdit<RelativeResourcePath>::Call(layout, "path", initialValue.path);
-			editPath->bindOnChange([editWeakPtr](const RelativeResourcePath& /*oldValue*/, const RelativeResourcePath& newValue, bool)
-			{
-				if (EditType::Ptr edit = editWeakPtr.lock())
+			const Edit<RelativeResourcePath>::Ptr editPath = FillEdit<RelativeResourcePath>::Call(layout, "path", initialValue.path);
+			editPath->bindOnChange([editWeakPtr](const RelativeResourcePath& /*oldValue*/, const RelativeResourcePath& newValue, bool) {
+				if (const EditType::Ptr edit = editWeakPtr.lock())
 				{
 					AnimationClipDescription animDescription = edit->getPreviousValue();
 					animDescription.path = newValue;
@@ -34,10 +25,9 @@ namespace TypesEditConstructor
 		}
 
 		{
-			Edit<AnimationClipParams>::Ptr editIsLooped = FillEdit<AnimationClipParams>::Call(layout, "clip parameters", initialValue.params);
-			editIsLooped->bindOnChange([editWeakPtr](AnimationClipParams /*oldValue*/, AnimationClipParams newValue, bool)
-			{
-				if (EditType::Ptr edit = editWeakPtr.lock())
+			const Edit<AnimationClipParams>::Ptr editIsLooped = FillEdit<AnimationClipParams>::Call(layout, "clip parameters", initialValue.params);
+			editIsLooped->bindOnChange([editWeakPtr](AnimationClipParams /*oldValue*/, const AnimationClipParams newValue, bool) {
+				if (const EditType::Ptr edit = editWeakPtr.lock())
 				{
 					AnimationClipDescription animDescription = edit->getPreviousValue();
 					animDescription.params = newValue;
@@ -48,10 +38,9 @@ namespace TypesEditConstructor
 		}
 
 		{
-			Edit<Vector2D>::Ptr editAnchor = FillEdit<Vector2D>::Call(layout, "anchor", initialValue.spriteParams.anchor);
-			editAnchor->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool)
-			{
-				if (EditType::Ptr edit = editWeakPtr.lock())
+			const Edit<Vector2D>::Ptr editAnchor = FillEdit<Vector2D>::Call(layout, "anchor", initialValue.spriteParams.anchor);
+			editAnchor->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool) {
+				if (const EditType::Ptr edit = editWeakPtr.lock())
 				{
 					AnimationClipDescription animDescription = edit->getPreviousValue();
 					animDescription.spriteParams.anchor = newValue;
@@ -62,10 +51,9 @@ namespace TypesEditConstructor
 		}
 
 		{
-			Edit<Vector2D>::Ptr editSize = FillEdit<Vector2D>::Call(layout, "size", initialValue.spriteParams.size);
-			editSize->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool)
-			{
-				if (EditType::Ptr edit = editWeakPtr.lock())
+			const Edit<Vector2D>::Ptr editSize = FillEdit<Vector2D>::Call(layout, "size", initialValue.spriteParams.size);
+			editSize->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool) {
+				if (const EditType::Ptr edit = editWeakPtr.lock())
 				{
 					AnimationClipDescription animDescription = edit->getPreviousValue();
 					animDescription.spriteParams.size = newValue;
@@ -77,4 +65,4 @@ namespace TypesEditConstructor
 
 		return edit;
 	}
-}
+} // namespace TypesEditConstructor

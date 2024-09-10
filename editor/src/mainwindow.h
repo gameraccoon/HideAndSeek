@@ -1,23 +1,20 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <memory>
 
-#include <QMainWindow>
 #include <QListWidgetItem>
+#include <QMainWindow>
 
-#include <raccoon-ecs/delegates.h>
-
-#include "editorcommands/editorcommandsstack.h"
 #include "componenteditcontent/componentcontentfactory.h"
-
-#include "GameData/EcsDefinitions.h"
-#include "GameData/Spatial/SpatialEntity.h"
-#include "GameData/Serialization/Json/JsonComponentSerializer.h"
-
+#include "editorcommands/editorcommandsstack.h"
 #include "editorutils/componentreference.h"
 #include "editorutils/editorentityreference.h"
 #include "editorutils/editoridgenerator.h"
+#include <raccoon-ecs/delegates.h>
+
+#include "GameData/EcsDefinitions.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
+#include "GameData/Spatial/SpatialEntity.h"
 
 namespace ads
 {
@@ -114,5 +111,3 @@ private:
 	std::unique_ptr<PrefabListToolbox> mPrefabListToolbox;
 	std::unique_ptr<TransformEditorToolbox> mTransformEditorToolbox;
 };
-
-#endif // MAINWINDOW_H

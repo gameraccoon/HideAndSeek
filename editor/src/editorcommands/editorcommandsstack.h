@@ -2,9 +2,8 @@
 
 #include <functional>
 
-#include <raccoon-ecs/delegates.h>
-
 #include "editorcommand.h"
+#include <raccoon-ecs/delegates.h>
 
 class EditorCommandsStack
 {
@@ -18,7 +17,7 @@ public:
 		// clear old redo commands
 		if (haveSomethingToRedo())
 		{
-			 mCommands.erase(mCommands.begin() + (mCurrentHeadIndex+1), mCommands.end());
+			mCommands.erase(mCommands.begin() + (mCurrentHeadIndex + 1), mCommands.end());
 		}
 
 		// add and activate
@@ -58,9 +57,9 @@ private:
 private:
 	std::vector<std::shared_ptr<EditorCommand>> mCommands;
 	int mCurrentHeadIndex = -1;
-	static const int mMaxHistorySize = 10000;
+	static constexpr int mMaxHistorySize = 10000;
 	// how ofter commands will be cleaned after reaching the limit
-	static const int mClearLag = 100;
+	static constexpr int mClearLag = 100;
 	OnChangeFn mChangeHandler;
 
 	int mLastExecutedCommandIdx = -1;

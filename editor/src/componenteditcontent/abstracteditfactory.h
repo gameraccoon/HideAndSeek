@@ -1,11 +1,8 @@
-#ifndef ABSTRACTEDITFACTORY_H
-#define ABSTRACTEDITFACTORY_H
+#pragma once
 
 #include <memory>
 
 #include <QObject>
-
-#include "GameData/EcsDefinitions.h"
 
 #include "src/editorcommands/editorcommandsstack.h"
 
@@ -16,7 +13,7 @@ struct ComponentSourceReference;
 class EditData : public QObject
 {
 public:
-	virtual ~EditData() = default;
+	~EditData() override = default;
 	virtual void fillContent(QLayout* layout, const ComponentSourceReference& sourceReference, const void* component, EditorCommandsStack& commandStack, CommandExecutionContext& context) = 0;
 };
 
@@ -26,5 +23,3 @@ public:
 	virtual ~AbstractEditFactory() = default;
 	virtual std::shared_ptr<EditData> getEditData() = 0;
 };
-
-#endif // ABSTRACTEDITFACTORY_H

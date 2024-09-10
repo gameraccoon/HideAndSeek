@@ -3,9 +3,10 @@
 #include "editorcommand.h"
 
 #include "EngineData/Geometry/Vector2D.h"
+
 #include "GameData/Spatial/CellPos.h"
 
-class ChangeEntityGroupLocationCommand : public EditorCommand
+class ChangeEntityGroupLocationCommand final : public EditorCommand
 {
 public:
 	ChangeEntityGroupLocationCommand(const std::vector<EditorEntityReference>& entities, Vector2D shift);

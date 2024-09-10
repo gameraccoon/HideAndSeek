@@ -3,12 +3,8 @@
 #include <QString>
 #include <QWidget>
 
-#include <raccoon-ecs/delegates.h>
-
-#include "GameData/EcsDefinitions.h"
-
-#include "src/editorutils/editorentityreference.h"
 #include "src/editorutils/componentreference.h"
+#include <raccoon-ecs/delegates.h>
 
 class MainWindow;
 class QPushButton;
@@ -20,11 +16,11 @@ namespace ads
 
 class QListWidgetItem;
 
-class ComponentsListToolbox : public QWidget
+class ComponentsListToolbox final : public QWidget
 {
 public:
 	ComponentsListToolbox(MainWindow* mainWindow, ads::CDockManager* dockManager);
-	~ComponentsListToolbox();
+	~ComponentsListToolbox() override;
 	void show();
 
 	static const QString WidgetName;

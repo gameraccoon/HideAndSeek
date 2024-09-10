@@ -3,16 +3,15 @@
 #include <algorithm>
 #include <ranges>
 
-#include "GameData/World.h"
-
 #include "GameData/Components/CollisionComponent.generated.h"
-#include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/LightBlockingGeometryComponent.generated.h"
 #include "GameData/Components/PathBlockingGeometryComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/World.h"
 
-#include "GameUtils/World/GameDataLoader.h"
-#include "GameUtils/Geometry/LightBlockingGeometry.h"
 #include "GameUtils/AI/PathBlockingGeometry.h"
+#include "GameUtils/Geometry/LightBlockingGeometry.h"
+#include "GameUtils/World/GameDataLoader.h"
 
 namespace Utils
 {
@@ -38,18 +37,10 @@ namespace Utils
 		for (auto& [cellPos, borders] : lightBlockingGeometryPieces)
 		{
 			// try to stabilize borders between saves
-			std::ranges::sort(borders,
-				[](const SimpleBorder& first, const SimpleBorder& second)
-				{
-					return first.a.x < second.a.x
-						|| (first.a.x == second.a.x &&
-							(first.b.x < second.b.x
-							|| (first.b.x == second.b.x &&
-								(first.a.y < second.a.y
-								|| (first.a.y == second.a.y &&
-									first.b.y < second.b.y)))));
-				}
-			);
+			std::ranges::sort(borders, [](const SimpleBorder& first, const SimpleBorder& second) {
+				return first.a.x < second.a.x
+					|| (first.a.x == second.a.x && (first.b.x < second.b.x || (first.b.x == second.b.x && (first.a.y < second.a.y || (first.a.y == second.a.y && first.b.y < second.b.y)))));
+			});
 
 			WorldCell& cell = world.getSpatialData().getOrCreateCell(cellPos);
 			ComponentSetHolder& cellComponents = cell.getCellComponents();
@@ -75,4 +66,4 @@ namespace Utils
 		world.clearCaches();
 		GameDataLoader::SaveWorld(world, ".", fileName, jsonSerializerHolder);
 	}
-}
+} // namespace Utils

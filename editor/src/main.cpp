@@ -1,12 +1,12 @@
-#include "mainwindow.h"
-
 #include <QApplication>
+
+#include "mainwindow.h"
 #include <raccoon-ecs/error_handling.h>
 
 #include "EngineCommon/Debug/Assert.h"
 #include "EngineCommon/Random/Random.h"
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	INITIALIZE_STRING_IDS();
 	Random::gGlobalGenerator = Random::GlobalGeneratorType(std::random_device()());

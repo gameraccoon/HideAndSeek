@@ -1,42 +1,42 @@
 #pragma once
 
+#include <QVector2D>
 #include <vector>
-
-#include <nlohmann/json.hpp>
 
 #include <QLineEdit>
 #include <QString>
-#include <QVector2D>
 #include <QWidget>
-
-#include <raccoon-ecs/delegates.h>
-
-#include "GameData/EcsDefinitions.h"
-#include "EngineData/Geometry/Vector2D.h"
-#include "GameData/Spatial/SpatialEntity.h"
-#include "GameData/Spatial/CellPos.h"
 
 #include "src/editorcommands/editorcommand.h"
 #include "src/editorutils/editorentityreference.h"
+#include <nlohmann/json.hpp>
+#include <raccoon-ecs/delegates.h>
+
+#include "EngineData/Geometry/Vector2D.h"
+
+#include "GameData/Spatial/CellPos.h"
+#include "GameData/Spatial/SpatialEntityManager.h"
 
 class MainWindow;
+class World;
+class QPoint;
 
 namespace ads
 {
 	class CDockManager;
 }
 
-class TransformEditorWidget : public QWidget
+class TransformEditorWidget final : public QWidget
 {
 public:
-	TransformEditorWidget(MainWindow* mainWindow);
+	explicit TransformEditorWidget(MainWindow* mainWindow);
 
-	void mousePressEvent(QMouseEvent *event) override;
-	void mouseMoveEvent(QMouseEvent *event) override;
-	void mouseReleaseEvent(QMouseEvent *event) override;
+	void mousePressEvent(QMouseEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void mouseReleaseEvent(QMouseEvent* event) override;
 	void paintEvent(QPaintEvent* event) override;
 
-	void onClick(const class QPoint& pos);
+	void onClick(const QPoint& pos);
 	SpatialEntityManager::RecordsVector getCellsOnScreen();
 	EditorEntityReference getEntityUnderPoint(const QPoint& pos);
 
@@ -48,12 +48,16 @@ public:
 	void clearGroupCenter();
 	void updateSelectedEntitiesPosition();
 
+	[[nodiscard]]
 	QVector2D projectAbsolute(const Vector2D& worldPos) const;
+	[[nodiscard]]
 	Vector2D deprojectAbsolute(const QVector2D& screenPos) const;
+	[[nodiscard]]
 	QVector2D project(const Vector2D& pos) const;
+	[[nodiscard]]
 	std::pair<CellPos, Vector2D> deproject(const QVector2D& screenPos) const;
 
-	class World* mWorld = nullptr;
+	World* mWorld = nullptr;
 	MainWindow* mMainWindow;
 
 	QLineEdit* mCoordinateXEdit = nullptr;
@@ -65,27 +69,29 @@ public:
 	QVector2D mPosShift = QVector2D(0.0f, 0.0f);
 	Vector2D mMoveShift = Vector2D(0.0f, 0.0f);
 	float mScale = 1.0f;
-	Vector2D mCursorObjectOffset;
+	Vector2D mCursorObjectOffset = ZERO_VECTOR;
 
 	RaccoonEcs::SinglecastDelegate<const std::vector<EditorEntityReference>&, const Vector2D&> OnEntitiesMoved;
 
 	std::vector<EditorEntityReference> mSelectedEntities;
-	Vector2D mSelectedGroupCenter;
+	Vector2D mSelectedGroupCenter = ZERO_VECTOR;
 
 	bool mFreeMove = true;
 	bool mIsMoved = false;
 	bool mIsRectangleSelection = false;
-	bool mIsCatchedSelectedEntity = false;
+	bool mHasCaughtSelectedEntity = false;
 };
 
-class TransformEditorToolbox : public QWidget
+class TransformEditorToolbox final : public QWidget
 {
 public:
 	TransformEditorToolbox(MainWindow* mainWindow, ads::CDockManager* dockManager);
-	~TransformEditorToolbox();
+	~TransformEditorToolbox() override;
 	void show();
+	[[nodiscard]]
 	bool isShown() const;
 
+	[[nodiscard]]
 	std::pair<CellPos, Vector2D> getWidgetCenterWorldPosition() const;
 
 	static const QString WidgetName;
@@ -104,6 +110,7 @@ private:
 	void onPasteCommand();
 	void onDeleteCommand();
 	void unselectNonExistingEntities();
+	[[nodiscard]]
 	QVector2D getWidgetCenter() const;
 
 private:
@@ -112,7 +119,7 @@ private:
 	TransformEditorWidget* mContent = nullptr;
 
 	std::vector<nlohmann::json> mCopiedObjects;
-	Vector2D mCopiedGroupCenter;
+	Vector2D mCopiedGroupCenter = ZERO_VECTOR;
 
 	RaccoonEcs::Delegates::Handle mOnWorldChangedHandle;
 	RaccoonEcs::Delegates::Handle mOnSelectedEntityChangedHandle;

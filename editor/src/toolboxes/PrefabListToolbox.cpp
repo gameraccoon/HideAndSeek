@@ -3,29 +3,24 @@
 #include <fstream>
 #include <iomanip>
 
-#include "src/mainwindow.h"
+#include <QAction>
+#include <QMenu>
+#include <QMessageBox>
+#include <QVBoxLayout>
 
+#include "DockAreaWidget.h"
 #include "DockManager.h"
 #include "DockWidget.h"
-#include "DockAreaWidget.h"
-
-#include <QVBoxLayout>
-#include <QMenu>
-#include <QAction>
-#include <QInputDialog>
-#include <QMessageBox>
-
-#include <raccoon-ecs/component_factory.h>
+#include "src/editorcommands/addcomponentcommand.h"
+#include "src/mainwindow.h"
 
 #include "GameData/Serialization/Json/EntityManager.h"
 #include "GameData/World.h"
 
-#include "src/editorcommands/addcomponentcommand.h"
-
 const QString PrefabListToolbox::WidgetName = "Prefabs";
-const QString PrefabListToolbox::ToolboxName = PrefabListToolbox::WidgetName + "Toolbox";
-const QString PrefabListToolbox::ContainerName = PrefabListToolbox::WidgetName + "Container";
-const QString PrefabListToolbox::ContainerContentName = PrefabListToolbox::ContainerName + "Content";
+const QString PrefabListToolbox::ToolboxName = WidgetName + "Toolbox";
+const QString PrefabListToolbox::ContainerName = WidgetName + "Container";
+const QString PrefabListToolbox::ContainerContentName = ContainerName + "Content";
 const QString PrefabListToolbox::ListName = "PrefabList";
 
 PrefabListToolbox::PrefabListToolbox(MainWindow* mainWindow, ads::CDockManager* dockManager)
@@ -92,11 +87,11 @@ void PrefabListToolbox::loadFromFile(const QString& filePath)
 		mPrefabs.clear();
 		prefabJson.at("prefabs").get_to(mPrefabs);
 	}
-	catch(const nlohmann::detail::exception& e)
+	catch (const nlohmann::detail::exception& e)
 	{
 		LogError("Can't parse '%s': %s", filePath.toStdString().c_str(), e.what());
 	}
-	catch(const std::exception& e)
+	catch (const std::exception& e)
 	{
 		LogError("Can't open '%s': %s", filePath.toStdString().c_str(), e.what());
 	}
@@ -116,8 +111,8 @@ void PrefabListToolbox::saveToFile(QString filePath)
 	{
 		std::ofstream mapFile(filePath.toStdString());
 
-		nlohmann::json content{
-			{"prefabs", mPrefabs}
+		const nlohmann::json content{
+			{ "prefabs", mPrefabs }
 		};
 		mapFile << std::setw(4) << content << std::endl;
 	}
@@ -127,10 +122,9 @@ void PrefabListToolbox::saveToFile(QString filePath)
 	}
 }
 
-void PrefabListToolbox::createPrefabFromEntity(const QString& prefabName, Entity entity)
+void PrefabListToolbox::createPrefabFromEntity(const QString& prefabName, const Entity entity)
 {
-	auto it = std::find_if(mPrefabs.begin(), mPrefabs.end(), [prefabName](const PrefabData& prefabData)
-	{
+	const auto it = std::find_if(mPrefabs.begin(), mPrefabs.end(), [prefabName](const PrefabData& prefabData) {
 		return prefabData.name == prefabName;
 	});
 
@@ -151,7 +145,7 @@ void PrefabListToolbox::createPrefabFromEntity(const QString& prefabName, Entity
 
 	PrefabData prefabData;
 	prefabData.name = prefabName;
-	EntityManager& worldEntityManager = currentWorld->getEntityManager();
+	const EntityManager& worldEntityManager = currentWorld->getEntityManager();
 	Json::GetPrefabFromEntity(worldEntityManager, prefabData.data, entity, jsonSerializationHolder);
 	mPrefabs.push_back(prefabData);
 	updateContent();
@@ -159,7 +153,7 @@ void PrefabListToolbox::createPrefabFromEntity(const QString& prefabName, Entity
 
 void PrefabListToolbox::updateContent()
 {
-	World* currentWorld = mMainWindow->getCurrentWorld();
+	const World* currentWorld = mMainWindow->getCurrentWorld();
 	if (currentWorld == nullptr)
 	{
 		return;
@@ -184,7 +178,7 @@ void PrefabListToolbox::onCurrentItemChanged(QListWidgetItem* /*current*/, QList
 
 void PrefabListToolbox::showContextMenu(const QPoint& pos)
 {
-	QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
+	const QListWidget* entitiesList = mDockManager->findChild<QListWidget*>(ListName);
 	if (entitiesList == nullptr)
 	{
 		return;
@@ -202,34 +196,33 @@ void PrefabListToolbox::showContextMenu(const QPoint& pos)
 	contextMenu.addAction(&actionCreateInstance);
 
 	QAction actionRemove("Remove Prefab", this);
-	connect(&actionRemove, &QAction::triggered, this, &PrefabListToolbox::removeSelectedPreab);
+	connect(&actionRemove, &QAction::triggered, this, &PrefabListToolbox::removeSelectedPrefab);
 	contextMenu.addAction(&actionRemove);
 
 	contextMenu.exec(entitiesList->mapToGlobal(pos));
 }
 
-void PrefabListToolbox::removeSelectedPreab()
+void PrefabListToolbox::removeSelectedPrefab()
 {
-	QListWidget* prefabList = mDockManager->findChild<QListWidget*>(ListName);
+	const QListWidget* prefabList = mDockManager->findChild<QListWidget*>(ListName);
 	if (prefabList == nullptr)
 	{
 		return;
 	}
 
-	QListWidgetItem* currentItem = prefabList->currentItem();
+	const QListWidgetItem* currentItem = prefabList->currentItem();
 	if (currentItem == nullptr)
 	{
 		return;
 	}
 
-	World* currentWorld = mMainWindow->getCurrentWorld();
+	const World* currentWorld = mMainWindow->getCurrentWorld();
 	if (currentWorld == nullptr)
 	{
 		return;
 	}
 
-	mPrefabs.erase(std::find_if(mPrefabs.begin(), mPrefabs.end(), [prefabName = currentItem->text()](const PrefabData& prefabData)
-	{
+	mPrefabs.erase(std::find_if(mPrefabs.begin(), mPrefabs.end(), [prefabName = currentItem->text()](const PrefabData& prefabData) {
 		return prefabData.name == prefabName;
 	}));
 
@@ -238,13 +231,13 @@ void PrefabListToolbox::removeSelectedPreab()
 
 void PrefabListToolbox::createInstance()
 {
-	QListWidget* prefabList = mDockManager->findChild<QListWidget*>(ListName);
+	const QListWidget* prefabList = mDockManager->findChild<QListWidget*>(ListName);
 	if (prefabList == nullptr)
 	{
 		return;
 	}
 
-	QListWidgetItem* currentItem = prefabList->currentItem();
+	const QListWidgetItem* currentItem = prefabList->currentItem();
 	if (currentItem == nullptr)
 	{
 		return;
@@ -256,8 +249,7 @@ void PrefabListToolbox::createInstance()
 		return;
 	}
 
-	auto it = std::find_if(mPrefabs.begin(), mPrefabs.end(), [prefabName = currentItem->text()](const PrefabData& prefabData)
-	{
+	const auto it = std::find_if(mPrefabs.begin(), mPrefabs.end(), [prefabName = currentItem->text()](const PrefabData& prefabData) {
 		return prefabData.name == prefabName;
 	});
 

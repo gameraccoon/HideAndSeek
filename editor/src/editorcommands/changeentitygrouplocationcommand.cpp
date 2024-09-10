@@ -2,10 +2,10 @@
 
 #include "../editorutils/editoridutils.h"
 
-#include <GameData/World.h>
 #include <GameData/Components/TransformComponent.generated.h>
+#include <GameData/World.h>
 
-ChangeEntityGroupLocationCommand::ChangeEntityGroupLocationCommand(const std::vector<EditorEntityReference>& entities, Vector2D shift)
+ChangeEntityGroupLocationCommand::ChangeEntityGroupLocationCommand(const std::vector<EditorEntityReference>& entities, const Vector2D shift)
 	: EditorCommand(EffectBitset(EffectType::ComponentAttributes, EffectType::EntityLocations))
 	, mShift(shift)
 {
@@ -15,14 +15,13 @@ ChangeEntityGroupLocationCommand::ChangeEntityGroupLocationCommand(const std::ve
 	for (size_t i = 0; i < entities.size(); ++i)
 	{
 		mEditorEntityReferences[i] = entities[i].editorUniqueId;
-		mOriginalCellsOfEntities[i] = entities[i].cellPos.value_or(CellPos{0, 0});
+		mOriginalCellsOfEntities[i] = entities[i].cellPos.value_or(CellPos{ 0, 0 });
 	}
 }
 
 void ChangeEntityGroupLocationCommand::doCommand(CommandExecutionContext& context)
 {
-	auto applyShift = [this, &context](size_t i, TransformComponent* component, WorldCell* cell, Entity entity)
-	{
+	auto applyShift = [this, &context](const size_t i, TransformComponent* component, WorldCell* cell, const Entity entity) {
 		component->setLocation(mModifiedPositionsOfEntities[i]);
 		if (mModifiedCellsOfEntities[i] != mOriginalCellsOfEntities[i])
 		{
@@ -32,9 +31,10 @@ void ChangeEntityGroupLocationCommand::doCommand(CommandExecutionContext& contex
 	};
 
 	// if we never executed this command before, fill the data
-	if (mOriginalPositionsOfEntities.empty()) {
+	if (mOriginalPositionsOfEntities.empty())
+	{
 		mOriginalPositionsOfEntities.resize(mEditorEntityReferences.size(), ZERO_VECTOR);
-		mModifiedCellsOfEntities.resize(mEditorEntityReferences.size(), CellPos{0, 0});
+		mModifiedCellsOfEntities.resize(mEditorEntityReferences.size(), CellPos{ 0, 0 });
 		mModifiedPositionsOfEntities.resize(mEditorEntityReferences.size(), ZERO_VECTOR);
 
 		for (size_t i = 0; i < mEditorEntityReferences.size(); ++i)
@@ -77,8 +77,7 @@ void ChangeEntityGroupLocationCommand::doCommand(CommandExecutionContext& contex
 					continue;
 				}
 
-				auto [component] = cell->getEntityManager().getEntityComponents<TransformComponent>(entity.getEntity());
-				if (component)
+				if (auto [component] = cell->getEntityManager().getEntityComponents<TransformComponent>(entity.getEntity()); component)
 				{
 					applyShift(i, component, cell, entity.getEntity());
 				}
@@ -100,8 +99,7 @@ void ChangeEntityGroupLocationCommand::undoCommand(CommandExecutionContext& cont
 				continue;
 			}
 
-			auto [component] = cell->getEntityManager().getEntityComponents<TransformComponent>(entity.getEntity());
-			if (component)
+			if (auto [component] = cell->getEntityManager().getEntityComponents<TransformComponent>(entity.getEntity()); component)
 			{
 				component->setLocation(mOriginalPositionsOfEntities[i]);
 				if (mOriginalCellsOfEntities[i] != mModifiedCellsOfEntities[i])

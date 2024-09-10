@@ -1,12 +1,7 @@
-#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
-
-#include <string>
-
-#include <QLabel>
-#include <QLineEdit>
-#include <QDoubleValidator>
-#include <QCheckBox>
 #include <QHBoxLayout>
+#include <QLineEdit>
+
+#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
 namespace TypesEditConstructor
 {
@@ -15,25 +10,23 @@ namespace TypesEditConstructor
 	{
 		FillLabel(layout, label);
 
-		QHBoxLayout *innerLayout = HS_NEW QHBoxLayout;
+		QHBoxLayout* innerLayout = HS_NEW QHBoxLayout;
 
 		Edit<Vector2D>::Ptr edit = std::make_shared<Edit<Vector2D>>(initialValue);
 		Edit<Vector2D>::WeakPtr editWeakPtr = edit;
 
-		Edit<float>::Ptr editX = FillEdit<float>::Call(innerLayout, "x", initialValue.x);
-		editX->bindOnChange([editWeakPtr](float /*oldValue*/, float newValue, bool)
-		{
-			if (Edit<Vector2D>::Ptr edit = editWeakPtr.lock())
+		const Edit<float>::Ptr editX = FillEdit<float>::Call(innerLayout, "x", initialValue.x);
+		editX->bindOnChange([editWeakPtr](float /*oldValue*/, const float newValue, bool) {
+			if (const Edit<Vector2D>::Ptr edit = editWeakPtr.lock())
 			{
 				edit->transmitValueChange(Vector2D(newValue, edit->getPreviousValue().y));
 			}
 		});
 		edit->addChild(editX);
 
-		Edit<float>::Ptr editY = FillEdit<float>::Call(innerLayout, "y", initialValue.y);
-		editY->bindOnChange([editWeakPtr](float /*oldValue*/, float newValue, bool)
-		{
-			if (Edit<Vector2D>::Ptr edit = editWeakPtr.lock())
+		const Edit<float>::Ptr editY = FillEdit<float>::Call(innerLayout, "y", initialValue.y);
+		editY->bindOnChange([editWeakPtr](float /*oldValue*/, const float newValue, bool) {
+			if (const Edit<Vector2D>::Ptr edit = editWeakPtr.lock())
 			{
 				edit->transmitValueChange(Vector2D(edit->getPreviousValue().x, newValue));
 			}
@@ -46,4 +39,4 @@ namespace TypesEditConstructor
 		layout->addWidget(container);
 		return edit;
 	}
-}
+} // namespace TypesEditConstructor

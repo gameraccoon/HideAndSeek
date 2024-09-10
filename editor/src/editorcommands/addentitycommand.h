@@ -2,13 +2,11 @@
 
 #include <optional>
 
-#include <raccoon-ecs/entity.h>
-
 #include "editorcommand.h"
 
 class World;
 
-class AddEntityCommand : public EditorCommand
+class AddEntityCommand final : public EditorCommand
 {
 public:
 	AddEntityCommand();

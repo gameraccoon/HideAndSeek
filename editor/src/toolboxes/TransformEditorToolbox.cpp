@@ -1,16 +1,5 @@
 #include "TransformEditorToolbox.h"
 
-#include "src/mainwindow.h"
-
-#include "src/editorcommands/changeentitygrouplocationcommand.h"
-#include "src/editorcommands/addentitygroupcommand.h"
-#include "src/editorcommands/removeentitiescommand.h"
-#include "src/editorutils/editoridutils.h"
-
-#include "DockManager.h"
-#include "DockWidget.h"
-#include "DockAreaWidget.h"
-
 #include <QAction>
 #include <QApplication>
 #include <QCheckBox>
@@ -20,15 +9,24 @@
 #include <QPainter>
 #include <QSlider>
 
+#include "DockAreaWidget.h"
+#include "DockManager.h"
+#include "DockWidget.h"
+#include "src/editorcommands/addentitygroupcommand.h"
+#include "src/editorcommands/changeentitygrouplocationcommand.h"
+#include "src/editorcommands/removeentitiescommand.h"
+#include "src/editorutils/editoridutils.h"
+#include "src/mainwindow.h"
+
 #include "EngineCommon/Math/Float.h"
 
-#include "GameData/Serialization/Json/JsonComponentSerializer.h"
-#include "GameData/Serialization/Json/EntityManager.h"
-#include "GameData/Components/TransformComponent.generated.h"
 #include "GameData/Components/CollisionComponent.generated.h"
+#include "GameData/Components/TransformComponent.generated.h"
+#include "GameData/Serialization/Json/EntityManager.h"
+#include "GameData/Serialization/Json/JsonComponentSerializer.h"
 
 const QString TransformEditorToolbox::WidgetName = "TransformEditor";
-const QString TransformEditorToolbox::ToolboxName = TransformEditorToolbox::WidgetName + "Toolbox";
+const QString TransformEditorToolbox::ToolboxName = WidgetName + "Toolbox";
 
 static bool IsCtrlPressed()
 {
@@ -61,16 +59,11 @@ static Vector2D GetEntityPosition(EditorEntityReference entityRef, World* world)
 		return ZERO_VECTOR;
 	}
 
-	auto [transform] = cell->getEntityManager().getEntityComponents<const TransformComponent>(entity.getEntity());
-
-	if (transform)
+	if (auto [transform] = cell->getEntityManager().getEntityComponents<const TransformComponent>(entity.getEntity()); transform)
 	{
 		return transform->getLocation();
 	}
-	else
-	{
-		return ZERO_VECTOR;
-	}
+	return ZERO_VECTOR;
 }
 
 static Vector2D GetEntityGroupPosition(const std::vector<EditorEntityReference>& entities, World* world)
@@ -98,9 +91,9 @@ TransformEditorToolbox::TransformEditorToolbox(MainWindow* mainWindow, ads::CDoc
 	: mMainWindow(mainWindow)
 	, mDockManager(dockManager)
 {
-	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this]{ updateWorld(); });
-	mOnSelectedEntityChangedHandle = mMainWindow->OnSelectedEntityChanged.bind([this](const auto& entityRef){ onEntitySelected(entityRef); });
-	mOnCommandEffectHandle = mMainWindow->OnCommandEffectApplied.bind([this](EditorCommand::EffectBitset effects, bool originalCall){ onCommandExecuted(effects, originalCall); });
+	mOnWorldChangedHandle = mMainWindow->OnWorldChanged.bind([this] { updateWorld(); });
+	mOnSelectedEntityChangedHandle = mMainWindow->OnSelectedEntityChanged.bind([this](const auto& entityRef) { onEntitySelected(entityRef); });
+	mOnCommandEffectHandle = mMainWindow->OnCommandEffectApplied.bind([this](EditorCommand::EffectBitset effects, bool originalCall) { onCommandExecuted(effects, originalCall); });
 }
 
 TransformEditorToolbox::~TransformEditorToolbox()
@@ -118,10 +111,7 @@ void TransformEditorToolbox::show()
 		{
 			return;
 		}
-		else
-		{
-			mDockManager->layout()->removeWidget(dockWidget);
-		}
+		mDockManager->layout()->removeWidget(dockWidget);
 	}
 
 	mContent = HS_NEW TransformEditorWidget(mMainWindow);
@@ -140,7 +130,7 @@ void TransformEditorToolbox::show()
 	layout->setAlignment(Qt::AlignmentFlag::AlignBottom | Qt::AlignmentFlag::AlignRight);
 	mContent->setLayout(layout);
 
-	auto dv = HS_NEW QDoubleValidator(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), 10);
+	const auto dv = HS_NEW QDoubleValidator(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max(), 10);
 	dv->setNotation(QDoubleValidator::StandardNotation);
 
 	mContent->mCoordinateXEdit = HS_NEW QLineEdit();
@@ -164,19 +154,16 @@ void TransformEditorToolbox::show()
 	QObject::connect(scaleSlider, &QSlider::valueChanged, this, &TransformEditorToolbox::onScaleChanged);
 	layout->addWidget(scaleSlider);
 
-	mContent->OnEntitiesMoved.assign([this](const std::vector<EditorEntityReference>& entities, const Vector2D& shift){onEntitiesMoved(entities, shift);});
+	mContent->OnEntitiesMoved.assign([this](const std::vector<EditorEntityReference>& entities, const Vector2D& shift) { onEntitiesMoved(entities, shift); });
 }
 
 bool TransformEditorToolbox::isShown() const
 {
-	if (ads::CDockWidget* dockWidget = mDockManager->findDockWidget(ToolboxName))
+	if (const ads::CDockWidget* dockWidget = mDockManager->findDockWidget(ToolboxName))
 	{
 		return dockWidget->isVisible();
 	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 void TransformEditorToolbox::updateWorld()
@@ -221,8 +208,8 @@ void TransformEditorToolbox::onCommandExecuted(EditorCommand::EffectBitset effec
 		// check that they didn't change their cells
 		if (effects.hasAnyOf(EditorCommand::EffectType::ComponentAttributes, EditorCommand::EffectType::Entities))
 		{
-			std::weak_ptr<const EditorCommand> lastCommand = mMainWindow->getCommandStack().getLastExecutedCommand();
-			if (std::shared_ptr<const EditorCommand> command = lastCommand.lock())
+			const std::weak_ptr<const EditorCommand> lastCommand = mMainWindow->getCommandStack().getLastExecutedCommand();
+			if (const std::shared_ptr<const EditorCommand> command = lastCommand.lock())
 			{
 				if (const auto changeLocationCommand = dynamic_cast<const ChangeEntityGroupLocationCommand*>(command.get()))
 				{
@@ -278,7 +265,7 @@ void TransformEditorToolbox::onEntitySelected(const std::optional<EditorEntityRe
 
 void TransformEditorToolbox::onEntitiesMoved(const std::vector<EditorEntityReference>& entities, const Vector2D& shift)
 {
-	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	const CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
 	if (context.world == nullptr)
 	{
 		return;
@@ -299,9 +286,9 @@ void TransformEditorToolbox::onScaleChanged(int newValue)
 {
 	if (mContent)
 	{
-		float newScale = static_cast<float>(newValue) * 0.01f;
-		Vector2D halfScreenSizeInWorld = 0.5f / mContent->mScale * Vector2D(mContent->size().width(), mContent->size().height());
-		Vector2D shiftChange = halfScreenSizeInWorld * (mContent->mScale - newScale) / newScale;
+		const float newScale = static_cast<float>(newValue) * 0.01f;
+		const Vector2D halfScreenSizeInWorld = 0.5f / mContent->mScale * Vector2D(mContent->size().width(), mContent->size().height());
+		const Vector2D shiftChange = halfScreenSizeInWorld * (mContent->mScale - newScale) / newScale;
 		mContent->mPosShift += QVector2D(static_cast<int>(shiftChange.x), static_cast<int>(shiftChange.y));
 		mContent->mScale = newScale;
 		mContent->repaint();
@@ -342,7 +329,7 @@ void TransformEditorToolbox::onCopyCommand()
 
 	const auto& jsonSerializationHolder = mMainWindow->getComponentSerializationHolder();
 
-	Vector2D center{ZERO_VECTOR};
+	Vector2D center{ ZERO_VECTOR };
 	mCopiedObjects.clear();
 	for (EditorEntityReference entityRef : mContent->mSelectedEntities)
 	{
@@ -381,7 +368,7 @@ void TransformEditorToolbox::onCopyCommand()
 
 void TransformEditorToolbox::onPasteCommand()
 {
-	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	const CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
 	if (context.world == nullptr)
 	{
 		return;
@@ -399,18 +386,14 @@ void TransformEditorToolbox::onPasteCommand()
 
 	const Json::ComponentSerializationHolder& serializationHolder = mMainWindow->getComponentSerializationHolder();
 
-	mMainWindow->getCommandStack().executeNewCommand<AddEntityGroupCommand>(context,
-		mCopiedObjects,
-		serializationHolder,
-		mContent->deprojectAbsolute(getWidgetCenter()) - mCopiedGroupCenter
-	);
+	mMainWindow->getCommandStack().executeNewCommand<AddEntityGroupCommand>(context, mCopiedObjects, serializationHolder, mContent->deprojectAbsolute(getWidgetCenter()) - mCopiedGroupCenter);
 
 	mContent->repaint();
 }
 
 void TransformEditorToolbox::onDeleteCommand()
 {
-	CommandExecutionContext commandExecutionContext = mMainWindow->getCommandExecutionContext();
+	const CommandExecutionContext commandExecutionContext = mMainWindow->getCommandExecutionContext();
 	if (commandExecutionContext.world == nullptr)
 	{
 		return;
@@ -442,29 +425,27 @@ void TransformEditorToolbox::unselectNonExistingEntities()
 		return;
 	}
 
-	auto [begin, end] = std::ranges::remove_if(mContent->mSelectedEntities,
-		[world](const EditorEntityReference& entityRef)
+	auto [begin, end] = std::ranges::remove_if(mContent->mSelectedEntities, [world](const EditorEntityReference& entityRef) {
+		if (!entityRef.cellPos.has_value())
 		{
-			if (!entityRef.cellPos.has_value())
-			{
-				return true;
-			}
-
-			WorldCell* cell = world->getSpatialData().getCell(*entityRef.cellPos);
-
-			if (cell == nullptr) {
-				return true;
-			}
-
-			const OptionalEntity entity = Utils::GetEntityFromId(entityRef.editorUniqueId, cell->getEntityManager());
-			if (!entity.isValid())
-			{
-				return true;
-			}
-
-			return !cell->getEntityManager().hasEntity(entity.getEntity());
+			return true;
 		}
-	);
+
+		WorldCell* cell = world->getSpatialData().getCell(*entityRef.cellPos);
+
+		if (cell == nullptr)
+		{
+			return true;
+		}
+
+		const OptionalEntity entity = Utils::GetEntityFromId(entityRef.editorUniqueId, cell->getEntityManager());
+		if (!entity.isValid())
+		{
+			return true;
+		}
+
+		return !cell->getEntityManager().hasEntity(entity.getEntity());
+	});
 	mContent->mSelectedEntities.erase(begin, end);
 
 	mContent->setGroupCenter(GetEntityGroupPosition(mContent->mSelectedEntities, mContent->mWorld));
@@ -472,7 +453,7 @@ void TransformEditorToolbox::unselectNonExistingEntities()
 
 QVector2D TransformEditorToolbox::getWidgetCenter() const
 {
-	QSize size = mContent->size() / 2;
+	const QSize size = mContent->size() / 2;
 	return QVector2D(size.width(), size.height());
 }
 
@@ -481,7 +462,7 @@ std::pair<CellPos, Vector2D> TransformEditorToolbox::getWidgetCenterWorldPositio
 	return mContent->deproject(getWidgetCenter());
 }
 
-TransformEditorWidget::TransformEditorWidget(MainWindow *mainWindow)
+TransformEditorWidget::TransformEditorWidget(MainWindow* mainWindow)
 	: mMainWindow(mainWindow)
 {
 	mWorld = mainWindow->getCurrentWorld();
@@ -493,20 +474,20 @@ void TransformEditorWidget::mousePressEvent(QMouseEvent* event)
 	mMoveShift = ZERO_VECTOR;
 	mPressMousePos = mLastMousePos;
 	mIsMoved = false;
-	mIsCatchedSelectedEntity = false;
+	mHasCaughtSelectedEntity = false;
 	mIsRectangleSelection = false;
 
 	if (EditorEntityReference entityUnderCursor = getEntityUnderPoint(event->pos()); entityUnderCursor.cellPos.has_value())
 	{
 		if (std::find(mSelectedEntities.begin(), mSelectedEntities.end(), entityUnderCursor) != mSelectedEntities.end())
 		{
-			mIsCatchedSelectedEntity = true;
+			mHasCaughtSelectedEntity = true;
 		}
 		else if (mFreeMove && !IsCtrlPressed())
 		{
 			mSelectedEntities.clear();
 			mSelectedEntities.emplace_back(entityUnderCursor);
-			mIsCatchedSelectedEntity = true;
+			mHasCaughtSelectedEntity = true;
 			setGroupCenter(GetEntityPosition(entityUnderCursor, mWorld));
 		}
 	}
@@ -521,18 +502,18 @@ void TransformEditorWidget::mousePressEvent(QMouseEvent* event)
 
 void TransformEditorWidget::mouseMoveEvent(QMouseEvent* event)
 {
-	QVector2D pos = QVector2D(event->pos());
+	const QVector2D pos = QVector2D(event->pos());
 	if (!mIsMoved && (mPressMousePos - pos).lengthSquared() > 10.0f)
 	{
 		mIsMoved = true;
 	}
 
-	if (mIsMoved && mIsCatchedSelectedEntity)
+	if (mIsMoved && mHasCaughtSelectedEntity)
 	{
 		mMoveShift = deprojectAbsolute(pos) - deprojectAbsolute(mPressMousePos);
 	}
 
-	if (!mIsCatchedSelectedEntity && !mIsRectangleSelection)
+	if (!mHasCaughtSelectedEntity && !mIsRectangleSelection)
 	{
 		mPosShift -= QVector2D(mLastMousePos - pos) / mScale;
 	}
@@ -545,7 +526,7 @@ void TransformEditorWidget::mouseReleaseEvent(QMouseEvent* event)
 	bool needRepaint = true;
 	if (mIsMoved)
 	{
-		if (mIsCatchedSelectedEntity && !mSelectedEntities.empty())
+		if (mHasCaughtSelectedEntity && !mSelectedEntities.empty())
 		{
 			Vector2D cachedMoveShift = mMoveShift;
 			// need to reset the value before calling OnEntitiesMoved to correctly update visuals
@@ -589,105 +570,105 @@ void TransformEditorWidget::paintEvent(QPaintEvent*)
 	{
 		WorldCell& cell = record.extraData;
 		cell.getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
-			[&painter, &cell, crossSize, this](Entity entity, const TransformComponent* transform)
-		{
-			CellPos cellPos = cell.getPos();
-			Vector2D location = transform->getLocation();
+			[&painter, &cell, crossSize, this](Entity entity, const TransformComponent* transform) {
+				const CellPos cellPos = cell.getPos();
+				Vector2D location = transform->getLocation();
 
-			auto [collision] = cell.getEntityManager().getEntityComponents<const CollisionComponent>(entity);
+				auto [collision] = cell.getEntityManager().getEntityComponents<const CollisionComponent>(entity);
 
-			const size_t editorId = Utils::GetOrCreateEditorIdFromEntity(entity, cell.getEntityManager(), mMainWindow->getEditorIdGenerator());
+				const size_t editorId = Utils::GetOrCreateEditorIdFromEntity(entity, cell.getEntityManager(), mMainWindow->getEditorIdGenerator());
 
-			if (std::find(mSelectedEntities.begin(), mSelectedEntities.end(), EditorEntityReference(editorId, cellPos)) != mSelectedEntities.end())
-			{
-				// preview the movement
-				location += mMoveShift;
+				if (std::find(mSelectedEntities.begin(), mSelectedEntities.end(), EditorEntityReference(editorId, cellPos)) != mSelectedEntities.end())
+				{
+					// preview the movement
+					location += mMoveShift;
 
-				// calc selected entity border
-				QVector2D selectionLtShift;
-				QVector2D selectionSize;
+					// calc selected entity border
+					QVector2D selectionLtShift;
+					QVector2D selectionSize;
+					if (collision)
+					{
+						Hull geometry = collision->getGeometry();
+						if (geometry.type == HullType::Angular)
+						{
+							for (const Vector2D& point : geometry.points)
+							{
+								if (point.x < selectionLtShift.x())
+								{
+									selectionLtShift.setX(point.x);
+								}
+								if (point.y < selectionLtShift.y())
+								{
+									selectionLtShift.setY(point.y);
+								}
+								if (point.x > selectionSize.x())
+								{
+									selectionSize.setX(point.x);
+								}
+								if (point.y > selectionSize.y())
+								{
+									selectionSize.setY(point.y);
+								}
+							}
+
+							selectionSize -= selectionLtShift;
+						}
+						else
+						{
+							const float radius = geometry.getRadius();
+							selectionLtShift = QVector2D(-radius, -radius);
+							selectionSize = QVector2D(radius * 2.0f, radius * 2.0f);
+						}
+					}
+
+					// draw selected entity border
+					selectionLtShift *= mScale;
+					selectionLtShift -= QVector2D(5.0f, 5.0f);
+					selectionSize *= mScale;
+					selectionSize += QVector2D(10.0f, 10.0f);
+					const QRectF rectangle((projectAbsolute(location) + selectionLtShift).toPoint(), QSize(static_cast<int>(selectionSize.x()), static_cast<int>(selectionSize.y())));
+					QBrush brush = painter.brush();
+					brush.setColor(Qt::GlobalColor::blue);
+					painter.setBrush(brush);
+					painter.drawRect(rectangle);
+				}
+
+				// draw collision
 				if (collision)
 				{
 					Hull geometry = collision->getGeometry();
 					if (geometry.type == HullType::Angular)
 					{
-						for (Vector2D& point : geometry.points)
+						QPolygonF polygon;
+						for (const Vector2D& point : geometry.points)
 						{
-							if (point.x < selectionLtShift.x())
-							{
-								selectionLtShift.setX(point.x);
-							}
-							if (point.y < selectionLtShift.y())
-							{
-								selectionLtShift.setY(point.y);
-							}
-							if (point.x > selectionSize.x())
-							{
-								selectionSize.setX(point.x);
-							}
-							if (point.y > selectionSize.y())
-							{
-								selectionSize.setY(point.y);
-							}
+							polygon.append(projectAbsolute(location + point).toPointF());
 						}
-
-						selectionSize -= selectionLtShift;
+						painter.drawPolygon(polygon);
 					}
 					else
 					{
-						float radius = geometry.getRadius();
-						selectionLtShift = QVector2D(-radius, -radius);
-						selectionSize = QVector2D(radius * 2.0f, radius * 2.0f);
+						const float radius = geometry.getRadius();
+						const float halfWorldSize = radius * mScale;
+						const int worldSizeInt = static_cast<int>(halfWorldSize * 2.0f);
+						const QRectF rectangle((projectAbsolute(location) - QVector2D(halfWorldSize, halfWorldSize)).toPoint(), QSize(worldSizeInt, worldSizeInt));
+						painter.drawEllipse(rectangle);
 					}
 				}
 
-				// draw selected entity border
-				selectionLtShift *= mScale;
-				selectionLtShift -= QVector2D(5.0f, 5.0f);
-				selectionSize *= mScale;
-				selectionSize += QVector2D(10.0f, 10.0f);
-				QRectF rectangle((projectAbsolute(location) + selectionLtShift).toPoint(), QSize(static_cast<int>(selectionSize.x()), static_cast<int>(selectionSize.y())));
-				QBrush brush = painter.brush();
-				brush.setColor(Qt::GlobalColor::blue);
-				painter.setBrush(brush);
-				painter.drawRect(rectangle);
+				// draw entity location cross
+				const QVector2D screenLocation = projectAbsolute(location);
+				const QPoint screenPoint(static_cast<int>(screenLocation.x()), static_cast<int>(screenLocation.y()));
+				painter.drawLine(QPoint(screenPoint.x() - crossSize, screenPoint.y()), QPoint(screenPoint.x() + crossSize, screenPoint.y()));
+				painter.drawLine(QPoint(screenPoint.x(), screenPoint.y() - crossSize), QPoint(screenPoint.x(), screenPoint.y() + crossSize));
 			}
-
-			// draw collision
-			if (collision)
-			{
-				Hull geometry = collision->getGeometry();
-				if (geometry.type == HullType::Angular)
-				{
-					QPolygonF polygon;
-					for (Vector2D& point : geometry.points)
-					{
-						polygon.append(projectAbsolute(location + point).toPointF());
-					}
-					painter.drawPolygon(polygon);
-				}
-				else
-				{
-					float radius = geometry.getRadius();
-					float halfWorldSize = radius * mScale;
-					int worldSizeInt = static_cast<int>(halfWorldSize * 2.0f);
-					QRectF rectangle((projectAbsolute(location) - QVector2D(halfWorldSize, halfWorldSize)).toPoint(), QSize(worldSizeInt, worldSizeInt));
-					painter.drawEllipse(rectangle);
-				}
-			}
-
-			// draw entity location cross
-			QVector2D screenLocation = projectAbsolute(location);
-			QPoint screenPoint(static_cast<int>(screenLocation.x()), static_cast<int>(screenLocation.y()));
-			painter.drawLine(QPoint(screenPoint.x() - crossSize, screenPoint.y()), QPoint(screenPoint.x() + crossSize, screenPoint.y()));
-			painter.drawLine(QPoint(screenPoint.x(), screenPoint.y() - crossSize), QPoint(screenPoint.x(), screenPoint.y() + crossSize));
-		});
+		);
 	}
 
 	if (mIsRectangleSelection)
 	{
-		QVector2D size = QVector2D(mLastMousePos) - mPressMousePos;
-		QRect rect(mPressMousePos.toPoint(), QSize(static_cast<int>(size.x()), static_cast<int>(size.y())));
+		const QVector2D size = QVector2D(mLastMousePos) - mPressMousePos;
+		const QRect rect(mPressMousePos.toPoint(), QSize(static_cast<int>(size.x()), static_cast<int>(size.y())));
 		painter.drawRect(rect);
 	}
 }
@@ -700,7 +681,7 @@ void TransformEditorWidget::onClick(const QPoint& pos)
 	{
 		if (findResult.cellPos.has_value())
 		{
-			auto it = std::find(mSelectedEntities.begin(), mSelectedEntities.end(), findResult);
+			const auto it = std::find(mSelectedEntities.begin(), mSelectedEntities.end(), findResult);
 			if (it != mSelectedEntities.end())
 			{
 				mSelectedEntities.erase(it);
@@ -726,8 +707,8 @@ void TransformEditorWidget::onClick(const QPoint& pos)
 
 SpatialEntityManager::RecordsVector TransformEditorWidget::getCellsOnScreen()
 {
-	Vector2D screenSizeInWorld = Vector2D(size().width(), size().height()) / mScale;
-	Vector2D screenCenterPos = screenSizeInWorld*0.5f - Vector2D(mPosShift.x(), mPosShift.y());
+	const Vector2D screenSizeInWorld = Vector2D(size().width(), size().height()) / mScale;
+	const Vector2D screenCenterPos = screenSizeInWorld * 0.5f - Vector2D(mPosShift.x(), mPosShift.y());
 	return mWorld->getSpatialData().getCellsAround(screenCenterPos, screenSizeInWorld);
 }
 
@@ -744,40 +725,39 @@ EditorEntityReference TransformEditorWidget::getEntityUnderPoint(const QPoint& p
 		{
 			WorldCell& cell = record.extraData;
 			cell.getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
-				[worldPos, cellPos = cell.getPos(), &findResult](Entity entity, const TransformComponent* transform)
-			{
-				Vector2D location = transform->getLocation();
-				if (location.x - 10 < worldPos.x && location.x + 10 > worldPos.x
-					&&
-					location.y - 10 < worldPos.y && location.y + 10 > worldPos.y)
-				{
-					findResult.entity = entity;
-					findResult.cell = cellPos;
+				[worldPos, cellPos = cell.getPos(), &findResult](Entity entity, const TransformComponent* transform) {
+					const Vector2D location = transform->getLocation();
+					if (location.x - 10 < worldPos.x && location.x + 10 > worldPos.x
+						&& location.y - 10 < worldPos.y && location.y + 10 > worldPos.y)
+					{
+						findResult.entity = entity;
+						findResult.cell = cellPos;
+					}
 				}
-			});
+			);
 		}
 	}
 
 	if (!findResult.isValid())
 	{
-		return EditorEntityReference{0};
+		return EditorEntityReference{ 0 };
 	}
 
 	const size_t editorId = Utils::GetOrCreateEditorIdFromEntity(findResult.entity.getEntity(), mWorld->getSpatialData().getOrCreateCell(findResult.cell).getEntityManager(), mMainWindow->getEditorIdGenerator());
 
-	return EditorEntityReference{editorId, findResult.cell};
+	return EditorEntityReference{ editorId, findResult.cell };
 }
 
 void TransformEditorWidget::onCoordinateXChanged(const QString& newValueStr)
 {
-	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	const CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
 	if (context.world == nullptr)
 	{
 		return;
 	}
 
 	bool conversionSuccessful = false;
-	float newValue = newValueStr.toFloat(&conversionSuccessful);
+	const float newValue = newValueStr.toFloat(&conversionSuccessful);
 
 	if (!conversionSuccessful)
 	{
@@ -792,14 +772,14 @@ void TransformEditorWidget::onCoordinateXChanged(const QString& newValueStr)
 
 void TransformEditorWidget::onCoordinateYChanged(const QString& newValueStr)
 {
-	CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
+	const CommandExecutionContext context = mMainWindow->getCommandExecutionContext();
 	if (context.world == nullptr)
 	{
 		return;
 	}
 
 	bool conversionSuccessful = false;
-	float newValue = newValueStr.toFloat(&conversionSuccessful);
+	const float newValue = newValueStr.toFloat(&conversionSuccessful);
 
 	if (!conversionSuccessful)
 	{
@@ -846,19 +826,19 @@ void TransformEditorWidget::addEntitiesInRectToSelection(const Vector2D& start, 
 		{
 			WorldCell& cell = record.extraData;
 			cell.getEntityManager().forEachComponentSetWithEntity<const TransformComponent>(
-				[this, lt, rd, &cell](Entity entity, const TransformComponent* transform)
-			{
-				Vector2D location = transform->getLocation();
-				if (lt.x < location.x && location.x < rd.x && lt.y < location.y && location.y < rd.y)
-				{
-					const size_t editorId = Utils::GetOrCreateEditorIdFromEntity(entity, cell.getEntityManager(), mMainWindow->getEditorIdGenerator());
-					auto it = std::find(mSelectedEntities.begin(), mSelectedEntities.end(), EditorEntityReference(editorId, cell.getPos()));
-					if (it == mSelectedEntities.end())
+				[this, lt, rd, &cell](Entity entity, const TransformComponent* transform) {
+					const Vector2D location = transform->getLocation();
+					if (lt.x < location.x && location.x < rd.x && lt.y < location.y && location.y < rd.y)
 					{
-						mSelectedEntities.emplace_back(editorId, cell.getPos());
+						const size_t editorId = Utils::GetOrCreateEditorIdFromEntity(entity, cell.getEntityManager(), mMainWindow->getEditorIdGenerator());
+						const auto it = std::find(mSelectedEntities.begin(), mSelectedEntities.end(), EditorEntityReference(editorId, cell.getPos()));
+						if (it == mSelectedEntities.end())
+						{
+							mSelectedEntities.emplace_back(editorId, cell.getPos());
+						}
 					}
 				}
-			});
+			);
 		}
 	}
 }
@@ -867,7 +847,7 @@ template<typename Func>
 void UpdateFieldIfChanged(QLineEdit* field, float newValue, TransformEditorWidget* receiver, Func method)
 {
 	bool conversionSuccessful = false;
-	float oldValue = field->text().toFloat(&conversionSuccessful);
+	const float oldValue = field->text().toFloat(&conversionSuccessful);
 	if (!conversionSuccessful || !Math::AreEqualWithEpsilon(oldValue, newValue, 0.0101f))
 	{
 		QObject::disconnect(field, &QLineEdit::textChanged, receiver, method);
@@ -910,21 +890,21 @@ QVector2D TransformEditorWidget::projectAbsolute(const Vector2D& worldPos) const
 	return mScale * (QVector2D(worldPos.x, worldPos.y) + mPosShift);
 }
 
-Vector2D TransformEditorWidget::deprojectAbsolute(const QVector2D &screenPos) const
+Vector2D TransformEditorWidget::deprojectAbsolute(const QVector2D& screenPos) const
 {
-	QVector2D worldPos = screenPos / mScale - mPosShift;
+	const QVector2D worldPos = screenPos / mScale - mPosShift;
 	return Vector2D(worldPos.x(), worldPos.y());
 }
 
 QVector2D TransformEditorWidget::project(const Vector2D& pos) const
 {
-	Vector2D absoluteWorldPos = pos;
+	const Vector2D absoluteWorldPos = pos;
 	return mScale * (QVector2D(absoluteWorldPos.x, absoluteWorldPos.y) + mPosShift);
 }
 
 std::pair<CellPos, Vector2D> TransformEditorWidget::deproject(const QVector2D& screenPos) const
 {
-	QVector2D worldPosQt = screenPos / mScale - mPosShift;
+	const QVector2D worldPosQt = screenPos / mScale - mPosShift;
 	Vector2D worldPos(worldPosQt.x(), worldPosQt.y());
 	return std::make_pair(SpatialWorldData::GetCellForPos(worldPos), worldPos);
 }

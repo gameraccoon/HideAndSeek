@@ -1,11 +1,9 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
-
 #include <QString>
 #include <QWidget>
 
-#include <raccoon-ecs/delegates.h>
+#include <nlohmann/json.hpp>
 
 #include "GameData/EcsDefinitions.h"
 
@@ -20,7 +18,7 @@ class QListWidgetItem;
 class QMenu;
 class QPoint;
 
-class PrefabListToolbox : public QWidget
+class PrefabListToolbox final : public QWidget
 {
 public:
 	struct PrefabData
@@ -34,7 +32,7 @@ public:
 
 public:
 	PrefabListToolbox(MainWindow* mainWindow, ads::CDockManager* dockManager);
-	~PrefabListToolbox();
+	~PrefabListToolbox() override;
 	void show();
 
 	void clear();
@@ -52,7 +50,7 @@ private:
 	void updateContent();
 	void onCurrentItemChanged(QListWidgetItem* current, QListWidgetItem* previous);
 	void showContextMenu(const QPoint& pos);
-	void removeSelectedPreab();
+	void removeSelectedPrefab();
 	void createInstance();
 
 private:

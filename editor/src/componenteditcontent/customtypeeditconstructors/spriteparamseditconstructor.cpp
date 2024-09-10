@@ -1,12 +1,6 @@
-#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
-
-#include <string>
-
-#include <QLabel>
-#include <QLineEdit>
-#include <QDoubleValidator>
 #include <QCheckBox>
-#include <QHBoxLayout>
+
+#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
 namespace TypesEditConstructor
 {
@@ -21,10 +15,9 @@ namespace TypesEditConstructor
 		EditType::WeakPtr editWeakPtr = edit;
 
 		{
-			Edit<Vector2D>::Ptr editAnchor = FillEdit<Vector2D>::Call(layout, "anchor", initialValue.anchor);
-			editAnchor->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool)
-			{
-				if (Edit<SpriteParams>::Ptr edit = editWeakPtr.lock())
+			const Edit<Vector2D>::Ptr editAnchor = FillEdit<Vector2D>::Call(layout, "anchor", initialValue.anchor);
+			editAnchor->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool) {
+				if (const Edit<SpriteParams>::Ptr edit = editWeakPtr.lock())
 				{
 					SpriteParams animDescription = edit->getPreviousValue();
 					animDescription.anchor = newValue;
@@ -35,10 +28,9 @@ namespace TypesEditConstructor
 		}
 
 		{
-			Edit<Vector2D>::Ptr editSize = FillEdit<Vector2D>::Call(layout, "size", initialValue.size);
-			editSize->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool)
-			{
-				if (Edit<SpriteParams>::Ptr edit = editWeakPtr.lock())
+			const Edit<Vector2D>::Ptr editSize = FillEdit<Vector2D>::Call(layout, "size", initialValue.size);
+			editSize->bindOnChange([editWeakPtr](const Vector2D& /*oldValue*/, const Vector2D& newValue, bool) {
+				if (const Edit<SpriteParams>::Ptr edit = editWeakPtr.lock())
 				{
 					SpriteParams animDescription = edit->getPreviousValue();
 					animDescription.size = newValue;
@@ -50,4 +42,4 @@ namespace TypesEditConstructor
 
 		return edit;
 	}
-}
+} // namespace TypesEditConstructor

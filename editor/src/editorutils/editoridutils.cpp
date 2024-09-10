@@ -11,8 +11,7 @@ namespace Utils
 		OptionalEntity outEntity;
 
 		// not the most efficient way to do this, but this will do for now
-		entityManager.forEachComponentSetWithEntity<EditorIdComponent>([&outEntity, id](Entity entity, EditorIdComponent* editorIdComponent)
-		{
+		entityManager.forEachComponentSetWithEntity<EditorIdComponent>([&outEntity, id](Entity entity, EditorIdComponent* editorIdComponent) {
 			if (editorIdComponent->getId() == id)
 			{
 				outEntity = entity;
@@ -58,4 +57,4 @@ namespace Utils
 		editorIdComponent->setId(newId);
 		return newId;
 	}
-}
+} // namespace Utils

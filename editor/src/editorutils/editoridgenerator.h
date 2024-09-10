@@ -1,7 +1,5 @@
 #pragma once
 
-#include "GameData/Spatial/CellPos.h"
-
 class EditorIdGenerator
 {
 public:

@@ -1,10 +1,8 @@
 #include "removecomponentcommand.h"
 
-#include <QtWidgets/qcombobox.h>
+#include "src/editorutils/componentreferenceutils.h"
 
 #include "GameData/World.h"
-
-#include "src/editorutils/componentreferenceutils.h"
 
 RemoveComponentCommand::RemoveComponentCommand(const ComponentSourceReference& source, StringId typeName, const Json::ComponentSerializationHolder& jsonSerializerHolder, const ComponentFactory& componentFactory)
 	: EditorCommand(EffectBitset(EffectType::Components))
@@ -21,8 +19,7 @@ void RemoveComponentCommand::doCommand(CommandExecutionContext& context)
 	{
 		std::vector<TypedComponent> components = Utils::GetComponents(mSource, context.world);
 
-		auto it = std::find_if(components.begin(), components.end(), [typeName = mComponentTypeName](const TypedComponent& component)
-		{
+		auto it = std::find_if(components.begin(), components.end(), [typeName = mComponentTypeName](const TypedComponent& component) {
 			return component.typeId == typeName;
 		});
 

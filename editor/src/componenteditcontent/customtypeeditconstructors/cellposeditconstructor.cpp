@@ -1,12 +1,6 @@
-#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
-
-#include <string>
-
-#include <QLabel>
-#include <QLineEdit>
-#include <QDoubleValidator>
-#include <QCheckBox>
 #include <QHBoxLayout>
+
+#include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
 namespace TypesEditConstructor
 {
@@ -15,25 +9,23 @@ namespace TypesEditConstructor
 	{
 		FillLabel(layout, label);
 
-		QHBoxLayout *innerLayout = HS_NEW QHBoxLayout;
+		QHBoxLayout* innerLayout = HS_NEW QHBoxLayout;
 
 		Edit<CellPos>::Ptr edit = std::make_shared<Edit<CellPos>>(initialValue);
 		Edit<CellPos>::WeakPtr editWeakPtr = edit;
 
-		Edit<int>::Ptr editX = FillEdit<int>::Call(innerLayout, "x", initialValue.x);
-		editX->bindOnChange([editWeakPtr](int /*oldValue*/, int newValue, bool)
-		{
-			if (Edit<CellPos>::Ptr edit = editWeakPtr.lock())
+		const Edit<int>::Ptr editX = FillEdit<int>::Call(innerLayout, "x", initialValue.x);
+		editX->bindOnChange([editWeakPtr](int /*oldValue*/, const int newValue, bool) {
+			if (const Edit<CellPos>::Ptr edit = editWeakPtr.lock())
 			{
 				edit->transmitValueChange(CellPos(newValue, edit->getPreviousValue().y));
 			}
 		});
 		edit->addChild(editX);
 
-		Edit<int>::Ptr editY = FillEdit<int>::Call(innerLayout, "y", initialValue.y);
-		editY->bindOnChange([editWeakPtr](int /*oldValue*/, int newValue, bool)
-		{
-			if (Edit<CellPos>::Ptr edit = editWeakPtr.lock())
+		const Edit<int>::Ptr editY = FillEdit<int>::Call(innerLayout, "y", initialValue.y);
+		editY->bindOnChange([editWeakPtr](int /*oldValue*/, const int newValue, bool) {
+			if (const Edit<CellPos>::Ptr edit = editWeakPtr.lock())
 			{
 				edit->transmitValueChange(CellPos(edit->getPreviousValue().x, newValue));
 			}
@@ -46,4 +38,4 @@ namespace TypesEditConstructor
 		layout->addWidget(container);
 		return edit;
 	}
-}
+} // namespace TypesEditConstructor

@@ -1,4 +1,4 @@
-#include "EngineCommon/precomp.h"
+#pragma once
 
 #include <unordered_set>
 

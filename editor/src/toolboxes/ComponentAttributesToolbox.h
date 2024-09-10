@@ -5,10 +5,9 @@
 #include <QString>
 #include <QWidget>
 
-#include <raccoon-ecs/delegates.h>
-
 #include "src/editorcommands/editorcommand.h"
 #include "src/editorutils/componentreference.h"
+#include <raccoon-ecs/delegates.h>
 
 class MainWindow;
 
@@ -17,11 +16,11 @@ namespace ads
 	class CDockManager;
 }
 
-class ComponentAttributesToolbox : public QWidget
+class ComponentAttributesToolbox final : public QWidget
 {
 public:
 	ComponentAttributesToolbox(MainWindow* mainWindow, ads::CDockManager* dockManager);
-	~ComponentAttributesToolbox();
+	~ComponentAttributesToolbox() override;
 	void show();
 	bool isShown() const;
 

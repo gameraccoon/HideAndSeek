@@ -1,13 +1,5 @@
 #include "src/componenteditcontent/customtypeeditconstructors/customtypeeditconstructors.h"
 
-#include <string>
-
-#include <QLabel>
-#include <QLineEdit>
-#include <QDoubleValidator>
-#include <QCheckBox>
-#include <QHBoxLayout>
-
 namespace TypesEditConstructor
 {
 	template<>
@@ -21,10 +13,9 @@ namespace TypesEditConstructor
 		EditType::WeakPtr editWeakPtr = edit;
 
 		{
-			Edit<bool>::Ptr editIsLooped = FillEdit<bool>::Call(layout, "is looped", initialValue.isLooped);
-			editIsLooped->bindOnChange([editWeakPtr](bool /*oldValue*/, bool newValue, bool)
-			{
-				if (EditType::Ptr edit = editWeakPtr.lock())
+			const Edit<bool>::Ptr editIsLooped = FillEdit<bool>::Call(layout, "is looped", initialValue.isLooped);
+			editIsLooped->bindOnChange([editWeakPtr](bool /*oldValue*/, const bool newValue, bool) {
+				if (const EditType::Ptr edit = editWeakPtr.lock())
 				{
 					AnimationClipParams animDescription = edit->getPreviousValue();
 					animDescription.isLooped = newValue;
@@ -35,10 +26,9 @@ namespace TypesEditConstructor
 		}
 
 		{
-			Edit<float>::Ptr editSpeed = FillEdit<float>::Call(layout, "speed", initialValue.speed);
-			editSpeed->bindOnChange([editWeakPtr](float /*oldValue*/, float newValue, bool)
-			{
-				if (EditType::Ptr edit = editWeakPtr.lock())
+			const Edit<float>::Ptr editSpeed = FillEdit<float>::Call(layout, "speed", initialValue.speed);
+			editSpeed->bindOnChange([editWeakPtr](float /*oldValue*/, const float newValue, bool) {
+				if (const EditType::Ptr edit = editWeakPtr.lock())
 				{
 					AnimationClipParams animDescription = edit->getPreviousValue();
 					animDescription.speed = newValue;
@@ -50,4 +40,4 @@ namespace TypesEditConstructor
 
 		return edit;
 	}
-}
+} // namespace TypesEditConstructor
