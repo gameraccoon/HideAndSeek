@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/check-clang-format.yml
       - src/**
+      - editor/src/**
       - .clang-format
   workflow_dispatch:
 jobs:
