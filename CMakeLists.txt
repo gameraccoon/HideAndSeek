@@ -181,9 +181,10 @@ if(IMGUI_ENABLED)
 		${EXTERNALS_DIR}/sources/imgui/imgui.cpp
 		${EXTERNALS_DIR}/sources/imgui/imgui_demo.cpp
 		${EXTERNALS_DIR}/sources/imgui/imgui_draw.cpp
+		${EXTERNALS_DIR}/sources/imgui/imgui_tables.cpp
 		${EXTERNALS_DIR}/sources/imgui/imgui_widgets.cpp
-		${EXTERNALS_DIR}/sources/imgui/examples/imgui_impl_opengl2.cpp
-		${EXTERNALS_DIR}/sources/imgui/examples/imgui_impl_sdl.cpp
+		${EXTERNALS_DIR}/sources/imgui/backends/imgui_impl_opengl2.cpp
+		${EXTERNALS_DIR}/sources/imgui/backends/imgui_impl_sdl2.cpp
 	)
 	add_dependencies(${APP_NAME} Imgui)
 	include_directories(${EXTERNALS_DIR}/sources/imgui)

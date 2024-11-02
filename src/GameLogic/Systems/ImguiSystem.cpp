@@ -4,9 +4,9 @@
 
 #ifdef IMGUI_ENABLED
 
-#include "imgui/examples/imgui_impl_opengl2.h"
-#include "imgui/examples/imgui_impl_sdl.h"
-#include "imgui/imgui.h"
+#include <backends/imgui_impl_opengl2.h>
+#include <backends/imgui_impl_sdl2.h>
+#include <imgui.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
 
@@ -76,7 +76,7 @@ void ImguiSystem::update()
 
 		// start the imgui frame
 		ImGui_ImplOpenGL2_NewFrame();
-		ImGui_ImplSDL2_NewFrame(mEngine.getRawWindow());
+		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
 		// update the window hierarchy
