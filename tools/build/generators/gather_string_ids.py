@@ -1,36 +1,11 @@
 #!/usr/bin/python3
 
-import json
-import os
-from os import path
 import re
 
 from generators.shared_functions import *
 
-import sys
 
-if len(sys.argv) > 1:
-    working_dir = sys.argv[1]
-else:
-    working_dir = os.getcwd()
-
-
-configs_dir = path.join(working_dir, "config/code_generation/string_ids")
-sources_dir = path.join(working_dir, "src")
-templates_dir = path.join(configs_dir, "templates")
-
-string_literal_pattern = r'\WSTR_TO_ID\(\s*"([^"]*)"\s*\)'
-
-delimiter_dictionary = load_json(path.join(configs_dir, "delimiter_dictionary.json"))
-
-empty_delimiter_dictionary = {key: "" for key in delimiter_dictionary.keys()}
-
-element_templates = load_json(path.join(configs_dir, "element_templates.json"))
-
-files_to_generate = load_json(path.join(configs_dir, "files_to_generate.json"))
-
-
-def generate_string_ids_cpp_file(template_name, destination_dir, file_name_template, component_filled_templates):
+def generate_string_ids_cpp_file(template_name, destination_dir, file_name_template, component_filled_templates, templates_dir):
     template = read_template(template_name, templates_dir)
     generated_content = replace_content(template, component_filled_templates)
     file_name = replace_content(file_name_template, component_filled_templates)
@@ -43,7 +18,7 @@ def generate_string_ids_cpp_file(template_name, destination_dir, file_name_templ
     return out_file_path
 
 
-def generate_ids_list_descriptions(components):
+def generate_ids_list_descriptions(components, element_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary):
     component_filled_templates = {}
     for component_template in element_templates:
         template = read_template(component_template["name"], templates_dir)
@@ -86,7 +61,7 @@ def detect_duplicates(string_data):
             raise HashCollisionError("Hash collision between %s and %s: %u" % (string_data[i]["string_text"], string_data[i+1]["string_text"], string_data[i]["string_hash"]))
 
 
-def gather_string_data():
+def gather_string_data(sources_dir, string_literal_pattern):
     string_literals = []
 
     for root, directories, filenames in os.walk(sources_dir):
@@ -106,18 +81,34 @@ def gather_string_data():
     return result
 
 
-def generate_all():
-    components = gather_string_data()
+def generate_all(generator):
+    configs_dir = generator["configs_dir"]
+    output_dir_base = generator["output_dir_base"]
+    sources_dir = path.join(output_dir_base, "src")
+    templates_dir = path.join(configs_dir, generator["templates_dir"])
+
+    string_literal_pattern = r'\WSTR_TO_ID\(\s*"([^"]*)"\s*\)'
+
+    delimiter_dictionary = load_json(path.join(configs_dir, "delimiter_dictionary.json"))
+
+    empty_delimiter_dictionary = {key: "" for key in delimiter_dictionary.keys()}
+
+    element_templates = load_json(path.join(configs_dir, "element_templates.json"))
+
+    files_to_generate = load_json(path.join(configs_dir, "files_to_generate.json"))
+
+    components = gather_string_data(sources_dir, string_literal_pattern)
     generated_files = []
 
     # generate file with string ids
-    component_filled_templates = generate_ids_list_descriptions(components)
+    component_filled_templates = generate_ids_list_descriptions(components, element_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary)
     for file_info in files_to_generate:
         if "flags" in file_info and "list" in file_info["flags"]:
             out_file_name = generate_string_ids_cpp_file(file_info["template"],
-                 path.join(working_dir, file_info["output_dir"]),
-                 file_info["name_template"],
-                 component_filled_templates)
+                path.join(output_dir_base, file_info["output_dir"]),
+                file_info["name_template"],
+                component_filled_templates,
+                templates_dir)
 
             generated_files.append(out_file_name)
 

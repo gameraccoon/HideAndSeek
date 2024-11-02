@@ -99,7 +99,7 @@ find_package(Python3 COMPONENTS Interpreter)
 
 # code generation
 execute_process(
-	COMMAND ${Python3_EXECUTABLE} "${GAME_BASE_DIR}/tools/build/code_generate.py"
+	COMMAND ${Python3_EXECUTABLE} "${GAME_BASE_DIR}/tools/build/run_code_generation.py" --config ${GAME_BASE_DIR}/tools/build/generators.json --group pre-project-generation
 	WORKING_DIRECTORY ${GAME_BASE_DIR}
 	COMMAND_ERROR_IS_FATAL ANY
 )
@@ -278,7 +278,7 @@ endif()
 # pre-compile additional code generation
 add_custom_target(
 	AdditionalCodeGeneration
-	COMMAND ${Python3_EXECUTABLE} ${GAME_BASE_DIR}/tools/build/precompile_code_generate.py ${GAME_BASE_DIR}
+	COMMAND ${Python3_EXECUTABLE} ${GAME_BASE_DIR}/tools/build/run_code_generation.py --config ${GAME_BASE_DIR}/tools/build/generators.json --working-dir ${GAME_BASE_DIR} --group pre-project-generation --quiet
 	COMMENT "C++ pre-compile additional code generation"
 )
 add_dependencies(EngineCommon AdditionalCodeGeneration)

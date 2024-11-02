@@ -1,36 +1,6 @@
 #!/usr/bin/python3
 
-import json
-import os
-from os import path
-
 from generators.shared_functions import *
-
-import sys
-
-if len(sys.argv) > 1:
-    working_dir = sys.argv[1]
-else:
-    working_dir = os.getcwd()
-
-
-configs_dir = path.join(working_dir, "config/code_generation/components")
-templates_dir = path.join(configs_dir, "templates")
-descriptions_dir = path.join(working_dir, "config/class_descriptions/Components")
-
-
-delimiter_dictionary = load_json(path.join(configs_dir, "delimiter_dictionary.json"))
-
-empty_delimiter_dictionary = {key: "" for key in delimiter_dictionary.keys()}
-
-attribute_templates = load_json(path.join(configs_dir, "attribute_templates.json"))
-
-component_templates = load_json(path.join(configs_dir, "component_templates.json"))
-
-files_to_generate = load_json(path.join(configs_dir, "files_to_generate.json"))
-
-attribute_optional_fields = load_json(path.join(configs_dir, "attribute_optional_fields.json"))
-
 
 def get_base_data_dictionary(data_description):
     return {
@@ -43,7 +13,7 @@ def get_base_data_dictionary(data_description):
     }
 
 
-def get_attribute_data_dictionary(attribute):
+def get_attribute_data_dictionary(attribute, attribute_optional_fields):
     attribute_data_dictionary = {}
 
     for field_name, field_value in attribute.items():
@@ -93,13 +63,13 @@ def does_component_pass_filters(component, template_data):
 
     # if we have whitelist, skip attributes without whitelisted flags
     if "whitelist" in template_data:
-        if not any(x in attribute["component_flags"] for x in template_data["whitelist"]):
+        if not any(x in component["component_flags"] for x in template_data["whitelist"]):
             return False
 
     return True
 
 
-def append_attributes_data_dictionary(data_dictionary, data_description):
+def append_attributes_data_dictionary(data_dictionary, data_description, attribute_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary):
     for attribute_template_data in attribute_templates:
         template_name = attribute_template_data["name"]
 
@@ -140,13 +110,13 @@ def append_attributes_data_dictionary(data_dictionary, data_description):
     return data_dictionary
 
 
-def get_full_data_dictionary(data_description):
+def get_full_data_dictionary(data_description, attribute_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary):
     full_data_dictionary = get_base_data_dictionary(data_description)
-    full_data_dictionary = append_attributes_data_dictionary(full_data_dictionary, data_description)
+    full_data_dictionary = append_attributes_data_dictionary(full_data_dictionary, data_description, attribute_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary)
     return full_data_dictionary
 
 
-def generate_cpp_file(template_name, destination_dir, file_name_template, filled_templates):
+def generate_cpp_file(template_name, destination_dir, file_name_template, filled_templates, templates_dir):
     template = read_template(template_name, templates_dir)
     generated_content = replace_content(template, filled_templates)
     file_name = replace_content(file_name_template, filled_templates)
@@ -159,7 +129,7 @@ def generate_cpp_file(template_name, destination_dir, file_name_template, filled
     return out_file_path
 
 
-def generate_per_attribute_cpp_files(data_description, template_name, destination_dir, file_name_template, blacklist, full_data_dictionary):
+def generate_per_attribute_cpp_files(data_description, template_name, destination_dir, file_name_template, blacklist, full_data_dictionary, templates_dir):
     generated_files = []
     template = read_template(template_name, templates_dir)
     for attribute in data_description["attributes"]:
@@ -186,15 +156,16 @@ def generate_per_attribute_cpp_files(data_description, template_name, destinatio
     return generated_files
 
 
-def generate_files(file_infos, data_description, full_data_dict):
+def generate_files(file_infos, data_description, full_data_dict, output_base_dir, templates_dir):
     generated_files = []
     for file_info in file_infos:
         if "flags" in file_info and "per_attribute" in file_info["flags"]:
             generated_files += generate_per_attribute_cpp_files(data_description, file_info["template"],
-                path.join(working_dir, file_info["output_dir"]),
+                path.join(output_base_dir, file_info["output_dir"]),
                 file_info["name_template"],
                 file_info["blacklist"],
-                full_data_dict)
+                full_data_dict,
+                templates_dir)
         elif "flags" in file_info and "attribute_list" in file_info["flags"]:
             pass # generated in another function
         elif "flags" in file_info and "list" in file_info["flags"]:
@@ -202,24 +173,25 @@ def generate_files(file_infos, data_description, full_data_dict):
         else:
             if does_component_pass_filters(full_data_dict, file_info):
                 out_file_path = generate_cpp_file(file_info["template"],
-                    path.join(working_dir, file_info["output_dir"]),
+                    path.join(output_base_dir, file_info["output_dir"]),
                     file_info["name_template"],
-                    full_data_dict)
+                    full_data_dict,
+                    templates_dir)
                 generated_files.append(out_file_path)
 
     return generated_files
 
 
-def load_component_data_description(file_path):
+def load_component_data_description(file_path, attribute_optional_fields):
     component_data = load_json(file_path)
 
     for attribute in component_data["attributes"]:
-        attribute["data_dict"] = get_attribute_data_dictionary(attribute)
+        attribute["data_dict"] = get_attribute_data_dictionary(attribute, attribute_optional_fields)
 
     return component_data
 
 
-def generate_component_list_descriptions(components):
+def generate_component_list_descriptions(components, component_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary):
     component_filled_templates = {}
     for component_template in component_templates:
         template = read_template(component_template["name"], templates_dir)
@@ -245,7 +217,7 @@ def generate_component_list_descriptions(components):
     return component_filled_templates
 
 
-def generate_attribute_list_descriptions(components):
+def generate_attribute_list_descriptions(components, attribute_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary):
     attribute_filled_templates = {}
     for attribute_template in attribute_templates:
         template = read_template(attribute_template["name"], templates_dir)
@@ -258,7 +230,7 @@ def generate_attribute_list_descriptions(components):
         for component in components:
             full_data_dict = component["data_dict"]
             attributes = component["attributes"]
-            is_lastComponent = component is components[len(components) - 1]
+            is_last_component = component is components[len(components) - 1]
             for attribute in attributes:
                 # skip blacklisted attributes
                 if blacklist is not None:
@@ -266,7 +238,7 @@ def generate_attribute_list_descriptions(components):
                         continue
 
                 # skip delimiters for the last item
-                if is_lastComponent and attribute is attributes[len(attributes) - 1]:
+                if is_last_component and attribute is attributes[len(attributes) - 1]:
                     delimiter_dict = empty_delimiter_dictionary
                 else:
                     delimiter_dict = delimiter_dictionary
@@ -286,37 +258,55 @@ def get_component_name_from_file_name(file_name):
     return name
 
 
-def generate_all():
+def generate_all(generator):
+    configs_dir = generator["configs_dir"]
+    templates_dir = path.join(configs_dir, generator["templates_dir"])
+    descriptions_dir = generator["descriptions_dir"]
+    output_dir_base = generator["output_dir_base"]
+
+    delimiter_dictionary = load_json(path.join(configs_dir, "delimiter_dictionary.json"))
+
+    empty_delimiter_dictionary = {key: "" for key in delimiter_dictionary.keys()}
+
+    attribute_templates = load_json(path.join(configs_dir, "attribute_templates.json"))
+
+    component_templates = load_json(path.join(configs_dir, "component_templates.json"))
+
+    files_to_generate = load_json(path.join(configs_dir, "files_to_generate.json"))
+
+    attribute_optional_fields = load_json(path.join(configs_dir, "attribute_optional_fields.json"))
+
+
     generated_files = []
     components = []
     raw_components = []
     for file_name in os.listdir(descriptions_dir):
-        component = load_component_data_description(path.join(descriptions_dir, file_name))
+        component = load_component_data_description(path.join(descriptions_dir, file_name), attribute_optional_fields)
         component["component_name"] = get_component_name_from_file_name(file_name)
-        full_data_dict = get_full_data_dictionary(component)
-        generated_files += generate_files(files_to_generate, component, full_data_dict)
+        full_data_dict = get_full_data_dictionary(component, attribute_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary)
+        generated_files += generate_files(files_to_generate, component, full_data_dict, output_dir_base, templates_dir)
         component["data_dict"] = full_data_dict
         raw_components.append(component)
         components.append(full_data_dict)
 
     # generate component lists
-    component_filled_templates = generate_component_list_descriptions(components)
+    component_filled_templates = generate_component_list_descriptions(components, component_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary)
     for file_info in files_to_generate:
         if "flags" in file_info and "list" in file_info["flags"]:
             out_file_path = generate_cpp_file(file_info["template"],
-                path.join(working_dir, file_info["output_dir"]),
+                path.join(output_dir_base, file_info["output_dir"]),
                 file_info["name_template"],
-                component_filled_templates)
+                component_filled_templates, templates_dir)
             generated_files.append(out_file_path)
 
     # generate attributes lists
-    attribute_filled_templates = generate_attribute_list_descriptions(raw_components)
+    attribute_filled_templates = generate_attribute_list_descriptions(raw_components, attribute_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary)
     for file_info in files_to_generate:
         if "flags" in file_info and "attribute_list" in file_info["flags"]:
             out_file_path = generate_cpp_file(file_info["template"],
-                path.join(working_dir, file_info["output_dir"]),
+                path.join(output_dir_base, file_info["output_dir"]),
                 file_info["name_template"],
-                attribute_filled_templates)
+                attribute_filled_templates, templates_dir)
             generated_files.append(out_file_path)
 
     return generated_files

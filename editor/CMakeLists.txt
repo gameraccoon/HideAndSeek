@@ -5,6 +5,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 set(APP_NAME Editor)
 
@@ -66,9 +67,14 @@ else()
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
 endif()
 
+# requirements
+find_package(Python3 COMPONENTS Interpreter)
+
 # code generation
 execute_process(
-	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/tools/build/code_generate.py ${GAME_BASE_DIR}
+	COMMAND ${Python3_EXECUTABLE} "${GAME_BASE_DIR}/tools/build/run_code_generation.py" --config ${GAME_BASE_DIR}/tools/build/generators.json --group pre-project-generation
+	WORKING_DIRECTORY ${GAME_BASE_DIR}
+	COMMAND_ERROR_IS_FATAL ANY
 )
 
 set(APP_SRCS
@@ -175,7 +181,7 @@ set_target_properties(${APP_NAME} PROPERTIES
 # pre-compile additional code generation
 add_custom_target(
 	AdditionalCodeGeneration
-	COMMAND ${PYTHON_EXECUTABLE} ${GAME_BASE_DIR}/tools/build/precompile_code_generate.py ${GAME_BASE_DIR}
+	COMMAND ${Python3_EXECUTABLE} ${GAME_BASE_DIR}/tools/build/run_code_generation.py --config ${GAME_BASE_DIR}/tools/build/generators.json --working-dir ${GAME_BASE_DIR} --group pre-project-generation --quiet
 	COMMENT "C++ pre-compile additional code generation"
 )
 add_dependencies(GameData AdditionalCodeGeneration)

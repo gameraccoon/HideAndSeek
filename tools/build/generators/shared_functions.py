@@ -4,7 +4,6 @@ import json
 import os
 from os import path
 
-import sys
 
 def capitalize(input_str):
     return input_str[:1].capitalize() + input_str[1:]

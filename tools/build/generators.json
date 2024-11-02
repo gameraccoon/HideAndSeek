@@ -1,0 +1,35 @@
+{
+  "generators": {
+    "components": {
+      "name": "Components",
+      "configs_dir": "config/code_generation/components",
+      "descriptions_dir": "config/class_descriptions/Components",
+      "templates_dir": "templates",
+      "output_dir_base": "."
+    },
+    "enums": {
+      "name": "Enums",
+      "configs_dir": "config/code_generation/enums",
+      "descriptions_dir": "config/class_descriptions/Enums",
+      "templates_dir": "templates",
+      "output_dir_base": "."
+    },
+    "string_ids": {
+      "name": "StringId map",
+      "configs_dir": "config/code_generation/string_ids",
+      "descriptions_dir": "",
+      "templates_dir": "templates",
+      "output_dir_base": "."
+    }
+  },
+  "groups" : {
+    "pre-project-generation" : [
+      "components",
+      "enums",
+      "string_ids"
+    ],
+    "pre-compile" : [
+      "string_ids"
+    ]
+  }
+}
