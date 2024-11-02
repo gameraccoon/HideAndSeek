@@ -22,7 +22,6 @@
 [submodule "external/sources/SDL_mixer"]
 	path = external/sources/SDL_mixer
 	url = git@github.com:gameraccoon/SDL_mixer.git
-
 [submodule "src/Engine"]
 	path = src/Engine
 	url = git@github.com:gameraccoon/simple-game-engine.git
