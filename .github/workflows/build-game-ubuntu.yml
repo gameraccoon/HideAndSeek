@@ -37,17 +37,17 @@ jobs:
     - name: Checkout submodules
       run: git submodule update --init --recursive
 
-    - name: Update deb repo links
-      run: sudo apt-get update
-
     - name: Install dependencies
-      run: sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev
+      run: |
+        sudo apt-get update
+        sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev
 
     - name: Install GCC
-      uses: egor-tensin/setup-gcc@v1
+      uses: pkgxdev/setup@v2
       with:
-        version: 13
-        platform: x64
+        +: gcc@13
+
+    - run: gcc --version
 
     - name: Install ninja-build tool
       uses: seanmiddleditch/gha-setup-ninja@v4
@@ -56,8 +56,8 @@ jobs:
       shell: bash
       working-directory: ${{github.workspace}}/build/game
       env:
-        CC: gcc-13
-        CXX: g++-13
+        CC: gcc
+        CXX: g++
       run: cmake ${{github.workspace}} -DCMAKE_BUILD_TYPE=$BUILD_TYPE --preset linux-ninja
 
     - name: Build game

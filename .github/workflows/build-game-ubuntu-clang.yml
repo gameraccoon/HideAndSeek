@@ -37,11 +37,10 @@ jobs:
     - name: Checkout submodules
       run: git submodule update --init --recursive
 
-    - name: Update deb repo links
-      run: sudo apt-get update
-
     - name: Install dependencies
-      run: sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev
+      run: |
+        sudo apt-get update
+        sudo apt-get install libopusfile-dev libflac-dev libxmp-dev libfluidsynth-dev libwavpack-dev libmodplug-dev
 
     - name: Install LLVM and Clang
       uses: KyleMayes/install-llvm-action@v1
