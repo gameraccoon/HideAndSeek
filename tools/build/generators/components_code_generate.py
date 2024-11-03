@@ -159,16 +159,16 @@ def generate_per_attribute_cpp_files(data_description, template_name, destinatio
 def generate_files(file_infos, data_description, full_data_dict, output_base_dir, templates_dir):
     generated_files = []
     for file_info in file_infos:
-        if "flags" in file_info and "per_attribute" in file_info["flags"]:
+        if "per_object" in file_info and "attribute" in file_info["per_object"]:
             generated_files += generate_per_attribute_cpp_files(data_description, file_info["template"],
                 path.join(output_base_dir, file_info["output_dir"]),
                 file_info["name_template"],
                 file_info["blacklist"],
                 full_data_dict,
                 templates_dir)
-        elif "flags" in file_info and "attribute_list" in file_info["flags"]:
+        elif "list_objects" in file_info and "attribute" in file_info["list_objects"]:
             pass # generated in another function
-        elif "flags" in file_info and "list" in file_info["flags"]:
+        elif "list_objects" in file_info and "component" in file_info["list_objects"]:
             pass # generated in another function
         else:
             if does_component_pass_filters(full_data_dict, file_info):
@@ -292,7 +292,7 @@ def generate_all(generator):
     # generate component lists
     component_filled_templates = generate_component_list_descriptions(components, component_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary)
     for file_info in files_to_generate:
-        if "flags" in file_info and "list" in file_info["flags"]:
+        if "list_objects" in file_info and "component" in file_info["list_objects"]:
             out_file_path = generate_cpp_file(file_info["template"],
                 path.join(output_dir_base, file_info["output_dir"]),
                 file_info["name_template"],
@@ -302,7 +302,7 @@ def generate_all(generator):
     # generate attributes lists
     attribute_filled_templates = generate_attribute_list_descriptions(raw_components, attribute_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary)
     for file_info in files_to_generate:
-        if "flags" in file_info and "attribute_list" in file_info["flags"]:
+        if "list_objects" in file_info and "attribute" in file_info["list_objects"]:
             out_file_path = generate_cpp_file(file_info["template"],
                 path.join(output_dir_base, file_info["output_dir"]),
                 file_info["name_template"],

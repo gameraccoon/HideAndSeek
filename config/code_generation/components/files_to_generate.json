@@ -2,104 +2,111 @@
 	{
 		"name_template": "{class_name}.generated.h",
 		"template": "component_header",
-		"output_dir": "src/GameData/Components/"
+		"output_dir": "src/GameData/Components/",
+		"per_object": "component"
 	},
 	{
 		"name_template": "{class_name}ImguiWidget.generated.h",
 		"template": "imgui/component_inspector_window_header",
-		"output_dir": "src/GameLogic/Imgui/ComponentInspector/ComponentWidgets/"
+		"output_dir": "src/GameLogic/Imgui/ComponentInspector/ComponentWidgets/",
+		"per_object": "component"
 	},
 	{
 		"name_template": "{class_name}ImguiWidget.generated.cpp",
 		"template": "imgui/component_inspector_window_source",
-		"output_dir": "src/GameLogic/Imgui/ComponentInspector/ComponentWidgets/"
+		"output_dir": "src/GameLogic/Imgui/ComponentInspector/ComponentWidgets/",
+		"per_object": "component"
 	},
 	{
 		"name_template": "{class_name}{attribute_name_capital}PropertyDescriptor.generated.cpp",
 		"template": "imgui/filters/attribute_descriptor_source",
 		"output_dir": "src/GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptors/",
-		"flags": ["per_attribute"],
+		"per_object": "attribute",
 		"blacklist": ["get_by_ref"]
 	},
 	{
 		"name_template": "{class_name}{attribute_name_capital}PropertyDescriptor.generated.h",
 		"template": "imgui/filters/attribute_descriptor_header",
 		"output_dir": "src/GameLogic/Imgui/ComponentInspector/PropertyFilters/PropertyDescriptors/",
-		"flags": ["per_attribute"],
+		"per_object": "attribute",
 		"blacklist": ["get_by_ref"]
 	},
 	{
 		"name_template": "PropertyDescriptorsRegistration.generated.cpp",
 		"template": "imgui/filters/attributes_descriptors_registration_source",
 		"output_dir": "src/GameLogic/Imgui/ComponentInspector/PropertyFilters/",
-		"flags": ["attribute_list"]
+		"list_objects": "attribute"
 	},
 	{
 		"name_template": "{class_name}JsonSerializer.generated.h",
 		"template": "serialization/json/component_json_serializer_header",
 		"output_dir": "src/GameData/Serialization/Json/Generated",
+		"per_object": "component",
 		"blacklist": ["transient"]
 	},
 	{
 		"name_template": "{class_name}JsonSerializer.generated.cpp",
 		"template": "serialization/json/component_json_serializer_source",
 		"output_dir": "src/GameData/Serialization/Json/Generated",
+		"per_object": "component",
 		"blacklist": ["transient"]
 	},
 	{
 		"name_template": "{class_name}EditFactory.generated.h",
 		"template": "editor/component_edit_factory_header",
 		"output_dir": "editor/src/componenteditcontent/generated/",
+		"per_object": "component",
 		"blacklist": ["transient"]
 	},
 	{
 		"name_template": "{class_name}EditFactory.generated.cpp",
 		"template": "editor/component_edit_factory_source",
 		"output_dir": "editor/src/componenteditcontent/generated/",
+		"per_object": "component",
 		"blacklist": ["transient"]
 	},
 	{
 		"name_template": "Change{class_name}{attribute_name_capital}Command.generated.h",
 		"template": "editor/attribute_edit_command_header",
 		"output_dir": "editor/src/editorcommands/generated/",
-		"flags": ["per_attribute"],
+		"per_object": "attribute",
 		"blacklist": ["transient", "custom_editor"]
 	},
 	{
 		"name_template": "Change{class_name}{attribute_name_capital}Command.generated.cpp",
 		"template": "editor/attribute_edit_command_source",
 		"output_dir": "editor/src/editorcommands/generated/",
-		"flags": ["per_attribute"],
+		"per_object": "attribute",
 		"blacklist": ["transient", "custom_editor"]
 	},
 	{
 		"name_template": "ComponentFactoryRegistration.generated.cpp",
 		"template": "components_factory_registration_source",
 		"output_dir": "src/GameData/ComponentRegistration/",
-		"flags": ["list"]
+		"list_objects": "component"
 	},
 	{
 		"name_template": "ComponentWidgetsRegistration.generated.cpp",
 		"template": "imgui/components_inspector_window_registration_source",
 		"output_dir": "src/GameLogic/Imgui/ComponentInspector/",
-		"flags": ["list"]
+		"list_objects": "component"
 	},
 	{
 		"name_template": "ComponentJsonSerializerRegistration.generated.cpp",
 		"template": "serialization/json/components_json_serializer_registration_source",
 		"output_dir": "src/GameData/ComponentRegistration/",
-		"flags": ["list"]
+		"list_objects": "component"
 	},
 	{
 		"name_template": "componentregistration.generated.cpp",
 		"template": "editor/components_registration_source",
 		"output_dir": "editor/src/componenteditcontent/",
-		"flags": ["list"]
+		"list_objects": "component"
 	},
 	{
 		"name_template": "editablecomponentsset.generated.cpp",
 		"template": "editor/editable_components_set_source",
 		"output_dir": "editor/src/componenteditcontent/",
-		"flags": ["list"]
+		"list_objects": "component"
 	}
 ]

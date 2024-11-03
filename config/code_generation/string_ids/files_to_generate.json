@@ -3,6 +3,6 @@
 		"name_template": "GatheredStringIds.generated.cpp",
 		"template": "gathered_string_ids",
 		"output_dir": "src/GameData/Generated/",
-		"flags": ["list"]
+		"list_objects": "string_id"
 	}
 ]

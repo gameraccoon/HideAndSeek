@@ -2,11 +2,13 @@
 	{
 		"name_template": "{enum_name}.generated.h",
 		"template": "enum_header",
-		"output_dir": "src/GameData/Enums/"
+		"output_dir": "src/GameData/Enums/",
+		"per_object": "enum"
 	},
 	{
 		"name_template": "{enum_name}.generated.cpp",
 		"template": "enum_source",
-		"output_dir": "src/GameData/Enums/"
+		"output_dir": "src/GameData/Enums/",
+		"per_object": "enum"
 	}
 ]

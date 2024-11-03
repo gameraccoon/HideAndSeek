@@ -103,7 +103,7 @@ def generate_all(generator):
     # generate file with string ids
     component_filled_templates = generate_ids_list_descriptions(components, element_templates, templates_dir, delimiter_dictionary, empty_delimiter_dictionary)
     for file_info in files_to_generate:
-        if "flags" in file_info and "list" in file_info["flags"]:
+        if "list_objects" in file_info and "string_id" in file_info["list_objects"]:
             out_file_name = generate_string_ids_cpp_file(file_info["template"],
                 path.join(output_dir_base, file_info["output_dir"]),
                 file_info["name_template"],
