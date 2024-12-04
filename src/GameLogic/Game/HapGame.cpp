@@ -74,13 +74,13 @@ void HapGame::initSystems()
 	getGameLogicSystemsManager().registerSystem<CharacterStateSystem>(getWorldHolder());
 	getGameLogicSystemsManager().registerSystem<AnimationSystem>(getWorldHolder());
 
-	getNotPausablePostFrameSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
-	getNotPausablePostFrameSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getResourceManager(), getThreadPool());
-	getNotPausablePostFrameSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getResourceManager());
+	getNotPausableRenderSystemsManager().registerSystem<ResourceStreamingSystem>(getWorldHolder(), getResourceManager());
+	getNotPausableRenderSystemsManager().registerSystem<RenderSystem>(getWorldHolder(), getResourceManager(), getThreadPool());
+	getNotPausableRenderSystemsManager().registerSystem<DebugDrawSystem>(getWorldHolder(), getResourceManager());
 #ifdef IMGUI_ENABLED
 	if (HAL::Engine* engine = getEngine())
 	{
-		getNotPausablePostFrameSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, *engine);
+		getNotPausableRenderSystemsManager().registerSystem<ImguiSystem>(mImguiDebugData, *engine);
 	}
 #endif // IMGUI_ENABLED
 }

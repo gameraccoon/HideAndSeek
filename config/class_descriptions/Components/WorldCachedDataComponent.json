@@ -10,6 +10,13 @@
 			"flags": ["transient"]
 		},
 		{
+			"name": "cameraPosLastFrame",
+			"type": "Vector2D",
+			"default": " = ZERO_VECTOR",
+			"includes": ["\"EngineData/Geometry/Vector2D.h\""],
+			"flags": ["transient"]
+		},
+		{
 			"name": "cameraCellPos",
 			"type": "CellPos",
 			"default": "{0, 0}",

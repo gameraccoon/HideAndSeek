@@ -4,6 +4,7 @@
 
 #include <algorithm>
 
+#include "EngineCommon/TimeConstants.h"
 #include "EngineCommon/Types/TemplateAliases.h"
 #include "EngineCommon/Types/TemplateHelpers.h"
 
@@ -48,16 +49,19 @@ void RenderSystem::update()
 	World& world = mWorldHolder.getWorld();
 	GameData& gameData = mWorldHolder.getGameData();
 
-	const auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
-	Vector2D workingRect = worldCachedData->getScreenSize();
-	Vector2D cameraLocation = worldCachedData->getCameraPos();
-
-	static const Vector2D maxFov(500.0f, 500.0f);
+	static constexpr Vector2D maxFov(500.0f, 500.0f);
 
 	const auto [renderMode] = gameData.getGameComponents().getComponents<RenderModeComponent>();
-	const auto [time] = world.getWorldComponents().getComponents<TimeComponent>();
+	const auto [timeComponent] = world.getWorldComponents().getComponents<TimeComponent>();
+	const TimeData& time = timeComponent->getValue();
+	const GameplayTimestamp lastFixedUpdateTime = time.lastFixedUpdateTimestamp;
+	const float frameAlpha = time.frameAlpha;
 
-	Vector2D halfWindowSize = workingRect * 0.5f;
+	const auto [worldCachedData] = world.getWorldComponents().getComponents<WorldCachedDataComponent>();
+	const Vector2D workingRect = worldCachedData->getScreenSize();
+	const Vector2D cameraLocation = worldCachedData->getCameraPos() + (worldCachedData->getCameraPosLastFrame() - worldCachedData->getCameraPos()) * (1.0f - frameAlpha);
+
+	const Vector2D halfWindowSize = workingRect * 0.5f;
 
 	Vector2D drawShift = halfWindowSize - cameraLocation;
 
@@ -70,7 +74,7 @@ void RenderSystem::update()
 		return;
 	}
 
-	RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
+	const RenderAccessorGameRef renderAccessor = *renderAccessorCmp->getAccessor();
 
 	std::unique_ptr<RenderData> renderData = std::make_unique<RenderData>();
 
@@ -81,17 +85,25 @@ void RenderSystem::update()
 
 	if (!renderMode || renderMode->getIsDrawLightsEnabled())
 	{
-		const GameplayTimestamp timestampNow = time->getValue().lastFixedUpdateTimestamp;
-		drawLights(*renderData, spatialManager, cells, cameraLocation, drawShift, maxFov, halfWindowSize, timestampNow);
+		drawLights(*renderData, spatialManager, cells, cameraLocation, drawShift, maxFov, halfWindowSize, lastFixedUpdateTime);
 	}
 
 	if (!renderMode || renderMode->getIsDrawVisibleEntitiesEnabled())
 	{
 		SCOPED_PROFILER("draw visible entities");
-		spatialManager.forEachComponentSet<const SpriteRenderComponent, const TransformComponent>(
-			[&drawShift, &renderData](const SpriteRenderComponent* spriteRender, const TransformComponent* transform) {
-				Vector2D location = transform->getLocation() + drawShift;
-				float rotation = transform->getRotation().getValue();
+		spatialManager.forEachComponentSetWithEntity<const SpriteRenderComponent, const TransformComponent>(
+			[&drawShift, &renderData, frameAlpha](EntityView entityView, const SpriteRenderComponent* spriteRender, const TransformComponent* transform) {
+				Vector2D positionOffset = ZERO_VECTOR;
+				Rotator rotationOffset = Rotator(0.0f);
+				auto [movement] = entityView.getComponents<MovementComponent>();
+				if (movement)
+				{
+					positionOffset = (movement->getLastUpdatePosition() - transform->getLocation()) * (1.0f - frameAlpha);
+					rotationOffset = Rotator::GetFraction(movement->getLastUpdateRotation(), transform->getRotation(), frameAlpha);
+				}
+
+				const Vector2D location = transform->getLocation() + positionOffset + drawShift;
+				const float rotation = (transform->getRotation() + rotationOffset).getValue();
 				for (const auto& data : spriteRender->getSpriteDatas())
 				{
 					QuadRenderData& quadData = TemplateHelpers::EmplaceVariant<QuadRenderData>(renderData->layers);
@@ -109,7 +121,7 @@ void RenderSystem::update()
 	renderAccessor.submitData(std::move(renderData));
 }
 
-void RenderSystem::DrawVisibilityPolygon(RenderData& renderData, ResourceHandle lightSpriteHandle, const std::vector<Vector2D>& polygon, const Vector2D& fovSize, const Vector2D& drawShift)
+void RenderSystem::DrawVisibilityPolygon(RenderData& renderData, const ResourceHandle lightSpriteHandle, const std::vector<Vector2D>& polygon, const Vector2D& fovSize, const Vector2D& drawShift)
 {
 	if (polygon.size() > 2)
 	{
@@ -130,7 +142,7 @@ void RenderSystem::DrawVisibilityPolygon(RenderData& renderData, ResourceHandle 
 	}
 }
 
-void RenderSystem::drawBackground(RenderData& renderData, World& world, Vector2D drawShift, Vector2D windowSize)
+void RenderSystem::drawBackground(RenderData& renderData, World& world, const Vector2D drawShift, const Vector2D windowSize)
 {
 	SCOPED_PROFILER("RenderSystem::drawBackground");
 	auto [backgroundTexture] = world.getWorldComponents().getComponents<BackgroundTextureComponent>();
@@ -166,7 +178,7 @@ using LightBlockingComponents = std::vector<const LightBlockingGeometryComponent
 
 static std::vector<VisibilityPolygonCalculationResult> processVisibilityPolygonsGroup(
 	const TupleVector<LightComponent*, const TransformComponent*>& componentsToProcess,
-	Vector2D maxFov,
+	const Vector2D maxFov,
 	const LightBlockingComponents& lightBlockingComponents,
 	const GameplayTimestamp& timestamp
 )
@@ -192,7 +204,7 @@ static std::vector<VisibilityPolygonCalculationResult> processVisibilityPolygons
 	return calculationResults;
 }
 
-static size_t GetJobDivisor(size_t maxThreadsCount)
+static size_t GetJobDivisor(const size_t maxThreadsCount)
 {
 	// this algorithm is subject to change
 	// we need to divide work into chunks to pass to different threads
@@ -201,7 +213,7 @@ static size_t GetJobDivisor(size_t maxThreadsCount)
 	return maxThreadsCount * 3 - 1;
 }
 
-void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, SpatialEntityManager::RecordsVector& cells, Vector2D playerSightPosition, Vector2D drawShift, Vector2D maxFov, Vector2D screenHalfSize, const GameplayTimestamp& timestampNow)
+void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& managerGroup, SpatialEntityManager::RecordsVector& cells, const Vector2D playerSightPosition, const Vector2D drawShift, Vector2D maxFov, const Vector2D screenHalfSize, const GameplayTimestamp& timestampNow)
 {
 	SCOPED_PROFILER("RenderSystem::drawLights");
 
@@ -250,7 +262,7 @@ void RenderSystem::drawLights(RenderData& renderData, SpatialEntityManager& mana
 
 		// calculate how many threads we need
 		const size_t threadsCount = mThreadPool.getThreadsCount();
-		const size_t minimumComponentsForThread = 3;
+		constexpr size_t minimumComponentsForThread = 3;
 		const size_t componentsToRecalculate = lightComponentSets.size();
 		const size_t chunksCount = std::max(static_cast<size_t>(1), std::min(GetJobDivisor(threadsCount + 1), componentsToRecalculate / minimumComponentsForThread));
 		const size_t chunkSize = componentsToRecalculate / chunksCount;

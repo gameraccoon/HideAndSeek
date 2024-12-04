@@ -34,16 +34,24 @@
 			"flags": ["transient"]
 		},
 		{
-			"name": "previousStep",
-			"type": "Vector2D",
-			"default": " = ZERO_VECTOR",
-			"includes": ["\"EngineData/Geometry/Vector2D.h\""]
-		},
-		{
 			"name": "updateTimestamp",
 			"type": "GameplayTimestamp",
 			"default": "{0}",
 			"includes": ["\"GameData/Time/GameplayTimestamp.h\""],
+			"flags": ["transient"]
+		},
+		{
+			"name": "lastUpdatePosition",
+			"type": "Vector2D",
+			"default": " = ZERO_VECTOR",
+			"includes": ["\"EngineData/Geometry/Vector2D.h\""],
+			"flags": ["transient"]
+		},
+		{
+			"name": "lastUpdateRotation",
+			"type": "Rotator",
+			"default": " = Rotator(0.0f)",
+			"includes": ["\"EngineData/Geometry/Rotator.h\""],
 			"flags": ["transient"]
 		}
 	]

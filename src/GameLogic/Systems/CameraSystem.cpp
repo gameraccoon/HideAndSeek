@@ -59,6 +59,7 @@ void CameraSystem::update()
 
 			cameraMovement->setNextStep(cameraMove);
 
+			worldCachedData->setCameraPosLastFrame(worldCachedData->getCameraPos());
 			worldCachedData->setCameraPos(cameraNewPos);
 		}
 	}

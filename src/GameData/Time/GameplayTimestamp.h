@@ -6,6 +6,8 @@
 
 #include "EngineCommon/Types/BasicTypes.h"
 
+#include "GameData/Time/GameplayTimeDuration.h"
+
 class GameplayTimestamp
 {
 public:
@@ -13,12 +15,16 @@ public:
 
 public:
 	constexpr GameplayTimestamp() = default;
-	explicit constexpr GameplayTimestamp(TimeValueType time) noexcept
+	explicit constexpr GameplayTimestamp(const TimeValueType time) noexcept
 		: mTimestamp(time) {}
 
 	[[nodiscard]] bool isInitialized() const noexcept;
 
 	auto operator<=>(const GameplayTimestamp& other) const noexcept = default;
+
+	GameplayTimeDuration operator-(const GameplayTimestamp& other) const noexcept;
+	GameplayTimestamp operator+(const GameplayTimeDuration& duration) const noexcept;
+	GameplayTimestamp operator-(const GameplayTimeDuration& duration) const noexcept;
 
 	void increaseByUpdateCount(s32 passedUpdates) noexcept;
 	[[nodiscard]] GameplayTimestamp getIncreasedByUpdateCount(s32 passedUpdates) const noexcept;

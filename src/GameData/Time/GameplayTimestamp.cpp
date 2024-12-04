@@ -11,13 +11,28 @@ bool GameplayTimestamp::isInitialized() const noexcept
 	return mTimestamp != UNINITIALIZED_TIME;
 }
 
-void GameplayTimestamp::increaseByUpdateCount(s32 passedUpdates) noexcept
+GameplayTimeDuration GameplayTimestamp::operator-(const GameplayTimestamp& other) const noexcept
+{
+	return GameplayTimeDuration(mTimestamp - other.mTimestamp);
+}
+
+GameplayTimestamp GameplayTimestamp::operator+(const GameplayTimeDuration& duration) const noexcept
+{
+	return GameplayTimestamp(mTimestamp + duration.getFixedFramesCount());
+}
+
+GameplayTimestamp GameplayTimestamp::operator-(const GameplayTimeDuration& duration) const noexcept
+{
+	return GameplayTimestamp(mTimestamp - duration.getFixedFramesCount());
+}
+
+void GameplayTimestamp::increaseByUpdateCount(const s32 passedUpdates) noexcept
 {
 	Assert(isInitialized(), "Timestamp should be initialized before being used");
 	mTimestamp += passedUpdates * TimeMultiplier;
 }
 
-GameplayTimestamp GameplayTimestamp::getIncreasedByUpdateCount(s32 passedUpdates) const noexcept
+GameplayTimestamp GameplayTimestamp::getIncreasedByUpdateCount(const s32 passedUpdates) const noexcept
 {
 	Assert(isInitialized(), "Timestamp should be initialized before being used");
 	return GameplayTimestamp(mTimestamp + passedUpdates * TimeMultiplier);

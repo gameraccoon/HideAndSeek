@@ -11,6 +11,7 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
+class MoveInterpolationComponent;
 MovementSystem::MovementSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
@@ -21,8 +22,9 @@ void MovementSystem::update()
 	SCOPED_PROFILER("MovementSystem::update");
 	World& world = mWorldHolder.getWorld();
 
-	const auto [time] = world.getWorldComponents().getComponents<const TimeComponent>();
-	const GameplayTimestamp timestampNow = time->getValue().lastFixedUpdateTimestamp;
+	const auto [timeComponent] = world.getWorldComponents().getComponents<const TimeComponent>();
+	const TimeData& time = timeComponent->getValue();
+	const GameplayTimestamp timestampNow = time.lastFixedUpdateTimestamp;
 
 	struct CellScheduledTransfers
 	{
@@ -40,6 +42,9 @@ void MovementSystem::update()
 
 	world.getSpatialData().getAllCellManagers().forEachComponentSetWithEntityAndExtraData<MovementComponent, TransformComponent>(
 		[timestampNow, &transfers](const WorldCell& cell, EntityView entityView, MovementComponent* movement, TransformComponent* transform) {
+			movement->setLastUpdatePosition(transform->getLocation());
+			movement->setLastUpdateRotation(transform->getRotation());
+
 			if (!movement->getNextStep().isZeroLength())
 			{
 				Vector2D pos = transform->getLocation() + movement->getNextStep();

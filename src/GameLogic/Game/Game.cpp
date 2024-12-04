@@ -18,6 +18,8 @@
 #include "EngineUtils/Profiling/ProfileDataWriter.h"
 #endif // ENABLE_SCOPED_PROFILER
 
+#include "EngineCommon/TimeConstants.h"
+
 #include "EngineLogic/Render/RenderAccessor.h"
 
 #include "GameLogic/Initialization/StateMachines.h"
@@ -95,19 +97,28 @@ void Game::dynamicTimePostFrameUpdate(const float dt, const int processedFixedTi
 	mPostFrameSystemsManager.update();
 
 	mDebugBehavior.postInnerUpdate(*this);
+
+	// this additional reset is needed in case we are paused
+	mInputControllersData.resetLastFrameStates();
 }
 
-void Game::notPausablePostFrameUpdate(const float dt)
+void Game::notPausableRenderUpdate(const float frameAlpha)
 {
-	SCOPED_PROFILER("Game::notPausablePostFrameUpdate");
+	SCOPED_PROFILER("Game::notPausableRenderUpdate");
 
 	auto [time] = mWorld.getWorldComponents().getComponents<TimeComponent>();
-	time->getValueRef().lastUpdateDt = dt;
+	time->getValueRef().lastUpdateDt = frameAlpha * TimeConstants::ONE_FIXED_UPDATE_SEC;
+	time->getValueRef().frameAlpha = frameAlpha;
 
-	mNotPausablePostFrameSystemsManager.update();
+	mNotPausableRenderSystemsManager.update();
 
-	// this additional reset is needed for debug input in case we are paused
-	mInputControllersData.resetLastFrameStates();
+#ifndef DISABLE_SDL
+	// clear events used by immediate mode GUI
+	if (HAL::Engine* engine = getEngine())
+	{
+		engine->clearLastFrameEvents();
+	}
+#endif // !DISABLE_SDL
 
 	// test code
 	//mRenderThread.testRunMainThread(*mGameData.getGameComponents().getOrAddComponent<RenderAccessorComponent>()->getAccessor(), getResourceManager(), getEngine());
@@ -135,7 +146,7 @@ void Game::initResources()
 	mPreFrameSystemsManager.initResources();
 	mGameLogicSystemsManager.initResources();
 	mPostFrameSystemsManager.initResources();
-	mNotPausablePostFrameSystemsManager.initResources();
+	mNotPausableRenderSystemsManager.initResources();
 }
 
 void Game::onGameShutdown()
@@ -148,5 +159,5 @@ void Game::onGameShutdown()
 	mPreFrameSystemsManager.shutdown();
 	mGameLogicSystemsManager.shutdown();
 	mPostFrameSystemsManager.shutdown();
-	mNotPausablePostFrameSystemsManager.shutdown();
+	mNotPausableRenderSystemsManager.shutdown();
 }
