@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "GameData/Input/ControllerState.h"
+#include "EngineData/Input/ControllerState.h"
 
 namespace ControllerStateTestsInternal
 {

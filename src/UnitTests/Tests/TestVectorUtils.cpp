@@ -1,5 +1,7 @@
 #include "EngineCommon/precomp.h"
 
+#include <algorithm>
+
 #include <gtest/gtest.h>
 
 #include "EngineCommon/Types/ComplexTypes/VectorUtils.h"

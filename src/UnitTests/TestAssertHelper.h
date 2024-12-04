@@ -44,7 +44,9 @@ public:
 		AssertFatal(!IsGuardLocked.load(std::memory_order_relaxed), "DisableAssertGuard can't be created more than once at the same time");
 		IsGuardLocked.store(true, std::memory_order_relaxed);
 		DisableFailOnAssert();
-		gGlobalAssertHandler = []() { AssertsTriggeredCount.fetch_add(1, std::memory_order_relaxed); };
+		gGlobalAssertHandler = []() {
+			AssertsTriggeredCount.fetch_add(1, std::memory_order_relaxed);
+		};
 	}
 
 	~DisableAssertGuard()

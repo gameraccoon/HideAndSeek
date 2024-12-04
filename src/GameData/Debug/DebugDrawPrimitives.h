@@ -2,7 +2,7 @@
 
 #include "EngineData/Geometry/Vector2D.h"
 
-#include "GameData/Time/GameplayTimestamp.h"
+#include "EngineData/Time/GameplayTimestamp.h"
 
 struct DebugDrawPrimitive
 {

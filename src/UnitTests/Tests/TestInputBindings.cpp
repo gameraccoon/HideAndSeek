@@ -2,6 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include "EngineData/Input/InputBindingTypes.h"
+#include "EngineData/Input/PlayerControllerStates.h"
+
 #include "GameData/Input/InputBindings.h"
 
 TEST(InputBindings, PressSingleButtonKeyBinding_NotPressed)
@@ -27,7 +30,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_PressKey)
 
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustActivated);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::Active, GameplayInput::KeyState::JustActivated));
 }
 
 TEST(InputBindings, PressSingleButtonKeyBinding_KeepPressing)
@@ -50,7 +53,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_KeepPressing)
 	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::Active);
 }
 
-TEST(InputBindings, PressSingleButtonKeyBinding_PressAndRelease)
+TEST(InputBindings, PressSingleButtonKeyBinding_PressThenRelease)
 {
 	using namespace Input;
 
@@ -65,7 +68,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_PressAndRelease)
 	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustDeactivated);
 }
 
-TEST(InputBindings, PressSingleButtonKeyBinding_PressAndReleaseAndKeepReleasing)
+TEST(InputBindings, PressSingleButtonKeyBinding_PressThenReleaseThenKeepReleasing)
 {
 	using namespace Input;
 
@@ -99,7 +102,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_PressAndReleaseSameFrame)
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, false);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustDeactivated);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::JustActivated, GameplayInput::KeyState::JustDeactivated));
 }
 
 TEST(InputBindings, PressSingleButtonKeyBinding_ReleaseAndPressSameFrame)
@@ -115,7 +118,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_ReleaseAndPressSameFrame)
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, false);
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustActivated);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::Active, GameplayInput::KeyState::JustDeactivated, GameplayInput::KeyState::JustActivated));
 }
 
 TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_OnePressed)
@@ -130,7 +133,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_OnePressed)
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, false);
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(1, true);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustActivated);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::Active, GameplayInput::KeyState::JustActivated));
 }
 
 TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_BothPressed)
@@ -145,10 +148,10 @@ TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_BothPressed)
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(1, true);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustActivated);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::Active, GameplayInput::KeyState::JustActivated));
 }
 
-TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_BothPressedOneReleased)
+TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_BothPressedThenOneReleased)
 {
 	using namespace Input;
 
@@ -186,7 +189,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_OnePressedThenAnother)
 	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::Active);
 }
 
-TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_BothPressedBothReleased)
+TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_BothPressedThenBothReleased)
 {
 	using namespace Input;
 
@@ -205,7 +208,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_BothPressedBothReleased
 	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustDeactivated);
 }
 
-TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_OnePressedWhenOtherReleased)
+TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_OnePressedThenReleasedWithOtherPressed)
 {
 	using namespace Input;
 
@@ -221,7 +224,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_TwoBinds_OnePressedWhenOtherRele
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, false);
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(1, true);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::Active);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::Active, GameplayInput::KeyState::JustActivated, GameplayInput::KeyState::JustDeactivated));
 }
 
 TEST(InputBindings, PressButtonChordKeyBinding_OneKeyFromTwoIsPressed)
@@ -249,10 +252,10 @@ TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressed)
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(1, true);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustActivated);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::Active, GameplayInput::KeyState::JustActivated));
 }
 
-TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressedAndOneReleased)
+TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressedThenOneReleased)
 {
 	using namespace Input;
 
@@ -269,7 +272,7 @@ TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressedAndOneReleased)
 	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustDeactivated);
 }
 
-TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressedOneReleasedAndPressedAgain)
+TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressedThenOneReleasedThenPressedAgain)
 {
 	using namespace Input;
 
@@ -286,10 +289,10 @@ TEST(InputBindings, PressButtonChordKeyBinding_AllKeysPressedOneReleasedAndPress
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(0, true);
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(1, true);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustActivated);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::Active, GameplayInput::KeyState::JustActivated));
 }
 
-TEST(InputBindings, PressButtonChordKeyBinding_AllExceptOnePressedThenLastPressedButAlsoOneReleased)
+TEST(InputBindings, PressButtonChordKeyBinding_AllExceptOnePressedThenLastPressedWithOtherReleased)
 {
 	using namespace Input;
 
@@ -307,7 +310,7 @@ TEST(InputBindings, PressButtonChordKeyBinding_AllExceptOnePressedThenLastPresse
 }
 
 // some platforms can emulate button clicks by sending press and release events at the same time
-TEST(InputBindings, PressSingleButtonKeyBinding_AllExceptOnePressedThenPressAndReleaseLastButtonSameFrame)
+TEST(InputBindings, PressButtonChordKeyBinding_AllExceptOnePressedThenPressAndReleaseLastButtonSameFrame)
 {
 	using namespace Input;
 
@@ -322,10 +325,10 @@ TEST(InputBindings, PressSingleButtonKeyBinding_AllExceptOnePressedThenPressAndR
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(1, true);
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(1, false);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustDeactivated);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::JustActivated, GameplayInput::KeyState::JustDeactivated));
 }
 
-TEST(InputBindings, PressSingleButtonKeyBinding_AllPressedThenReleaseAndPressOneButtonSameFrame)
+TEST(InputBindings, PressButtonChordKeyBinding_AllPressedThenReleaseAndPressOneButtonSameFrame)
 {
 	using namespace Input;
 
@@ -340,7 +343,7 @@ TEST(InputBindings, PressSingleButtonKeyBinding_AllPressedThenReleaseAndPressOne
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(1, false);
 	controllerState.getState(ControllerType::Gamepad).updateButtonState(1, true);
 
-	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::KeyState::JustActivated);
+	EXPECT_EQ(InputBindings::GetKeyState(bindings.keyBindings[GameplayInput::InputKey::Shoot], controllerState), GameplayInput::MergeKeyStates(GameplayInput::KeyState::Active, GameplayInput::KeyState::JustActivated, GameplayInput::KeyState::JustDeactivated));
 }
 
 TEST(InputBindings, PositiveButtonAxisBinding_NotPressed)

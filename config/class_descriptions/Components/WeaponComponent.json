@@ -22,7 +22,7 @@
 			"name": "shotFinishTimestamp",
 			"type": "GameplayTimestamp",
 			"default": "{0}",
-			"includes": ["\"GameData/Time/GameplayTimestamp.h\""],
+			"includes": ["\"EngineData/Time/GameplayTimestamp.h\""],
 			"flags": ["transient"]
 		}
 	]

@@ -5,6 +5,8 @@
 #include <SDL_mouse.h>
 #include <SDL_scancode.h>
 
+#include "EngineData/Input/InputBindingTypes.h"
+
 #include "GameData/Components/GameplayInputComponent.generated.h"
 #include "GameData/Components/ImguiComponent.generated.h"
 #include "GameData/Components/TimeComponent.generated.h"

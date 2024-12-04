@@ -2,19 +2,13 @@
 
 #include <array>
 
+#include "EngineData/Input/GameplayInputKeyState.h"
+#include "EngineData/Time/GameplayTimestamp.h"
+
 #include "GameData/Input/GameplayInputConstants.h"
-#include "GameData/Time/GameplayTimestamp.h"
 
 namespace GameplayInput
 {
-	enum class KeyState
-	{
-		Inactive = 0,
-		JustActivated = 1,
-		Active = 2,
-		JustDeactivated = 3,
-	};
-
 	class FrameState
 	{
 	public:

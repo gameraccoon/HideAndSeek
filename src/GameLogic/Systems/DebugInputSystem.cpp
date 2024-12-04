@@ -6,10 +6,11 @@
 
 #include <SDL_scancode.h>
 
+#include "EngineData/Input/ControllerState.h"
+
 #include "GameData/Components/ImguiComponent.generated.h"
 #include "GameData/Components/RenderModeComponent.generated.h"
 #include "GameData/GameData.h"
-#include "GameData/Input/ControllerState.h"
 
 #include "HAL/InputControllersData.h"
 
