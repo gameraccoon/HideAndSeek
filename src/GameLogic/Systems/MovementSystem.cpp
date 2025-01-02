@@ -11,7 +11,6 @@
 
 #include "GameLogic/SharedManagers/WorldHolder.h"
 
-class MoveInterpolationComponent;
 MovementSystem::MovementSystem(WorldHolder& worldHolder) noexcept
 	: mWorldHolder(worldHolder)
 {
